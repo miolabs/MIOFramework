@@ -7,119 +7,146 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		14767BDF1F8F70F500FD17CF /* MIOFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 14767BDD1F8F70F500FD17CF /* MIOFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		14767BE61F8F71B900FD17CF /* MIOObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14767BE51F8F71B900FD17CF /* MIOObject.swift */; };
+		14767BF91F8F8D0A00FD17CF /* MIOUserInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 14767BF71F8F8D0A00FD17CF /* MIOUserInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		14767BFE1F8F8D2200FD17CF /* MUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14767BFD1F8F8D2200FD17CF /* MUIView.swift */; };
+		14767C001F8F8D2D00FD17CF /* MUIWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14767BFF1F8F8D2D00FD17CF /* MUIWindow.swift */; };
+		14767C021F8F8D7C00FD17CF /* MIOFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14767C031F8F8D7C00FD17CF /* MIOFoundation.framework */; };
+		14767C071F8F921C00FD17CF /* MUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14767C061F8F921C00FD17CF /* MUIViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		14767BDB1F8F70F500FD17CF /* MIOFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MIOFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		14767BDD1F8F70F500FD17CF /* MIOFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MIOFoundation.h; sourceTree = "<group>"; };
-		14767BDE1F8F70F500FD17CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		14767BE51F8F71B900FD17CF /* MIOObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIOObject.swift; sourceTree = "<group>"; };
+		14767BF41F8F8D0A00FD17CF /* MIOUserInterface.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MIOUserInterface.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		14767BF71F8F8D0A00FD17CF /* MIOUserInterface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MIOUserInterface.h; sourceTree = "<group>"; };
+		14767BF81F8F8D0A00FD17CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		14767BFD1F8F8D2200FD17CF /* MUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MUIView.swift; sourceTree = "<group>"; };
+		14767BFF1F8F8D2D00FD17CF /* MUIWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MUIWindow.swift; sourceTree = "<group>"; };
+		14767C031F8F8D7C00FD17CF /* MIOFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MIOFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		14767C061F8F921C00FD17CF /* MUIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MUIViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		14767BD71F8F70F500FD17CF /* Frameworks */ = {
+		14767BF01F8F8D0A00FD17CF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14767C021F8F8D7C00FD17CF /* MIOFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		14767B421F8F543200FD17CF = {
+		14767BE71F8F8CF100FD17CF = {
 			isa = PBXGroup;
 			children = (
-				14767B491F8F544E00FD17CF /* source */,
-				14767BDB1F8F70F500FD17CF /* MIOFoundation.framework */,
-				14767BDC1F8F70F500FD17CF /* MIOFoundation */,
+				14767BEE1F8F8CF600FD17CF /* source */,
+				14767BF61F8F8D0A00FD17CF /* MIOUserInterface */,
+				14767BF51F8F8D0A00FD17CF /* Products */,
+				14767C011F8F8D7C00FD17CF /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
-		14767B491F8F544E00FD17CF /* source */ = {
+		14767BEE1F8F8CF600FD17CF /* source */ = {
 			isa = PBXGroup;
 			children = (
-				14767BE51F8F71B900FD17CF /* MIOObject.swift */,
+				14767BFD1F8F8D2200FD17CF /* MUIView.swift */,
+				14767BFF1F8F8D2D00FD17CF /* MUIWindow.swift */,
+				14767C061F8F921C00FD17CF /* MUIViewController.swift */,
 			);
 			path = source;
 			sourceTree = "<group>";
 		};
-		14767BDC1F8F70F500FD17CF /* MIOFoundation */ = {
+		14767BF51F8F8D0A00FD17CF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				14767BDD1F8F70F500FD17CF /* MIOFoundation.h */,
-				14767BDE1F8F70F500FD17CF /* Info.plist */,
+				14767BF41F8F8D0A00FD17CF /* MIOUserInterface.framework */,
 			);
-			path = MIOFoundation;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		14767BF61F8F8D0A00FD17CF /* MIOUserInterface */ = {
+			isa = PBXGroup;
+			children = (
+				14767BF71F8F8D0A00FD17CF /* MIOUserInterface.h */,
+				14767BF81F8F8D0A00FD17CF /* Info.plist */,
+			);
+			path = MIOUserInterface;
+			sourceTree = "<group>";
+		};
+		14767C011F8F8D7C00FD17CF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				14767C031F8F8D7C00FD17CF /* MIOFoundation.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		14767BD81F8F70F500FD17CF /* Headers */ = {
+		14767BF11F8F8D0A00FD17CF /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14767BDF1F8F70F500FD17CF /* MIOFoundation.h in Headers */,
+				14767BF91F8F8D0A00FD17CF /* MIOUserInterface.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		14767BDA1F8F70F500FD17CF /* MIOFoundation */ = {
+		14767BF31F8F8D0A00FD17CF /* MIOUserInterface */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 14767BE01F8F70F500FD17CF /* Build configuration list for PBXNativeTarget "MIOFoundation" */;
+			buildConfigurationList = 14767BFA1F8F8D0A00FD17CF /* Build configuration list for PBXNativeTarget "MIOUserInterface" */;
 			buildPhases = (
-				14767BD61F8F70F500FD17CF /* Sources */,
-				14767BD71F8F70F500FD17CF /* Frameworks */,
-				14767BD81F8F70F500FD17CF /* Headers */,
-				14767BD91F8F70F500FD17CF /* Resources */,
+				14767BEF1F8F8D0A00FD17CF /* Sources */,
+				14767BF01F8F8D0A00FD17CF /* Frameworks */,
+				14767BF11F8F8D0A00FD17CF /* Headers */,
+				14767BF21F8F8D0A00FD17CF /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = MIOFoundation;
-			productName = MIOFoundation;
-			productReference = 14767BDB1F8F70F500FD17CF /* MIOFoundation.framework */;
+			name = MIOUserInterface;
+			productName = MIOUserInterface;
+			productReference = 14767BF41F8F8D0A00FD17CF /* MIOUserInterface.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		14767B431F8F543200FD17CF /* Project object */ = {
+		14767BE81F8F8CF100FD17CF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0900;
 				TargetAttributes = {
-					14767BDA1F8F70F500FD17CF = {
+					14767BF31F8F8D0A00FD17CF = {
 						CreatedOnToolsVersion = 9.0;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = 14767B461F8F543200FD17CF /* Build configuration list for PBXProject "MIOFoundation" */;
+			buildConfigurationList = 14767BEB1F8F8CF100FD17CF /* Build configuration list for PBXProject "MIOUserInterface" */;
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 14767B421F8F543200FD17CF;
-			productRefGroup = 14767B421F8F543200FD17CF;
+			mainGroup = 14767BE71F8F8CF100FD17CF;
+			productRefGroup = 14767BF51F8F8D0A00FD17CF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				14767BDA1F8F70F500FD17CF /* MIOFoundation */,
+				14767BF31F8F8D0A00FD17CF /* MIOUserInterface */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		14767BD91F8F70F500FD17CF /* Resources */ = {
+		14767BF21F8F8D0A00FD17CF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -129,30 +156,32 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		14767BD61F8F70F500FD17CF /* Sources */ = {
+		14767BEF1F8F8D0A00FD17CF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14767BE61F8F71B900FD17CF /* MIOObject.swift in Sources */,
+				14767BFE1F8F8D2200FD17CF /* MUIView.swift in Sources */,
+				14767C071F8F921C00FD17CF /* MUIViewController.swift in Sources */,
+				14767C001F8F8D2D00FD17CF /* MUIWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		14767B471F8F543200FD17CF /* Debug */ = {
+		14767BEC1F8F8CF100FD17CF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
 			name = Debug;
 		};
-		14767B481F8F543200FD17CF /* Release */ = {
+		14767BED1F8F8CF100FD17CF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
 			name = Release;
 		};
-		14767BE11F8F70F500FD17CF /* Debug */ = {
+		14767BFB1F8F8D0A00FD17CF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -209,13 +238,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = MIOFoundation/Info.plist;
+				INFOPLIST_FILE = MIOUserInterface/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.miolabs.MIOFoundation;
+				PRODUCT_BUNDLE_IDENTIFIER = com.miolabs.MIOUserInterface;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -227,7 +256,7 @@
 			};
 			name = Debug;
 		};
-		14767BE21F8F70F500FD17CF /* Release */ = {
+		14767BFC1F8F8D0A00FD17CF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -278,12 +307,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = MIOFoundation/Info.plist;
+				INFOPLIST_FILE = MIOUserInterface/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.miolabs.MIOFoundation;
+				PRODUCT_BUNDLE_IDENTIFIER = com.miolabs.MIOUserInterface;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -297,25 +326,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		14767B461F8F543200FD17CF /* Build configuration list for PBXProject "MIOFoundation" */ = {
+		14767BEB1F8F8CF100FD17CF /* Build configuration list for PBXProject "MIOUserInterface" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				14767B471F8F543200FD17CF /* Debug */,
-				14767B481F8F543200FD17CF /* Release */,
+				14767BEC1F8F8CF100FD17CF /* Debug */,
+				14767BED1F8F8CF100FD17CF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		14767BE01F8F70F500FD17CF /* Build configuration list for PBXNativeTarget "MIOFoundation" */ = {
+		14767BFA1F8F8D0A00FD17CF /* Build configuration list for PBXNativeTarget "MIOUserInterface" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				14767BE11F8F70F500FD17CF /* Debug */,
-				14767BE21F8F70F500FD17CF /* Release */,
+				14767BFB1F8F8D0A00FD17CF /* Debug */,
+				14767BFC1F8F8D0A00FD17CF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 14767B431F8F543200FD17CF /* Project object */;
+	rootObject = 14767BE81F8F8CF100FD17CF /* Project object */;
 }

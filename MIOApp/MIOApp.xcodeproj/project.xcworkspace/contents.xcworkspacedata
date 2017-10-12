@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:../../MIOFoundation/MIOFoundation.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:../../MIOCore/MIOCore.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "self:MIOApp.xcodeproj">
    </FileRef>
 </Workspace>
