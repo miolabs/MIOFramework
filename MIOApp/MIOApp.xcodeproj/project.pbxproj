@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1404372A1F93B0E40025E833 /* MIOApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140437291F93B0E40025E833 /* MIOApp.swift */; };
 		14767BCD1F8F700A00FD17CF /* MIOApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 14767BCB1F8F700A00FD17CF /* MIOApp.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		14767BD41F8F708700FD17CF /* MIOApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14767B381F8F528400FD17CF /* MIOApp.swift */; };
 		14767BE41F8F712200FD17CF /* MIOFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14767BD31F8F701900FD17CF /* MIOFoundation.framework */; };
 		14767C041F8F8F7C00FD17CF /* MIOUserInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14767C051F8F8F7C00FD17CF /* MIOUserInterface.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		14767B381F8F528400FD17CF /* MIOApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIOApp.swift; sourceTree = "<group>"; };
+		140437291F93B0E40025E833 /* MIOApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MIOApp.swift; sourceTree = "<group>"; };
 		14767BC91F8F700A00FD17CF /* MIOApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MIOApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		14767BCB1F8F700A00FD17CF /* MIOApp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MIOApp.h; sourceTree = "<group>"; };
 		14767BCC1F8F700A00FD17CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -35,22 +35,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		140437281F93B0E40025E833 /* sources */ = {
+			isa = PBXGroup;
+			children = (
+				140437291F93B0E40025E833 /* MIOApp.swift */,
+			);
+			path = sources;
+			sourceTree = "<group>";
+		};
 		14767B301F8F526300FD17CF = {
 			isa = PBXGroup;
 			children = (
-				14767B371F8F526E00FD17CF /* source */,
+				140437281F93B0E40025E833 /* sources */,
 				14767BC91F8F700A00FD17CF /* MIOApp.framework */,
 				14767BCA1F8F700A00FD17CF /* MIOApp */,
 				14767BD11F8F701900FD17CF /* Frameworks */,
 			);
-			sourceTree = "<group>";
-		};
-		14767B371F8F526E00FD17CF /* source */ = {
-			isa = PBXGroup;
-			children = (
-				14767B381F8F528400FD17CF /* MIOApp.swift */,
-			);
-			path = source;
 			sourceTree = "<group>";
 		};
 		14767BCA1F8F700A00FD17CF /* MIOApp */ = {
@@ -149,7 +149,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14767BD41F8F708700FD17CF /* MIOApp.swift in Sources */,
+				1404372A1F93B0E40025E833 /* MIOApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

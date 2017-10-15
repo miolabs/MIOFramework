@@ -7,21 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		140437251F93B0D70025E833 /* MUIWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140437221F93B0D70025E833 /* MUIWindow.swift */; };
+		140437261F93B0D70025E833 /* MUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140437231F93B0D70025E833 /* MUIViewController.swift */; };
+		140437271F93B0D70025E833 /* MUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140437241F93B0D70025E833 /* MUIView.swift */; };
 		14767BF91F8F8D0A00FD17CF /* MIOUserInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 14767BF71F8F8D0A00FD17CF /* MIOUserInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		14767BFE1F8F8D2200FD17CF /* MUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14767BFD1F8F8D2200FD17CF /* MUIView.swift */; };
-		14767C001F8F8D2D00FD17CF /* MUIWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14767BFF1F8F8D2D00FD17CF /* MUIWindow.swift */; };
 		14767C021F8F8D7C00FD17CF /* MIOFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14767C031F8F8D7C00FD17CF /* MIOFoundation.framework */; };
-		14767C071F8F921C00FD17CF /* MUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14767C061F8F921C00FD17CF /* MUIViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		140437221F93B0D70025E833 /* MUIWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MUIWindow.swift; sourceTree = "<group>"; };
+		140437231F93B0D70025E833 /* MUIViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MUIViewController.swift; sourceTree = "<group>"; };
+		140437241F93B0D70025E833 /* MUIView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MUIView.swift; sourceTree = "<group>"; };
 		14767BF41F8F8D0A00FD17CF /* MIOUserInterface.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MIOUserInterface.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		14767BF71F8F8D0A00FD17CF /* MIOUserInterface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MIOUserInterface.h; sourceTree = "<group>"; };
 		14767BF81F8F8D0A00FD17CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		14767BFD1F8F8D2200FD17CF /* MUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MUIView.swift; sourceTree = "<group>"; };
-		14767BFF1F8F8D2D00FD17CF /* MUIWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MUIWindow.swift; sourceTree = "<group>"; };
 		14767C031F8F8D7C00FD17CF /* MIOFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MIOFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		14767C061F8F921C00FD17CF /* MUIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MUIViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,24 +36,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		140437211F93B0D70025E833 /* sources */ = {
+			isa = PBXGroup;
+			children = (
+				140437221F93B0D70025E833 /* MUIWindow.swift */,
+				140437231F93B0D70025E833 /* MUIViewController.swift */,
+				140437241F93B0D70025E833 /* MUIView.swift */,
+			);
+			path = sources;
+			sourceTree = "<group>";
+		};
 		14767BE71F8F8CF100FD17CF = {
 			isa = PBXGroup;
 			children = (
-				14767BEE1F8F8CF600FD17CF /* source */,
+				140437211F93B0D70025E833 /* sources */,
 				14767BF61F8F8D0A00FD17CF /* MIOUserInterface */,
 				14767BF51F8F8D0A00FD17CF /* Products */,
 				14767C011F8F8D7C00FD17CF /* Frameworks */,
 			);
-			sourceTree = "<group>";
-		};
-		14767BEE1F8F8CF600FD17CF /* source */ = {
-			isa = PBXGroup;
-			children = (
-				14767BFD1F8F8D2200FD17CF /* MUIView.swift */,
-				14767BFF1F8F8D2D00FD17CF /* MUIWindow.swift */,
-				14767C061F8F921C00FD17CF /* MUIViewController.swift */,
-			);
-			path = source;
 			sourceTree = "<group>";
 		};
 		14767BF51F8F8D0A00FD17CF /* Products */ = {
@@ -160,9 +160,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14767BFE1F8F8D2200FD17CF /* MUIView.swift in Sources */,
-				14767C071F8F921C00FD17CF /* MUIViewController.swift in Sources */,
-				14767C001F8F8D2D00FD17CF /* MUIWindow.swift in Sources */,
+				140437261F93B0D70025E833 /* MUIViewController.swift in Sources */,
+				140437271F93B0D70025E833 /* MUIView.swift in Sources */,
+				140437251F93B0D70025E833 /* MUIWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

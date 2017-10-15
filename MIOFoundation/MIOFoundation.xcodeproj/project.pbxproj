@@ -7,15 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		140437201F93A75C0025E833 /* MIOObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1404371F1F93A75C0025E833 /* MIOObject.swift */; };
 		14767BDF1F8F70F500FD17CF /* MIOFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 14767BDD1F8F70F500FD17CF /* MIOFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		14767BE61F8F71B900FD17CF /* MIOObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14767BE51F8F71B900FD17CF /* MIOObject.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1404371F1F93A75C0025E833 /* MIOObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MIOObject.swift; sourceTree = "<group>"; };
 		14767BDB1F8F70F500FD17CF /* MIOFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MIOFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		14767BDD1F8F70F500FD17CF /* MIOFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MIOFoundation.h; sourceTree = "<group>"; };
 		14767BDE1F8F70F500FD17CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		14767BE51F8F71B900FD17CF /* MIOObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIOObject.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,21 +29,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1404371E1F93A75C0025E833 /* sources */ = {
+			isa = PBXGroup;
+			children = (
+				1404371F1F93A75C0025E833 /* MIOObject.swift */,
+			);
+			path = sources;
+			sourceTree = "<group>";
+		};
 		14767B421F8F543200FD17CF = {
 			isa = PBXGroup;
 			children = (
-				14767B491F8F544E00FD17CF /* source */,
+				1404371E1F93A75C0025E833 /* sources */,
 				14767BDB1F8F70F500FD17CF /* MIOFoundation.framework */,
 				14767BDC1F8F70F500FD17CF /* MIOFoundation */,
 			);
-			sourceTree = "<group>";
-		};
-		14767B491F8F544E00FD17CF /* source */ = {
-			isa = PBXGroup;
-			children = (
-				14767BE51F8F71B900FD17CF /* MIOObject.swift */,
-			);
-			path = source;
 			sourceTree = "<group>";
 		};
 		14767BDC1F8F70F500FD17CF /* MIOFoundation */ = {
@@ -97,6 +97,7 @@
 				TargetAttributes = {
 					14767BDA1F8F70F500FD17CF = {
 						CreatedOnToolsVersion = 9.0;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -133,7 +134,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14767BE61F8F71B900FD17CF /* MIOObject.swift in Sources */,
+				140437201F93A75C0025E833 /* MIOObject.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

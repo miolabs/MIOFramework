@@ -43,9 +43,6 @@ class MIOApp: MIOObject {
             self.mainWindow!.rootViewController!.viewDidAppear(animated: false);
         
             self.isMainWindowReady = true;
-        
-//            MIOCoreEventRegisterObserverForType(MIOCoreEventType.Click, this, this._clickEvent);
-//            MIOCoreEventRegisterObserverForType(MIOCoreEventType.Resize, this, this._resizeEvent);
         };
     }
     
