@@ -1,2 +1,8 @@
 # miojs-cli
-MIOJS Command line interface tool
+
+This is a cli tool to generate projects for [MIOJSLibs](https://github.com/miolabs/MIOJSLibs).
+
+## Usage
+
+    npm install miojs -g
+    miojs -h

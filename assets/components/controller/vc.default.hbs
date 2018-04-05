@@ -1,0 +1,14 @@
+/// <reference path="../../libs/MIOUI/MIOUI.ts" />
+
+class {{name}} extends MUIViewController
+{
+    private _{{vcName}} = null;
+
+    viewDidLoad()
+    {
+        super.viewDidLoad();
+
+        this._{{vcName}} = new MUIViewController("{{containerId}}");
+        this._{{vcName}}.initWithResource("{{viewPath}}");
+    }
+}
