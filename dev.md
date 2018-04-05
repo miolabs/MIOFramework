@@ -1,5 +1,16 @@
 # Development
 
+## Getting started
+
+Install the dependencies of the project, and start development.
+
+```bash
+npm install
+npm start
+```
+
+## Make it available in terminal
+
 You can link your repository as if it was installed globally, with [npm-link](https://docs.npmjs.com/cli/link)
 
     npm link
