@@ -3,7 +3,7 @@ import chalk from 'chalk';
 
 export function ErrorMessage(command, message) {
     command.outputHelp()
-    console.log(`  ` + chalk.red(message))
+    console.log(`  ${chalk.red(message)}`)
     console.log()
     process.exit(1)
 }

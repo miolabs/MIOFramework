@@ -3,7 +3,7 @@ import {
     camelToSnake,
     capitalizeFirstLetter,
     uncapitalizeFirstLetter
-} from '../utils/stringutils';
+} from './stringutils';
 
 export const assets = {
     compVcDefault: {path: 'components/controller/vc.default.hbs', variableNames: ["name", "vcName", "containerId", "viewPath"]},

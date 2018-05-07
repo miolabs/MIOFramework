@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import Handlebars from 'handlebars';
-import { ITemplateData } from './interfaces/ITemplateData';
-import {config} from '../blocks/ProjectHandler';
+import { ITemplateData } from '../../interfaces/ITemplateData';
+import {config} from '../../utils/ProjectHandler';
 
 function getAsset(assetPath:string){
     return path.resolve(__dirname, '..', config.assetsFolder, assetPath);

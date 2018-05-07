@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { IAssetData } from './interfaces/IAssetData';
-import {config} from '../blocks/ProjectHandler';
+import { IAssetData } from '../../interfaces/IAssetData';
+import {config} from '../../utils/ProjectHandler';
 
 function getAsset(assetPath:string){
     return path.resolve(__dirname, '..', config.assetsFolder, assetPath);
@@ -22,7 +22,7 @@ export class FolderHandler {
         return new Promise((resolve, reject) => {
             fs.copy(this.templateFolderPath, this.resultFolderName)
                 .then(() => {
-                    console.log(`Projectt initialized in ${this.resultFolderName}`)
+                    console.log(`Project initialized in ${this.resultFolderName}`)
                     return resolve(true);
                 })
                 .catch(err => {

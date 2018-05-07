@@ -1,7 +1,11 @@
+/**
+ * This command is responsible for creating new components from templated blueprints.
+ */
+
 import chalk from 'chalk';
 import * as program from 'commander';
-import { ErrorMessage } from '../utils/error';
-import { component, View, ViewController, Controller } from './components/component';
+import { ErrorMessage } from '../../utils/error';
+import { component, View, ViewController, Controller } from './component';
 export function New(cmd, type, name) {
     switch(type){
         case "v":
