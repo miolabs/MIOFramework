@@ -56,13 +56,13 @@ miojs -h
 * src
   * index.ts
   * commands
-    * init.ts
     * build.ts
-    * pack.ts
-    * test.ts
     * create.ts
-    * serve.ts
+    * init.ts
     * lint.ts
+    * pack.ts
+    * serve.ts
+    * test.ts
   * webpack.config.js
   * tsconfig.json
   * index.js

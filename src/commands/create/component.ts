@@ -1,34 +1,35 @@
-import { cleanArgs } from '../../utils/arguments';
-import { ProjectHandler as pth, assets } from '../../blocks/ProjectHandler';
-import { TemplateHandler } from '../../blocks/TemplateHandler';
-import { StyleTemplate } from '../../blocks/templates/StyleTemplate';
-import { ViewTemplate } from '../../blocks/templates/ViewTemplate';
-import { ControllerTemplate } from '../../blocks/templates/ControllerTemplate';
+import { cleanArgs } from "../../utils/arguments";
+import { assets } from "../../utils/ProjectHandler";
+import { TemplateHandler } from "./TemplateHandler";
+import { ControllerTemplate } from "./templates/ControllerTemplate";
+import { StyleTemplate } from "./templates/StyleTemplate";
+import { ViewTemplate } from "./templates/ViewTemplate";
 
-export function View(cmd, name){
+export function View(cmd, name) {
     const params = cleanArgs(cmd);
     const needStyle = !params.noStyle;
     return component(params, name, false, true, needStyle);
 }
-export function ViewController(cmd, name){
+export function ViewController(cmd, name) {
     const params = cleanArgs(cmd);
     const needStyle = !params.noStyle;
     return component(params, name, true, true, needStyle);
 }
-export function Controller(cmd, name){
+export function Controller(cmd, name) {
     const params = cleanArgs(cmd);
     const needStyle = !params.noStyle;
     const needTemplate = params.needTemplate;
     return component(params, name, true, needTemplate, needStyle);
 }
 
-export function component(params, name: string, needController:boolean=false, needView:boolean=false, needStyle:boolean=false) {
-    let promises = [];
+export function component(
+    params, name: string, needController: boolean= false, needView: boolean= false, needStyle: boolean= false) {
+    const promises = [];
     let style = null;
     let view = null;
 
-    if (needStyle){
-        if(params.scss){
+    if (needStyle) {
+        if (params.scss) {
             style = new StyleTemplate(name, assets.viewScssDefault);
         } else {
             style = new StyleTemplate(name, assets.viewCssDefault);
@@ -36,8 +37,8 @@ export function component(params, name: string, needController:boolean=false, ne
         const css = new TemplateHandler(style.getBuildInfo());
         promises.push(css.build());
     }
-    if(needView){
-        if (params.noCustomStyle){
+    if (needView) {
+        if (params.noCustomStyle) {
             view = new ViewTemplate(name, assets.viewHtmlNoCustomStyle, style);
         } else {
             view = new ViewTemplate(name, assets.viewHtmlDefault, style);
@@ -45,12 +46,12 @@ export function component(params, name: string, needController:boolean=false, ne
         const html = new TemplateHandler(view.getBuildInfo());
         promises.push(html.build());
     }
-    if(needController){
+    if (needController) {
         let ts = null;
-        if(!needView && params.initEmptyResource){
-            ts = new ControllerTemplate(name, assets.compVCEmptyRes)
-        } else if(!needView && params.initEmpty){
-            ts = new ControllerTemplate(name, assets.compVCEmpty)
+        if (!needView && params.initEmptyResource) {
+            ts = new ControllerTemplate(name, assets.compVCEmptyRes);
+        } else if (!needView && params.initEmpty) {
+            ts = new ControllerTemplate(name, assets.compVCEmpty);
         } else {
             ts = new ControllerTemplate(name, assets.compVcDefault, view);
         }

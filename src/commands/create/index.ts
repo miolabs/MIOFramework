@@ -2,34 +2,23 @@
  * This command is responsible for creating new components from templated blueprints.
  */
 
-import chalk from 'chalk';
-import * as program from 'commander';
-import { ErrorMessage } from '../../utils/error';
-import { component, View, ViewController, Controller } from './component';
+import chalk from "chalk";
+import { ErrorMessage } from "../../utils/error";
+import { Controller, View, ViewController } from "./component";
+
 export function New(cmd, type, name) {
-    switch(type){
-        case "v":
+    switch (type) {
         case "view":
           View(cmd, name);
           break;
-        case "c":
-        case "ctr":
-        case "ctrl":
         case "controller":
-          Controller(cmd, name)
+          Controller(cmd, name);
           break;
-        case "vc":
-        case "vctr":
-        case "vctrl":
-        case "viewc":
-        case "viewctr":
-        case "viewctrl":
-        case "viewcontrol":
         case "viewcontroller":
           ViewController(cmd, name);
           break;
         default:
-          ErrorMessage(cmd, `Unknown type ${chalk.yellow(type)}.`)
+          ErrorMessage(cmd, `Unknown type ${chalk.yellow(type)}.`);
           break;
       }
 }
