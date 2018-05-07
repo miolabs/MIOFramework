@@ -1,4 +1,4 @@
 export interface IAssetData {
-    path:string,
-    variableNames:string[]
+    path: string;
+    variableNames: string[];
 }

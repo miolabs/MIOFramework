@@ -11,10 +11,10 @@ export function camelToSnake(name: string) {
     return name.replace(/([A-Z])/g, (x, y) => `_${y.toLowerCase()}`).replace(/^_/, "");
 }
 
-export function capitalizeFirstLetter(string: string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+export function capitalizeFirstLetter(text: string) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-export function uncapitalizeFirstLetter(string: string) {
-    return string.charAt(0).toLowerCase() + string.slice(1);
+export function uncapitalizeFirstLetter(text: string) {
+    return text.charAt(0).toLowerCase() + text.slice(1);
 }
