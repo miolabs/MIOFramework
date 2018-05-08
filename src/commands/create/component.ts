@@ -1,29 +1,25 @@
-import { cleanArgs } from "../../utils/arguments";
 import { assets } from "../../utils/ProjectHandler";
 import { TemplateHandler } from "./TemplateHandler";
 import { ControllerTemplate } from "./templates/ControllerTemplate";
 import { StyleTemplate } from "./templates/StyleTemplate";
 import { ViewTemplate } from "./templates/ViewTemplate";
 
-export function View(cmd, name) {
-    const params = cleanArgs(cmd);
-    const needStyle = !params.noStyle;
-    return component(params, name, false, true, needStyle);
+export function View(params, name) {
+    return component(params, name, false, true);
 }
-export function ViewController(cmd, name) {
-    const params = cleanArgs(cmd);
-    const needStyle = !params.noStyle;
-    return component(params, name, true, true, needStyle);
+
+export function ViewController(params, name) {
+    return component(params, name, true, true);
 }
-export function Controller(cmd, name) {
-    const params = cleanArgs(cmd);
-    const needStyle = !params.noStyle;
+
+export function Controller(params, name) {
     const needTemplate = params.needTemplate;
-    return component(params, name, true, needTemplate, needStyle);
+    return component(params, name, true, needTemplate);
 }
 
 export function component(
-    params, name: string, needController: boolean= false, needView: boolean= false, needStyle: boolean= false) {
+    params, name: string, needController: boolean= false, needView: boolean= false) {
+    const needStyle = !params.noStyle;
     const promises = [];
     let style = null;
     let view = null;
@@ -37,6 +33,7 @@ export function component(
         const css = new TemplateHandler(style.getBuildInfo());
         promises.push(css.build());
     }
+
     if (needView) {
         if (params.noCustomStyle) {
             view = new ViewTemplate(name, assets.viewHtmlNoCustomStyle, style);
@@ -46,6 +43,7 @@ export function component(
         const html = new TemplateHandler(view.getBuildInfo());
         promises.push(html.build());
     }
+
     if (needController) {
         let ts = null;
         if (!needView && params.initEmptyResource) {
@@ -56,6 +54,7 @@ export function component(
             ts = new ControllerTemplate(name, assets.compVcDefault, view);
         }
         const ctrl = new TemplateHandler(ts.getBuildInfo());
+        promises.push(ctrl.build());
     }
     return Promise.all(promises);
 }

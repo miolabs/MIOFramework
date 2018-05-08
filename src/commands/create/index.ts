@@ -5,20 +5,22 @@
 import chalk from "chalk";
 import { ErrorMessage } from "../../utils/error";
 import { Controller, View, ViewController } from "./component";
+import { cleanArgs } from "../../utils/arguments";
 
 export function New(cmd, type, name) {
+    const params = cleanArgs(cmd);
     switch (type) {
         case "view":
-          View(cmd, name);
+          View(params, name);
           break;
         case "controller":
-          Controller(cmd, name);
+          Controller(params, name);
           break;
         case "viewcontroller":
-          ViewController(cmd, name);
+          ViewController(params, name);
           break;
         default:
-          ErrorMessage(cmd, `Unknown type ${chalk.yellow(type)}.`);
+          ErrorMessage(params, `Unknown type ${chalk.yellow(type)}.`);
           break;
       }
 }
