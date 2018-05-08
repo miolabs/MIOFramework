@@ -25,34 +25,29 @@ export function component(
     let view = null;
 
     if (needStyle) {
-        if (params.css) {
-            style = new StyleTemplate(name, assets.viewCssDefault);
-        } else {
-            style = new StyleTemplate(`_${name}`, assets.viewScssDefault);
-        }
+        const asset = params.css ? assets.viewScssDefault : assets.viewCssDefault;
+        style = new StyleTemplate(name, asset);
         const css = new TemplateHandler(style.getBuildInfo());
         promises.push(css.build());
     }
 
     if (needView) {
-        if (params.noCustomStyle) {
-            view = new ViewTemplate(name, assets.viewHtmlNoCustomStyle, style);
-        } else {
-            view = new ViewTemplate(name, assets.viewHtmlDefault, style);
-        }
+        const asset = params.noCustomStyle ? assets.viewHtmlNoCustomStyle : params.viewHtmlDefault;
+        view = new ViewTemplate(name, asset, style);
         const html = new TemplateHandler(view.getBuildInfo());
         promises.push(html.build());
     }
 
     if (needController) {
-        let ts = null;
+        let asset = null;
         if (!needView && params.initEmptyResource) {
-            ts = new ControllerTemplate(name, assets.compVCEmptyRes);
+            asset = assets.compVCEmptyRes;
         } else if (!needView && params.initEmpty) {
-            ts = new ControllerTemplate(name, assets.compVCEmpty);
+            asset = assets.compVCEmpty;
         } else {
-            ts = new ControllerTemplate(name, assets.compVcDefault, view);
+            asset = assets.compVcDefault;
         }
+        const ts = new ControllerTemplate(name, asset, view);
         const ctrl = new TemplateHandler(ts.getBuildInfo());
         promises.push(ctrl.build());
     }
