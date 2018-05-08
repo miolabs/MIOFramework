@@ -14,7 +14,7 @@
         ],
         "sourceMaps": true,
         "args": [
-            //"new", "v", "helloView"
+            //"create", "view", "helloView"
             "init", "app-name", // new app called app-name
         ],
         "sourceMapPathOverrides": {
