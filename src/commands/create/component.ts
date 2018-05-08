@@ -25,10 +25,10 @@ export function component(
     let view = null;
 
     if (needStyle) {
-        if (params.scss) {
-            style = new StyleTemplate(name, assets.viewScssDefault);
-        } else {
+        if (params.css) {
             style = new StyleTemplate(name, assets.viewCssDefault);
+        } else {
+            style = new StyleTemplate(`_${name}`, assets.viewScssDefault);
         }
         const css = new TemplateHandler(style.getBuildInfo());
         promises.push(css.build());
