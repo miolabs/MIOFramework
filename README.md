@@ -3,11 +3,9 @@
 This is a cli tool to generate projects for [MIOJSLibs](https://github.com/miolabs/MIOJSLibs).
 
 * [Usage](#usage)
+* [Commands](#commands)
+* [Development](#development)
 * [Plans](#plans)
-  * [Commands to support](#commands-to-support)
-  * [Directory structure](#directory-structure)
-  * [Key concepts](#key-concepts)
-  * [Plan to the future](#plan-to-the-future)
 
 ## Usage
 
@@ -16,9 +14,7 @@ npm install miojs -g
 miojs -h
 ```
 
-## Plans
-
-### Commands to support
+## Commands
 
 * init - create a new project from a template
   * the templates are located in the repository.
@@ -35,54 +31,15 @@ miojs -h
 * serve - start an http server with the files.
   * currently we use a minimal express server.
 * lint - lint the code.
-  * currently we use `htlmhint` and `tslint`
+  * currently we use `htmlhint` and `tslint`
   * generate the lint configs
 * dev
   * combine the others
 
-### Directory structure
+## Development
 
-* templates
-  * init
-    * simple
-    * complete
-    * navigation
-    * table
-  * create
-    * view
-    * controller
-* dist
-  * //generated sources
-* src
-  * index.ts
-  * commands
-    * build.ts
-    * create.ts
-    * init.ts
-    * lint.ts
-    * pack.ts
-    * serve.ts
-    * test.ts
-  * webpack.config.js
-  * tsconfig.json
-  * index.js
-  * package.json
-* tests
-  * //unit tests
-* docs
-  * //detailed documentation for the tool
+[Development docs](./docs/development.md)
 
-### Key concepts
+## Plans
 
-* One build tool for all.
-* The build tool has to work with different project languages (php, javascript, typescript, swift)
-* The build tool has to take care of the project specific checks, linting.
-* The build tool has to be well documented
-* The build tool has to have regression tests for modifications.
-* The build tool has to read configurations from a config file
-  * server data: port, sourcefolder
-  * linter, if different from the original.
-
-### Plan to the future
-
-* Rewrite everything to swift.
+[Plan docs](./docs/plan.md)
