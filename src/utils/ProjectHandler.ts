@@ -14,7 +14,7 @@ export const assets = {
 };
 
 export const config = {
-    assetsFolder: "assets",
+    assetsFolder: "templates",
     cssDir: "app/layout",
     htmlDir: "app/layout",
     tsDir: "sources",
