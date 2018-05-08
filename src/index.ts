@@ -1,5 +1,5 @@
 import * as program from "commander";
-import { New } from "./commands/create";
+import { Create } from "./commands/create";
 import { Init } from "./commands/init";
 import { cleanArgs } from "./utils/arguments";
 
@@ -15,10 +15,10 @@ program
   });
 
 program
-  .command("new <type> <name>")
+  .command("create <type> <name>")
   .description("create a new component\n\n  type: (view | ctr)\n  name: string")
   .action((type, name, cmd) => {
-    New(cmd, type, name);
+    Create(cmd, type, name);
   });
 
 program.commands.forEach((c) => c.on("--help", () => console.log()));

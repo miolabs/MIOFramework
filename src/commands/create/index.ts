@@ -7,7 +7,7 @@ import { ErrorMessage } from "../../utils/error";
 import { Controller, View, ViewController } from "./component";
 import { cleanArgs } from "../../utils/arguments";
 
-export function New(cmd, type, name) {
+export function Create(cmd, type, name) {
     const params = cleanArgs(cmd);
     switch (type) {
         case "view":
