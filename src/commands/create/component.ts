@@ -4,19 +4,6 @@ import { ControllerTemplate } from "./templates/ControllerTemplate";
 import { StyleTemplate } from "./templates/StyleTemplate";
 import { ViewTemplate } from "./templates/ViewTemplate";
 
-export function View(params, name) {
-    return component(params, name, false, true);
-}
-
-export function ViewController(params, name) {
-    return component(params, name, true, true);
-}
-
-export function Controller(params, name) {
-    const needTemplate = params.needTemplate;
-    return component(params, name, true, needTemplate);
-}
-
 export function component(
     params, name: string, needController: boolean= false, needView: boolean= false) {
     const needStyle = !params.noStyle;
@@ -51,5 +38,9 @@ export function component(
         const ctrl = new TemplateHandler(ts.getBuildInfo());
         promises.push(ctrl.build());
     }
-    return Promise.all(promises);
+    return Promise.all(promises)
+        .then((result: any[]) => {
+            return true;
+        })
+        .catch((error) => false);
 }

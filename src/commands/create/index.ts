@@ -4,23 +4,33 @@
 
 import chalk from "chalk";
 import { ErrorMessage } from "../../utils/error";
-import { Controller, View, ViewController } from "./component";
 import { cleanArgs } from "../../utils/arguments";
+import { component } from "./component";
 
-export function Create(cmd, type, name) {
+export function Create(cmd, type, name): Promise<boolean> {
     const params = cleanArgs(cmd);
     switch (type) {
         case "view":
-          View(params, name);
-          break;
+          return View(params, name);
         case "controller":
-          Controller(params, name);
-          break;
+          return Controller(params, name);
         case "viewcontroller":
-          ViewController(params, name);
-          break;
+          return ViewController(params, name);
         default:
           ErrorMessage(params, `Unknown type ${chalk.yellow(type)}.`);
-          break;
+          return new Promise(() => false);
       }
+}
+
+function View(params, name) {
+  return component(params, name, false, true);
+}
+
+function ViewController(params, name) {
+  return component(params, name, true, true);
+}
+
+function Controller(params, name) {
+  const needTemplate = params.needTemplate;
+  return component(params, name, true, needTemplate);
 }
