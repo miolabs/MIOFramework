@@ -3,9 +3,10 @@ import { ITemplateData } from "../../../interfaces/ITemplateData";
 import { ProjectHandler, config } from "../../../utils/ProjectHandler";
 import { capitalizeFirstLetter } from "../../../utils/stringutils";
 import { StyleTemplate } from "./StyleTemplate";
+import * as path from "path";
 
 export function genHTMLFilePath(name: string) {
-    return `${config.htmlDir}/${name}/`;
+    return path.join(config.htmlDir, name);
 }
 export function genViewName(name: string) {
     name += name.slice(-4) === "View" ? "" : "View";
@@ -28,7 +29,7 @@ export class ViewTemplate {
 
         this.fileName = genHTMLFileName(name);
         this.filePath = genHTMLFilePath(name);
-        this.resultFileFullPath = `${this.filePath}/${this.fileName}`;
+        this.resultFileFullPath = path.join(this.filePath, this.fileName);
 
         if (assetData.variableNames.indexOf("containerId") > -1) {
             if (style && style.data && style.data.containerId) {

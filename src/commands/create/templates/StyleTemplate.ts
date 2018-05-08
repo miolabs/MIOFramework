@@ -2,6 +2,7 @@ import { IAssetData } from "../../../interfaces/IAssetData";
 import { ITemplateData } from "../../../interfaces/ITemplateData";
 import { config, ProjectHandler } from "../../../utils/ProjectHandler";
 import { capitalizeFirstLetter } from "../../../utils/stringutils";
+import * as path from "path";
 
 export function genStyleName(name: string) {
     name += name.slice(-4) === "View" ? "" : "View";
@@ -20,7 +21,7 @@ export function genStyleFileName(name: string, extension: string= "css") {
 }
 
 export function genStyleFilePath(name: string) {
-    return `${config.cssDir}/${name}`;
+    return path.join(config.cssDir, name);
 }
 
 export class StyleTemplate {
@@ -35,7 +36,7 @@ export class StyleTemplate {
 
         this.fileName = genStyleFileName(name);
         this.filePath = genStyleFilePath(name);
-        this.resultFileFullPath = `${this.filePath}/${this.fileName}`;
+        this.resultFileFullPath = path.join(this.filePath, this.fileName);
 
         if (assetData.variableNames.indexOf("containerId") > -1) {
             this.data.containerId = ProjectHandler.genContainerIdFromName(name);

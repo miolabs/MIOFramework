@@ -4,12 +4,13 @@ import { ITemplateData } from "../../../interfaces/ITemplateData";
 import { config } from "../../../utils/ProjectHandler";
 import { camelToSnake, capitalizeFirstLetter, uncapitalizeFirstLetter } from "../../../utils/stringutils";
 import { ViewTemplate } from "./ViewTemplate";
+import * as path from "path";
 
 export function genContainerIdFromName(name: string) {
     return camelToSnake(name).toLowerCase();
 }
 export function genControllerFilePath(name: string) {
-    return `${config.tsDir}/${name}/`;
+    return path.join(config.tsDir, name);
 }
 export function genControllerName(name: string) {
     name += name.slice(-14) === "ViewController" ? "" : "ViewController";
@@ -35,7 +36,7 @@ export class ControllerTemplate {
 
         this.fileName = genControllerFileName(name);
         this.filePath = genControllerFilePath(name);
-        this.resultFileFullPath = `${this.filePath}/${this.fileName}`;
+        this.resultFileFullPath = path.join(this.filePath, this.fileName);
 
         if (assetData.variableNames.indexOf("name") > -1) {
             this.data.name = genControllerName(name);
