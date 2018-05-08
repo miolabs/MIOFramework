@@ -18,6 +18,10 @@ npm link
 miojs new -h
 ```
 
+## How to debug
+
+Set the environmental arguments in `.vscode/launch.json` and start the launch config.
+
 ## Write unit tests
 
 [tutorial](http://how-to-write-a-typescript-library.com/unit-testing)
