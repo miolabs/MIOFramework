@@ -2,7 +2,7 @@ import chalk from "chalk";
 import * as program from "commander";
 
 export function ErrorMessage(command, message) {
-    command.outputHelp();
+    // command. outputHelp();
     console.log(`  ${chalk.red(message)}`);
     console.log();
     process.exit(1);

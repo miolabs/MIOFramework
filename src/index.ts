@@ -10,12 +10,16 @@ program
   .command("init <app-name>")
   .description("create a new project")
   .option("-f, --force", "Overwrite target directory if it exists")
-  .action((name, cmd) => Init(name, cleanArgs(cmd)));
+  .action((name, cmd) => {
+    Init(name, cleanArgs(cmd));
+  });
 
 program
   .command("new <type> <name>")
   .description("create a new component\n\n  type: (view | ctr)\n  name: string")
-  .action((type, name, cmd) => New(cmd, type, name));
+  .action((type, name, cmd) => {
+    New(cmd, type, name);
+  });
 
 program.commands.forEach((c) => c.on("--help", () => console.log()));
 
