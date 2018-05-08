@@ -32,7 +32,7 @@ export function component(
     }
 
     if (needView) {
-        const asset = params.noCustomStyle ? assets.viewHtmlNoCustomStyle : params.viewHtmlDefault;
+        const asset = params.noCustomStyle ? assets.viewHtmlNoCustomStyle : assets.viewHtmlDefault;
         view = new ViewTemplate(name, asset, style);
         const html = new TemplateHandler(view.getBuildInfo());
         promises.push(html.build());
