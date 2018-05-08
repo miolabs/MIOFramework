@@ -18,17 +18,7 @@ export class FolderHandler {
         this.templateFolderPath = getAsset(assetData.path);
         this.resultFolderName = getTarget(resultFolderName);
     }
-    public build(): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            fs.copy(this.templateFolderPath, this.resultFolderName)
-                .then(() => {
-                    console.log(`Project initialized in ${this.resultFolderName}`);
-                    return resolve(true);
-                })
-                .catch((err) => {
-                    console.error(err);
-                    return reject(false);
-                });
-        });
+    public build(): Promise<void> {
+        return fs.copy(this.templateFolderPath, this.resultFolderName);
     }
 }
