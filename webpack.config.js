@@ -1,3 +1,5 @@
+const prod = process.env.NODE_ENV === "prod";
+
 module.exports = {
     entry: './src/index.ts',
     output: {
@@ -27,7 +29,7 @@ module.exports = {
         __filename: false,
     },
     optimization: {
-        minimize: true
+        minimize: prod
     },
     mode: "development"
 };

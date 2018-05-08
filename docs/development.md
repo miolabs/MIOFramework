@@ -13,8 +13,10 @@ npm start
 
 You can link your repository as if it was installed globally, with [npm-link](https://docs.npmjs.com/cli/link)
 
-    npm link
-    miojs new -h
+```bash
+npm link
+miojs new -h
+```
 
 ## Write unit tests
 
@@ -24,17 +26,23 @@ You can link your repository as if it was installed globally, with [npm-link](ht
 
 To publish your first version to npm run:
 
-    tsc
-    npm publish
+```bash
+tsc
+npm publish
+```
 
 Now you're all set to go! Consume your library anywhere you want by running:
 
-    npm install --save hwrld
+```bash
+npm install --save hwrld
+```
 
 and consume it using
 
-    import {HelloWorld} from 'hwrld'
-    HelloWorld.sayHello();
+```typescript
+import {HelloWorld} from 'hwrld'
+HelloWorld.sayHello();
+```
 
 ## Further reading marterial
 

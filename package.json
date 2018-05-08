@@ -7,6 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack --watch",
+    "prod": "cross-env NODE_ENV='prod' webpack",
     "tsc": "tsc"
   },
   "repository": {
@@ -38,6 +39,7 @@
     "minimist": "^1.2.0"
   },
   "devDependencies": {
+    "cross-env": "^5.1.4",
     "ts-loader": "^4.1.0",
     "typescript": "^2.8.1",
     "webpack": "^4.5.0",
