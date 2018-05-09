@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:MIOCore/MIOCore.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:MIOFoundation/MIOFoundation.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:MIOUserInterface/MIOUserInterface.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:MIOApp/MIOApp.xcodeproj">
+   </FileRef>
+</Workspace>

@@ -1,0 +1,80 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXFileReference section */
+		14767B411F8F533800FD17CF /* MIOCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIOCore.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		14767B391F8F530700FD17CF = {
+			isa = PBXGroup;
+			children = (
+				14767B401F8F532A00FD17CF /* source */,
+			);
+			sourceTree = "<group>";
+		};
+		14767B401F8F532A00FD17CF /* source */ = {
+			isa = PBXGroup;
+			children = (
+				14767B411F8F533800FD17CF /* MIOCore.swift */,
+			);
+			path = source;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		14767B3A1F8F530700FD17CF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0900;
+			};
+			buildConfigurationList = 14767B3D1F8F530700FD17CF /* Build configuration list for PBXProject "MIOCore" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 14767B391F8F530700FD17CF;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		14767B3E1F8F530700FD17CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		14767B3F1F8F530700FD17CF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		14767B3D1F8F530700FD17CF /* Build configuration list for PBXProject "MIOCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				14767B3E1F8F530700FD17CF /* Debug */,
+				14767B3F1F8F530700FD17CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 14767B3A1F8F530700FD17CF /* Project object */;
+}

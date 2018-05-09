@@ -1,0 +1,24 @@
+{
+  "name": "miolibs",
+  "version": "1.0.0",
+  "description": "MIOLibs for cross plarform development with the cocoa / cocoa touch style",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MIOLabs/MIOLibs.git"
+  },
+  "author": "Javier Segura Perez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MIOLabs/MIOLibs/issues"
+  },
+  "homepage": "https://github.com/MIOLabs/MIOLibs#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.3.2",
+    "gulp-exec": "^2.1.3"
+  }
+}
