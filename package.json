@@ -5,11 +5,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "btpush": "git subtree push --prefix=MIOBuildTool https://github.com/miolabs/MIOBuildTool master",
-    "btpull": "git subtree pull --prefix=MIOBuildTool https://github.com/miolabs/MIOBuildTool master",
+    "btpull": "git subtree pull --prefix=MIOBuildTool https://github.com/miolabs/MIOBuildTool master --squash",
     "stpush": "git subtree push --prefix=MIOSwiftTranspiler https://github.com/miolabs/MIOSwiftTranspiler master",
-    "stpull": "git subtree pull --prefix=MIOSwiftTranspiler https://github.com/miolabs/MIOSwiftTranspiler master",
+    "stpull": "git subtree pull --prefix=MIOSwiftTranspiler https://github.com/miolabs/MIOSwiftTranspiler master --squash",
     "lpush": "git subtree push --prefix=MIOLibs https://github.com/miolabs/MIOLibs master",
-    "lpull": "git subtree pull --prefix=MIOLibs https://github.com/miolabs/MIOLibs master"
+    "lpull": "git subtree pull --prefix=MIOLibs https://github.com/miolabs/MIOLibs master --squash",
+    "pull": "npm run btpull && npm run stpull && npm run lpull"
   },
   "repository": {
     "type": "git",
