@@ -1,0 +1,24 @@
+{
+  "name": "mioframework",
+  "version": "0.0.1",
+  "description": "The MIO Framework!",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "btpush": "git subtree push --prefix=MIOBuildTool https://github.com/miolabs/MIOBuildTool master",
+    "btpull": "git subtree pull --prefix=MIOBuildTool https://github.com/miolabs/MIOBuildTool master",
+    "stpush": "git subtree push --prefix=MIOSwiftTranspiler https://github.com/miolabs/MIOSwiftTranspiler master",
+    "stpull": "git subtree pull --prefix=MIOSwiftTranspiler https://github.com/miolabs/MIOSwiftTranspiler master",
+    "lpush": "git subtree push --prefix=MIOLibs https://github.com/miolabs/MIOLibs master",
+    "lpull": "git subtree pull --prefix=MIOLibs https://github.com/miolabs/MIOLibs master"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miolabs/MIOFramework.git"
+  },
+  "author": "Mátyás Budavári <budavariam@gmail.com> (https://budavariam.github.io)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/miolabs/MIOFramework/issues"
+  },
+  "homepage": "https://github.com/miolabs/MIOFramework#readme"
+}
