@@ -1,0 +1,398 @@
+{
+  "String": {
+    "typeReplacement": {
+      "ts": "string"
+    },
+    "properties": [{
+      "name": "+",
+      "function": true,
+      "parameters": [{"type": "Int"}, {"type": "String"}],
+      "type": "String"
+    }, {
+      "name": "+",
+      "function": true,
+      "parameters": [{"type": "String"}, {"type": "Int"}],
+      "type": "String"
+    }, {
+      "name": "+",
+      "function": true,
+      "parameters": [{"type": "Double"}, {"type": "String"}],
+      "type": "String"
+    }, {
+      "name": "+",
+      "function": true,
+      "parameters": [{"type": "String"}, {"type": "Double"}],
+      "type": "String"
+    }, {
+      "name": "characters",
+      "codeReplacement": {
+        "ts": null,
+        "java": null
+      }
+    }, {
+      "name": "count",
+      "type": "Int",
+      "codeReplacement": {
+        "ts": "#L.length",
+        "java": "#L.length()"
+      }
+    }]
+  },
+  "Dictionary": {
+    "generics": ["Key", "Value"],
+    "typeReplacement": {
+      "ts": "Dictionary<#Value>",
+      "java": "InitializableHashMap<#Key, #Value>",
+      "javaProtocol": "Map<#Key, #Value>"
+    },
+    "cloneOnAssignmentReplacement": {
+      "ts": true,
+      "java": true
+    },
+    "properties": [{
+      "name": "[]",
+      "function": true,
+      "type": "Value",
+      "codeReplacement": {
+        "java": "#L.get(#R)",
+        "javaAssignment": "#L.put(#R, #ASS)",
+        "tsAssignmentNil": "delete #L[#R]",
+        "javaAssignmentNil": "#L.remove(#R)"
+      }
+    }, {
+      "name": "count",
+      "type": "Int",
+      "codeReplacement": {
+        "ts": "_.size(#L)",
+        "java": "#L.size()"
+      }
+    }, {
+      "name": "updateValue",
+      "function": true,
+      "parameters": [{"type": "Value"}, {"type": "Key", "externalName": "forKey"}],
+      "type": "Void",
+      "codeReplacement": {
+        "ts": "_.updateValue(#L, #AA)",
+        "java": "put"
+      }
+    }]
+  },
+  "Array": {
+    "generics": ["Value"],
+    "typeReplacement": {
+      "ts": "Array<#Value>",
+      "java": "ArrayList<#Value>",
+      "javaProtocol": "List<#Value>"
+    },
+    "cloneOnAssignmentReplacement": {
+      "ts": true,
+      "java": true
+    },
+    "properties": [{
+      "name": "init",
+      "function": true,
+      "parameters": [],
+      "type": "[Value]",
+      "codeReplacement": {
+        "ts": "new Array<#Value>()",
+        "java": "new ArrayList<#Value>()"
+      }
+    }, {
+      "name": "init",
+      "function": true,
+      "parameters": [{"type": "Value", "externalName": "repeating"}, {"type": "Int", "externalName": "count"}],
+      "type": "[Value]",
+      "codeReplacement": {
+        "ts": "new Array(#A1).fill(#A0)",
+        "java": "new ArrayList<#Value>(Collections.nCopies(#A1, #A0))"
+      }
+    }, {
+      "name": "[]",
+      "function": true,
+      "type": "Value",
+      "codeReplacement": {
+        "java": "#L.get(#R)",
+        "javaAssignment": "#L.put(#R, #ASS)",
+        "tsAssignmentNil": "#L.splice(#R, 1)",
+        "javaAssignmentNil": "#L.remove(#R)"
+      }
+    }, {
+      "name": "+",
+      "function": true,
+      "parameters": [{"type": "[Value]"}, {"type": "[Value]"}],
+      "type": "[Value]",
+      "codeReplacement": {
+        "ts": "#A0.concat(#A1)",
+        "java": "new ArrayList<String>() { { addAll(#A0); addAll(#A1); } }"
+      }
+    }, {
+      "name": "+=",
+      "function": true,
+      "parameters": [{"type": "[Value]"}, {"type": "[Value]"}],
+      "type": "Void",
+      "codeReplacement": {
+        "ts": "#A0.pushMany(#A1)",
+        "java": "#A0.addAll(#A1)"
+      }
+    }, {
+      "name": "count",
+      "type": "Int",
+      "codeReplacement": {
+        "ts": "#L.length",
+        "java": "#L.size()"
+      }
+    }, {
+      "name": "enumerated",
+      "function": true,
+      "codeReplacement": {
+        "ts": null,
+        "java": null
+      }
+    }, {
+      "name": "append",
+      "function": true,
+      "parameters": [{"type": "Value"}],
+      "type": "Void",
+      "codeReplacement": {
+        "ts": "#L.push(#AA)",
+        "java": "#L.add(#AA)"
+      }
+    }, {
+      "name": "append",
+      "function": true,
+      "parameters": [{"type": "[Value]", "externalName": "contentsOf"}],
+      "type": "Void",
+      "codeReplacement": {
+        "ts": "#L.pushMany(#AA)",
+        "java": "#L.addAll(#AA)"
+      }
+    }, {
+      "name": "insert",
+      "function": true,
+      "parameters": [{"type": "Value"}, {"type": "Int", "externalName": "at"}],
+      "type": "Void",
+      "codeReplacement": {
+        "ts": "#L.splice(#A1, 0, #A0)",
+        "java": "#L.add(#A1, #A0)"
+      }
+    }, {
+      "name": "insert",
+      "function": true,
+      "parameters": [{"type": "[Value]", "externalName": "contentsOf"}, {"type": "Int", "externalName": "at"}],
+      "type": "Void",
+      "codeReplacement": {
+        "ts": "#L.pushManyAt(#AA)",
+        "java": "#L.addAll(#A1, #A0)"
+      }
+    }, {
+      "name": "remove",
+      "function": true,
+      "parameters": [{"type": "Int", "externalName": "at"}],
+      "type": "Void",
+      "codeReplacement": {
+        "ts": "#L.splice(#AA, 1)",
+        "java": "#L.remove(#AA)"
+      }
+    }, {
+      "name": "filter",
+      "function": true,
+      "parameters": [{"type": "(Value)->Bool"}],
+      "type": "[Value]",
+      "codeReplacement": {
+        "ts": "#L.filter(#AA)"
+      }
+    }, {
+      "name": "sort",
+      "function": true,
+      "parameters": [{"type": "(Value,Value)->Bool", "externalName": "by"}],
+      "type": "[Value]",
+      "codeReplacement": {
+        "ts": "#L.sortBool(#AA)"
+      }
+    }, {
+      "name": "map",
+      "function": true,
+      "parameters": [{"type": "(Value)->Value"}],
+      "type": "[Value]",
+      "codeReplacement": {
+        "ts": "#L.map(#AA)"
+      }
+    }, {
+      "name": "reduce",
+      "function": true,
+      "parameters": [{"type": "Value"}, {"type": "(Value,Value)->Value"}],
+      "type": "Value",
+      "codeReplacement": {
+        "ts": "#L.reduce(#A1, #A0)"
+      }
+    }]
+  },
+  "Set": {
+    "generics": ["Value"],
+    "typeReplacement": {
+      "ts": "Set<#Value>",
+      "java": "HashSet<#Value>",
+      "javaProtocol": "Set<#Value>"
+    },
+    "cloneOnAssignmentReplacement": {
+      "ts": true,
+      "java": true
+    },
+    "properties": [{
+      "name": "count",
+      "type": "Int",
+      "codeReplacement": {
+        "ts": "#L.size",
+        "java": "#L.size()"
+      }
+    }, {
+      "name": "insert",
+      "function": true,
+      "parameters": [{"type": "Value"}],
+      "type": "Void",
+      "codeReplacement": {
+        "ts": "#L.add(#AA)",
+        "java": "#L.add(#AA)"
+      }
+    }]
+  },
+  "Int": {
+    "typeReplacement": {
+      "ts": "number",
+      "java": "Integer"
+    },
+    "properties": [{
+      "name": "init",
+      "function": true,
+      "type": "Int",
+      "codeReplacement": {
+        "ts": "parseInt(#AA)",
+        "java": "Integer.parseInt(#AA)"
+      }
+    }, {
+      "name": "/",
+      "function": true,
+      "parameters": [{"type": "Int"}, {"type": "Int"}],
+      "type": "Int",
+      "codeReplacement": {
+        "ts": "((#A0 / #A1)|0)"
+      }
+    }, {
+      "name": "/=",
+      "function": true,
+      "parameters": [{"type": "Int"}, {"type": "Int"}],
+      "type": "Void",
+      "codeReplacement": {
+        "ts": "#A0 = ((#A0 / #A1)|0)"
+      }
+    }]
+  },
+  "Double": {
+    "typeReplacement": {
+      "ts": "number",
+      "java": "Float"
+    },
+    "properties": [{
+      "name": "init",
+      "function": true,
+      "parameters": [{"type": "String"}],
+      "type": "Double",
+      "codeReplacement": {
+        "ts": "parseFloat(#AA)",
+        "java": "Double.parseDouble(#AA)"
+      }
+    }, {
+      "name": "init",
+      "function": true,
+      "parameters": [{"type": "Int"}],
+      "type": "Double",
+      "codeReplacement": {
+        "ts": "#AA",
+        "java": "#AA"
+      }
+    }, {
+      "name": "+",
+      "function": true,
+      "parameters": [{"type": "Int"}, {"type": "Double"}],
+      "type": "Double"
+    }, {
+      "name": "+",
+      "function": true,
+      "parameters": [{"type": "Double"}, {"type": "Int"}],
+      "type": "Double"
+    }, {
+      "name": "-",
+      "function": true,
+      "parameters": [{"type": "Int"}, {"type": "Double"}],
+      "type": "Double"
+    }, {
+      "name": "-",
+      "function": true,
+      "parameters": [{"type": "Double"}, {"type": "Int"}],
+      "type": "Double"
+    }, {
+      "name": "*",
+      "function": true,
+      "parameters": [{"type": "Int"}, {"type": "Double"}],
+      "type": "Double"
+    }, {
+      "name": "*",
+      "function": true,
+      "parameters": [{"type": "Double"}, {"type": "Int"}],
+      "type": "Double"
+    }, {
+      "name": "/",
+      "function": true,
+      "parameters": [{"type": "Int"}, {"type": "Double"}],
+      "type": "Double"
+    }, {
+      "name": "/",
+      "function": true,
+      "parameters": [{"type": "Double"}, {"type": "Int"}],
+      "type": "Double"
+    }, {
+      "name": "%",
+      "function": true,
+      "parameters": [{"type": "Int"}, {"type": "Double"}],
+      "type": "Double"
+    }, {
+      "name": "%",
+      "function": true,
+      "parameters": [{"type": "Double"}, {"type": "Int"}],
+      "type": "Double"
+    }]
+  },
+  "Void": {
+    "typeReplacement": {
+      "ts": "void",
+      "java": "void"
+    }
+  },
+  "Any": {
+    "typeReplacement": {
+      "ts": "any",
+      "java": "any"
+    }
+  },
+  "Bool": {
+    "typeReplacement": {
+      "ts": "boolean",
+      "java": "Boolean"
+    }
+  },
+  "Tuple": {
+    "typeReplacement": {
+      "ts": "Dictionary<any>",
+      "java": "InitializableHashMap<String, Object>",
+      "javaProtocol": "Map<String, ?>"
+    }
+  },
+  "print": {
+    "function": true,
+    "type": "Void",
+    "codeReplacement": {
+      "ts": "console.log(#AA)",
+      "java": "System.out.println(#AA)"
+    }
+  }
+}
