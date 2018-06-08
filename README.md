@@ -2,17 +2,15 @@
 
 The MIO Framework!
 
-Do you ever wished to share code between platforms? Do you like the Apple frameworks but you want/need to develop in other platforms? We are making that possible.
+Have you ever wished to share code between platforms? Do you like the Apple frameworks but you want/need to develop in other platforms? Code sharing and Apple frameworks on different platforms; we are making that possible.
 
-We are porting the Apple frameworks like Foundation, UIKit and CoreData to other platform or enviroments, like the web, backned servers and hadware development!
+MioLabs is porting the Apple frameworks like Foundation, UIKit and CoreData to other platforms such as the web, backend servers and hardware microcontrollers!
 
-So you can share most of the loginc with the same language and the same API yopu arelady know!
+We choose Swift as our main language programming and now you can share both the programming logic and language and use the same API you already know and love!  We have ported the libraries and created a compiler/transpiler, all based around Apple frameworks and Swift language, for the other platforms/environments. 
 
-For that we had to port the libs, create a compiler/trasnpiler for the other platforms/enviroments. 
+This is currently under heavy development, but we have come a long way from where we were two years ago when we started to port these frameworks to the web.  Now we are taking another step forward implementing Swift code into all platforms making code sharing possible and making you into a faster, more efficient developer. 
 
-This is currently under heavly devlopment, but we came from the exprience that we start 2 years ago to port al these frameworks for the web. Now we are taking an step forward to just no use in another platform the same logic, use the same code, making you more efficent and fast to develop
-
-MIOLabs team!
+The MIOLabs team!
 
 ## Subtrees
 
