@@ -1,0 +1,16 @@
+.idea/typescript-compiler.xml
+.idea
+/web/bundle.sh
+deploy
+node_modules
+.DS_Store
+resources/app.js
+resources/app.js.map
+
+resources/styles.css
+/app/
+
+/resources/libs/miojslibs/
+
+/_htmlkeys.json
+/_tskeys.json
