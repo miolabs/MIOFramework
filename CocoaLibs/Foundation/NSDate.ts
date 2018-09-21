@@ -1,4 +1,4 @@
-import { NSCoreLexer } from "../NSCore";
+import { MIOCoreLexer } from "./platform/MIOCoreLexer";
 
 /**
  * Created by godshadow on 11/3/16.
@@ -112,7 +112,7 @@ export function NSDateGetUTCTimeString(date)
 
 export function NSDateFromString(string)
 {
-    var lexer:NSCoreLexer = new NSCoreLexer(string);
+    let lexer = new MIOCoreLexer(string);
     
     // Values    
     // lexer.addTokenType(0, /^([0-9]{2,4})-/i); // Year

@@ -71,3 +71,16 @@ export function MIOCoreRegisterClassByName(name, object){
 export function MIOCoreClassByName(name){
     return _micore_classes_by_name[name];
 }
+
+export enum MIOCoreBrowserType
+{
+    Safari,
+    Chrome,
+    IE,
+    Edge,
+    Other
+}
+
+export function MIOCoreGetBrowser(): MIOCoreBrowserType {
+    return MIOCoreBrowserType.Other;
+}

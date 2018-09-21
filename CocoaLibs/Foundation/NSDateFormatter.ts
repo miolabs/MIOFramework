@@ -1,5 +1,5 @@
 import {NSFormatter} from './NSFormatter'
-import {NSCoreGetBrowser, NSCoreBrowserType} from '../NSCore/platform'
+import {MIOCoreDateGetInternalSeparatorSymbol} from './platform/web/MIOCoreDate'
 
 export enum NSDateFormatterStyle {
     NoStyle,
@@ -14,16 +14,11 @@ export class NSDateFormatter extends NSFormatter {
     dateStyle = NSDateFormatterStyle.ShortStyle;
     timeStyle = NSDateFormatterStyle.ShortStyle;    
 
-    private browserDateSeparatorSymbol:string = null;
+    private internalDateSeparatorSymbol:string = null;
 
     init(){
         super.init();
-
-        let browser = NSCoreGetBrowser();
-        if (browser == NSCoreBrowserType.Safari)
-            this.browserDateSeparatorSymbol = "/";
-        else 
-            this.browserDateSeparatorSymbol = "-";
+        this.internalDateSeparatorSymbol = MIOCoreDateGetInternalSeparatorSymbol();
     }
 
     dateFromString(str:string):Date {
@@ -172,7 +167,7 @@ export class NSDateFormatter extends NSFormatter {
         if (yy.length > 0) result = result && this._validateYear(yy);
         if (result == false) return [false, parseString, null, chIndex];
         
-        var dateString = (yy[3]? yy : ("20" + yy)) + this.browserDateSeparatorSymbol + (mm[1]?mm:"0"+mm) + this.browserDateSeparatorSymbol + (dd[1]?dd:"0"+dd);
+        var dateString = (yy[3]? yy : ("20" + yy)) + this.internalDateSeparatorSymbol + (mm[1]?mm:"0"+mm) + this.internalDateSeparatorSymbol + (dd[1]?dd:"0"+dd);
         return [true, parseString, dateString, chIndex];
     }
 

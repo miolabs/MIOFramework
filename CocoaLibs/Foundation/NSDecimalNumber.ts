@@ -1,5 +1,5 @@
 import { NSNumber } from "./NSNumber";
-import { Decimal } from 'decimal.js';
+import { MIOCoreDecimalNumber } from "./platform/web/MIOCoreDecimalNumber";
 
 export class NSDecimalNumber extends NSNumber
 {
@@ -39,11 +39,11 @@ export class NSDecimalNumber extends NSNumber
     initWithString(str:string){
         this._initWithValue(str);
     }
-
+    
     initWithDecimal(value){
         super.init();
         if (isNaN(value) || value == null) {
-            this.storeValue = new Decimal(0);
+            this.storeValue = new MIOCoreDecimalNumber(0);
         }
         else {
             this.storeValue = value;
@@ -52,7 +52,7 @@ export class NSDecimalNumber extends NSNumber
 
     _initWithValue(value){
         super.init();
-        this.storeValue = new Decimal(value||0);
+        this.storeValue = new MIOCoreDecimalNumber(value||0);
     }
 
     decimalNumberByAdding(value:NSDecimalNumber){
