@@ -28,9 +28,10 @@ public class Main {
         Cache cache = new Cache();
 
         TypeLoader.load(cache, tree);
+        PrecedenceGroupLoader.load(cache, tree);
         OperatorLoader.load(cache, tree);
 
-        CacheVisitor cacheVisitor = new CacheVisitor(cache, targetLanguage);
+        CacheVisitor cacheVisitor = new CacheVisitor(cache, targetLanguage, tree);
         cacheVisitor.visit(tree);
 
         TranspilerVisitor transpilerVisitor = new TranspilerVisitor(cache, targetLanguage);

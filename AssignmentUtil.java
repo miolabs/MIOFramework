@@ -1,5 +1,6 @@
 import org.antlr.v4.runtime.ParserRuleContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AssignmentUtil {
@@ -7,7 +8,7 @@ public class AssignmentUtil {
     static public String augment(String code, Instance type, ParserRuleContext originalCtx, Visitor visitor) {
 
         boolean isCopied =
-            type.definition.cloneOnAssignmentReplacement != null && type.definition.cloneOnAssignmentReplacement.get(visitor.targetLanguage) &&
+            type.definition != null && type.definition.cloneOnAssignmentReplacement != null && type.definition.cloneOnAssignmentReplacement.get(visitor.targetLanguage) &&
             !WalkerUtil.isDirectDescendant(SwiftParser.Literal_expressionContext.class, originalCtx) &&
             !code.startsWith("new ");
 
@@ -49,14 +50,15 @@ public class AssignmentUtil {
     }
 
     static public String handleConstantDeclaration(SwiftParser.Constant_declarationContext ctx, Visitor visitor) {
-        return handleDeclaration("const", SwiftParser.Constant_declaration_headContext.class, ctx, visitor);
+        return handleDeclaration("const", SwiftParser.Constant_declaration_headContext.class, ctx.constant_declaration_head().declaration_modifiers(), ctx, visitor);
     }
     static public String handleVariableDeclaration(SwiftParser.Variable_declarationContext ctx, Visitor visitor) {
-        return handleDeclaration("let", SwiftParser.Variable_declaration_headContext.class, ctx, visitor);
+        return handleDeclaration("let", SwiftParser.Variable_declaration_headContext.class, ctx.variable_declaration_head().declaration_modifiers(), ctx, visitor);
     }
-    static private String handleDeclaration(String tsDeclarationHead, Class headClass, ParserRuleContext ctx, Visitor visitor) {
+    static private String handleDeclaration(String tsDeclarationHead, Class headClass, SwiftParser.Declaration_modifiersContext modifiers, ParserRuleContext ctx, Visitor visitor) {
         boolean isInClass = ctx.parent != null && ctx.parent.parent instanceof SwiftParser.DeclarationsContext;
         return
+            (modifiers(modifiers).contains("static") ? "static " : "") +
             (visitor.targetLanguage.equals("ts") && !isInClass ? tsDeclarationHead + " " : "") +
             visitor.visitWithoutClasses(ctx, headClass);
     }
@@ -112,7 +114,8 @@ public class AssignmentUtil {
         String propertyName = visitor.visitChildren(ctx.variable_name()).trim();
         Cache.CacheBlockAndObject property = visitor.cache.find(propertyName, ctx);
         String propertyType = ((Instance)property.object).targetType(visitor.targetLanguage, false, true);
-        String internalVar = "this." + propertyName + "$val";
+        String internalGetVar = "this." + propertyName + "$val";
+        String internalSetVar = "this." + propertyName + "$val = newValue";
 
         SwiftParser.WillSet_clauseContext willSetClause = declarationCtx.willSet_didSet_block().willSet_clause();
         SwiftParser.DidSet_clauseContext didSetClause = declarationCtx.willSet_didSet_block().didSet_clause();
@@ -122,19 +125,39 @@ public class AssignmentUtil {
         if(isOverride) {
             ClassDefinition classDefinition = (ClassDefinition)visitor.cache.findNearestAncestorStructure(ctx).object;
             Instance superPropertyType = new Instance((ClassDefinition)classDefinition.superClass.object).getProperty(propertyName);
-            if(!superPropertyType.isGetterSetter) internalVar = "this." + propertyName;
+            if(!superPropertyType.isGetterSetter) {
+                internalGetVar = "this." + propertyName;
+                internalSetVar = "this." + propertyName + " = newValue";
+            }
+            else {
+                internalGetVar = "super." + propertyName + "$get()";
+                internalSetVar = "super." + propertyName + "$set(newValue)";
+            }
         }
 
         return
             (!isOverride ? propertyName + "$val: " + propertyType + " " + (declarationCtx.initializer() != null ? visitor.visit(declarationCtx.initializer()) : "" ) + "\n" : "") +
-            propertyName + "$get(): " + propertyType + " { return " + internalVar + " }\n" +
+            propertyName + "$get(): " + propertyType + " { return " + internalGetVar + " }\n" +
             propertyName + "$set(newValue: " + propertyType + ") {\n" +
                 "let willSet = (" + willSetArgumentName(willSetClause) + ": " + propertyType + ") => " + visitor.visit(willSetClause.code_block()) + "\n" +
                 (didSetClause != null ? "let didSet = (" + didSetArgumentName(didSetClause) + ": " + propertyType + ") => " + visitor.visit(didSetClause.code_block()) + "\n" : "") +
-                (didSetClause != null ? "let oldValue: " + propertyType + " = " + internalVar + ";\n" : "") +
+                (didSetClause != null ? "let oldValue: " + propertyType + " = " + internalGetVar + ";\n" : "") +
                 "willSet(newValue);\n" +
-                internalVar + " = newValue;\n" +
+                internalSetVar + ";\n" +
                 (didSetClause != null ? "didSet(oldValue);\n" : "") +
             "}";
+    }
+
+    static public String handleSubscriptDeclaration(SwiftParser.Subscript_declarationContext ctx, Visitor visitor) {
+        return FunctionUtil.functionDeclaration(ctx, ctx.subscript_head().declaration_modifiers(), visitor);
+    }
+
+    static public List<String> modifiers(SwiftParser.Declaration_modifiersContext currModifier) {
+        List<String> modifiers = new ArrayList<String>();
+        while(currModifier != null) {
+            modifiers.add(currModifier.declaration_modifier().getText());
+            currModifier = currModifier.declaration_modifiers();
+        }
+        return modifiers;
     }
 }

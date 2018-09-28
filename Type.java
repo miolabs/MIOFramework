@@ -6,15 +6,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+class PrecedenceGroup {
+    public boolean leftAssociativity;
+}
+
 class Operator {
-    public int priority;
+    public PrecedenceGroup precedenceGroup;
+    public String word;
     public Definition result;
-    public Map<String, String> codeReplacement;
+    public Map<String, String> codeReplacementPrefix;
+    public Map<String, String> codeReplacementInfix;
+    public Map<String, String> codeReplacementPostfix;
+}
+
+class Generic {//either generic or associatedtype
+    public String name;
+    public List<ClassDefinition> protocols;
+    public Generic(String name, List<ClassDefinition> protocols){ this.name = name; this.protocols = protocols; }
 }
 
 abstract class Definition {
     public String name;
-    public List<String> generics;
+    public List<Generic> generics;
+    //TODO associated type clarifications, że w tym protocole od tego generica, ten associatedtype (ta klasa/do tego protocolu)
     public Map<String, Boolean> cloneOnAssignmentReplacement;//ts->boolean, java->boolean
 }
 
@@ -22,7 +36,9 @@ class ClassDefinition extends Definition {
     public Map<String, String> typeReplacement;//ts, java, javaProtocol(e.g. Map for HashMap) -- string with generics
     public Cache.CacheBlockAndObject superClass;
     public Map<String, Instance> properties;
-    public ClassDefinition(String name, Cache.CacheBlockAndObject superClass, Map<String, Instance> properties, List<String> generics){ this.name = name; this.superClass = superClass; this.properties = properties; this.generics = generics; }
+    boolean isProtocol;
+    public List<ClassDefinition> protocols;
+    public ClassDefinition(String name, Cache.CacheBlockAndObject superClass, Map<String, Instance> properties, List<Generic> generics, boolean isProtocol, List<ClassDefinition> protocols){ this.name = name; this.superClass = superClass; this.properties = properties; this.generics = generics; this.isProtocol = isProtocol; this.protocols = protocols; }
     public Map<String, Cache.CacheBlockAndObject> getAllProperties() {
         Map<String, Cache.CacheBlockAndObject> allProperties = new HashMap<String, Cache.CacheBlockAndObject>();
         ClassDefinition classDefinition = this;
@@ -43,21 +59,56 @@ class FunctionDefinition extends Definition {
     public List<String> parameterExternalNames;
     public List<Instance> parameterTypes;
     public int numParametersWithDefaultValue = 0;
+    public int operator = 0;//1: infix, 2: prefix, 3: postfix
     public Instance result;
     public Map<String, String> codeReplacement;//ts->tsCode, java->javaCode; if you can, rather keep it in Property, but sometimes needed for top-level funcs
-    public FunctionDefinition(String name, List<String> parameterExternalNames, List<Instance> parameterTypes, int numParametersWithDefaultValue, Instance result, List<String> generics){ this.name = name; this.parameterExternalNames = parameterExternalNames; this.parameterTypes = parameterTypes; this.numParametersWithDefaultValue = numParametersWithDefaultValue; this.result = result; this.generics = generics; }
+    public FunctionDefinition(String name, List<String> parameterExternalNames, List<Instance> parameterTypes, int numParametersWithDefaultValue, Instance result, List<Generic> generics){ this.name = name; this.parameterExternalNames = parameterExternalNames; this.parameterTypes = parameterTypes; this.numParametersWithDefaultValue = numParametersWithDefaultValue; this.result = result; this.generics = generics; }
     public FunctionDefinition(ParserRuleContext ctx, Visitor visitor) {
+
+        this.generics = GenericUtil.fromParameterClause(GenericUtil.genericParameterClauseCtxFromFunction(ctx), visitor);
+
         List<SwiftParser.ParameterContext> parameters = FunctionUtil.parameters(ctx);
 
-        this.parameterExternalNames = FunctionUtil.parameterExternalNames(parameters);
+        this.parameterExternalNames = FunctionUtil.parameterExternalNames(parameters, ctx instanceof SwiftParser.Subscript_declarationContext);
         this.parameterTypes = FunctionUtil.parameterTypes(parameters, visitor);
         this.numParametersWithDefaultValue = FunctionUtil.numParametersWithDefaultValue(parameters);
-        this.name = FunctionUtil.functionName(ctx, parameterExternalNames, parameterTypes);
+
+        String baseName =
+            ctx instanceof SwiftParser.Function_declarationContext ? ((SwiftParser.Function_declarationContext)ctx).function_name().getText() :
+            ctx instanceof SwiftParser.Protocol_method_declarationContext ? ((SwiftParser.Protocol_method_declarationContext)ctx).function_name().getText() :
+            ctx instanceof SwiftParser.Subscript_declarationContext ? "OP_subscript" :
+            "init";
+
+        Cache.CacheBlockAndObject operator = visitor.cache.find(baseName, ctx);
+        if(operator != null && operator.object instanceof Operator) {
+            SwiftParser.Declaration_modifiersContext modifiers =
+                ctx instanceof SwiftParser.Function_declarationContext ? ((SwiftParser.Function_declarationContext) ctx).function_head().declaration_modifiers() :
+                ctx instanceof SwiftParser.Protocol_method_declarationContext ? ((SwiftParser.Protocol_method_declarationContext) ctx).function_head().declaration_modifiers() :
+                ctx instanceof SwiftParser.Subscript_declarationContext ? ((SwiftParser.Subscript_declarationContext) ctx).subscript_head().declaration_modifiers() :
+                null;
+            if(AssignmentUtil.modifiers(modifiers).contains("prefix")) this.operator = 2;
+            else if(AssignmentUtil.modifiers(modifiers).contains("postfix")) this.operator = 3;
+            else this.operator = 1;
+            baseName = "OP_" + ((Operator)operator.object).word + (this.operator == 2 ? "_PREFIX" : this.operator == 3 ? "_POSTFIX" : "");
+            for(int i = 0; i < parameterExternalNames.size(); i++) {
+                parameterExternalNames.set(i, "");
+            }
+        }
+        this.name = baseName + FunctionUtil.nameAugment(parameterExternalNames, parameterTypes);
 
         this.result =
-            ctx instanceof SwiftParser.Function_declarationContext ? TypeUtil.fromFunction(((SwiftParser.Function_declarationContext) ctx).function_signature().function_result(), ((SwiftParser.Function_declarationContext) ctx).function_body().code_block().statements(), false, visitor) :
+            ctx instanceof SwiftParser.Function_declarationContext ? TypeUtil.fromFunction(((SwiftParser.Function_declarationContext) ctx).function_signature().function_result(), null, false, ctx, visitor) :
+            ctx instanceof SwiftParser.Protocol_method_declarationContext ? TypeUtil.fromFunction(((SwiftParser.Protocol_method_declarationContext) ctx).function_signature().function_result(), null, false, ctx, visitor) :
+            ctx instanceof SwiftParser.Subscript_declarationContext ? TypeUtil.fromFunction(((SwiftParser.Subscript_declarationContext) ctx).function_result(), null, false, ctx, visitor) :
             new Instance("Void", ctx, visitor.cache);
     }
+}
+
+class EnumerationDefinition extends Definition {
+    public Instance rawType;
+    public HashMap<String, String> rawValues;
+    public HashMap<String, Instance> tupleTypes;
+    public EnumerationDefinition(String name, Instance rawType, HashMap<String, String> rawValues, HashMap<String, Instance> tupleTypes) { this.name = name; this.rawType = rawType; this.rawValues = rawValues; this.tupleTypes = tupleTypes; }
 }
 
 class Instance {
@@ -67,6 +118,7 @@ class Instance {
     public boolean isOptional = false;
     public boolean isInout = false;
     public boolean isVariadicParameter = false;
+    public String enumerationDefinition = null;
     //class property modifiers
     public boolean isStatic = false;
     public boolean isOperator = false;
@@ -90,6 +142,7 @@ class Instance {
     public Instance withoutPropertyInfo() {
         Instance instance = new Instance(this.definition, this.genericDefinition, this.generics);
         instance.isOptional = isOptional;
+        instance.enumerationDefinition = enumerationDefinition;
         return instance;
     }
     public String targetType(String language) { return targetType(language, false, false); }
@@ -112,7 +165,7 @@ class Instance {
             }
         }
         if(type == null) type = "any";
-        //TODO might be different based on specified generics too
+        type += GenericUtil.targetType(this, language);
         if(!isInout || baseIfInout) return type;
         return "{get: () => " + type + ", set: (val: " + type + ") => void}";
     }
