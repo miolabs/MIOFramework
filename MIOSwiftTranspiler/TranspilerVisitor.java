@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class TranspilerVisitor extends Visitor {
 
     public TranspilerVisitor(Cache cache, String targetLanguage) {
@@ -18,6 +20,10 @@ public class TranspilerVisitor extends Visitor {
         return ControlFlow.repeatWhile(ctx, this);
     }
 
+    @Override public String visitSwitch_statement(SwiftParser.Switch_statementContext ctx) {
+        return ControlFlow.switchStatement(ctx, this);
+    }
+
     @Override public String visitIf_statement(SwiftParser.If_statementContext ctx) {
         return ControlFlow.ifThen(ctx, this);
     }
@@ -27,10 +33,13 @@ public class TranspilerVisitor extends Visitor {
     }
 
     @Override public String visitFunction_declaration(SwiftParser.Function_declarationContext ctx) {
-        return FunctionUtil.functionDeclaration(ctx, this);
+        return FunctionUtil.functionDeclaration(ctx, ctx.function_head().declaration_modifiers(), this);
     }
     @Override public String visitInitializer_declaration(SwiftParser.Initializer_declarationContext ctx) {
-        return FunctionUtil.functionDeclaration(ctx, this);
+        return FunctionUtil.functionDeclaration(ctx, ctx.initializer_head().declaration_modifiers(), this);
+    }
+    @Override public String visitProtocol_method_declaration(SwiftParser.Protocol_method_declarationContext ctx) {
+        return FunctionUtil.functionDeclaration(ctx, ctx.function_head().declaration_modifiers(), this);
     }
 
     @Override public String visitType(SwiftParser.TypeContext ctx) {
@@ -44,7 +53,6 @@ public class TranspilerVisitor extends Visitor {
     @Override public String visitConstant_declaration(SwiftParser.Constant_declarationContext ctx) {
         return AssignmentUtil.handleConstantDeclaration(ctx, this);
     }
-
     @Override public String visitVariable_declaration(SwiftParser.Variable_declarationContext ctx) {
         return AssignmentUtil.handleVariableDeclaration(ctx, this);
     }
@@ -61,10 +69,21 @@ public class TranspilerVisitor extends Visitor {
         return AssignmentUtil.handlePropertyDeclaration(ctx, this);
     }
 
+    @Override public String visitSubscript_declaration(SwiftParser.Subscript_declarationContext ctx) {
+        return AssignmentUtil.handleSubscriptDeclaration(ctx, this);
+    }
+
     @Override public String visitDeclaration(SwiftParser.DeclarationContext ctx) {
         boolean shouldBeNewLine = ctx.parent instanceof SwiftParser.DeclarationsContext;
         boolean shouldHaveSemicolon = shouldBeNewLine && !(ctx.getChild(0) instanceof SwiftParser.Function_declarationContext);
         return visitChildren(ctx) + (shouldBeNewLine ? (shouldHaveSemicolon ? ";" : "") + "\n" : "");
+    }
+    @Override public String visitProtocol_member_declaration(SwiftParser.Protocol_member_declarationContext ctx) {
+        return visitChildren(ctx) + "\n";
+    }
+
+    @Override public String visitProtocol_property_declaration(SwiftParser.Protocol_property_declarationContext ctx) {
+        return visitChildren(ctx, Arrays.asList(0, 3/*variable_declaration_head & getter_setter_keyword_block*/));
     }
 
     @Override public String visitExpression_element(SwiftParser.Expression_elementContext ctx) {
@@ -77,8 +96,10 @@ public class TranspilerVisitor extends Visitor {
     }
 
     @Override public String visitStruct_keyword(SwiftParser.Struct_keywordContext ctx) {
-        //just treat struct as class for now; we could swap it for an interface, but it's less work that way for now
         return "class ";
+    }
+    @Override public String visitProtocol_keyword(SwiftParser.Protocol_keywordContext ctx) {
+        return "interface ";
     }
 
     @Override public String visitParameter(SwiftParser.ParameterContext ctx) {
@@ -97,9 +118,38 @@ public class TranspilerVisitor extends Visitor {
     @Override public String visitInout(SwiftParser.InoutContext ctx) {
         return "";
     }
+    @Override public String visitFallthrough_statement(SwiftParser.Fallthrough_statementContext ctx) {
+        return "";
+    }
+    @Override public String visitEnum_declaration(SwiftParser.Enum_declarationContext ctx) {
+        return "";
+    }
+    @Override public String visitTypealias_keyword(SwiftParser.Typealias_keywordContext ctx) {
+        return "type ";
+    }
 
-    @Override public String visitType_inheritance_symbol(SwiftParser.Type_inheritance_symbolContext ctx) {
-        return "extends ";
+    @Override public String visitType_inheritance_clause(SwiftParser.Type_inheritance_clauseContext ctx) {
+        String code = "";
+        boolean useComma = false;
+        SwiftParser.Type_inheritance_listContext typeInheritanceListCtx = ctx.type_inheritance_list();
+        ClassDefinition thisDefinition = (ClassDefinition)cache.find(Cache.structureName(ctx.parent), ctx).object;
+        while(typeInheritanceListCtx != null) {
+            String inheritedName = typeInheritanceListCtx.type_identifier().getText();
+            ClassDefinition inheritedDefinition = (ClassDefinition)cache.find(inheritedName, ctx).object;
+            if(thisDefinition.isProtocol) {
+                code += (!useComma ? " extends " : ", ") + inheritedName;
+                useComma = true;
+            }
+            else if(!inheritedDefinition.isProtocol) {
+                code += "extends " + inheritedName;
+            }
+            else {
+                code += (!useComma ? " implements " : ", ") + inheritedName;
+                useComma = true;
+            }
+            typeInheritanceListCtx = typeInheritanceListCtx.type_inheritance_list();
+        }
+        return code;
     }
 
     @Override public String visitClass_body(SwiftParser.Class_bodyContext ctx) {
@@ -111,5 +161,9 @@ public class TranspilerVisitor extends Visitor {
 
     @Override public String visitReturn_statement(SwiftParser.Return_statementContext ctx) {
         return Initializer.handleReturnStatement(ctx, this);
+    }
+
+    @Override public String visitOperator_declaration(SwiftParser.Operator_declarationContext ctx) {
+        return "";
     }
 }

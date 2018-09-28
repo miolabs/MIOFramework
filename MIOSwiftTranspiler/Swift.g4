@@ -39,7 +39,8 @@ top_level : statement* EOF ;
 
 statement
 // : assignment_statement ';'?
- : expression semicolon?
+ : operator_declaration semicolon? //has to take precedence over expression, as otherwise `infix operator +-` was parsed as two expressions `infix` `operator +-`; swapping expression & declaration wouldn't work either
+ | expression semicolon?
  | declaration semicolon?
  | loop_statement semicolon?
  | branch_statement semicolon?
@@ -296,7 +297,6 @@ declaration
  | deinitializer_declaration
  | extension_declaration
  | subscript_declaration
- | operator_declaration
  ;
 
 declarations : declaration+ ;
@@ -367,9 +367,10 @@ didSet_clause : attributes? 'didSet' setter_name? code_block  ;
 // GRAMMAR OF A TYPE ALIAS DECLARATION
 
 typealias_declaration : typealias_head typealias_assignment  ;
-typealias_head : attributes? access_level_modifier? 'typealias' typealias_name  ;
+typealias_head : attributes? access_level_modifier? typealias_keyword typealias_name  ;
+typealias_keyword: 'typealias';
 typealias_name : identifier  ;
-typealias_assignment : assignment_operator type  ;
+typealias_assignment : '=' type  ;
 
 // GRAMMAR OF A FUNCTION DECLARATION
 // NOTE: Swift Grammar Spec indicates that a function_body is optional
@@ -436,7 +437,7 @@ class_body : '{' declarations? '}'  ;
 
 // GRAMMAR OF A PROTOCOL DECLARATION
 
-protocol_declaration : attributes? access_level_modifier? 'protocol' protocol_name type_inheritance_clause? protocol_body  ;
+protocol_declaration : attributes? access_level_modifier? protocol_keyword protocol_name type_inheritance_clause? protocol_body  ;
 protocol_name : identifier  ;
 protocol_body : '{' protocol_member_declarations? '}'  ;
 
@@ -447,6 +448,7 @@ protocol_member_declaration : protocol_property_declaration
  | protocol_associated_type_declaration
  ;
 protocol_member_declarations : protocol_member_declaration protocol_member_declarations? ;
+protocol_keyword : 'protocol';
 
 // GRAMMAR OF A PROTOCOL PROPERTY DECLARATION
 
@@ -465,7 +467,7 @@ protocol_initializer_declaration
 
 // GRAMMAR OF A PROTOCOL SUBSCRIPT DECLARATION
 
-protocol_subscript_declaration : subscript_head subscript_result getter_setter_keyword_block  ;
+protocol_subscript_declaration : subscript_head function_result getter_setter_keyword_block  ;
 
 // GRAMMAR OF A PROTOCOL ASSOCIATED TYPE DECLARATION
 
@@ -498,25 +500,20 @@ extension_body : '{' declarations?'}'  ;
 // GRAMMAR OF A SUBSCRIPT DECLARATION
 
 subscript_declaration
- : subscript_head subscript_result code_block
- | subscript_head subscript_result getter_setter_block
- | subscript_head subscript_result getter_setter_keyword_block
+ : subscript_head function_result getter_setter_block
+ | subscript_head function_result getter_setter_keyword_block
+ | subscript_head function_result code_block
  ;
 
 subscript_head : attributes? declaration_modifiers? 'subscript' parameter_clause  ;
-subscript_result : arrow_operator attributes? type  ;
 
 // GRAMMAR OF AN OPERATOR DECLARATION
 
 operator_declaration : prefix_operator_declaration | postfix_operator_declaration | infix_operator_declaration  ;
-prefix_operator_declaration : 'prefix' 'operator' operator '{' '}'  ;
-postfix_operator_declaration : 'postfix' 'operator' operator '{' '}'  ;
-infix_operator_declaration : 'infix' 'operator' operator '{' infix_operator_attributes '}' ; // Note: infix_operator_attributes is optional by definition so no ? needed
-infix_operator_attributes : precedence_clause? associativity_clause? ;
-precedence_clause : 'precedence' precedence_level ;
-precedence_level : integer_literal ;
-associativity_clause : 'associativity' associativity ;
-associativity : 'left' | 'right' | 'none' ;
+prefix_operator_declaration : 'prefix' 'operator' operator ;
+postfix_operator_declaration : 'postfix' 'operator' operator ;
+infix_operator_declaration : 'infix' 'operator' operator infix_operator_precedence_clause? ;
+infix_operator_precedence_clause: ':' identifier;
 
 // GRAMMAR OF A DECLARATION MODIFIER
 declaration_modifier
@@ -655,7 +652,7 @@ primary_expression
  | literal_expression
  | closure_expression
  | parenthesized_expression
- //| implicit_member_expression NEEDED??
+ | implicit_member_expression
  | wildcard_expression
  | selector_expression
  ;

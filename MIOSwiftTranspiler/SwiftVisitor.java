@@ -639,6 +639,12 @@ public interface SwiftVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTypealias_head(SwiftParser.Typealias_headContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link SwiftParser#typealias_keyword}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTypealias_keyword(SwiftParser.Typealias_keywordContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link SwiftParser#typealias_name}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -903,6 +909,12 @@ public interface SwiftVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProtocol_member_declarations(SwiftParser.Protocol_member_declarationsContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link SwiftParser#protocol_keyword}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitProtocol_keyword(SwiftParser.Protocol_keywordContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link SwiftParser#protocol_property_declaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -981,12 +993,6 @@ public interface SwiftVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSubscript_head(SwiftParser.Subscript_headContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SwiftParser#subscript_result}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSubscript_result(SwiftParser.Subscript_resultContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link SwiftParser#operator_declaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -1011,35 +1017,11 @@ public interface SwiftVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitInfix_operator_declaration(SwiftParser.Infix_operator_declarationContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SwiftParser#infix_operator_attributes}.
+	 * Visit a parse tree produced by {@link SwiftParser#infix_operator_precedence_clause}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitInfix_operator_attributes(SwiftParser.Infix_operator_attributesContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link SwiftParser#precedence_clause}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPrecedence_clause(SwiftParser.Precedence_clauseContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link SwiftParser#precedence_level}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPrecedence_level(SwiftParser.Precedence_levelContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link SwiftParser#associativity_clause}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAssociativity_clause(SwiftParser.Associativity_clauseContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link SwiftParser#associativity}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAssociativity(SwiftParser.AssociativityContext ctx);
+	T visitInfix_operator_precedence_clause(SwiftParser.Infix_operator_precedence_clauseContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SwiftParser#declaration_modifier}.
 	 * @param ctx the parse tree
