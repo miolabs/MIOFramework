@@ -1,0 +1,29 @@
+{
+  "name": "project",
+  "version": "0.0.1",
+  "description": "This is an example project for MIOJSLibs",
+  "scripts": {
+    "preupdate-libs": "npm install",
+    "update-libs": "copyfiles \"node_modules/miojslibs/dist/js/**/*\" ./app/libs/miojslibs/ --up 4",
+    "start": "concurrently \"npm run serve\" \"npm run scss:watch\" \"npm run build:watch\"",
+    "serve": "http-server -s -c-1 -p9090",
+    "build": "tsc --project .",
+    "build:watch": "npm run build -- --watch --preserveWatchOutput",
+    "scss": "node-sass app -o app --output-style compressed",
+    "prescss:watch": "npm run scss",
+    "scss:watch": "npm run scss -- -w app",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "miojslibs": "^0.9.33"
+  },
+  "devDependencies": {
+    "concurrently": "^3.5.1",
+    "copyfiles": "^2.0.0",
+    "http-server": "^0.11.1",
+    "node-sass": "^4.9.0",
+    "typescript": "^2.9.1"
+  }
+}

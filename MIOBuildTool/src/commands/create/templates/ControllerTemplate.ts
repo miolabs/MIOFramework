@@ -1,16 +1,16 @@
 
+import * as path from "path";
+import { projectConfig } from "../../../defaults/projectDefaults";
 import { IAssetData } from "../../../interfaces/IAssetData";
 import { ITemplateData } from "../../../interfaces/ITemplateData";
-import { config } from "../../../utils/ProjectHandler";
 import { camelToSnake, capitalizeFirstLetter, uncapitalizeFirstLetter } from "../../../utils/stringutils";
 import { ViewTemplate } from "./ViewTemplate";
-import * as path from "path";
 
 export function genContainerIdFromName(name: string) {
     return camelToSnake(name).toLowerCase();
 }
 export function genControllerFilePath(name: string) {
-    return path.join(config.tsDir, name);
+    return path.join(projectConfig.tsDir, name);
 }
 export function genControllerName(name: string) {
     name += name.slice(-14) === "ViewController" ? "" : "ViewController";
