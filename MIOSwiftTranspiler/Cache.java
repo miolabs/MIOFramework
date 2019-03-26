@@ -6,27 +6,30 @@ public class Cache {
 
     static class CacheBlockAndObject {
         public ParseTree block;
-        public Object object;//Operator/Definition/Instance
+        public Object object;//PrecedenceGroup/Operator/Definition/Instance
 
         public CacheBlockAndObject(ParseTree block, Object object) {
             this.block = block;
             this.object = object;
         }
     }
-    static class CacheBlockAndExpression {
-        public ParseTree block;
-        public Expression expression;
-
-        public CacheBlockAndExpression(ParseTree block, Expression expression) {
-            this.block = block;
-            this.expression = expression;
-        }
-    }
 
     private Map<ParseTree, Map<String, Object>> cache = new HashMap<ParseTree, Map<String, Object>>();
 
     static public boolean isStructureBlock(ParseTree node) {
-        return node instanceof SwiftParser.Class_bodyContext || node instanceof SwiftParser.Struct_bodyContext;
+        return (
+            node instanceof SwiftParser.Class_bodyContext ||
+            node instanceof SwiftParser.Struct_bodyContext ||
+            node instanceof SwiftParser.Protocol_bodyContext
+        );
+    }
+
+    static public String structureName(ParseTree ctx) {
+        return (
+            ctx instanceof SwiftParser.Class_declarationContext ? ((SwiftParser.Class_declarationContext)ctx).class_name().getText() :
+            ctx instanceof SwiftParser.Struct_declarationContext ? ((SwiftParser.Struct_declarationContext)ctx).struct_name().getText() :
+            ((SwiftParser.Protocol_declarationContext)ctx).protocol_name().getText()
+        );
     }
 
     public ParseTree findNearestAncestorBlock(ParseTree node) {
@@ -35,6 +38,7 @@ public class Cache {
                 node instanceof SwiftParser.Code_blockContext ||
                 node instanceof SwiftParser.Closure_expressionContext ||
                 node instanceof SwiftParser.Explicit_closure_expressionContext ||
+                node instanceof SwiftParser.Switch_caseContext ||
                 isStructureBlock(node);
         if(isBlock) return node;
         if(node == null || node.getParent() == null || node.getParent() == node) return null;
@@ -62,9 +66,14 @@ public class Cache {
             String className = classDeclaration.class_name().getText();
             return find(className, classDeclaration);
         }
-        else {
+        else if(block instanceof SwiftParser.Struct_bodyContext) {
             SwiftParser.Struct_declarationContext structDeclaration = (SwiftParser.Struct_declarationContext)((SwiftParser.Struct_bodyContext)block).parent;
             String className = structDeclaration.struct_name().getText();
+            return find(className, structDeclaration);
+        }
+        else {
+            SwiftParser.Protocol_declarationContext structDeclaration = (SwiftParser.Protocol_declarationContext)((SwiftParser.Protocol_bodyContext)block).parent;
+            String className = structDeclaration.protocol_name().getText();
             return find(className, structDeclaration);
         }
     }
@@ -98,7 +107,7 @@ public class Cache {
         return allTypes;
     }
 
-    public void cacheOne(String identifier, Object object/*Operator/Definition/Instance*/, ParseTree ctx) {
+    public void cacheOne(String identifier, Object object/*PrecedenceGroup/Operator/Definition/Instance*/, ParseTree ctx) {
         //System.out.println("Caching " + identifier + " as " + object.uniqueId());
 
         ParseTree nearestAncestorBlock = findNearestAncestorBlock(ctx);
@@ -106,12 +115,12 @@ public class Cache {
         if(isStructureBlock(nearestAncestorBlock)) {
             //save the variable under class definition too
             CacheBlockAndObject classDefinition = getClassDefinition(nearestAncestorBlock);
-            Instance property = object instanceof FunctionDefinition ? new Instance((FunctionDefinition)object) : (Instance)object;
+            Instance property = (Instance)object;
             if(identifier.equals("init") || identifier.startsWith("init$")) {
                 property.isInitializer = true;
                 if(((SwiftParser.Initializer_declarationContext)ctx).initializer_head().getText().contains("?")) property.isFailableInitializer = true;
             }
-            ((ClassDefinition)classDefinition.object).properties.put(identifier, property);
+            ((ClassDefinition) classDefinition.object).properties.put(identifier, property);
         }
 
         if(!cache.containsKey(nearestAncestorBlock)) {

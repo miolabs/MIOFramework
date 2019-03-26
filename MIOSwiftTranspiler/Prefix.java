@@ -18,14 +18,12 @@ import java.util.regex.Matcher;
 public class Prefix implements PrefixOrExpression {
 
     private ParserRuleContext originalCtx;
-    private SwiftParser.Prefix_operatorContext prefixOperatorContext;
     public ArrayList<PrefixElem> elems = new ArrayList<PrefixElem>();
     public ParserRuleContext originalCtx() {return originalCtx;}
 
     public Prefix(SwiftParser.Prefix_expressionContext prefixCtx, Instance knownType, Visitor visitor) {
         ArrayList<ParserRuleContext> chain = flattenChain(prefixCtx);
         originalCtx = prefixCtx;
-        prefixOperatorContext = prefixCtx.prefix_operator();
 
         Instance currType = null;
         boolean nextIsOptional = false;
@@ -44,6 +42,13 @@ public class Prefix implements PrefixOrExpression {
                 functionCallParams = new ArrayList<ParserRuleContext>();
                 if(functionCall.parenthesized_expression() != null && functionCall.parenthesized_expression().expression_element_list() != null) for(int i = 0; i < functionCall.parenthesized_expression().expression_element_list().expression_element().size(); i++) functionCallParams.add(functionCall.parenthesized_expression().expression_element_list().expression_element().get(i));
                 functionCallParams.add(functionCall.trailing_closure().explicit_closure_expression());
+            }
+
+            //handling .rawValue for enums
+            if(currType != null && currType.enumerationDefinition != null) {
+                currType = currType.withoutPropertyInfo();//essentially used as .clone()
+                currType.enumerationDefinition = null;
+                continue;
             }
 
             PrefixElem elem = PrefixElem.get(ctx, functionCallParams, chain, chainPos, currType, (chainPos + (functionCallParams != null ? 1 : 0) >= chain.size() - 1) ? knownType : null, visitor);
@@ -78,16 +83,13 @@ public class Prefix implements PrefixOrExpression {
     }
 
     public String code(ParseTree ctx, Visitor visitor) {
-        return elemCode(elems, 0, initString(), null, prefixOperatorContext != null && prefixOperatorContext.getText().equals("&"), ctx, visitor);
+        return elemCode(elems, 0, "", null, ctx, visitor);
     }
     public String code(String assignment, ParseTree ctx, Visitor visitor) {
-        return elemCode(elems, 0, initString(), assignment, prefixOperatorContext != null && prefixOperatorContext.getText().equals("&"), ctx, visitor);
+        return elemCode(elems, 0, "", assignment, ctx, visitor);
     }
     public String code(String assignment, int limit, ParseTree ctx, Visitor visitor) {
-        return elemCode(elems.subList(0, limit), 0, initString(), assignment, prefixOperatorContext != null && prefixOperatorContext.getText().equals("&"), ctx, visitor);
-    }
-    private String initString() {
-        return prefixOperatorContext != null && !prefixOperatorContext.getText().equals("&") ? prefixOperatorContext.getText() : "";
+        return elemCode(elems.subList(0, limit), 0, "", assignment, ctx, visitor);
     }
     static public Map<String, String> replacements(List<PrefixElem> elems, int chainPos, boolean isLast, String assignment, Visitor visitor) {
         PrefixElem elem = elems.get(chainPos);
@@ -99,11 +101,18 @@ public class Prefix implements PrefixOrExpression {
         }
         Map<String, String> replacements = new HashMap<String, String>();
         if(codeReplacement != null && codeReplacement.containsKey(visitor.targetLanguage)) replacements.put("", codeReplacement.get(visitor.targetLanguage));
-        if(codeReplacement != null && isLast && assignment != null && assignment.contains("T") && codeReplacement.containsKey(visitor.targetLanguage + "Assignment")) replacements.put("T", codeReplacement.get(visitor.targetLanguage + "Assignment"));
-        if(codeReplacement != null && isLast && assignment != null && assignment.contains("N") && codeReplacement.containsKey(visitor.targetLanguage + "AssignmentNil")) replacements.put("N", codeReplacement.get(visitor.targetLanguage + "AssignmentNil"));
+        if(isLast && assignment != null) {
+            if(assignment.contains("T")) {
+                if(codeReplacement != null && codeReplacement.containsKey(visitor.targetLanguage + "Assignment")) replacements.put("T", codeReplacement.get(visitor.targetLanguage + "Assignment"));
+                else if(assignment.contains("N")) replacements.put("T", "#L" + (chainPos == 0 ? "#R" : elem.replaceWithSubscript ? "[#R]" : ".#R") + " = #ASS");
+            }
+            if(assignment.contains("N")) {
+                if(codeReplacement != null && codeReplacement.containsKey(visitor.targetLanguage + "AssignmentNil")) replacements.put("N", codeReplacement.get(visitor.targetLanguage + "AssignmentNil"));
+            }
+        }
         return replacements;
     }
-    static private String elemCode(List<PrefixElem> elems, int chainPos, String L, String assignment/*null/"T"/"N"/"TN"*/, boolean isInOutExpression, ParseTree ctx, Visitor visitor) {
+    static private String elemCode(List<PrefixElem> elems, int chainPos, String L, String assignment/*null/"T"/"N"/"TN"*/, ParseTree ctx, Visitor visitor) {
         PrefixElem elem = elems.get(chainPos);
         boolean isLast = chainPos + 1 >= elems.size();
 
@@ -117,19 +126,29 @@ public class Prefix implements PrefixOrExpression {
                 replacement.get("");
         }
         else {
-            LR = "#L" + (chainPos == 0 ? "#R" : elem.isSubscript ? "[#R]" : ".#R");
-            if(isLast) {
-                if(assignment != null) {
-                    if(elem.type.isGetterSetter) LR += "$set(#ASS)";
-                    else if(elem.type.isInout) LR += ".set(#ASS)";
-                }
-                else {
-                    if(elem.type.isGetterSetter) LR += "$get()";
-                    else if(elem.type.isInout) LR += ".get()";
+            LR = "#L" + (chainPos == 0 ? "#R" : elem.replaceWithSubscript ? "[#R]" : ".#R");
+            if(chainPos > 0 && elems.get(0).type.definition instanceof EnumerationDefinition) {
+                //we're hiding Enumeration references, e.g. `CompassPoint` in CompassPoint.west
+                LR = "#R";
+            }
+            else if(isLast && assignment != null) {
+                if(elem.isSubscript) LR += "$set(#AA, #ASS)";
+                else if(elem.type.isGetterSetter) LR += "$set(#ASS)";
+                else if(elem.type.isInout) LR += ".set(#ASS)";
+                else if(chainPos > 0 && ((ClassDefinition)elems.get(0).type.definition).isProtocol) {
+                    LR = "if('#R$set' in #L) { " + LR + "$set(#ASS); } else { " + LR + " = #ASS;}";
                 }
             }
-            if(elem.initializerSignature != null) LR = "new " + LR + "(\"" + elem.initializerSignature + "\",#AA)";
-            else if(elem.functionCallParams != null) LR += "(#AA)";
+            else {
+                if(elem.isSubscript) LR += "$get(#AA)";
+                else if(elem.type.isGetterSetter) LR += "$get()";
+                else if(elem.type.isInout) LR += ".get()";
+                else if(chainPos > 0 && ((ClassDefinition)elems.get(0).type.definition).isProtocol) {
+                    LR = "('#R$get' in #L ? " + LR + "$get() : " + LR + ")";
+                }
+                else if(elem.initializerSignature != null) LR = "new " + LR + "(\"" + elem.initializerSignature + "\",#AA)";
+                else if(elem.functionCallParams != null) LR += "(#AA)";
+            }
         }
 
         LR = LR.replaceAll("#L", Matcher.quoteReplacement(L)).replaceAll("#R", Matcher.quoteReplacement(elem.code.trim()));
@@ -144,7 +163,7 @@ public class Prefix implements PrefixOrExpression {
         }
 
         String nextCode =
-                !isLast ? elemCode(elems, chainPos + 1, LR, assignment, isInOutExpression, ctx, visitor)
+                !isLast ? elemCode(elems, chainPos + 1, LR, assignment, ctx, visitor)
                 : LR;
 
         if(elem.isOptional && assignment == null) {
@@ -156,10 +175,6 @@ public class Prefix implements PrefixOrExpression {
             if(initializer != null && initializer.isFailableInitializer) {
                 nextCode = "_.failableInit(" + nextCode + ")";
             }
-        }
-
-        if(isLast && isInOutExpression) {
-            nextCode = "{get: () => " + nextCode + ", set: $val => " + nextCode + " = $val}";
         }
 
         return nextCode;

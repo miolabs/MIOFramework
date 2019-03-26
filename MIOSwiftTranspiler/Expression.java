@@ -7,7 +7,7 @@ import java.util.List;
 //deals with expression context (as defined in Swift.g4), which is a basic code building block
 //breaks the expression up into binary operations (e.g. instance.method() + 1) and arranges them in the order of priority
 //then delegates the calculations to BinaryExpression (e.g. instance.method() + 1) and Prefix (e.g. instance.method())
-//perhaps it might be worth it to join BinaryExpression & Prefix into one module, s binary expressions are really just static functions
+//perhaps it might be worth it to join BinaryExpression & Prefix into one module, as binary expressions are really just static functions
 //(e.g. 1 + 2 is Int.add(1, 2), but that's some major refactoring, so let's leave it as is for now
 public class Expression implements PrefixOrExpression {
 
@@ -27,7 +27,7 @@ public class Expression implements PrefixOrExpression {
 
         List<SwiftParser.Binary_expressionContext> binaries = ctx.binary_expressions() != null ? ctx.binary_expressions().binary_expression() : new ArrayList<SwiftParser.Binary_expressionContext>();
         ArrayList<ParserRuleContext> operators = new ArrayList<ParserRuleContext>();
-        ArrayList<Object /*ParserRuleContext or BinaryExpression*/> ctxs = new ArrayList<Object>();
+        ArrayList<Object /*Prefix_expressionContext or BinaryExpression*/> ctxs = new ArrayList<Object>();
 
         for(int i = -1 + (skipFirst ? 1 : 0); i < binaries.size(); i++) {
             if(skipFirst ? i >= 1 : i >= 0) {
@@ -40,10 +40,22 @@ public class Expression implements PrefixOrExpression {
             }
         }
 
-        for(int priority = BinaryExpression.minOperatorPriority; priority <= BinaryExpression.maxOperatorPriority; priority++) {
-            for(int i = 0; i < operators.size(); i++) {
+        for(int i = 0; i < ctxs.size(); i++) {
+            if(ctxs.get(i) == null) continue;
+            SwiftParser.Prefix_expressionContext prefixCtx = (SwiftParser.Prefix_expressionContext) ctxs.get(i);
+            if(prefixCtx.postfix_expression().chain_postfix_expression() instanceof SwiftParser.Chain_postfix_operatorContext && !BinaryExpression.isOptionalChainingOperator(((SwiftParser.Chain_postfix_operatorContext) prefixCtx.postfix_expression().chain_postfix_expression()).postfix_operator())) {
+                ctxs.set(i, new BinaryExpression(ctxs.get(i), null, ((SwiftParser.Chain_postfix_operatorContext) prefixCtx.postfix_expression().chain_postfix_expression()).postfix_operator()));
+            }
+            if(prefixCtx.prefix_operator() != null) {
+                ctxs.set(i, new BinaryExpression(null, ctxs.get(i)/*can't be prefixCtx because might be postfix binary expression as set above*/, prefixCtx.prefix_operator()));
+            }
+        }
+
+        for(int j = 0; j < PrecedenceGroupLoader.precedenceGroups.size(); j++) {
+            PrecedenceGroup precedenceGroup = PrecedenceGroupLoader.precedenceGroups.get(j);
+            for(int i = precedenceGroup.leftAssociativity ? 0 : operators.size() - 1; precedenceGroup.leftAssociativity ? i < operators.size() : i >= 0; i += precedenceGroup.leftAssociativity ? 1 : -1) {
                 ParserRuleContext operator = operators.get(i);
-                if(BinaryExpression.priorityForOperator(operator, ctx, visitor) != priority) continue;
+                if(!BinaryExpression.operatorBelongsToPrecedenceGroup(operator, precedenceGroup, ctx, visitor)) continue;
                 Object L = ctxs.get(i);
                 Object R = ctxs.get(i + 1);
                 BinaryExpression LR = new BinaryExpression(L, R, operator);
@@ -51,12 +63,12 @@ public class Expression implements PrefixOrExpression {
                 ctxs.remove(i);
                 ctxs.add(i, LR);
                 operators.remove(i);
-                i--;
+                if(precedenceGroup.leftAssociativity) i--;
             }
         }
 
         if(ctxs.get(0) instanceof SwiftParser.Prefix_expressionContext) {
-            Prefix prefix = new Prefix((SwiftParser.Prefix_expressionContext)ctxs.get(0), knownType, visitor);
+            Prefix prefix = new Prefix((SwiftParser.Prefix_expressionContext) ctxs.get(0), knownType, visitor);
             this.code = prefix.code(ctx, visitor);
             this.type = prefix.type();
         }

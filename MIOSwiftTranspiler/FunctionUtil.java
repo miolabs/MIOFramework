@@ -1,5 +1,4 @@
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,12 +12,13 @@ public class FunctionUtil {
         return parameterList != null ? parameterList.parameter() : new ArrayList<SwiftParser.ParameterContext>();
     }
 
-    static public ArrayList<String> parameterExternalNames(List<?extends ParserRuleContext> parameters) {
+    static public ArrayList<String> parameterExternalNames(List<?extends ParserRuleContext> parameters, boolean isSubscript) {
         ArrayList<String> names = new ArrayList<String>();
-        for(int i = 0; parameters != null && i < parameters.size(); i++) names.add(parameterExternalName(parameters.get(i), i));
+        for(int i = 0; parameters != null && i < parameters.size(); i++) names.add(parameterExternalName(parameters.get(i), isSubscript));
         return names;
     }
-    static private String parameterExternalName(ParserRuleContext parameter, int parameterPos) {
+    static private String parameterExternalName(ParserRuleContext parameter, boolean isSubscript) {
+        if(isSubscript) return "";
         if(parameter instanceof SwiftParser.ParameterContext) {
             if(((SwiftParser.ParameterContext)parameter).external_parameter_name() != null) {
                 if(((SwiftParser.ParameterContext)parameter).external_parameter_name().getText().equals("_")) return "";
@@ -52,13 +52,6 @@ public class FunctionUtil {
         return augment;
     }
 
-    static public String functionName(ParserRuleContext ctx, List<String> parameterExternalNames, List<Instance> parameterTypes) {
-        String baseName =
-            ctx instanceof SwiftParser.Function_declarationContext ? ((SwiftParser.Function_declarationContext)ctx).function_name().getText() :
-            "init";
-        return baseName + nameAugment(parameterExternalNames, parameterTypes);
-    }
-
     static public ArrayList<Instance> parameterTypes(List<?extends ParserRuleContext> parameters, Visitor visitor) {
         ArrayList<Instance> parameterTypes = new ArrayList<Instance>();
         if(parameters == null) return parameterTypes;
@@ -76,7 +69,7 @@ public class FunctionUtil {
                 parameterType = null;
             }
             else {
-                parameterType = TypeUtil.infer(parameter instanceof SwiftParser.ParameterContext ? ((SwiftParser.ParameterContext) parameter).default_argument_clause().expression() : ((SwiftParser.Expression_elementContext) parameter).expression(), visitor);
+                parameterType = TypeUtil.infer(parameter instanceof SwiftParser.ParameterContext ? ((SwiftParser.ParameterContext) parameter).default_argument_clause().expression() : parameter instanceof SwiftParser.Expression_elementContext ? ((SwiftParser.Expression_elementContext) parameter).expression() : (SwiftParser.ExpressionContext) parameter, visitor);
             }
             if(parameterType == null) return null;
             parameterTypes.add(parameterType);
@@ -100,15 +93,18 @@ public class FunctionUtil {
         Map<String, Cache.CacheBlockAndObject> matches = new HashMap<String, Cache.CacheBlockAndObject>();
         varName = varName.trim();
 
-        for(Map.Entry<String, Cache.CacheBlockAndObject> iterator:allProperties.entrySet()) {
-            boolean passes = (
-                (iterator.getValue().object instanceof Instance && ((Instance) iterator.getValue().object).definition instanceof FunctionDefinition) ||
-                iterator.getValue().object instanceof FunctionDefinition
-            ) && functionStartsWith(iterator.getKey(), varName);
-            if(passes) {
-                matches.put(iterator.getKey(), iterator.getValue());
+        if(allProperties != null) {
+            for(Map.Entry<String, Cache.CacheBlockAndObject> iterator:allProperties.entrySet()) {
+                boolean passes = (
+                        (iterator.getValue().object instanceof Instance && ((Instance) iterator.getValue().object).definition instanceof FunctionDefinition) ||
+                                iterator.getValue().object instanceof FunctionDefinition
+                ) && functionStartsWith(iterator.getKey(), varName);
+                if(passes) {
+                    matches.put(iterator.getKey(), iterator.getValue());
+                }
             }
         }
+
         return matches;
     }
 
@@ -141,14 +137,10 @@ public class FunctionUtil {
                     expectedParameterExternalName = functionType.parameterExternalNames.get(i);
                     expectedParameterType = functionType.parameterTypes.get(i);
                 }
-                if(
-                    !expectedParameterExternalName.equals(parameterExternalNames.get(i)) || (parameterTypes.get(i) != null && (
-                        //if parameter is of known type, compare its uniqueId with supplied parameter's uniqueId
-                        expectedParameterType.definition != null ? !expectedParameterType.uniqueId().equals(parameterTypes.get(i).uniqueId()) :
-                        //if parameter is of a generic type, check if our lType has that generic defined and then compare that definition's uniqueId
-                        !lType.generics.get(expectedParameterType.genericDefinition).uniqueId().equals(parameterTypes.get(i).uniqueId())
-                    ))
-                ) parametersMatch = false;
+                if(lType != null) expectedParameterType = lType.specifyGenerics(expectedParameterType);
+                if(!expectedParameterExternalName.equals(parameterExternalNames.get(i))) { parametersMatch = false; break; }
+                if(isInitializer && expectedParameterType.definition == null && expectedParameterType.genericDefinition != null/* TODO && genericsNotYetSpecified*/) {}
+                else if(parameterTypes.get(i) != null && !TypeUtil.conformsToType(parameterTypes.get(i), expectedParameterType)){ parametersMatch = false; break; }
             }
             if(!parametersMatch) continue;
             if(parameterTypes.size() >= functionType.parameterTypes.size() - functionType.numParametersWithDefaultValue) return iterator.getKey().substring(defaultFunctionName.length());
@@ -161,20 +153,33 @@ public class FunctionUtil {
         return name.startsWith(varName) && (name.length() == varName.length() || name.startsWith(varName + "$"));
     }
 
-    static public String functionDeclaration(ParserRuleContext ctx, Visitor visitor) {
+    static public String functionDeclaration(ParserRuleContext ctx, SwiftParser.Declaration_modifiersContext modifiers, Visitor visitor) {
         FunctionDefinition functionDefinition = new FunctionDefinition(ctx, visitor);
-        boolean isInClass = ctx.parent != null && ctx.parent.parent instanceof SwiftParser.DeclarationsContext;
+        boolean isInClass = ctx.parent != null && (ctx.parent.parent instanceof SwiftParser.DeclarationsContext || ctx.parent.parent instanceof SwiftParser.Protocol_member_declarationsContext);
+        SwiftParser.Generic_parameter_clauseContext genericParameterClauseCtx = GenericUtil.genericParameterClauseCtxFromFunction(ctx);
+        boolean isSubscript = ctx instanceof SwiftParser.Subscript_declarationContext;
 
-        return (
-            (!isInClass ? "function " : "") +
-            FunctionUtil.functionName(ctx, functionDefinition.parameterExternalNames, functionDefinition.parameterTypes) +
-            "(" + visitor.visitChildren(parameterList(ctx)) + "):" +
+        String code = "";
+        List<SwiftParser.Code_blockContext> codeBlockCtxs = FunctionUtil.codeBlockCtxs(ctx);
+        for(int j = 0; j < codeBlockCtxs.size(); j++) {
+            code += (
+                (AssignmentUtil.modifiers(modifiers).contains("static") ? "static " : "") +
+                (!isInClass ? "function " : "") +
+                functionDefinition.name + (isSubscript ? j == 0 ? "$get" : "$set" : "") +
+                (genericParameterClauseCtx != null ? visitor.visit(genericParameterClauseCtx) : "") +
+                "(" +
+                visitor.visitChildren(parameterList(ctx)) +
+                (isSubscript && j == 1 ? ", " + AssignmentUtil.setterArgumentName((SwiftParser.Setter_clauseContext) codeBlockCtxs.get(1).parent) + ": " + functionDefinition.result.targetType(visitor.targetLanguage) : "") +
+                "):" +
                 functionDefinition.result.targetType(visitor.targetLanguage) +
-            visitor.visit(codeBlockCtx(ctx))
-        );
+                visitor.visit(codeBlockCtxs.get(j))
+            );
+        }
+
+        return code;
     }
 
-    static public String closureExpression(SwiftParser.Closure_expressionContext ctx, Instance type, List<ParserRuleContext/*Expression_elementContext or Closure_expressionContext*/> functionCallParams, Visitor visitor) {
+    static public String closureExpression(SwiftParser.Closure_expressionContext ctx, Instance type, List<? extends ParserRuleContext/*Expression_elementContext or Closure_expressionContext*/> functionCallParams, Visitor visitor) {
         String closureExpression = "";
         if(ctx.operator() != null) {
             closureExpression = "(a, b) => a " + ctx.operator().getText() + " b";
@@ -234,12 +239,25 @@ public class FunctionUtil {
         return parameterNames;
     }
 
-    static public SwiftParser.Code_blockContext codeBlockCtx(ParserRuleContext ctx) {
-        return ctx instanceof SwiftParser.Function_declarationContext ? ((SwiftParser.Function_declarationContext)ctx).function_body().code_block() :
-               ((SwiftParser.Initializer_declarationContext)ctx).initializer_body().code_block();
+    static public List<SwiftParser.Code_blockContext> codeBlockCtxs(ParserRuleContext ctx) {
+        List<SwiftParser.Code_blockContext> codeBlockCtxs = new ArrayList<SwiftParser.Code_blockContext>();
+        if(ctx instanceof SwiftParser.Function_declarationContext) codeBlockCtxs.add(((SwiftParser.Function_declarationContext)ctx).function_body().code_block());
+        else if(ctx instanceof SwiftParser.Initializer_declarationContext) codeBlockCtxs.add(((SwiftParser.Initializer_declarationContext)ctx).initializer_body().code_block());
+        else if(ctx instanceof SwiftParser.Subscript_declarationContext) {
+            if(((SwiftParser.Subscript_declarationContext) ctx).code_block() != null) {
+                codeBlockCtxs.add(((SwiftParser.Subscript_declarationContext) ctx).code_block());
+            }
+            else {
+                codeBlockCtxs.add(((SwiftParser.Subscript_declarationContext) ctx).getter_setter_block().getter_clause().code_block());
+                if(((SwiftParser.Subscript_declarationContext) ctx).getter_setter_block().setter_clause() != null) codeBlockCtxs.add(((SwiftParser.Subscript_declarationContext) ctx).getter_setter_block().setter_clause().code_block());
+            }
+        }
+        return codeBlockCtxs;
     }
     static public SwiftParser.Parameter_listContext parameterList(ParserRuleContext ctx) {
         return ctx instanceof SwiftParser.Function_declarationContext ? ((SwiftParser.Function_declarationContext)ctx).function_signature().parameter_clauses().parameter_clause().parameter_list() :
-               ((SwiftParser.Initializer_declarationContext)ctx).parameter_clause().parameter_list();
+               ctx instanceof SwiftParser.Initializer_declarationContext ? ((SwiftParser.Initializer_declarationContext)ctx).parameter_clause().parameter_list() :
+               ctx instanceof SwiftParser.Subscript_declarationContext ? ((SwiftParser.Subscript_declarationContext)ctx).subscript_head().parameter_clause().parameter_list() :
+               ((SwiftParser.Protocol_method_declarationContext)ctx).function_signature().parameter_clauses().parameter_clause().parameter_list();
     }
 }

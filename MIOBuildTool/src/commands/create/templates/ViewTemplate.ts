@@ -1,12 +1,13 @@
+import * as path from "path";
+import { projectConfig } from "../../../defaults/projectDefaults";
 import { IAssetData } from "../../../interfaces/IAssetData";
 import { ITemplateData } from "../../../interfaces/ITemplateData";
-import { ProjectHandler, config } from "../../../utils/ProjectHandler";
+import { ProjectHandler } from "../../../utils/project";
 import { capitalizeFirstLetter } from "../../../utils/stringutils";
 import { StyleTemplate } from "./StyleTemplate";
-import * as path from "path";
 
 export function genHTMLFilePath(name: string) {
-    return path.join(config.htmlDir, name);
+    return path.join(projectConfig.htmlDir, name);
 }
 export function genViewName(name: string) {
     name += name.slice(-4) === "View" ? "" : "View";
