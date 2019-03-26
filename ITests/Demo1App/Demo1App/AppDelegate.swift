@@ -1,9 +1,9 @@
 //
 //  AppDelegate.swift
-//  TestApp
+//  Demo1App
 //
-//  Created by Javier Segura Perez on 27/09/2018.
-//  Copyright © 2018 Javier Segura Perez. All rights reserved.
+//  Created by Javier Segura Perez on 26/03/2019.
+//  Copyright © 2019 Javier Segura Perez. All rights reserved.
 //
 
 import UIKit
@@ -16,10 +16,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        window = UIWindow(frame: UIScreen.main.bounds)
-        let vc = ViewController()        
-        window!.rootViewController = vc
-        window!.makeKeyAndVisible()
         return true
     }
 
