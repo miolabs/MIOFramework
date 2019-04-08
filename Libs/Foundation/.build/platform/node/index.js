@@ -36,4 +36,3 @@ __export(require("../../NSLog"));
 __export(require("../../NSNumber"));
 __export(require("../../NSSortDescriptor"));
 __export(require("../../NSPropertyListSerialization"));
-//# sourceMappingURL=index.js.map

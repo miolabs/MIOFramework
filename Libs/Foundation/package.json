@@ -4,13 +4,16 @@
   "description": "Apple foundation framework",
   "main": "index.js",
   "scripts": {
-	"test": "echo \"Error: no test specified\" && exit 1",
-	"transpilets": "tsc <urltopath>",
-	"build:dev": "gulp build dev"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:dev:node": "BUILD_ENV=dev BUILD_PLATFORM=node gulp build",
+    "build:prod:node": "BUILD_ENV=pro BUILD_PLATFORM=node gulp build",
+    "build:dev:web": "BUILD_ENV=dev BUILD_PLATFORM=web gulp build",
+    "build:prod:web": "BUILD_ENV=pro BUILD_PLATFORM=web gulp build"
   },
   "author": "MIOLabs Team",
   "license": "APACHE",
   "devDependencies": {
-    "gulp": "^4.0.0"
+    "gulp": "^4.0.0",
+    "gulp-typescript": "^5.0.1"
   }
 }
