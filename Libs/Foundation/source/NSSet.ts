@@ -1,5 +1,6 @@
 import { NSObject } from "./NSObject";
 import { NSPredicate, _NSPredicateFilterObjects } from "./NSPredicate";
+import "./NSArray";
 
 export class NSSet extends NSObject {
 

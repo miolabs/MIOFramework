@@ -1,5 +1,6 @@
-import {NSFormatter} from './NSFormatter'
-import {NSCoreGetBrowser, NSCoreBrowserType} from '../NSCore/platform'
+import { NSFormatter } from './NSFormatter'
+import { MIOCoreGetPlatform } from './core/MIOCore';
+import { MIOCorePlatformType } from './core/MIOCoreTypes';
 
 export enum NSDateFormatterStyle {
     NoStyle,
@@ -19,8 +20,8 @@ export class NSDateFormatter extends NSFormatter {
     init(){
         super.init();
 
-        let browser = NSCoreGetBrowser();
-        if (browser == NSCoreBrowserType.Safari)
+        let browser = MIOCoreGetPlatform();
+        if (browser == MIOCorePlatformType.Safari)
             this.browserDateSeparatorSymbol = "/";
         else 
             this.browserDateSeparatorSymbol = "-";

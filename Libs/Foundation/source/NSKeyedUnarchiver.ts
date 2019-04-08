@@ -1,7 +1,6 @@
 import { NSCoder } from "./NSCoder";
-import { NSError } from "./NSError";
 import { NSPropertyListSerialization } from "./NSPropertyListSerialization";
-import { NSClassFromString } from "../NSCore/platform/Web/NSCore_Web";
+import { NSClassFromString } from "./core/MIOCore";
 
 
 export class NSKeyedUnarchiver extends NSCoder
