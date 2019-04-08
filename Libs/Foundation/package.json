@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
 	"test": "echo \"Error: no test specified\" && exit 1",
-	"transpilets": "tsc <urltopath>"
+	"transpilets": "tsc <urltopath>",
+	"build:dev": "gulp build dev"
   },
   "author": "MIOLabs Team",
   "license": "APACHE",

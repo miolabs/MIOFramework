@@ -3,8 +3,8 @@ const { series, parallel } = require("gulp");
 const fs = require("fs");
 const utils = require("./gulp.utils");
 
-function buildLibs(cb) {
-	utils.readDir();
+function build(env, cb) {
+
 	cb();
 }
 
