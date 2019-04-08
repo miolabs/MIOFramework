@@ -10,19 +10,32 @@
     "stpull": "git subtree pull --prefix=MIOSwiftTranspiler https://github.com/miolabs/MIOSwiftTranspiler master --squash",
     "lpush": "git subtree push --prefix=MIOLibs https://github.com/miolabs/MIOLibs master",
     "lpull": "git subtree pull --prefix=MIOLibs https://github.com/miolabs/MIOLibs master --squash",
-    "pull": "npm run btpull && npm run stpull && npm run lpull"
+    "pull": "npm run btpull && npm run stpull && npm run lpull",
+    "buildts": "../swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -Xfrontend -disable-access-control -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk -target arm64-apple-ios12.2 -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks ./ITests/Demo1App/Demo1App/.build/data.swift > ./ITests/Demo1App/Demo1App/.build/data.ts",
+    "transpilets": "tsc ./ITests/Demo1App/Demo1App/.build/data.ts"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/miolabs/MIOFramework.git"
   },
-  "author": "Mátyás Budavári <budavariam@gmail.com> (https://budavariam.github.io)",
+  "author": "Edgar Pedreño <edgar.pedreno@gmail.com> (https://eddyspa.github.io) Mátyás Budavári <budavariam@gmail.com> (https://budavariam.github.io)",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/miolabs/MIOFramework/issues"
   },
   "homepage": "https://github.com/miolabs/MIOFramework#readme",
   "devDependencies": {
-    "gulp": "^4.0.0"
+    "file-system": "^2.2.2",
+    "gulp": "^4.0.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-typescript": "^5.0.1",
+    "gulp-uglify": "^3.0.2",
+    "rimraf": "^2.6.3",
+    "xml2js": "^0.4.19"
+  },
+  "dependencies": {
+    "miojslibs": "^0.9.128",
+    "readable-stream": "^3.3.0",
+    "typescript": "^3.4.1"
   }
 }
