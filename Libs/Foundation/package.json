@@ -1,0 +1,15 @@
+{
+  "name": "apple-foundation",
+  "version": "1.0.0",
+  "description": "Apple foundation framework",
+  "main": "index.js",
+  "scripts": {
+	"test": "echo \"Error: no test specified\" && exit 1",
+	"transpilets": "tsc <urltopath>"
+  },
+  "author": "MIOLabs Team",
+  "license": "APACHE",
+  "devDependencies": {
+    "gulp": "^4.0.0"
+  }
+}
