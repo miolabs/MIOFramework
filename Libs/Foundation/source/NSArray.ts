@@ -1,5 +1,21 @@
 //For code completion the interface is defined in types/mio/index.d.ts
 
+interface Array<T>
+{
+    count();
+    addObject(object);
+    removeObject(object);
+    removeObjectAtIndex(index);
+    indexOfObject(object);
+    containsObject(object);
+    objectAtIndex(index);
+    firstObject();
+    lastObject();
+};
+
+Array.prototype.addObject = function(){
+    return this.length;
+}
 
 Array.prototype.addObject = function(object){
     this.push(object);

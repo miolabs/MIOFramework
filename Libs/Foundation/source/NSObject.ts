@@ -2,8 +2,7 @@
  * Created by godshadow on 26/3/16.
  */
 
-import { NSClassFromString } from "../NSCore/platform";
-
+import { NSClassFromString } from "./core/MIOCore";
 
 export class NSObject
 {

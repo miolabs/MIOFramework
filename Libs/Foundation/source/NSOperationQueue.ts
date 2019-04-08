@@ -1,5 +1,6 @@
 import { NSObject } from "./NSObject";
 import { NSOperation } from "./NSOperation";
+import "./NSArray";
 
 export class NSOperationQueue extends NSObject {
 

@@ -1,6 +1,6 @@
-import { NSCoreLexer } from "../NSCore";
 import { NSObject } from "./NSObject";
 import { NSISO8601DateFormatter } from "./NSISO8601DateFormatter";
+import { MIOCoreLexer } from "./core/MIOCoreLexer";
 
 /**
  * Created by godshadow on 1/5/16.
@@ -280,7 +280,7 @@ export class NSPredicate extends NSObject {
      
     predicateGroup = null;    
 
-    private lexer:NSCoreLexer = null;
+    private lexer:MIOCoreLexer = null;
 
     public static predicateWithFormat(format) {
         let p = new NSPredicate();
@@ -309,7 +309,7 @@ export class NSPredicate extends NSObject {
 
     private tokenizeWithFormat(format:string){
         
-        this.lexer = new NSCoreLexer(format);
+        this.lexer = new MIOCoreLexer(format);
         
         // Values
         

@@ -10,21 +10,18 @@ export class NSURLRequest extends NSObject
     binary = false;
     download = false;
 
-    static requestWithURL(url:NSURL):NSURLRequest
-    {
+    static requestWithURL(url:NSURL):NSURLRequest{
         var request = new NSURLRequest();
         request.initWithURL(url);
 
         return request;
     }
 
-    initWithURL(url:NSURL)
-    {
+    initWithURL(url:NSURL){
         this.url = url;
     }
 
-    setHeaderField(field, value)
-    {
+    setHeaderField(field, value){
         this.headers.push({"Field" : field, "Value" : value});
     }
 }

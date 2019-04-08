@@ -1,4 +1,5 @@
-import { NSCoreGetBrowser, NSCoreBrowserType } from "../NSCore/platform";
+import { MIOCoreGetPlatform} from './core/MIOCore';
+import { MIOCorePlatformType } from './core/MIOCoreTypes';
 import { NSDateFormatter, NSDateFormatterStyle } from "./NSDateFormatter";
 
 export class NSISO8601DateFormatter extends NSDateFormatter {
@@ -16,7 +17,7 @@ export class NSISO8601DateFormatter extends NSDateFormatter {
 
         if (str == null) return null;
         let dateString:string = null;
-        if (NSCoreGetBrowser() == NSCoreBrowserType.Safari){
+        if (MIOCoreGetPlatform() == MIOCorePlatformType.Safari){
             dateString = str.split('-').join("/");
             if (dateString.length > 19) dateString = dateString.substr(0, 19);
         }

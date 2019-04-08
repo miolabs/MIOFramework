@@ -1,4 +1,10 @@
 
+// Core tools
+export * from '../../core/MIOCoreTypes'
+export * from '../node/MIOCore_node'
+export * from '../../core/MIOCoreLexer'
+
+// Apple libs
 export * from '../../NSPoint'
 export * from '../../NSRange'
 export * from '../../NSRect'
