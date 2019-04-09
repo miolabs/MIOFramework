@@ -7,7 +7,7 @@ import { NSClassFromString } from "./core/MIOCore";
 export class NSObject
 {
     private _className:string = null;
-    getClassName(){
+    getClassName():string {
         if (this._className != null) return this._className;
 
         this._className = this.constructor["name"];
@@ -18,15 +18,15 @@ export class NSObject
         return this._className;
     }    
     
-    get className (){
+    get className():string{
         return this.getClassName();
     }
 
     keyPaths = {};
 
-    init() {}
+    init(){}
 
-    private _notifyValueChange(key:string, type:string) {
+    private _notifyValueChange(key:string, type:string){
         
         let observers = this.keyPaths[key];
         if (observers == null) return;
@@ -66,7 +66,7 @@ export class NSObject
         this._notifyValueChange(key, "did");
     }
 
-    private _addObserver(obs, key:string, context, keyPath?:string) {
+    private _addObserver(obs:any, key:string, context:any, keyPath?:string) {
 
         let observers = this.keyPaths[key];
         if (observers == null)
@@ -94,7 +94,7 @@ export class NSObject
         return [key, offset];
     }
 
-    addObserver(obs, keypath:string, context?)
+    addObserver(obs:any, keypath:string, context?:any)
     {
         let [key, offset] = this._keyFromKeypath(keypath);
         
@@ -102,8 +102,8 @@ export class NSObject
             this._addObserver(obs, key, context);
         }
         else {
-            var obj = this;
-            var exit = false;
+            let obj = this;
+            let exit = false;
             while (exit == false) {                
                 if (offset == null) {
                     obj._addObserver(obs, key, context, keypath);
@@ -119,7 +119,7 @@ export class NSObject
         }
     }
 
-    removeObserver(obs, keypath:string)
+    removeObserver(obs:any, keypath:string)
     {
         let observers = this.keyPaths[keypath];
         if (observers == null)
@@ -129,7 +129,7 @@ export class NSObject
         observers.splice(index, 1);
     }
 
-    setValueForKey(value, key:string) {
+    setValueForKey(value:any, key:string) {
     
         this.willChangeValue(key);
         this[key] = value;

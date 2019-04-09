@@ -2,7 +2,14 @@
   "name": "apple-foundation",
   "version": "1.0.0",
   "description": "Apple foundation framework",
-  "main": "index.js",
+  "author": "MIOLabs Team",
+  "license": "APACHE",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:dev:node": "BUILD_ENV=dev BUILD_PLATFORM=node gulp build",
@@ -10,11 +17,13 @@
     "build:dev:web": "BUILD_ENV=dev BUILD_PLATFORM=web gulp build",
     "build:prod:web": "BUILD_ENV=pro BUILD_PLATFORM=web gulp build"
   },
-  "author": "MIOLabs Team",
-  "license": "APACHE",
   "devDependencies": {
+    "bundle-dts": "^1.0.1",
     "decimal.js": "^10.1.1",
     "gulp": "^4.0.0",
-    "gulp-typescript": "^5.0.1"
+    "gulp-typescript": "^5.0.1",
+    "rollup": "^1.9.0",
+    "rollup-plugin-typescript2": "^0.20.1",
+    "typescript": "^3.4.2"
   }
 }

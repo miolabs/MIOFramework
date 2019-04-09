@@ -4,17 +4,17 @@ import { NSObject } from "./NSObject";
 
 export interface NSCoding
 {
-    initWithCoder?(coder:NSCoder);
-    encodeWithCoder?(coder:NSCoder);
+    initWithCoder?(coder:NSCoder):void;
+    encodeWithCoder?(coder:NSCoder):void;
 }
 
 export class NSCoder extends NSObject
 {
-    decodeIntegerForKey(key:string){
+    decodeIntegerForKey(key:string):any{
 
     }
 
-    decodeObjectForKey(key:string){
+    decodeObjectForKey(key:string):any{
 
     }
 }
