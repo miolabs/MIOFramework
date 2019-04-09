@@ -1,6 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "include": [
-	  "source/platform/web/index.ts"
-  ]
-}
