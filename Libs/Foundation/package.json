@@ -13,21 +13,20 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:dev:node": "BUILD_ENV=dev BUILD_PLATFORM=node gulp build",
-    "build:prod:node": "BUILD_ENV=pro BUILD_PLATFORM=node gulp build",
+    "build:prod:node": "BUILD_ENV=prod BUILD_PLATFORM=node gulp build",
     "build:dev:web": "BUILD_ENV=dev BUILD_PLATFORM=web gulp build",
-    "build:prod:web": "BUILD_ENV=pro BUILD_PLATFORM=web gulp build"
+    "build:prod:web": "BUILD_ENV=prod BUILD_PLATFORM=web gulp build"
   },
   "devDependencies": {
-    "bundle-dts": "^1.0.1",
     "decimal.js": "^10.1.1",
+    "dts-bundle": "^0.7.3",
     "gulp": "^4.0.0",
     "gulp-typescript": "^5.0.1",
-<<<<<<< HEAD
-    "gulp-uglify": "^3.0.2"
-=======
+    "gulp-uglify": "^3.0.2",
+    "readable-stream": "^3.3.0",
+    "rimraf": "^2.6.3",
     "rollup": "^1.9.0",
     "rollup-plugin-typescript2": "^0.20.1",
     "typescript": "^3.4.2"
->>>>>>> df8a789575071a43ce85946cf72a6c8edc36a21a
   }
 }
