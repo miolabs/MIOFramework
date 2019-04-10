@@ -60,10 +60,8 @@ function parseStoryBoard(cb) {
 		filesArr.unshift(item);
 	});
 	for(item of filesArr) {
-		var fileString = fs.readFileSync(pathStoryBoard+item, "utf8");
-		parseString(fileString, function(err, xml) {
-			sb.parseDocument(xml);
-		});
+		var fileString = fs.readFileSync(pathStoryBoard+item, "utf8");		
+		sb.parseDocument(fileString);		
 	}
 	cb();
 }

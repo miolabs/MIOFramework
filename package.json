@@ -25,6 +25,8 @@
   },
   "homepage": "https://github.com/miolabs/MIOFramework#readme",
   "devDependencies": {
+    "@miolabs/mio-foundation-node": "^1.0.0",
+    "decimal.js": "^10.1.1",
     "file-system": "^2.2.2",
     "gulp": "^4.0.0",
     "gulp-sourcemaps": "^2.6.5",

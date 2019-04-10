@@ -1,18 +1,129 @@
 var fs = require("file-system");
+var NSXMLParser = require("@miolabs/mio-foundation-node").NSXMLParser;
 
 //GLOBAL VARIABLES
 var currentFileName = null;
 var currentFileContent = null;
+var elementsStack = [];
+var currentElement = null;
 
-function parseDocument(node) {	
-	console.log('Entering Document');		
+function parseDocument(xmlString) {	
+	console.log('Entering Document');			
 
-	let doc = node["document"];
-	if (doc == null) return null; // Error
+	var parser = new NSXMLParser();
+	parser.initWithString(xmlString, this);
+	parser.parse();	
+}
 
-	parseScenes(doc["scenes"]);
+function parserDidStartDocument(parser){
+	console.log("Start to parse the storyboard");
+}
 
-	console.log(currentFileContent);
+function parserDidStartElement(parser, element, attributes){
+	
+	if (element == "scene"){				
+		let id = attributes["sceneID"];
+		currentFileName = "scene-" + id + ".html";		
+		currentFileContent = "<html><head><link rel='stylesheet' type='text/css' href='base.css'></head><body><div class='scene' id='"+ id +"'>";
+	}
+	else if (element == "viewController"){
+		let id = attributes["id"];
+		let customClass = attributes["customClass"];
+					
+		currentFileContent += "<div class='viewController' id='" + id + "'";	
+		if (customClass != null) currentFileContent += " data-class='" + customClass + "'";
+		currentFileContent += ">";											
+	}
+	else if (element == "view"){
+		pushNewElement(element, attributes);
+	}
+	else if (element == "label"){
+		let item = pushNewElement(element, attributes);
+		parseTextAlignment(attributes["textAlignment"], item["Classes"]);
+
+		let text = attributes["text"];			
+		if (text != null) item["Content"] = item["Content"] + "<span>" + text + "</span>";
+	}
+}
+
+function parserDidEndElement(parser, element){
+
+	if (element == "scene"){				
+		currentFileContent += "</div></body></html>";
+		generateHtmlFile();			
+		console.log(currentFileContent);
+		currentFileName = null;
+		currentFileContent = null;
+	}
+	else if (element == "viewController"){
+		currentFileContent += "</div>";		
+	}
+	else if (element == "view"){
+		popElement();
+	}
+	else if (element == "label"){
+		popElement();
+	}
+}
+
+function pushNewElement(element, attributes){
+	let id = attributes["id"];
+	let contenMode = parseContentMode(attributes["contentMode"]);
+	
+	let item = {};		
+	let styles = [];
+	let classes = [];
+	item["ID"] = id;
+	item["Content"] = "";
+	item["Styles"] = styles;
+	item["Classes"] = classes;		
+	classes.push(parseClassType(element));
+	if (contenMode != null) classes.push(contenMode);
+
+	elementsStack.push(item);
+	currentElement = item;
+
+	return item;
+}
+
+function popElement(){
+	let item = elementsStack.pop();
+	console.log(item["Classes"]);
+	let parentItem = null;	
+	let parentContent = "";	
+	if (elementsStack.length > 0){
+		parentItem = elementsStack[elementsStack.length - 1];
+		currentElement = parentItem;			
+	}
+
+	let id = item["ID"];
+	let classes = item["Classes"];
+	let styles = item["Styles"];
+	classes = classes.length > 0 ? "class='" + classes.join(" ") + "'": "";		
+	styles = styles.length > 0 ? "style='" + styles.join("") + "'": "";		
+	let content = item["Content"];
+
+	addContentToParentItem("<div " + classes + "id='" + id + "'" + styles + ">", parentItem);
+	if (content != null) addContentToParentItem(content, parentItem);			
+	addContentToParentItem("</div>", parentItem);		
+
+}
+
+function addContentToParentItem(content, item){
+	if (item == null) {
+		currentFileContent += content;		
+	}
+	else {
+		item["Content"] = item["Content"] + content;		
+	}
+}
+
+function parserFoundCharacters(parser, characters){
+
+}
+
+function parserDidEndDocument(parser){
+
 }
 
 function parseScenes(item){
@@ -348,5 +459,9 @@ function generateHtmlFile() {
 }
 
 module.exports = {
-	parseDocument
+	parseDocument,
+	parserDidStartDocument,
+	parserDidStartElement,
+	parserDidEndElement,
+	parserDidEndDocument
 };
