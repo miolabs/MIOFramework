@@ -44,6 +44,37 @@ function parserDidStartElement(parser, element, attributes){
 		let text = attributes["text"];			
 		if (text != null) item["Content"] = item["Content"] + "<span>" + text + "</span>";
 	}
+	else if (element == "button"){
+		let item = pushNewElement(element, attributes);		
+		parseTextAlignment(attributes["textAlignment"], item["Classes"]);
+		parseButtonType(attributes["buttonType"], item["Classes"]);
+	}
+	else if (element == "rect"){
+		let styles = currentElement["Styles"];
+		styles.push("position:absolute;");
+	
+		if (attributes["x"] != null) styles.push("left:" + attributes["x"] + "px;");
+		if (attributes["y"] != null) styles.push("top:" + attributes["y"] + "px;");
+		if (attributes["width"] != null) styles.push("width:" + attributes["width"] + "px;");
+		if (attributes["height"] != null) styles.push("height:" + attributes["height"] + "px;");		
+	}
+	else if (element == "color"){
+		let styles = currentElement["Styles"];
+		let key = parseColorKey(attributes["key"]);
+		if (key == null) return;
+		let r = parseFloat(attributes["red"]) * 255;
+		let g = parseFloat(attributes["green"]) * 255;
+		let b = parseFloat(attributes["blue"]) * 255;
+		let a = parseFloat(attributes["alpha"]);
+		
+		let value = key + ":rgba(" + r + ", " + g + ", " + b + ", " + a + ");";
+		styles.push(value);	
+	}
+	else if (element == "fontDescription"){
+		let styles = currentElement["Styles"];
+		let size = attributes["pointSize"];	
+		if (size != null) styles.push("font-size:" + size + "px;");	
+	}
 }
 
 function parserDidEndElement(parser, element){
@@ -62,6 +93,9 @@ function parserDidEndElement(parser, element){
 		popElement();
 	}
 	else if (element == "label"){
+		popElement();
+	}
+	else if (element == "button"){
 		popElement();
 	}
 }
@@ -125,6 +159,9 @@ function parserFoundCharacters(parser, characters){
 function parserDidEndDocument(parser){
 
 }
+
+
+
 
 function parseScenes(item){
 	console.log("Entering parseScenes");
