@@ -1,13 +1,13 @@
 
-export var _UICoreLayerIDCount = 0;
+export var _MUICoreLayerIDCount = 0;
 
-export function UICoreLayerIDFromObject(object): string {
+export function MUICoreLayerIDFromObject(object): string {
 
     var classname = object.constructor.name.substring(3);
-    return UICoreLayerIDFromClassname(classname);
+    return MUICoreLayerIDFromClassname(classname);
 }
 
-export function UICoreLayerIDFromClassname(classname:string): string {
+export function MUICoreLayerIDFromClassname(classname:string): string {
 
     var digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
 
@@ -19,12 +19,12 @@ export function UICoreLayerIDFromClassname(classname:string): string {
     }
 
     var layerID = classname.toLowerCase() + "_" + random;
-    _UICoreLayerIDCount++;
+    _MUICoreLayerIDCount++;
 
     return layerID;
 }
 
-export function UICoreLayerCreate(layerID?) {
+export function MUICoreLayerCreate(layerID?) {
     var layer = document.createElement("DIV");
     if (layerID != null)
         layer.setAttribute("id", layerID);
@@ -34,25 +34,25 @@ export function UICoreLayerCreate(layerID?) {
     return layer;
 }
 
-export function UICoreLayerAddSublayer(layer, subLayer){    
+export function MUICoreLayerAddSublayer(layer, subLayer){    
     layer.appendChild(subLayer);
 }
 
-export function UICoreLayerRemoveSublayer(layer, subLayer){    
+export function MUICoreLayerRemoveSublayer(layer, subLayer){    
     layer.removeChild(subLayer);
 }
 
-export function UICoreLayerCreateWithStyle(style, layerID?) {
-    var layer = UICoreLayerCreate(layerID);
-    UICoreLayerAddStyle(layer, style);
+export function MUICoreLayerCreateWithStyle(style, layerID?) {
+    var layer = MUICoreLayerCreate(layerID);
+    MUICoreLayerAddStyle(layer, style);
 
     return layer;
 }
 
-export function UICoreLayerAddStyle(layer, style) {
+export function MUICoreLayerAddStyle(layer, style) {
     layer.classList.add(style);
 }
 
-export function UICoreLayerRemoveStyle(layer, style) {
+export function MUICoreLayerRemoveStyle(layer, style) {
     layer.classList.remove(style);
 }

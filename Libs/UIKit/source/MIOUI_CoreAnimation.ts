@@ -1,4 +1,4 @@
-import { MIOObject } from "../MIOFoundation";
+import { NSObject } from "mio-foundation-web";
 
 /*
     ANIMATIONS
@@ -30,13 +30,13 @@ export enum UIAnimationType
     ZoomOut 
 }
 
-export interface UIViewControllerAnimatedTransitioning extends MIOObject
+export interface UIViewControllerAnimatedTransitioning extends NSObject
 {    
     animationControllerForPresentedController();
 }
 
 
-export interface UIViewControllerAnimatedTransitioning extends MIOObject
+export interface UIViewControllerAnimatedTransitioning extends NSObject
 {    
     transitionDuration(transitionContext):number;
     animateTransition(transitionContext):void;

@@ -1,7 +1,6 @@
 import { UIControl } from "./UIControl";
 import { UILayerGetFirstElementWithTag } from "./UIView";
-import { MIOLocalizeString } from "../MIOCore";
-import { UICoreLayerAddStyle, UICoreLayerRemoveStyle } from ".";
+import { MUICoreLayerAddStyle, MUICoreLayerRemoveStyle } from ".";
 
 /**
  * Created by godshadow on 12/3/16.
@@ -32,7 +31,7 @@ export class UIButton extends UIControl
 
     init(){
         super.init();
-        UICoreLayerAddStyle(this.layer, "btn");
+        MUICoreLayerAddStyle(this.layer, "btn");
         this.setupLayers();
     }
 
@@ -73,7 +72,7 @@ export class UIButton extends UIControl
         }
 
         let key = this.layer.getAttribute("data-title");
-        if (key != null) this.setTitle(MIOLocalizeString(key, key));
+        if (key != null) this.setTitle(NSLocalizeString(key, key));
         
         // Prevent click
         this.layer.addEventListener("click", function(e) {
@@ -143,12 +142,12 @@ export class UIButton extends UIControl
             return;
 
         if (value == true) {
-            UICoreLayerAddStyle(this.layer, "selected");
+            MUICoreLayerAddStyle(this.layer, "selected");
             //UICoreLayerRemoveStyle(this.layer, "deselected");
         }
         else {
             //UICoreLayerAddStyle(this.layer, "deselected");
-            UICoreLayerRemoveStyle(this.layer, "selected");
+            MUICoreLayerRemoveStyle(this.layer, "selected");
         }
 
         this._selected = value;

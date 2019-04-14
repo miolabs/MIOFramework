@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Apple foundation framework",
   "author": "MIOLabs Team",
-  "license": "APACHE",
+  "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "files": [

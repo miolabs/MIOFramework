@@ -1,7 +1,7 @@
 import { UIWindow } from "./UIWindow";
 import { MIOCoreGetLanguages, setMIOLocalizedStrings, MIOCoreAddLanguage } from "../MIOCore";
 import { MIOCoreGetBrowserLanguage, MIOCoreEventRegisterObserverForType, MIOCoreEventType, MIOCoreEvent, MIOCoreEventInput } from "../MIOCore/platform";
-import { MIOURLRequest, MIOURL, MIOURLConnection, _MIOBundleAppSetResource, MIOPropertyListSerialization } from "../MIOFoundation";
+import { NSPropertyListSerialization, NSURLRequest, NSURL, NSURLConnection } from "foundation";
 
 /**
  * Created by godshadow on 11/3/16.
@@ -63,8 +63,8 @@ export class UIApplication {
             completion.call(target);
         }
         
-        let request = MIOURLRequest.requestWithURL(MIOURL.urlWithString(url));
-        let con = new MIOURLConnection();
+        let request = NSURLRequest.requestWithURL(NSURL.urlWithString(url));
+        let con = new NSURLConnection();
         con.initWithRequestBlock(request, this, function(code, data){
             if (code == 200) {
                 setMIOLocalizedStrings(JSON.parse(data.replace(/(\r\n|\n|\r)/gm, "")));
@@ -74,8 +74,8 @@ export class UIApplication {
     }
 
     private downloadAppPlist(target, completion){        
-        let request = MIOURLRequest.requestWithURL(MIOURL.urlWithString("app.plist"));
-        let con = new MIOURLConnection();
+        let request = NSURLRequest.requestWithURL(NSURL.urlWithString("app.plist"));
+        let con = new NSURLConnection();
         con.initWithRequestBlock(request, this, function(code, data){
             if (code == 200) {                
                 _MIOBundleAppSetResource("app", "plist", data);
@@ -90,7 +90,7 @@ export class UIApplication {
             if (data == null) throw new Error("We couldn't download the app.plist");
             
             // Get Languages from the app.plist
-            let config = MIOPropertyListSerialization.propertyListWithData(data, 0, 0, null);
+            let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);
             let langs = config["Languages"];
             for (let key in langs) {
                 let url = langs[key];
@@ -137,8 +137,8 @@ export class UIApplication {
         var url = this.languages[key];
 
         // Download
-        var conn = new MIOURLConnection();
-        conn.initWithRequestBlock(MIOURLRequest.requestWithURL(url), this, function (error, data) {
+        var conn = new NSURLConnection();
+        conn.initWithRequestBlock(NSURLRequest.requestWithURL(url), this, function (error, data) {
 
             if (data != null) {
                 var json = JSON.parse(data.replace(/(\r\n|\n|\r)/gm, ""));
