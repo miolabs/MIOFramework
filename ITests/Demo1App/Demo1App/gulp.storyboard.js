@@ -1,5 +1,5 @@
 var fs = require("file-system");
-var NSXMLParser = require("@miolabs/mio-foundation-node").NSXMLParser;
+var NSXMLParser = require("mio-foundation-node").NSXMLParser;
 
 //GLOBAL VARIABLES
 var currentFileName = null;
