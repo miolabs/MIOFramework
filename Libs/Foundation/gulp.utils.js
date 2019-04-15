@@ -108,7 +108,7 @@ function buildWebProd() {
 	return gulp.src(['./dist/*.js', './dist/core/MIOCoreTypes.js', './dist/platform/web/MIOCore_web.js'])
 	.pipe(concat("foundation.min.js"))
 	.pipe(uglify())
-	.pipe(gulp.dest("./.build/node-web/"))
+	.pipe(gulp.dest("./.build/web-prod/"))
 }
 
 function cleanBuild() {

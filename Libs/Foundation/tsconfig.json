@@ -1,12 +1,8 @@
 {
   "compilerOptions": {
     "declaration": true,
-<<<<<<< HEAD
     "declarationDir": "./dist",
     "module": "commonjs",    
-=======
-    "declarationDir": "./dist",    
->>>>>>> 452448297f07ac3fc0ce1c423aaddd3f190c191d
     "outDir": "./dist",
     "target": "es5",
     "noImplicitAny": false

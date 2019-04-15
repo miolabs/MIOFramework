@@ -53,15 +53,19 @@ function createNodePackage(cb) {
 }
 
 function createWebPackage(cb) {
-	const SRC = __dirname + "/.build/web-prod/";
+	const SRC = __dirname + "/.build/";
 	const DEST = __dirname + "/packages/mio-foundation-web/";
+	const DIST = __dirname + "/dist/";
 
 	if(fs.existsSync(SRC)) {
 		//Create package and types folder
 		fs.mkdirSync(DEST + "types", {recursive: true});
 		
 		//Copy foundation.d.ts to types folder
-		fs.copyFileSync(SRC + "foundation.d.ts", DEST + "types/foundation.d.ts");
+		fs.copyFileSync(DIST + "core/MIOCoreTypes.d.ts", DEST + "types/foundation.d.ts");
+
+		//Copy foundation.min.js
+		fs.copyFileSync(SRC + "web-prod/foundation.min.js", DEST + "foundation.min.js");
 
 		//Copy package.json, LICENSE AND README
 		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
@@ -73,7 +77,6 @@ function createWebPackage(cb) {
 	} else {
 		console.log("/.build directory does not exist");
 	}
-	//utils.minifyWebProd();
 	//utils.cleanBuild();
 	cb();
 }
