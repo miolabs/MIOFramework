@@ -49,6 +49,20 @@ function parserDidStartElement(parser, element, attributes){
 		parseTextAlignment(attributes["textAlignment"], item["Classes"]);
 		parseButtonType(attributes["buttonType"], item["Classes"]);
 	}
+	else if (element == "textField"){
+		let item = pushNewElement(element, attributes);		
+		parseTextAlignment(attributes["textAlignment"], item["Classes"]);		
+	
+		let inputAttrs = [];	
+		if (attributes["text"] != null) inputAttrs.push("value='" + attributes["text"] + "'");
+		if (attributes["placeholder"] != null) inputAttrs.push("placeholder='" + attributes["placeholder"] + "'");
+		
+		let inputClasses = [];
+		parseBorderStyle(attributes["borderStyle"], inputClasses);
+		if (inputClasses.length > 0) inputAttrs.push(classesStringify(inputClasses));		
+		
+		item["Content"] = item["Content"] + "<input type='text' " + inputAttrs.join(" ") + ">"			
+	}
 	else if (element == "rect"){
 		let styles = currentElement["Styles"];
 		styles.push("position:absolute;");
@@ -75,6 +89,10 @@ function parserDidStartElement(parser, element, attributes){
 		let size = attributes["pointSize"];	
 		if (size != null) styles.push("font-size:" + size + "px;");	
 	}
+	else if (element == "state"){
+		let title = attributes["title"];
+		if (title != null) currentElement["Content"] = currentElement["Content"] + "<span>" + title + "</span>";	
+	}	
 }
 
 function parserDidEndElement(parser, element){
@@ -96,6 +114,9 @@ function parserDidEndElement(parser, element){
 		popElement();
 	}
 	else if (element == "button"){
+		popElement();
+	}
+	else if (element == "textField"){
 		popElement();
 	}
 }

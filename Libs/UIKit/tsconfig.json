@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+      "declaration": true,
+      "declarationDir": "./dist",
+      "outDir": "./dist",
+      "target": "es5",
+      "noImplicitAny": false
+    },
+    "include": [
+      "source/**/*"
+    ],
+    "exclude": ["node_modules"]
+  }

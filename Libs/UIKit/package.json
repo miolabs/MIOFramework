@@ -1,0 +1,14 @@
+{
+  "name": "apple-uikit",
+  "version": "1.0.0",
+  "description": "Apple UIKit libraries for Javascript/typescript developers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "MIOLabs Team",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "mio-foundation-web": "^1.0.1"
+  }
+}
