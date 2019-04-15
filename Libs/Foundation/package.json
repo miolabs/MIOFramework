@@ -15,12 +15,15 @@
     "build:dev:node": "BUILD_ENV=dev BUILD_PLATFORM=node gulp build",
     "build:prod:node": "BUILD_ENV=prod BUILD_PLATFORM=node gulp build",
     "build:dev:web": "BUILD_ENV=dev BUILD_PLATFORM=web gulp build",
-    "build:prod:web": "BUILD_ENV=prod BUILD_PLATFORM=web gulp build"
+	"build:prod:web": "BUILD_ENV=prod BUILD_PLATFORM=web gulp build",
+	"createNodePackage": "npm run build:prod:node && gulp createNodePackage",
+	"createWebPackage": "npm run build:prod:web && gulp createWebPackage"
   },
   "devDependencies": {
     "decimal.js": "^10.1.1",
     "dts-bundle": "^0.7.3",
     "gulp": "^4.0.0",
+    "gulp-concat": "^2.6.1",
     "gulp-typescript": "^5.0.1",
     "gulp-uglify": "^3.0.2",
     "readable-stream": "^3.3.0",

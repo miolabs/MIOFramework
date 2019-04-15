@@ -1,15 +1,12 @@
 const gulp = require("gulp");
-const { series, parallel } = require("gulp");
 const fs = require("fs");
 const utils = require("./gulp.utils");
-const dts = require("dts-bundle");
-const rimraf = require("rimraf");
 
 function build(cb) {
 	var env = process.env["BUILD_ENV"];
 	var platform = process.env["BUILD_PLATFORM"];
 
-	console.log(env + " " + platform);
+	console.log("Environment: " + env + " Platform: " + platform);
 
 	if (env == "dev" && platform == "node") {
 		utils.buildNodeDev();
@@ -26,9 +23,38 @@ function build(cb) {
 	cb();
 }
 
-function createPackage(cb) {
+function createNodePackage(cb) {
+	const SRC = __dirname + "/.build/";
 	const DEST = __dirname + "/packages/mio-foundation-node/";
-	const SRC = __dirname + "/.build/node-prod/";
+	const DIST = __dirname + "/dist/";
+
+	if(fs.existsSync(SRC)) {
+		//Create package and types folder
+		fs.mkdirSync(DEST + "types", {recursive: true});
+		
+		//Copy foundation.d.ts to types folder
+		fs.copyFileSync(DIST + "core/MIOCoreTypes.d.ts", DEST + "types/foundation.d.ts");
+
+		//Copy foundation.min.js
+		fs.copyFileSync(SRC + "node-prod/foundation.min.js", DEST + "foundation.min.js");
+
+		//Copy package.json, LICENSE AND README
+		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
+		fs.copyFileSync(__dirname + "/../../README.md", DEST + "README.md");
+
+		//Copy foundation.js to the package folder
+		//fs.copyFileSync(__dirname + "/.build/node-prod/foundation.js", DEST + "foundation.min.js");
+		console.log("Package created succesfully");
+	} else {
+		console.log("/.build directory does not exist");
+	}
+	utils.cleanBuild();
+	cb();
+}
+
+function createWebPackage(cb) {
+	const SRC = __dirname + "/.build/web-prod/";
+	const DEST = __dirname + "/packages/mio-foundation-web/";
 
 	if(fs.existsSync(SRC)) {
 		//Create package and types folder
@@ -42,32 +68,18 @@ function createPackage(cb) {
 		fs.copyFileSync(__dirname + "/../../README.md", DEST + "README.md");
 
 		//Copy foundation.js to the package folder
-		fs.copyFileSync(__dirname + "/.build/foundation-min/node-prod/foundation.js", DEST + "foundation.min.js");
+		//fs.copyFileSync(__dirname + "/.build/node-prod/foundation.js", DEST + "foundation.min.js");
 		console.log("Package created succesfully");
-		cleanBuild();
 	} else {
 		console.log("/.build directory does not exist");
 	}
+	//utils.minifyWebProd();
+	//utils.cleanBuild();
 	cb();
-}
-
-function cleanBuild() {
-	const dir = __dirname + "/.build";
-	const rollupcache = __dirname + "/.rpt2_cache";
-
-	if(fs.existsSync(dir)) {
-		rimraf(dir, function(err) {
-			if(err) throw err;
-			rimraf.sync(rollupcache);
-			console.log("/.build folder deleted successfully");
-		});
-	} else {
-		console.log("/.build directory does not exist");
-	}
 }
 
 module.exports = {
 	build: build,
-	createPackage: createPackage,
-	cleanBuild: cleanBuild
+	createNodePackage: createNodePackage,
+	createWebPackage: createWebPackage
 }
