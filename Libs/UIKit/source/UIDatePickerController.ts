@@ -1,7 +1,7 @@
 import { UIViewController } from "./UIViewController";
 import { MIOSize, MIODateGetStringForMonth } from "../MIOFoundation";
 import { UILabel } from "./UILabel";
-import { UICalendarView } from "./UICalendarView";
+import { UICalendarView } from "./MUICalendarView";
 
 export class UIDatePickerController extends UIViewController
 {

@@ -1,5 +1,5 @@
 import { UIControl } from "./UIControl";
-import { UICoreLayerAddStyle, UICoreLayerRemoveStyle } from "./MIOUI_CoreLayer";
+import { MUICoreLayerAddStyle, MUICoreLayerRemoveStyle } from "./core/MUICoreLayer";
 
 /**
  * Created by godshadow on 12/3/16.
@@ -12,7 +12,7 @@ export class UICheckButton extends UIControl
 
     init(){
         super.init();
-        UICoreLayerAddStyle(this.layer, "checkbox"); 
+        MUICoreLayerAddStyle(this.layer, "checkbox"); 
     }
 
     initWithLayer(layer, owner, options?){
@@ -43,10 +43,10 @@ export class UICheckButton extends UIControl
     setOn(on){
         this._on = on;
         if (on == true){
-            UICoreLayerAddStyle(this.layer, "selected");
+            MUICoreLayerAddStyle(this.layer, "selected");
         }
         else {
-            UICoreLayerRemoveStyle(this.layer, "selected");            
+            MUICoreLayerRemoveStyle(this.layer, "selected");            
         }
     }
 

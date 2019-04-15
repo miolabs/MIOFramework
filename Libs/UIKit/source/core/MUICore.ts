@@ -1,8 +1,9 @@
-import { UIView, UILayerSearchElementByID } from "./UIView";
-import { UIViewController } from "./UIViewController";
+
+import { UIView, UILayerSearchElementByID } from "../UIView";
+import { UIViewController } from "../UIViewController";
 import { MIOClassFromString, MIOCoreIsPhone } from "../MIOCore/platform";
-import { UIModalPresentationStyle, UIPresentationController } from "./UIViewController_PresentationController";
-import { _UIAnimationStart } from "./MIOUI_CoreAnimation";
+import { UIModalPresentationStyle, UIPresentationController } from "../UIViewController_PresentationController";
+import { _UIAnimationStart } from "./MUICoreAnimation";
 import { MIOSize } from "../MIOFoundation";
 
 export interface Window {

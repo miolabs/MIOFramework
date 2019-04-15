@@ -39,7 +39,7 @@ function buildWebDev() {
 		  file: '.build/web-dev/foundation.js',
 		  format: 'cjs',
 		  name: 'foundation',
-		  sourcemap: true
+			sourcemap: true,			
 		}).then(function(){
 			return dts.bundle({
 				name: 'foundation',
@@ -53,7 +53,9 @@ function buildNodeProd() {
 	return rollup.rollup({
 		input: './source/index.ts',
 		plugins: [
-		  rollupTypescript()
+		  rollupTypescript({
+				tsconfigDefaults:{ compilerOptions: { declaration: true } }
+			})
 		]
 	}).then(bundle => {
 		return bundle.write({

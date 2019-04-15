@@ -1,13 +1,22 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "declarationDir": "./dist",    
     "outDir": "./dist",
+    "outFile": "./dist/foundation-web.js",
     "target": "es5",
-    "noImplicitAny": false
+    "strict": false,
+    "noImplicitThis": false,
+    "removeComments": true,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+
   },
-  "include": [
-    "source/**/*"
+  "include": [    
+    "source/core/MIOCoreTypes.ts",
+    "source/core/MIOCoreLexer.ts",
+    "source/platform/web/MIOCore_web.ts",
+    "source/*"
   ],
   "exclude": ["node_modules"]
 }

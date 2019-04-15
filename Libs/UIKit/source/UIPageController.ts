@@ -1,6 +1,6 @@
 import { UIViewController } from "./UIViewController";
 import { MIOObject } from "../MIOFoundation";
-import { _MIUShowViewController } from "./MIOUI_Core";
+import { _MIUShowViewController } from "./core/MUICore";
 
 /**
  * Created by godshadow on 11/3/16.

@@ -1,7 +1,7 @@
 import { MIOObject, MIORect, MIOSize } from "../MIOFoundation";
 import { UIViewController } from "./UIViewController";
 import { MIOCoreIsPhone, MIOCoreIsMobile } from "../MIOCore/platform";
-import { UIWindowSize } from "./MIOUI_Core";
+import { UIWindowSize } from "./core/MUICore";
 import { UIWindow } from "./UIWindow";
 import { UIClassListForAnimationType, UIAnimationType } from "./MIOUI_CoreAnimation";
 import { UICoreLayerAddStyle } from ".";

@@ -1,7 +1,7 @@
 import { UIWindow } from "./UIWindow";
 import { MIOCoreGetLanguages, setMIOLocalizedStrings, MIOCoreAddLanguage } from "../MIOCore";
 import { MIOCoreGetBrowserLanguage, MIOCoreEventRegisterObserverForType, MIOCoreEventType, MIOCoreEvent, MIOCoreEventInput } from "../MIOCore/platform";
-import { NSPropertyListSerialization, NSURLRequest, NSURL, NSURLConnection } from "foundation";
+import { NSPropertyListSerialization, NSURLRequest, NSURL, NSURLConnection } from "mio-foundation-web/types/.";
 
 /**
  * Created by godshadow on 11/3/16.

@@ -1,6 +1,6 @@
 import { UIControl } from "./UIControl";
 import { UIButton, UIButtonType } from "./UIButton";
-import { UIOutletRegister } from "./MIOUI_Core";
+import { UIOutletRegister } from "./core/MUICore";
 
 /**
  * Created by godshadow on 29/08/16.
