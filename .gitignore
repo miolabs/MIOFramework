@@ -16,7 +16,10 @@ resources/styles.css
 /_tskeys.json
 
 ITests/dist/*
-
+/dist/
+/build/
+/.dist/
+/.build/
 
 # Xcode
 #
