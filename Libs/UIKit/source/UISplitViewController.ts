@@ -1,4 +1,4 @@
-import { _MIUShowViewController, _UIHideViewController } from "./MIOUI_Core";
+import { _MIUShowViewController, _UIHideViewController } from "./core/MUICore";
 import { UIView } from "./UIView";
 import { UIViewController } from "./UIViewController";
 import { UICoreLayerAddStyle } from ".";

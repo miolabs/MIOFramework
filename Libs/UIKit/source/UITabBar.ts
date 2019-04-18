@@ -1,6 +1,6 @@
 import { UIButton, UIButtonType } from "./UIButton";
 import { UIView } from "./UIView";
-import { UIOutletRegister } from "./MIOUI_Core";
+import { UIOutletRegister } from "./core/MUICore";
 import { MIORect } from "../MIOFoundation";
 
 /**

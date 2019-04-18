@@ -5,7 +5,7 @@ import { UINavigationController } from "./UINavigationController";
 import { UIPresentationController, UIModalPresentationStyle, UIModalTransitionStyle } from "./UIViewController_PresentationController";
 import { UIPopoverPresentationController } from "./UIViewController_PopoverPresentationController";
 import { UICoreLayerIDFromObject, UICoreLayerAddStyle } from "./MIOUI_CoreLayer";
-import { _MIUShowViewController, _UIHideViewController } from "./MIOUI_Core";
+import { _MIUShowViewController, _UIHideViewController } from "./core/MUICore";
 import { UIWindow } from "./UIWindow";
 import { MIOLocalizeString } from "../MIOCore";
 import { UISplitViewController } from "./UISplitViewController";

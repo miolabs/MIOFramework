@@ -1,4 +1,4 @@
-import { NSObject } from "mio-foundation-web";
+import { NSObject } from "foundation";
 
 /*
     ANIMATIONS

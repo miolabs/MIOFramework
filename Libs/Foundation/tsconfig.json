@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
-    "declaration": true,
-    "declarationDir": "./dist",
+    "declaration": true,    
     "module": "commonjs",    
     "outDir": "./dist",
     "target": "es5",
     "noImplicitAny": false
   },
   "include": [
-    "source/**/*"
+    "source/core/MIOCoreTypes.ts",
+    "source/core/MIOCoreLexer.ts",
+    "source/platform/web/MIOCore_web.ts",
+    "source/*"
+
   ],
   "exclude": [
 	"node_modules"

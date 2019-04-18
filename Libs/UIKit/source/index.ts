@@ -2,6 +2,11 @@
  * Created by godshadow on 05/12/2016.
  */
 
+export * from './core/MUICore'
+export * from './core/MUICoreLayer'
+export * from './core/MUICoreAnimation'
+
+
 export * from "./UIView"
 export * from "./UIWindow"
 
@@ -39,27 +44,15 @@ export * from "./UISplitViewController"
 export * from "./UITabBarController"
 export * from "./UIAlertViewController"
 
-export * from "./UIWebApplication"
+export * from "./UIApplication"
 
-
-// EXTRAS
-
-export * from "./UICalendarView"
 export * from "./UIDatePickerController"
-export * from "./UIChartView"
 
-export * from "./UIReportViewController"
-
-export * from "./UIReportTableView"
-
-export * from './MIOUI_Core'
-export * from './MIOUI_CoreAnimation'
-export * from './MIOUI_CoreLayer'
 export * from './UIActivityIndicatorView'
 export * from './UIEdgeInsets'
 export * from './UIViewController_PopoverPresentationController'
 export * from './UIViewController_PresentationController'
-export * from './UICodeEditor'
+
 
 export * from './UIEvent'
 export * from './UIGestureRecognizer'
@@ -67,5 +60,3 @@ export * from './UITapGestureRecognizer'
 export * from './UIPanGestureRecognizer'
 
 export * from './UIOpenPanel'
-
-export * from './MWSTableView'

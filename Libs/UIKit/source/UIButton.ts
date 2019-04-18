@@ -1,6 +1,6 @@
 import { UIControl } from "./UIControl";
 import { UILayerGetFirstElementWithTag } from "./UIView";
-import { MUICoreLayerAddStyle, MUICoreLayerRemoveStyle } from ".";
+import { MUICoreLayerAddStyle, MUICoreLayerRemoveStyle } from "./core/MUICoreLayer";
 
 /**
  * Created by godshadow on 12/3/16.

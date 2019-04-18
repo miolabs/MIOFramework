@@ -1,6 +1,6 @@
 import { UIViewController } from "./UIViewController";
 import { MIOObject } from "../MIOFoundation";
-import { _UIHideViewController, _MIUShowViewController } from "./MIOUI_Core";
+import { _UIHideViewController, _MIUShowViewController } from "./core/MUICore";
 import { UIClassListForAnimationType, UIAnimationType } from "./MIOUI_CoreAnimation";
 import { UIView } from "./UIView";
 
