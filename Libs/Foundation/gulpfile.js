@@ -25,12 +25,47 @@ function build(cb) {
 	cb();
 }
 
+function concatJsFiles(cb) {
+	var arrayFiles = ["./dist/NSPoint.js", "./dist/NSRange.js", "./dist/NSRect.js", "./dist/NSSize.js", "./dist/NSObject.js", "./dist/NSNull.js", "./dist/NSError.js"];
+
+	for (var index = 0; index < arrayFiles.length; index++){
+		let file = arrayFiles[index];		
+		var content = fs.readFileSync(file, "utf8");
+		content = content.replace('"use strict";', '');	
+		content = content.replace('Object.defineProperty(exports, "__esModule", { value: true });', '');	
+		content = content.replace(/require\(\"\.\/(.*)\"\);/g, "$1");
+		fs.writeFileSync(file, content);
+	}
+
+	var content = '"use strict";\n';
+	//content += 'var __extends = (this && this.__extends) || (function () {\nvar extendStatics = function (d, b) {\nextendStatics = Object.setPrototypeOf ||\n({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||\nfunction (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };\nreturn extendStatics(d, b);\n};\nreturn function (d, b) {\nextendStatics(d, b);\nfunction __() { this.constructor = d; }\nd.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());\n};\n})();';
+	content += 'Object.defineProperty(exports, "__esModule", { value: true });\n';
+	fs.writeFileSync("./dist/header.js", content);
+	arrayFiles.unshift("./dist/header.js");
+
+	gulp.src(arrayFiles)
+	.pipe(concat("foundation.js"))
+	.pipe(gulp.dest("./.build"))
+	cb();
+}
+
 //Creates foundation.d.ts
 function buildDts(cb) {
 	return gulp.src(['./dist/*.d.ts', '!./dist/index.d.ts', './dist/core/*.d.ts'])
 	.pipe(concat("foundation.d.ts"))
 	.pipe(gulp.dest("./.build/types"))
 	cb();
+}
+
+function deleteDtsImport() {
+	var path = __dirname + "/.build/types/foundation.d.ts";
+	var dtsContent = fs.readFileSync(path, "utf8");
+	var newContent =  dtsContent.replace(/import(.*)/g, "");	
+	fs.writeFileSync(path, newContent);
+
+	return gulp.src(".")
+	//.pipe(deleteDtsImport)
+	.pipe(gulp.dest("."));
 }
 
 //Creates foundation.min.js
@@ -43,8 +78,8 @@ function buildNodeProd(cb) {
             output: {
                 path: __dirname + "/.build/node-prod/",
 				filename: 'foundation.min.js',
-				library: ["agGrid"],
-                libraryTarget: "umd"
+				library: ["foundation"],
+                libraryTarget: "commonjs"
             }
         }))
         .pipe(gulp.dest('./.build/node-prod/'));
@@ -61,8 +96,8 @@ function buildWebProd(cb) {
             output: {
                 path: __dirname + "/.build/web-prod/",
 				filename: 'foundation.min.js',
-				library: ["agGrid"],
-                libraryTarget: "umd"
+				library: ["foundation"],
+                libraryTarget: "commonjs"
             }
         }))
         .pipe(gulp.dest('./.build/web-prod/'));
@@ -136,8 +171,10 @@ function cleanBuild(cb) {
 }
 
 module.exports = {
+	concatJsFiles: concatJsFiles,
 	build: build,
 	buildDts: buildDts,
+	deleteDtsImport: deleteDtsImport,
 	buildNodeProd: buildNodeProd,
 	buildWebProd: buildWebProd,
 	createNodePackage: createNodePackage,
