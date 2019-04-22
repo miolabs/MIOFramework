@@ -17,9 +17,9 @@
     "build:prod:node": "BUILD_ENV=prod BUILD_PLATFORM=node gulp build",
     "build:prod:web": "BUILD_ENV=prod BUILD_PLATFORM=web gulp build",
     "create:node:pkg": "gulp createNodePackage",
-	"create:web:pkg": "gulp createWebPackage",
-	"build:dts": "gulp buildDts",
-	"clean:build": "gulp cleanBuild"
+    "create:web:pkg": "gulp createWebPackage",
+    "build:dts": "gulp buildDts",
+    "clean:build": "gulp cleanBuild"
   },
   "devDependencies": {
     "decimal.js": "^10.1.1",
