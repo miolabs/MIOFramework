@@ -1,8 +1,10 @@
 const gulp = require("gulp");
 const fs = require("fs");
 const concat = require("gulp-concat");
-const webpackStream = require('webpack-stream');
 const rimraf = require("rimraf");
+const uglify = require("gulp-uglify");
+
+let arrIndexFiles = [];
 
 function build(cb) {
 	var env = process.env["BUILD_ENV"];
@@ -25,82 +27,71 @@ function build(cb) {
 	cb();
 }
 
-function concatJsFiles(cb) {
-	var arrayFiles = ["./dist/NSPoint.js", "./dist/NSRange.js", "./dist/NSRect.js", "./dist/NSSize.js", "./dist/NSObject.js", "./dist/NSNull.js", "./dist/NSError.js"];
+function parseIndexNodeTs(cb) {
+	var regEx = /export\s.\sfrom \'.\/(.*)\'/gm;
+	var content = fs.readFileSync("./source/index.node.ts", "utf8");
+	var item;
 
-	for (var index = 0; index < arrayFiles.length; index++){
-		let file = arrayFiles[index];		
-		var content = fs.readFileSync(file, "utf8");
-		content = content.replace('"use strict";', '');	
-		content = content.replace('Object.defineProperty(exports, "__esModule", { value: true });', '');	
-		content = content.replace(/require\(\"\.\/(.*)\"\);/g, "$1");
-		fs.writeFileSync(file, content);
+	arrIndexFiles = [];
+
+	while (item = regEx.exec(content)) {		
+		arrIndexFiles.push("./source/" + item[1] + ".ts");
 	}
-
-	var content = '"use strict";\n';
-	//content += 'var __extends = (this && this.__extends) || (function () {\nvar extendStatics = function (d, b) {\nextendStatics = Object.setPrototypeOf ||\n({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||\nfunction (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };\nreturn extendStatics(d, b);\n};\nreturn function (d, b) {\nextendStatics(d, b);\nfunction __() { this.constructor = d; }\nd.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());\n};\n})();';
-	content += 'Object.defineProperty(exports, "__esModule", { value: true });\n';
-	fs.writeFileSync("./dist/header.js", content);
-	arrayFiles.unshift("./dist/header.js");
-
-	gulp.src(arrayFiles)
-	.pipe(concat("foundation.js"))
-	.pipe(gulp.dest("./.build"))
 	cb();
 }
 
-//Creates foundation.d.ts
-function buildDts(cb) {
-	return gulp.src(['./dist/*.d.ts', '!./dist/index.d.ts', './dist/core/*.d.ts'])
-	.pipe(concat("foundation.d.ts"))
-	.pipe(gulp.dest("./.build/types"))
-	cb();
+function concatNodeTsFiles() {		
+	return gulp.src(arrIndexFiles)
+	.pipe(concat("foundation.node.ts"))
+	.pipe(gulp.dest("./source/"))
 }
 
-function deleteDtsImport() {
-	var path = __dirname + "/.build/types/foundation.d.ts";
-	var dtsContent = fs.readFileSync(path, "utf8");
-	var newContent =  dtsContent.replace(/import(.*)/g, "");	
+function cleanNodeFoundation(cb) {
+	const path = "./source/foundation.node.ts";
+	var originalContent = fs.readFileSync(path, "utf8");
+	var newContent =  originalContent.replace(/import(.*)/g, "");
 	fs.writeFileSync(path, newContent);
-
-	return gulp.src(".")
-	//.pipe(deleteDtsImport)
-	.pipe(gulp.dest("."));
-}
-
-//Creates foundation.min.js
-function buildNodeProd(cb) {
-	return gulp.src('dist/platform/node/*.js', 'dist/index.js')
-        .pipe(webpackStream({
-            entry: {
-                main: './dist/index.js'
-            },
-            output: {
-                path: __dirname + "/.build/node-prod/",
-				filename: 'foundation.min.js',
-				library: ["foundation"],
-                libraryTarget: "commonjs"
-            }
-        }))
-        .pipe(gulp.dest('./.build/node-prod/'));
 	cb();
 }
 
-//Creates foundation.min.js
-function buildWebProd(cb) {
-	return gulp.src('dist/platform/web/*.js', 'dist/index.js')
-        .pipe(webpackStream({
-            entry: {
-                main: './dist/index.js'
-            },
-            output: {
-                path: __dirname + "/.build/web-prod/",
-				filename: 'foundation.min.js',
-				library: ["foundation"],
-                libraryTarget: "commonjs"
-            }
-        }))
-        .pipe(gulp.dest('./.build/web-prod/'));
+function minifyNodeProd(cb) {
+	return gulp.src('./dist/foundation.node.js')
+	.pipe(uglify())
+	.pipe(gulp.dest('./.build/node-prod/'));
+	cb();
+}
+
+function parseIndexWebTs(cb) {
+	var regEx = /export\s.\sfrom \'.\/(.*)\'/gm;
+	var content = fs.readFileSync("./source/index.web.ts", "utf8");
+	var item;
+
+	arrIndexFiles = [];
+
+	while (item = regEx.exec(content)) {		
+		arrIndexFiles.push("./source/" + item[1] + ".ts");
+	}
+	cb();
+}
+
+function concatWebTsFiles() {		
+	return gulp.src(arrIndexFiles)
+	.pipe(concat("foundation.web.ts"))
+	.pipe(gulp.dest("./source/"))
+}
+
+function cleanWebFoundation(cb) {
+	const path = "./source/foundation.web.ts";
+	var originalContent = fs.readFileSync(path, "utf8");
+	var newContent =  originalContent.replace(/import(.*)/g, "");
+	fs.writeFileSync(path, newContent);
+	cb();
+}
+
+function minifyWebProd(cb) {
+	return gulp.src('./dist/foundation.web.js')
+	.pipe(uglify())
+	.pipe(gulp.dest('./.build/web-prod/'));
 	cb();
 }
 
@@ -113,10 +104,10 @@ function createNodePackage(cb) {
 		fs.mkdirSync(DEST + "types", {recursive: true});
 		
 		//Copy foundation.d.ts to types folder
-		fs.copyFileSync(SRC + "types/foundation.d.ts", DEST + "types/foundation.d.ts");
+		fs.copyFileSync("./dist/foundation.node.d.ts", DEST + "types/foundation.node.d.ts");
 
 		//Copy foundation.min.js
-		fs.copyFileSync(SRC + "node-prod/foundation.min.js", DEST + "foundation.min.js");
+		fs.copyFileSync("./.build/node-prod/foundation.node.js", DEST + "foundation.node.js");
 
 		//Copy package.json, LICENSE AND README
 		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
@@ -124,7 +115,7 @@ function createNodePackage(cb) {
 
 		console.log("Package created succesfully");
 	} else {
-		console.log("/.build directory does not exist");
+		console.log("/.build directory does not exist - Execute first gulp minifyNodeProd");
 	}
 	cb();
 }
@@ -138,10 +129,10 @@ function createWebPackage(cb) {
 		fs.mkdirSync(DEST + "types", {recursive: true});
 		
 		//Copy foundation.d.ts to types folder
-		fs.copyFileSync(SRC + "types/foundation.d.ts", DEST + "types/foundation.d.ts");
+		fs.copyFileSync("./dist/foundation.web.d.ts", DEST + "types/foundation.web.d.ts");
 
 		//Copy foundation.min.js
-		fs.copyFileSync(SRC + "web-prod/foundation.min.js", DEST + "foundation.min.js");
+		fs.copyFileSync("./.build/web-prod/foundation.web.js", DEST + "foundation.web.js");
 
 		//Copy package.json, LICENSE AND README
 		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
@@ -151,33 +142,42 @@ function createWebPackage(cb) {
 		//fs.copyFileSync(__dirname + "/.build/node-prod/foundation.js", DEST + "foundation.min.js");
 		console.log("Package created succesfully");
 	} else {
-		console.log("/.build directory does not exist");
+		console.log("/.build directory does not exist - Execute first gulp minifyWebProd");
 	}
 	cb();
 }
 
-function cleanBuild(cb) {
-	const dir = __dirname + "/.build";
+function removeTempFolders(cb) {
+	const buildDir = __dirname + "/.build";
+	const distDir =  __dirname + "/dist";
 
-	if(fs.existsSync(dir)) {
-		rimraf(dir, function(err) {
+	if(fs.existsSync(buildDir)) {
+		rimraf(buildDir, function(err) {
 			if(err) throw err;
 			console.log("/.build folder deleted successfully");
 		});
 	} else {
 		console.log("/.build directory does not exist");
 	}
+
+	if(fs.existsSync(distDir)) {
+		rimraf(distDir, function(err) {
+			if(err) throw err;
+			console.log("/dist folder deleted successfully");
+		});
+	} else {
+		console.log("/dist directory does not exist");
+	}
 	cb();
 }
 
 module.exports = {
-	concatJsFiles: concatJsFiles,
-	build: build,
-	buildDts: buildDts,
-	deleteDtsImport: deleteDtsImport,
-	buildNodeProd: buildNodeProd,
-	buildWebProd: buildWebProd,
+	build: build, //Not working, fix it when implementing dev building
+	buildNodeProd: gulp.series(parseIndexNodeTs, concatNodeTsFiles, cleanNodeFoundation),
+	buildWebProd: gulp.series(parseIndexWebTs, concatWebTsFiles, cleanWebFoundation),
+	minifyNodeProd: minifyNodeProd,
+	minifyWebProd: minifyWebProd,
 	createNodePackage: createNodePackage,
 	createWebPackage: createWebPackage,
-	cleanBuild: cleanBuild
+	removeTempFolders: removeTempFolders
 }

@@ -2,6 +2,10 @@
 Further reading: https://github.com/Microsoft/TypeScript/wiki/FAQ#why-are-imports-being-elided-in-my-emit
 */
 
+export * from './core/MIOCoreTypes'
+export * from './platform/web/MIOCore_web'
+export * from './core/MIOCoreLexer'
+
 export * from './NSPoint'
 export * from './NSRange'
 export * from './NSRect'
@@ -14,9 +18,13 @@ export * from './NSError'
 export * from './NSCoder'
 export * from './NSKeyedUnarchiver'
 
+export * from './NSNumber'
 export * from './NSDecimalNumber'
+
 export * from './NSDate'
+
 export * from './NSUUID'
+
 export * from './NSPredicate'
 export * from './NSSet'
 export * from './NSIndexPath'
@@ -45,6 +53,5 @@ export * from './NSBundle'
 
 export * from './NSLog'
 
-export * from './NSNumber'
 export * from './NSSortDescriptor'
 export * from './NSPropertyListSerialization'
