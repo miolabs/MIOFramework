@@ -6,7 +6,6 @@ export * from './core/MUICore'
 export * from './core/MUICoreLayer'
 export * from './core/MUICoreAnimation'
 
-
 export * from "./UIView"
 export * from "./UIWindow"
 
@@ -44,8 +43,6 @@ export * from "./UISplitViewController"
 export * from "./UITabBarController"
 export * from "./UIAlertViewController"
 
-export * from "./UIApplication"
-
 export * from "./UIDatePickerController"
 
 export * from './UIActivityIndicatorView'
@@ -60,3 +57,5 @@ export * from './UITapGestureRecognizer'
 export * from './UIPanGestureRecognizer'
 
 export * from './UIOpenPanel'
+
+export * from "./UIApplication"

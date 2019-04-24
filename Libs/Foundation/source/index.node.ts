@@ -4,6 +4,7 @@ Further reading: https://github.com/Microsoft/TypeScript/wiki/FAQ#why-are-import
 
 export * from './core/MIOCoreTypes'
 export * from './platform/node/MIOCore_node'
+export * from './core/MIOCoreMD5'
 export * from './core/MIOCoreLexer'
 
 export * from './NSPoint'

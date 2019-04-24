@@ -9,6 +9,6 @@
   "author": "MIOLabs Team",
   "license": "Apache-2.0",
   "devDependencies": {
-    "mio-foundation-web": "^1.0.5"
+    "mio-foundation-web": "^1.0.6"
   }
 }

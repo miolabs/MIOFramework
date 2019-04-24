@@ -9,12 +9,11 @@ interface String
 };
 
 //For code completion the interface is defined in types/mio/index.d.ts
-
-String.prototype.lastPathComponent = function():string{
+String.prototype.lastPathComponent = function(){
     return MIOCoreStringLastPathComponent(this);
 }
 
-String.prototype.pathExtension = function():string{
+String.prototype.pathExtension = function(){
     return MIOCoreStringPathExtension(this);
 } 
 
@@ -84,21 +83,21 @@ function MIOCoreStringPathExtension(string:string):string
 
 function MIOCoreStringDeletingLastPathComponent(string:string)
 {
-    var index = string.lastIndexOf("/");
-    var str = string.substr(0, index);
+    let index = string.lastIndexOf("/");
+    let str = string.substr(0, index);
 
     return str;
 }
 
 function MIOCoreStringStandardizingPath(string)
 {
-    var array = string.split("/");
+    let array = string.split("/");
 
-    var newArray = []; 
-    var index = 0;
+    let newArray = []; 
+    let index = 0;
     for (let count = 0; count < array.length; count++)
     {
-        var component:string = array[count];
+        let component:string = array[count];
         if (component.substr(0,2) == "..")
             index--;
         else 
@@ -108,12 +107,11 @@ function MIOCoreStringStandardizingPath(string)
         }                
     }
 
-    var str = "";
+    let str = "";
     if (index > 0)
         str = newArray[0];
 
-    for (let count = 1; count < index; count++)
-    {
+    for (let count = 1; count < index; count++){
         str += "/" + newArray[count];
     }
 
@@ -122,8 +120,7 @@ function MIOCoreStringStandardizingPath(string)
 
 
 let _MIOLocalizedStrings = null;
-
-function MIOLocalizeString(key, defaultValue)
+export function MIOLocalizeString(key, defaultValue)
 {
     let strings =  _MIOLocalizedStrings;
     if (strings == null)
@@ -136,10 +133,12 @@ function MIOLocalizeString(key, defaultValue)
     return value;
 }
 
-function setMIOLocalizedStrings(data) {
+export function MIOCoreStringSetLocalizedStrings(data) 
+{
     _MIOLocalizedStrings = data
 }
 
-function getMIOLocalizedStrings() {
+export function MIOCoreStringGetLocalizedStrings() 
+{
     return _MIOLocalizedStrings
 }
