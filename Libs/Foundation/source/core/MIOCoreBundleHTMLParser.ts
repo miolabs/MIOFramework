@@ -27,7 +27,7 @@ export class MIOCoreBundleHTMLParser implements MIOCoreHTMLParserDelegate
         
         if (element.toLocaleLowerCase() == "div"){
             
-            if (attributes["main-div"] == true) {
+            if (attributes["data-main-view-controller"] == true) {
                 // Start capturing   
                 this.isCapturing = true;
             }

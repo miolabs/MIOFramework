@@ -30,7 +30,7 @@ function parserDidStartElement(parser, element, attributes){
 		let id = attributes["id"];
 		let customClass = attributes["customClass"];
 					
-		currentFileContent += "<div class='viewController' id='" + id + "'";	
+		currentFileContent += "<div class='viewController' id='" + id + "' data-main-view-controller='true'";	
 		if (customClass != null) currentFileContent += " data-class='" + customClass + "'";
 		currentFileContent += ">";											
 	}

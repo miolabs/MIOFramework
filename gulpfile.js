@@ -30,7 +30,7 @@ function unifySwiftFiles(cb) {
 function transpileTsToJs(cb) {
 	return gulp.src("./ITests/Demo1App/Demo1App/.build/data.ts")
 				.pipe(ts({
-					outFile: "data.js",
+					outFile: "app.js",
 					removeComments: true,
 					allowJs: true,
 					suppressImplicitAnyIndexErrors: true,
