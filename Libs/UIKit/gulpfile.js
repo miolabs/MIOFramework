@@ -49,7 +49,7 @@ function UICreateWebPackage(cb) {
 		fs.mkdirSync(DEST + "types", {recursive: true});
 		
 		//Copy UIKit.d.ts to types folder
-		fs.copyFileSync("./dist/UIKit.web.d.ts", DEST + "types/UIKit.web.d.ts");
+		//fs.copyFileSync("./dist/UIKit.web.d.ts", DEST + "types/UIKit.web.d.ts");
 
 		//Copy UIKit js
 		fs.copyFileSync("./.build/web-prod/UIKit.web.js", DEST + "UIKit.web.js");
@@ -58,12 +58,24 @@ function UICreateWebPackage(cb) {
 		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
 		fs.copyFileSync(__dirname + "/../../README.md", DEST + "README.md");
 
-		//Copy foundation.js to the package folder
-		//fs.copyFileSync(__dirname + "/.build/node-prod/foundation.js", DEST + "foundation.min.js");
 		console.log("Package created succesfully");
 	} else {
 		console.log("/.build directory does not exist - Execute first gulp UIminifyWebProd");
 	}
+	cb();
+}
+
+function UIBuildWebPackageFile(cb) {
+	var platform = "web";
+	var regEx = /{%platform%}/gm;
+	const DEST = "packages/mio-uikit-web/";
+
+	//Create package.platform.json
+	fs.copyFileSync("package.platform.json", DEST + "package.json");
+	
+	var content = fs.readFileSync("packages/mio-uikit-" + platform + "/package.json", "utf8");
+	content = content.replace(regEx, platform);
+	fs.writeFileSync("packages/mio-uikit-" + platform + "/package.json", content);
 	cb();
 }
 
@@ -95,6 +107,6 @@ module.exports = {
 	//build: build, //Not working, fix it when implementing dev building
 	UIBuildWebProd: gulp.series(UIParseIndexWebTs, UIConcatWebTsFiles, UICleanWebFoundation),
 	UIMinifyWebProd,
-	UICreateWebPackage,
-	UIRemoveTempFolders
+	UIBuildWebPackage: gulp.series(UICreateWebPackage, UIBuildWebPackageFile),
+	UIRemoveTempFolders: UIRemoveTempFolders
 }

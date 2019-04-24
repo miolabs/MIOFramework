@@ -1,0 +1,12 @@
+{
+  "name": "mio-uikit-{%platform%}",
+  "version": "1.0.0",
+  "description": "Apple UIKit framework for {%platform%}",
+  "main": "UIKit.{%platform%}.js",
+  "types": "types/UIKit.{%platform%}.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "MIOLabs",
+  "license": "Apache-2.0"
+}

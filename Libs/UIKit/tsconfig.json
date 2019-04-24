@@ -10,7 +10,7 @@
 		"source/core/MUICore.ts",
 		"source/core/MIOCoreAnimation.ts",
 		"source/core/MIOCoreLayer.ts",
-		"source/*"
+		"source/**/*"
 	],
 	"exclude": [
 		"node_modules",
