@@ -52,7 +52,7 @@ function UICreateWebPackage(cb) {
 		//fs.copyFileSync("./dist/UIKit.web.d.ts", DEST + "types/UIKit.web.d.ts");
 
 		//Copy UIKit js
-		fs.copyFileSync("./.build/web-prod/UIKit.web.js", DEST + "UIKit.web.js");
+		fs.copyFileSync("./.build/web-prod/UIKit.web.js", DEST + "mio-uikit-web.js");
 
 		//Copy package.json, LICENSE AND README
 		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
