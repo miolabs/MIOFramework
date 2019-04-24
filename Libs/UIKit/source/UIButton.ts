@@ -1,3 +1,4 @@
+import { NSLocalizeString } from "mio-foundation-web";
 import { UIControl } from "./UIControl";
 import { UILayerGetFirstElementWithTag } from "./UIView";
 import { MUICoreLayerAddStyle, MUICoreLayerRemoveStyle } from "./core/MUICoreLayer";

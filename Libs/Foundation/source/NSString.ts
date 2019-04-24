@@ -120,7 +120,7 @@ function MIOCoreStringStandardizingPath(string)
 
 
 let _MIOLocalizedStrings = null;
-export function MIOLocalizeString(key, defaultValue)
+export function NSLocalizeString(key, defaultValue)
 {
     let strings =  _MIOLocalizedStrings;
     if (strings == null)

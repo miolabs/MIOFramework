@@ -22,6 +22,8 @@ export * from './NSKeyedUnarchiver'
 export * from './NSNumber'
 export * from './NSDecimalNumber'
 
+export * from './NSString'
+
 export * from './NSDate'
 
 export * from './NSUUID'
