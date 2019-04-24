@@ -109,6 +109,9 @@ function createNodePackage(cb) {
 		//Copy foundation.min.js
 		fs.copyFileSync("./.build/node-prod/foundation.node.js", DEST + "foundation.node.js");
 
+		//Create package.platform.json
+		fs.copyFileSync("package.platform.json", DEST + "package.json");
+
 		//Copy package.json, LICENSE AND README
 		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
 		fs.copyFileSync(__dirname + "/../../README.md", DEST + "README.md");
@@ -138,12 +141,38 @@ function createWebPackage(cb) {
 		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
 		fs.copyFileSync(__dirname + "/../../README.md", DEST + "README.md");
 
-		//Copy foundation.js to the package folder
-		//fs.copyFileSync(__dirname + "/.build/node-prod/foundation.js", DEST + "foundation.min.js");
 		console.log("Package created succesfully");
 	} else {
 		console.log("/.build directory does not exist - Execute first gulp minifyWebProd");
 	}
+	cb();
+}
+
+function buildNodePackageFile(cb) {
+	var platform = "node";
+	var regEx = /{%platform%}/gm;
+	const DEST = "packages/mio-foundation-node/";
+
+	//Create package.platform.json
+	fs.copyFileSync("package.platform.json", DEST + "package.json");
+	
+	var content = fs.readFileSync("packages/mio-foundation-" + platform + "/package.json", "utf8");
+	content = content.replace(regEx, platform);
+	fs.writeFileSync("packages/mio-foundation-" + platform + "/package.json", content);
+	cb();
+}
+
+function buildWebPackageFile(cb) {
+	var platform = "web";
+	var regEx = /{%platform%}/gm;
+	const DEST = "packages/mio-foundation-web/";
+
+	//Create package.platform.json
+	fs.copyFileSync("package.platform.json", DEST + "package.json");
+	
+	var content = fs.readFileSync("packages/mio-foundation-" + platform + "/package.json", "utf8");
+	content = content.replace(regEx, platform);
+	fs.writeFileSync("packages/mio-foundation-" + platform + "/package.json", content);
 	cb();
 }
 
@@ -177,7 +206,7 @@ module.exports = {
 	buildWebProd: gulp.series(parseIndexWebTs, concatWebTsFiles, cleanWebFoundation),
 	minifyNodeProd: minifyNodeProd,
 	minifyWebProd: minifyWebProd,
-	createNodePackage: createNodePackage,
-	createWebPackage: createWebPackage,
+	buildNodePackage: gulp.series(createNodePackage, buildNodePackageFile),
+	buildWebPackage: gulp.series(createWebPackage, buildWebPackageFile),
 	removeTempFolders: removeTempFolders
 }
