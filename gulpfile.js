@@ -34,7 +34,7 @@ function transpileTsToJs(cb) {
 					removeComments: true,
 					allowJs: true,
 					suppressImplicitAnyIndexErrors: true,
-					types: ["miojslibs"],
+					types: ["mio-foundation-web", "mio-uikit-web"],
 					target: "es5"
 				}))
 				.pipe(gulp.dest("./ITests/Demo1App/Demo1App/dist/"));
@@ -43,7 +43,7 @@ function transpileTsToJs(cb) {
 function uglifyJs(cb) {
 	return pipeline( 
 			//sourcemaps.init({largeFile: true}),
-			gulp.src("./ITests/Demo1App/Demo1App/.build/data.js"),
+			gulp.src("./ITests/Demo1App/Demo1App/.build/app.js"),
 			uglify({
 				sourceMap: true
 			}),
