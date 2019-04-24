@@ -1,10 +1,9 @@
 
+import { NSClassFromString, NSSize, MIOCoreIsPhone } from "mio-foundation-web";
 import { UIView, UILayerSearchElementByID } from "../UIView";
 import { UIViewController } from "../UIViewController";
-import { MIOClassFromString, MIOCoreIsPhone } from "../MIOCore/platform";
 import { UIModalPresentationStyle, UIPresentationController } from "../UIViewController_PresentationController";
 import { _UIAnimationStart } from "./MUICoreAnimation";
-import { MIOSize } from "../MIOFoundation";
 
 export interface Window {
     prototype;
@@ -42,7 +41,7 @@ export function UIOutlet(owner, elementID, className?, options?)
     if (className == null)
         className = "UIView";
 
-    let classInstance = MIOClassFromString(className);
+    let classInstance = NSClassFromString(className);
     classInstance.initWithLayer(layer, owner, options);
     // Track outlets inside view controller (owner)
     UIOutletRegister(owner, elementID, classInstance);
@@ -71,7 +70,7 @@ export function UIWindowSize()
     //var h = document.body.clientHeight;window.innerHeight
     var h = window.innerHeight;
 
-    return new MIOSize(w, h);
+    return new NSSize(w, h);
 }
 
 export function _MIUShowViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, animated:boolean, target?, completion?)

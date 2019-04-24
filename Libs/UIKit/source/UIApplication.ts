@@ -1,5 +1,6 @@
-import {NSURLRequest, NSURLConnection, NSPropertyListSerialization, NSURL} from "mio-foundation-web";
+import {NSURLRequest, NSURLConnection, NSPropertyListSerialization, NSURL, MIOCoreGetLanguages, MIOCoreAddLanguage, MIOCoreGetPlatformLanguage} from "mio-foundation-web";
 import { UIWindow } from "./UIWindow";
+import { MIOCoreStringSetLocalizedStrings } from "mio-foundation-web";
 
 /**
  * Created by godshadow on 11/3/16.
@@ -66,7 +67,7 @@ export class UIApplication {
         let con = new NSURLConnection();
         con.initWithRequestBlock(request, this, function(code, data){
             if (code == 200) {
-                setMIOLocalizedStrings(JSON.parse(data.replace(/(\r\n|\n|\r)/gm, "")));
+                MIOCoreStringSetLocalizedStrings(JSON.parse(data.replace(/(\r\n|\n|\r)/gm, "")));
             }
             completion.call(target);
         });        
@@ -95,7 +96,7 @@ export class UIApplication {
                 let url = langs[key];
                 MIOCoreAddLanguage(key, url);
             }
-            let lang = MIOCoreGetBrowserLanguage();
+            let lang = MIOCoreGetPlatformLanguage();
             this.setLanguage(lang, this, function(){
                 this._run();
             });            
@@ -133,15 +134,15 @@ export class UIApplication {
     }
 
     downloadLanguage(key, fn) {        
-        var url = this.languages[key];
+        let url = this.languages[key];
 
         // Download
-        var conn = new NSURLConnection();
+        let conn = new NSURLConnection();
         conn.initWithRequestBlock(NSURLRequest.requestWithURL(url), this, function (error, data) {
 
             if (data != null) {
-                var json = JSON.parse(data.replace(/(\r\n|\n|\r)/gm, ""));
-                setMIOLocalizedStrings(json);
+                let json = JSON.parse(data.replace(/(\r\n|\n|\r)/gm, ""));
+                MIOCoreStringSetLocalizedStrings(json);
             }
 
             fn.call(this);

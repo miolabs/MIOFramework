@@ -1,7 +1,7 @@
-import { MIOObject } from "../MIOFoundation";
+import { NSObject } from "mio-foundation-web";
 
 
-export class UIEvent extends MIOObject
+export class UIEvent extends NSObject
 {
     static eventWithSysEvent(sysEvent){
         let ev = new UIEvent();

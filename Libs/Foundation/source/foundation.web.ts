@@ -9,6 +9,10 @@ export enum MIOCorePlatformType
 
 
 
+export function NSClassFromString(className:string){
+    return null;
+}
+
 export function MIOCoreGetPlatform():MIOCorePlatformType {
     let agent = navigator.userAgent.toLowerCase();
     let browserType = MIOCorePlatformType.Unknown;    
@@ -18,12 +22,183 @@ export function MIOCoreGetPlatform():MIOCorePlatformType {
     return browserType;
 }
 
-export function NSClassFromString(className:string){
-    return null;
+export function MIOCoreGetPlatformLocale(){
+    // navigator.languages:    Chrome & FF
+    // navigator.language:     Safari & Others
+    // navigator.userLanguage: IE & Others
+    return navigator.languages || navigator.language || navigator['userLanguage'];
+}
+
+export function MIOCoreGetPlatformLanguage(){
+    let locale = MIOCoreGetPlatformLocale();
+    if (typeof(locale) == "string") return locale.substring(0, 2);
+    else {
+        let l = locale[0];
+        return l.substring(0, 2);
+    }
+}
+
+export function MIOCoreIsPhone(){    
+
+    let phone = ['iphone','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile'];
+    for (let index = 0; index < phone.length; index++) {
+        if (navigator.userAgent.toLowerCase().indexOf(phone[index].toLowerCase()) > 0) {
+            return true;
+        }
+    }    
+    return false;
+}
+
+export function MIOCoreIsPad(){
+    let pad = ['ipad'];
+    for (let index = 0; index < pad.length; index++) {
+        if (navigator.userAgent.toLowerCase().indexOf(pad[index].toLowerCase()) > 0) {
+            return true;
+        }
+    }
+    
+    return false;    
+}
+
+export function MIOCoreIsMobile()
+{
+    //var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile'];
+    let mobile = ['iphone','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile'];
+    for (let index = 0; index < mobile.length; index++) {
+        if (navigator.userAgent.toLowerCase().indexOf(mobile[index].toLowerCase()) > 0) return true;
+    }
+
+    // nothing found.. assume desktop
+    return false;
+}
+
+export function MIOCoreBundleGetMainURLString():string{
+    return window.location.href;
+}
+
+export function MIOCoreBundleGetContentsFromURLString(path:string, target:any, completion:any){
+    let xhr = new XMLHttpRequest();
+
+    xhr.onload = function () {        
+        completion.call(target, this.status, this.responseText);    
+    };
+    xhr.open("GET", path);
+    xhr.send();
 }
 
 
+
 export function MIOCoreCreateMD5(s) {function L(k,d){return(k<<d)|(k>>>(32-d))}function K(G,k){var I,d,F,H,x;F=(G&2147483648);H=(k&2147483648);I=(G&1073741824);d=(k&1073741824);x=(G&1073741823)+(k&1073741823);if(I&d){return(x^2147483648^F^H)}if(I|d){if(x&1073741824){return(x^3221225472^F^H)}else{return(x^1073741824^F^H)}}else{return(x^F^H)}}function r(d,F,k){return(d&F)|((~d)&k)}function q(d,F,k){return(d&k)|(F&(~k))}function p(d,F,k){return(d^F^k)}function n(d,F,k){return(F^(d|(~k)))}function u(G,F,aa,Z,k,H,I){G=K(G,K(K(r(F,aa,Z),k),I));return K(L(G,H),F)}function f(G,F,aa,Z,k,H,I){G=K(G,K(K(q(F,aa,Z),k),I));return K(L(G,H),F)}function D(G,F,aa,Z,k,H,I){G=K(G,K(K(p(F,aa,Z),k),I));return K(L(G,H),F)}function t(G,F,aa,Z,k,H,I){G=K(G,K(K(n(F,aa,Z),k),I));return K(L(G,H),F)}function e(G){var Z;var F=G.length;var x=F+8;var k=(x-(x%64))/64;var I=(k+1)*16;var aa=Array(I-1);var d=0;var H=0;while(H<F){Z=(H-(H%4))/4;d=(H%4)*8;aa[Z]=(aa[Z]| (G.charCodeAt(H)<<d));H++}Z=(H-(H%4))/4;d=(H%4)*8;aa[Z]=aa[Z]|(128<<d);aa[I-2]=F<<3;aa[I-1]=F>>>29;return aa}function B(x){var k="",F="",G,d;for(d=0;d<=3;d++){G=(x>>>(d*8))&255;F="0"+G.toString(16);k=k+F.substr(F.length-2,2)}return k}function J(k){k=k.replace(/rn/g,"n");var d="";for(var F=0;F<k.length;F++){var x=k.charCodeAt(F);if(x<128){d+=String.fromCharCode(x)}else{if((x>127)&&(x<2048)){d+=String.fromCharCode((x>>6)|192);d+=String.fromCharCode((x&63)|128)}else{d+=String.fromCharCode((x>>12)|224);d+=String.fromCharCode(((x>>6)&63)|128);d+=String.fromCharCode((x&63)|128)}}}return d}var C=Array();var P,h,E,v,g,Y,X,W,V;var S=7,Q=12,N=17,M=22;var A=5,z=9,y=14,w=20;var o=4,m=11,l=16,j=23;var U=6,T=10,R=15,O=21;s=J(s);C=e(s);Y=1732584193;X=4023233417;W=2562383102;V=271733878;for(P=0;P<C.length;P+=16){h=Y;E=X;v=W;g=V;Y=u(Y,X,W,V,C[P+0],S,3614090360);V=u(V,Y,X,W,C[P+1],Q,3905402710);W=u(W,V,Y,X,C[P+2],N,606105819);X=u(X,W,V,Y,C[P+3],M,3250441966);Y=u(Y,X,W,V,C[P+4],S,4118548399);V=u(V,Y,X,W,C[P+5],Q,1200080426);W=u(W,V,Y,X,C[P+6],N,2821735955);X=u(X,W,V,Y,C[P+7],M,4249261313);Y=u(Y,X,W,V,C[P+8],S,1770035416);V=u(V,Y,X,W,C[P+9],Q,2336552879);W=u(W,V,Y,X,C[P+10],N,4294925233);X=u(X,W,V,Y,C[P+11],M,2304563134);Y=u(Y,X,W,V,C[P+12],S,1804603682);V=u(V,Y,X,W,C[P+13],Q,4254626195);W=u(W,V,Y,X,C[P+14],N,2792965006);X=u(X,W,V,Y,C[P+15],M,1236535329);Y=f(Y,X,W,V,C[P+1],A,4129170786);V=f(V,Y,X,W,C[P+6],z,3225465664);W=f(W,V,Y,X,C[P+11],y,643717713);X=f(X,W,V,Y,C[P+0],w,3921069994);Y=f(Y,X,W,V,C[P+5],A,3593408605);V=f(V,Y,X,W,C[P+10],z,38016083);W=f(W,V,Y,X,C[P+15],y,3634488961);X=f(X,W,V,Y,C[P+4],w,3889429448);Y=f(Y,X,W,V,C[P+9],A,568446438);V=f(V,Y,X,W,C[P+14],z,3275163606);W=f(W,V,Y,X,C[P+3],y,4107603335);X=f(X,W,V,Y,C[P+8],w,1163531501);Y=f(Y,X,W,V,C[P+13],A,2850285829);V=f(V,Y,X,W,C[P+2],z,4243563512);W=f(W,V,Y,X,C[P+7],y,1735328473);X=f(X,W,V,Y,C[P+12],w,2368359562);Y=D(Y,X,W,V,C[P+5],o,4294588738);V=D(V,Y,X,W,C[P+8],m,2272392833);W=D(W,V,Y,X,C[P+11],l,1839030562);X=D(X,W,V,Y,C[P+14],j,4259657740);Y=D(Y,X,W,V,C[P+1],o,2763975236);V=D(V,Y,X,W,C[P+4],m,1272893353);W=D(W,V,Y,X,C[P+7],l,4139469664);X=D(X,W,V,Y,C[P+10],j,3200236656);Y=D(Y,X,W,V,C[P+13],o,681279174);V=D(V,Y,X,W,C[P+0],m,3936430074);W=D(W,V,Y,X,C[P+3],l,3572445317);X=D(X,W,V,Y,C[P+6],j,76029189);Y=D(Y,X,W,V,C[P+9],o,3654602809);V=D(V,Y,X,W,C[P+12],m,3873151461);W=D(W,V,Y,X,C[P+15],l,530742520);X=D(X,W,V,Y,C[P+2],j,3299628645);Y=t(Y,X,W,V,C[P+0],U,4096336452);V=t(V,Y,X,W,C[P+7],T,1126891415);W=t(W,V,Y,X,C[P+14],R,2878612391);X=t(X,W,V,Y,C[P+5],O,4237533241);Y=t(Y,X,W,V,C[P+12],U,1700485571);V=t(V,Y,X,W,C[P+3],T,2399980690);W=t(W,V,Y,X,C[P+10],R,4293915773);X=t(X,W,V,Y,C[P+1],O,2240044497);Y=t(Y,X,W,V,C[P+8],U,1873313359);V=t(V,Y,X,W,C[P+15],T,4264355552);W=t(W,V,Y,X,C[P+6],R,2734768916);X=t(X,W,V,Y,C[P+13],O,1309151649);Y=t(Y,X,W,V,C[P+4],U,4149444226);V=t(V,Y,X,W,C[P+11],T,3174756917);W=t(W,V,Y,X,C[P+2],R,718787259);X=t(X,W,V,Y,C[P+9],O,3951481745);Y=K(Y,h);X=K(X,E);W=K(W,v);V=K(V,g)}var i=B(Y)+B(X)+B(W)+B(V);return i.toLowerCase()};
+
+export function MIOCoreStringHasPreffix(str, preffix)
+{
+    return str.substring(0, preffix.length) === preffix;
+}
+
+export function MIOCoreStringHasSuffix(str, suffix)
+{
+    let s = str.substr(str.length - suffix.length);
+    return s == suffix;
+}
+
+export function MIOCoreStringAppendPathComponent(string:string, path):string
+{
+    let str = string;
+
+    if (string.charAt(string.length - 1) == "/" && path.charAt(0) == "/"){
+        str += path.substr(1);
+    }
+    else if (string.charAt(string.length - 1) != "/" && path.charAt(0) != "/"){
+        str += "/" + path;
+    }
+    else {
+        str += path;
+    }
+
+    return str;
+}
+
+export function MIOCoreStringLastPathComponent(string:string)
+{
+    let index = string.lastIndexOf("/");
+    if (index == -1) return string;
+    let len = string.length - index;
+    let str = string.substr(index, len);
+
+    return str;
+}
+
+export function MIOCoreStringPathExtension(string:string):string
+{
+    let lastPathComponent = MIOCoreStringLastPathComponent(string);
+    let items = lastPathComponent.split(".");
+    if (items.length == 1) return "";
+
+    let ext = items[items.length - 1];
+    return ext;
+}
+
+export function MIOCoreStringDeletingLastPathComponent(string:string)
+{
+    let index = string.lastIndexOf("/");
+    let str = string.substr(0, index);
+
+    return str;
+}
+
+export function MIOCoreStringStandardizingPath(string)
+{
+    let array = string.split("/");
+
+    let newArray = []; 
+    let index = 0;
+    for (let count = 0; count < array.length; count++)
+    {
+        let component:string = array[count];
+        if (component.substr(0,2) == "..")
+            index--;
+        else 
+        {
+            newArray[index] = component;
+            index++;
+        }                
+    }
+
+    let str = "";
+    if (index > 0)
+        str = newArray[0];
+
+    for (let count = 1; count < index; count++){
+        str += "/" + newArray[count];
+    }
+
+    return str;
+}
+
+
+let _MIOLocalizedStrings = null;
+export function MIOCoreStringSetLocalizedStrings(data) 
+{
+    _MIOLocalizedStrings = data
+}
+
+export function MIOCoreStringGetLocalizedStrings() 
+{
+    return _MIOLocalizedStrings
+}
+
+export function  MIOCoreStringLocalizeString(key:string, defaultValue:string){
+    let strings =  MIOCoreStringGetLocalizedStrings;
+    if (strings == null)
+        return defaultValue;
+
+    let value = strings[key];
+    if (value == null)
+        return defaultValue;
+
+    return value;
+}
+
 
 export class MIOCoreLexer 
 {
@@ -114,6 +289,737 @@ export class MIOCoreLexer
         return index == -1 ? token : this.prevToken();
     }
 }
+
+let _miocore_languages = null;
+export function MIOCoreAddLanguage(lang, url)
+{
+    if (_miocore_languages == null) _miocore_languages = {};
+    _miocore_languages[lang] = url;
+}
+
+export function MIOCoreGetLanguages()
+{
+    return _miocore_languages;
+}
+
+
+
+export interface MIOCoreHTMLParserDelegate {
+    parserDidStartElement(parser:MIOCoreHTMLParser, element, attributes);
+    parserDidEndElement(parser:MIOCoreHTMLParser, element);
+
+    parserFoundCharacters(parser:MIOCoreHTMLParser, characters:string);
+
+    parserFoundComment(parser:MIOCoreHTMLParser, comment:string);
+
+    parserDidStartDocument(parser:MIOCoreHTMLParser);
+    parserDidEndDocument(parser:MIOCoreHTMLParser);
+}
+
+export enum MIOCoreHTMLParserTokenType {
+    Identifier,    
+    OpenTag,    
+    CloseTag,
+    OpenCloseTag,
+    InlineCloseTag,
+    Question,
+    Exclamation,
+    Equal,
+    Quote,
+    Commentary,
+    End
+}
+
+export class MIOCoreHTMLParser 
+{
+    private string:string = null;
+    private stringIndex = 0;
+    private delegate:MIOCoreHTMLParserDelegate = null;
+
+    private exceptionsTags = ["!DOCTYPE", "area", "base", "br", "col", "hr", "img", "input", "link", "meta", "param", "keygen", "source"];
+
+    initWithString(string:string, delegate:MIOCoreHTMLParserDelegate) {
+        this.string = string;
+        this.delegate = delegate;
+    }
+
+    private nextChar():string{
+        if (this.stringIndex >= this.string.length) return null;
+        let ch = this.string.charAt(this.stringIndex);
+        this.stringIndex++;
+        return ch;
+    }
+
+    private prevChar():string{
+        this.stringIndex--;
+        return this.string.charAt(this.stringIndex);
+    }
+
+    private getChars(stopChars) {
+
+        var chs:string = "";        
+        var exit = false;
+        while(exit == false) {
+            chs += this.nextChar();
+            if (MIOCoreStringHasSuffix(chs, stopChars) == true) exit = true;
+        }
+
+        // Remove the stop chars
+        return chs.substr(0, chs.length - stopChars.length);
+    }
+
+    /*
+    STREAM TOKENIZER
+    */
+
+    private readToken(){
+                
+        let value = "";
+
+        this.lastTokenIndex = this.stringIndex;
+
+        let ch = this.nextChar();        
+        if (ch == null) return null;
+        while(ch == " ") ch = this.nextChar();
+
+        let exit = false;
+        while (exit == false) {
+            
+            switch(ch) {
+                case "<":
+                    if (value.length == 0) value = this.minor();
+                    else this.prevChar();
+                    exit = true;
+                    break;
+
+                // case "!":
+                //     if (value.length == 0) value = this.exclamation();
+                //     else this.prevChar();
+                //     exit = true;
+                //     break;
+
+                case ">":
+                    if (value.length == 0) value = this.major();
+                    else this.prevChar();
+                    exit = true;
+                    break;
+
+                // case "/":
+                //     if (value.length == 0) value = this.slash();
+                //     else this.prevChar();                    
+                //     exit = true;
+                //     break;
+
+                case "=":
+                    if (value.length == 0) value = ch;
+                    else this.prevChar();
+                    exit = true;
+
+                case " ":
+                    exit = true;
+                    break;      
+                    
+                case "\"":                    
+                case "'":
+                    if (value.length == 0) value = ch;
+                    exit = true;
+                    break;
+
+                default:
+                    value += ch;
+                    ch = this.nextChar();
+                    if (ch == null) exit = true;
+                    break;
+            }
+            
+        }
+
+        return value;
+    }
+
+    private minor(){
+        let ch = this.nextChar();
+        let value = "";
+
+        switch (ch) {
+            case "/":
+                value = "</";    
+                break;
+
+            case "!":
+                value = this.exclamation();
+                break;
+
+            default: 
+                value = "<";
+                this.prevChar();
+                break;
+            
+        }
+        
+        return value;
+    }
+
+    private major(){
+
+        this.prevChar(); // Major symbol
+        let ch = this.prevChar();
+
+        let value = ">";
+        if (ch == "/"){
+            value = "/>";
+        }
+
+        value = this.nextChar();
+        value = this.nextChar();            
+        return value;
+    }
+
+    // private slash(){
+
+    //     let ch = this.nextChar();
+    //     if (ch == ">") return "/>";
+
+    //     this.unexpectedToken();
+    // }
+
+    private exclamation(){
+
+        let ch = this.nextChar();
+        if (ch == "-") {
+            let ch2 = this.nextChar();
+            if (ch2 == "-") {
+                return "<!--";
+            }
+            else this.unexpectedToken(ch + ch2);
+        }
+        
+        this.prevChar();
+        this.prevChar();
+        return "<";
+    }
+
+    private lastTokenIndex = -1;
+    private lastTokenValue:string = null;
+    private prevToken() {
+        this.stringIndex = this.lastTokenIndex;
+        this.lastTokenIndex = -1;
+        let value = this.lastTokenValue;
+        this.lastTokenValue = null;
+        return value;
+    }
+
+    private nextToken(){
+
+        let type = MIOCoreHTMLParserTokenType.Identifier;
+        let value = this.readToken();
+
+        if (value == null) return [MIOCoreHTMLParserTokenType.End, value];
+
+        switch(value) {
+            case "<":
+                type = MIOCoreHTMLParserTokenType.OpenTag;
+                break;
+
+            case ">":
+                type = MIOCoreHTMLParserTokenType.CloseTag;
+                break;
+
+            case "</":
+                type = MIOCoreHTMLParserTokenType.OpenCloseTag;
+                break;                
+
+            case "/>":
+                type = MIOCoreHTMLParserTokenType.InlineCloseTag;
+                break;
+
+            case "<!--":
+                type = MIOCoreHTMLParserTokenType.Commentary;                
+                break;
+
+            case "=":
+                type = MIOCoreHTMLParserTokenType.Equal;
+                break;       
+                
+            case "\"":
+            case "'":
+                type = MIOCoreHTMLParserTokenType.Quote;
+                break;
+        }
+
+        this.lastTokenValue = value;
+        return [type, value];
+    }
+
+    /* 
+        PARSER
+    */
+
+    parse(){
+        if (this.string == null) return;
+        
+        if (typeof this.delegate.parserDidStartDocument === "function") {
+            this.delegate.parserDidStartDocument(this);
+        }
+        
+        let exit = false;        
+        do {            
+            let [type, value] = this.nextToken();
+            switch (type) {
+
+                case MIOCoreHTMLParserTokenType.OpenTag:
+                    this.openTag();
+                    break;
+
+                case MIOCoreHTMLParserTokenType.OpenCloseTag:
+                    this.closeElement();
+                    break;
+                        
+                case MIOCoreHTMLParserTokenType.Commentary:
+                    this.comment();
+                    break;
+
+                case MIOCoreHTMLParserTokenType.Identifier:
+                    this.foundChars(value);
+                    break;
+
+                case MIOCoreHTMLParserTokenType.End:
+                    exit = true;
+                    break;
+
+                default:
+                    this.unexpectedToken(value);
+                    break;
+            }
+
+        } while (exit == false);
+
+        if (typeof this.delegate.parserDidEndDocument === "function") {
+            this.delegate.parserDidEndDocument(this);
+        }
+
+    }
+
+    private unexpectedToken(value) {
+        throw new Error("Unexpected token: " + value);
+    }
+
+    private openTag(){
+
+        let [type, value] = this.nextToken();
+        switch (type){
+
+            case MIOCoreHTMLParserTokenType.Identifier:
+                this.openElement(value);
+                break;
+
+            case MIOCoreHTMLParserTokenType.Exclamation:
+                this.exclamation();
+                break;                            
+        }
+    }
+
+    private openElement(element){        
+        let attributes = this.attributes();
+        this.closeTag(element, attributes);
+    }
+
+    private attributes(){        
+
+        var attributes = {};
+        var exit = false;
+        
+        var attrKey = null;
+
+        let isKey = true;
+
+        while (exit == false) {
+
+            let [type, value] = this.nextToken();
+            switch (type) {
+            
+                case MIOCoreHTMLParserTokenType.Identifier:
+                    if (isKey) {
+                        attrKey = value;
+                        attributes[attrKey] = null;
+                    }
+                    else {
+                        attributes[attrKey] = value;
+                        isKey = true;
+                    }
+                    break;
+
+                case MIOCoreHTMLParserTokenType.Equal:
+                    isKey = false;
+                    break;
+
+                case MIOCoreHTMLParserTokenType.Quote:
+                    attributes[attrKey] = this.getChars(value);
+                    isKey = true;
+                    break;
+
+                case MIOCoreHTMLParserTokenType.CloseTag:
+                case MIOCoreHTMLParserTokenType.InlineCloseTag:
+                    this.prevToken();
+                    exit = true;
+                    break;                    
+            }            
+        }  
+        
+        return attributes;
+    }
+
+    private closeTag(element, attributes){
+
+        let [type, value] = this.nextToken();
+
+        switch (type) {
+
+            case MIOCoreHTMLParserTokenType.CloseTag:
+                if (typeof this.delegate.parserDidStartElement === "function") {
+                    this.delegate.parserDidStartElement(this, element, attributes);
+                }
+                // Only call close element for the execeptions tags            
+                if ((this.exceptionsTags.indexOf(element) > -1) && (typeof this.delegate.parserDidEndElement === "function")) {
+                    this.delegate.parserDidEndElement(this, element);
+                }
+
+                // Special cases like <style></style> or <script></script>
+                // We need to read everything 'til the next close tag
+                if (element == "style" || element == "script"){
+                    let chars = this.readToNextString("</" + element + ">");
+                    this.foundChars(chars);
+                    
+                    if (typeof this.delegate.parserDidEndElement === "function") {
+                        this.delegate.parserDidEndElement(this, element);
+                    }                                        
+                }                
+                
+                break;
+
+            case MIOCoreHTMLParserTokenType.InlineCloseTag:
+                if (typeof this.delegate.parserDidEndElement === "function") {
+                    this.delegate.parserDidEndElement(this, element);
+                }                
+                break;
+
+            default:
+                this.unexpectedToken(value);
+                break;
+        }
+
+    }
+
+    private closeElement(){
+        
+        let [type, value] = this.nextToken();
+        if (type != MIOCoreHTMLParserTokenType.Identifier) this.unexpectedToken(value);
+        let element = value;
+
+        [type, value] = this.nextToken();
+        if (type != MIOCoreHTMLParserTokenType.CloseTag) this.unexpectedToken(value);
+        
+        if (typeof this.delegate.parserDidEndElement === "function") {
+            this.delegate.parserDidEndElement(this, element);
+        }
+    }    
+
+    private comment(){
+        let cmt = this.getChars("-->");
+        if (typeof this.delegate.parserFoundComment === "function") {
+            this.delegate.parserFoundComment(this, cmt);
+        }
+    }
+
+    private foundChars(chars){
+        if (chars == null) return;
+        if (typeof this.delegate.parserFoundCharacters === "function") {
+            this.delegate.parserFoundCharacters(this, chars);
+        }        
+    }
+
+    private readToNextString(element:string){
+        
+        let str = "";
+        for (let index = 0; index < element.length; index++){
+            let ch = this.nextChar();
+            if (ch == null) throw Error("Unexpected end of string: " + str);
+            str += ch;
+        }
+
+        if (str == element) return null;
+        
+        let exit = false;
+        while (exit == false){
+            let ch = this.nextChar();            
+            if (ch == null) throw Error("Unexpected end of string: " + str);
+            str += ch;
+            let cmp = str.substr(-element.length);
+            if (cmp == element) exit = true;
+        }
+
+        let chars = str.substr(0, str.length - element.length);
+        console.log("*****\n" + chars + "\n*****\n");
+        return chars;
+    }
+
+}
+
+export class MIOCoreBundle
+{
+    
+}
+
+
+
+export class MIOCoreBundleHTMLParser implements MIOCoreHTMLParserDelegate 
+{
+    private text = null;    
+
+    private result = "";
+    private isCapturing = false;
+    private elementCapturingCount = 0;
+
+    constructor(text) {
+        this.text = text;
+    }
+
+    parse(){
+        let parser = new MIOCoreHTMLParser();
+        parser.initWithString(this.text, this);
+
+        parser.parse();
+
+        return this.result;
+    }    
+
+    // HTML Parser delegate
+    parserDidStartElement(parser:MIOCoreHTMLParser, element:string, attributes){
+        
+        if (element.toLocaleLowerCase() == "div"){
+            
+            if (attributes["main-div"] == true) {
+                // Start capturing   
+                this.isCapturing = true;
+            }
+        }
+
+        if (this.isCapturing == true) {            
+            this.openTag(element, attributes);
+            this.elementCapturingCount++;
+        }
+    }
+
+    private currentString = null;
+    private currentStringLocalizedKey = null;
+    parserFoundCharacters(parser:MIOCoreHTMLParser, characters:string){
+        if (this.isCapturing == true) {
+            if (this.currentString == null) {
+                this.currentString = characters;
+            }
+            else 
+                this.currentString += " " + characters;
+            
+            //this.result += " " + characters;
+        }
+    }
+
+    parserFoundComment(parser:MIOCoreHTMLParser, comment:string) {
+        if (this.isCapturing == true) {
+            this.result += "<!-- " + comment + "-->";
+        }
+    }
+
+    parserDidEndElement(parser:MIOCoreHTMLParser, element:string){        
+
+        if (this.isCapturing == true) {            
+                this.closeTag(element);                
+                this.elementCapturingCount--;            
+        }
+
+        if (this.elementCapturingCount == 0) this.isCapturing = false;
+
+        this.currentString = null;        
+    }
+
+    parserDidStartDocument(parser:MIOCoreHTMLParser){
+        console.log("parser started");
+    }
+
+    parserDidEndDocument(parser:MIOCoreHTMLParser){
+        console.log("datamodel.xml parser finished");
+        console.log(this.result);
+    }
+
+    private openTag(element, attributes){
+
+        this.translateCharacters();
+
+        this.result += "<" + element;        
+
+        for (let key in attributes){            
+            let value = attributes[key];
+            if (value != null) {
+                this.result += " " + key + "='" + value + "'";
+            }
+            else {
+                this.result += " " + key;
+            }
+        }
+
+        this.result += ">";
+
+        if (element == "span") {
+            this.currentStringLocalizedKey = attributes["localized-key"] || attributes["data-localized-key"];
+        }
+    }
+
+    private closeTag(element){
+        this.translateCharacters();
+        this.result += "</" + element + ">";        
+    }
+
+    private translateCharacters(){
+        if (this.currentString != null) {
+            if (this.currentStringLocalizedKey == null) {
+                this.result += this.currentString;
+            }else {
+                this.result += MIOCoreStringLocalizeString(this.currentStringLocalizedKey, this.currentString);
+            }
+        }
+        this.currentString = null;
+        this.currentStringLocalizedKey = null;        
+    }
+
+}
+
+
+
+
+export class MIOCoreBundle_web extends MIOCoreBundle
+{
+    baseURL:string = null;
+
+    private _layoutWorker = null;
+    private _layoutQueue = null;
+    private _layoutCache = null;
+
+    private _isDownloadingResource = false;
+    
+    loadHTMLFromPath(path, target, completion){
+        MIOCoreBundleGetContentsFromURLString(path, this, function(code, data){
+
+            let parser = new MIOCoreBundleHTMLParser(data);
+            let contents = parser.parse();
+
+            completion.call(target, contents);
+        });
+    }
+
+    // loadHMTLFromPath(path, layerID, target, completion)
+    // {
+    //     if (this._layoutWorker == null)
+    //     {
+    //         this._layoutWorker = new Worker("libs/miojslibs/webworkers/Bundle_WebWorker.js");
+    //         this._layoutWorker.postMessage({"CMD" : "SetLanguageStrings", "LanguageStrings" : MIOCoreStringGetLocalizedStrings()});
+            
+    //         let instance = this;
+    //         this._layoutWorker.onmessage = function (event) {
+
+    //             let item = event.data;
+
+    //             if (item["Type"] == "HTML"){
+    //                 let result = item["Result"];
+
+    //                 let layerID = item["LayerID"];
+    //                 console.log(" <- layerid: " + layerID);                    
+    
+    //                 instance.layerDidDownload(result);
+    //             }     
+    //             else if (item["Error"] != null) {
+    //                 throw new Error(`MIOBundle: ${item["Error"]}`);
+    //             }           
+    //         }
+    //     }
+
+    //     if (this._layoutQueue == null)
+    //         this._layoutQueue = [];
+
+    //     if (this._layoutCache == null)
+    //         this._layoutCache = {};
+
+    //     if (this._layoutCache[path] != null)
+    //     {
+    //         let i = this._layoutCache[path];
+    //         let layout = i["Layer"];
+    //         completion.call(target, layout);
+    //     }
+    //     else
+    //     {
+    //         let url = MIOCoreStringAppendPathComponent(this.baseURL, path);
+    //         let item = {"Key" : path, "Path" : MIOCoreStringDeletingLastPathComponent(path), "URL": url, "LayerID": layerID, "Target" : target, "Completion" : completion};
+    //         this._layoutQueue.push(item);
+
+    //         this.checkQueue();        
+    //     }
+    // }
+
+    private checkQueue()
+    {
+        if (this._isDownloadingResource == true)
+            return;
+
+        if (this._layoutQueue.length == 0)
+            return;
+
+        this._isDownloadingResource = true;
+        let item = this._layoutQueue[0];
+
+        // Send only the information need
+        console.log("Download resource: " + item["URL"]);
+        var msg = {"CMD" : "DownloadHTML", "URL" : item["URL"], "Path" : item["Path"], "LayerID" : item["LayerID"]};
+        console.log(" -> layerid: " + item["LayerID"]);
+        this._layoutWorker.postMessage(msg);
+    }
+
+    private layerDidDownload(layer)
+    {
+        let item = this._layoutQueue[0];
+
+        console.log("Downloaded resource: " + item["URL"]);
+
+        this._isDownloadingResource = false;
+
+        item["Layer"] = layer;
+
+        var key = item["Key"];
+        this._layoutCache[key] = item; 
+
+        this._checkDownloadCount();
+    }
+
+    private _checkDownloadCount()
+    {
+        if (this._isDownloadingResource == true) return;
+
+        let item = this._layoutQueue[0];
+
+        this._layoutQueue.splice(0, 1);
+
+        var target = item["Target"];
+        var completion = item["Completion"];
+        var layer = item["Layer"];
+
+        completion.call(target, layer);
+
+        delete item["Target"];
+        delete item["Completion"];
+
+        this.checkQueue();
+    }
+}
+
+
 export class NSPoint
 {
     x = 0;
@@ -718,6 +1624,8 @@ export class NSDecimalNumber extends NSNumber
         return this.storeValue.toNumber();
     }
 }
+
+
 interface String 
 { 
     lastPathComponent():string, 
@@ -753,114 +1661,9 @@ String.prototype.hasSuffix = function(suffix:string):boolean{
     return MIOCoreStringHasSuffix(this, suffix);
 }
 
-function MIOCoreStringHasPreffix(str, preffix)
+export function NSLocalizeString(key:string, defaultValue:string)
 {
-    return str.substring(0, preffix.length) === preffix;
-}
-
-function MIOCoreStringHasSuffix(str, suffix)
-{
-    let s = str.substr(str.length - suffix.length);
-    return s == suffix;
-}
-
-function MIOCoreStringAppendPathComponent(string:string, path):string
-{
-    let str = string;
-
-    if (string.charAt(string.length - 1) == "/" && path.charAt(0) == "/"){
-        str += path.substr(1);
-    }
-    else if (string.charAt(string.length - 1) != "/" && path.charAt(0) != "/"){
-        str += "/" + path;
-    }
-    else {
-        str += path;
-    }
-
-    return str;
-}
-
-function MIOCoreStringLastPathComponent(string:string)
-{
-    let index = string.lastIndexOf("/");
-    if (index == -1) return string;
-    let len = string.length - index;
-    let str = string.substr(index, len);
-
-    return str;
-}
-
-function MIOCoreStringPathExtension(string:string):string
-{
-    let lastPathComponent = MIOCoreStringLastPathComponent(string);
-    let items = lastPathComponent.split(".");
-    if (items.length == 1) return "";
-
-    let ext = items[items.length - 1];
-    return ext;
-}
-
-function MIOCoreStringDeletingLastPathComponent(string:string)
-{
-    let index = string.lastIndexOf("/");
-    let str = string.substr(0, index);
-
-    return str;
-}
-
-function MIOCoreStringStandardizingPath(string)
-{
-    let array = string.split("/");
-
-    let newArray = []; 
-    let index = 0;
-    for (let count = 0; count < array.length; count++)
-    {
-        let component:string = array[count];
-        if (component.substr(0,2) == "..")
-            index--;
-        else 
-        {
-            newArray[index] = component;
-            index++;
-        }                
-    }
-
-    let str = "";
-    if (index > 0)
-        str = newArray[0];
-
-    for (let count = 1; count < index; count++){
-        str += "/" + newArray[count];
-    }
-
-    return str;
-}
-
-
-let _MIOLocalizedStrings = null;
-export function NSLocalizeString(key, defaultValue)
-{
-    let strings =  _MIOLocalizedStrings;
-    if (strings == null)
-        return defaultValue;
-
-    let value = strings[key];
-    if (value == null)
-        return defaultValue;
-
-    return value;
-}
-
-export function MIOCoreStringSetLocalizedStrings(data) 
-{
-    _MIOLocalizedStrings = data
-}
-
-export function MIOCoreStringGetLocalizedStrings() 
-{
-    return _MIOLocalizedStrings
+    return MIOCoreStringLocalizeString(key, defaultValue);
 }
 
 
@@ -4072,10 +4875,96 @@ export class NSOperationQueue extends NSObject {
 }
 
 
-class NSBundle extends NSObject
+
+
+
+
+
+/**
+ * Created by godshadow on 9/4/16.
+ */
+
+export class MIOBundle extends NSObject
 {
-	
+    url:NSURL = null;
+
+    private static _mainBundle = null;
+    
+    public static mainBundle():MIOBundle{
+        if (this._mainBundle == null){            
+            let urlString = MIOCoreBundleGetMainURLString();
+
+            this._mainBundle = new MIOBundle();
+            this._mainBundle.initWithURL(NSURL.urlWithString(urlString));
+        }
+
+        return this._mainBundle;
+    }
+
+    initWithURL(url:NSURL){
+        this.url = url;
+    }
+
+    loadNibNamed(name:string, owner, options){
+
+    }
+
+    loadHTMLNamed(path, layerID, target?, completion?){            
+        if (MIOCoreGetAppType() == MIOCoreAppType.Web){
+            if (this._webBundle == null){
+                this._webBundle = new MIOCoreBundle();
+                this._webBundle.baseURL = this.url.absoluteString;
+            }
+
+            this._webBundle.loadHMTLFromPath(path, layerID, this, function(layerData){
+                                
+                // let parser = new BundleFileParser(layerData, layerID);
+                // let result = parser.parse();
+
+                let domParser = new DOMParser();
+                let items = domParser.parseFromString(layerData, "text/html");
+                let layer = items.getElementById(layerID);
+
+                if (target != null && completion != null)
+                    completion.call(target, layer);
+            });
+        }
+    }
+
+    private _loadResourceFromURL(url:NSURL, target, completion){
+        let request = NSURLRequest.requestWithURL(url);
+        let conn =  new NSURLConnection();
+        conn.initWithRequestBlock(request, this, function(error, data){
+            completion.call(target, data);
+        });
+    }
+
+    pathForResourceOfType(resource:string, type:string){
+        return MIOCoreBundleGetAppResource(resource, type);
+    }
+
 }
+
+let _MIOAppBundleResources = {};
+
+export function MIOCoreBundleSetAppResource(resource:string, type:string, content:string){
+    let files = _MIOAppBundleResources[type];
+    if (files == null) {
+        files = {};
+        _MIOAppBundleResources[type] = files;
+    }
+
+    files[resource] = content;
+}
+
+export function MIOCoreBundleGetAppResource(resource:string, type:string){
+    let files = _MIOAppBundleResources[type];
+    if (files == null) return null;
+
+    let content = files[resource];
+    return content;
+}
+
 
 export function NSLog(format) {
     console.log(format);

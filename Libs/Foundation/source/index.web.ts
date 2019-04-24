@@ -5,7 +5,13 @@ Further reading: https://github.com/Microsoft/TypeScript/wiki/FAQ#why-are-import
 export * from './core/MIOCoreTypes'
 export * from './platform/web/MIOCore_web'
 export * from './core/MIOCoreMD5'
+export * from './core/MIOCoreString'
 export * from './core/MIOCoreLexer'
+export * from './core/MIOCoreLanguages'
+export * from './core/MIOCoreHTMLParser'
+export * from './core/MIOCoreBundle'
+export * from './core/MIOCoreBundleHTMLParser'
+export * from './platform/web/MIOCoreBundle_web'
 
 export * from './NSPoint'
 export * from './NSRange'
