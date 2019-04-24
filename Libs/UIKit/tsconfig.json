@@ -1,13 +1,19 @@
 {
-    "compilerOptions": {
-      "declaration": true,
-      "declarationDir": "./dist",
-      "outDir": "./dist",
-      "target": "es5",
-      "noImplicitAny": false
-    },
-    "include": [
-      "source/**/*"
-    ],
-    "exclude": ["node_modules"]
-  }
+	"compilerOptions": {
+		"declaration": true,
+		"module": "commonjs",
+		"outDir": "./dist",
+		"target": "es5",
+		"noImplicitAny": false
+	},
+	"include": [
+		"source/core/MUICore.ts",
+		"source/core/MIOCoreAnimation.ts",
+		"source/core/MIOCoreLayer.ts",
+		"source/*"
+	],
+	"exclude": [
+		"node_modules",
+		"platform/index.ts"
+	]
+}
