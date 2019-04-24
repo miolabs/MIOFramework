@@ -107,7 +107,7 @@ function createNodePackage(cb) {
 		fs.copyFileSync("./dist/foundation.node.d.ts", DEST + "types/foundation.node.d.ts");
 
 		//Copy foundation.min.js
-		fs.copyFileSync("./.build/node-prod/foundation.node.js", DEST + "foundation.node.js");
+		fs.copyFileSync("./.build/node-prod/foundation.node.js", DEST + "mio-foundation-node.js");
 
 		//Create package.platform.json
 		fs.copyFileSync("package.platform.json", DEST + "package.json");
@@ -135,7 +135,7 @@ function createWebPackage(cb) {
 		fs.copyFileSync("./dist/foundation.web.d.ts", DEST + "types/foundation.web.d.ts");
 
 		//Copy foundation.min.js
-		fs.copyFileSync("./.build/web-prod/foundation.web.js", DEST + "foundation.web.js");
+		fs.copyFileSync("./.build/web-prod/foundation.web.js", DEST + "mio-foundation-web.js");
 
 		//Copy package.json, LICENSE AND README
 		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
