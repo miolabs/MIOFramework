@@ -31,11 +31,7 @@
     "gulp-sourcemaps": "^2.6.5",
     "gulp-typescript": "^5.0.1",
     "gulp-uglify": "^3.0.2",
-<<<<<<< HEAD
-    "mio-foundation-node": "^1.0.0",
-=======
-    "mio-foundation-node": "^1.0.1",
->>>>>>> 452448297f07ac3fc0ce1c423aaddd3f190c191d
+    "mio-foundation-node": "^1.0.6",
     "rimraf": "^2.6.3",
     "xml2js": "^0.4.19"
   },

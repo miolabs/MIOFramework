@@ -2,15 +2,15 @@
 
 interface Array<T>
 {
-    count();
-    addObject(object);
-    removeObject(object);
-    removeObjectAtIndex(index);
-    indexOfObject(object);
-    containsObject(object);
-    objectAtIndex(index);
-    firstObject();
-    lastObject();
+    count():number;
+    addObject(object:any):void;
+    removeObject(object:any):void;
+    removeObjectAtIndex(index:number):void;
+    indexOfObject(object:any):number;
+    containsObject(object:any):boolean;
+    objectAtIndex(index:number):any;
+    firstObject():any;
+    lastObject():any;
 };
 
 Array.prototype.addObject = function(){
@@ -41,7 +41,7 @@ Array.prototype.containsObject = function(object):boolean{
     return index > -1 ? true : false;
 }
 
-Array.prototype.objectAtIndex = function(index){        
+Array.prototype.objectAtIndex = function(index){
     return this[index];
 }
 
