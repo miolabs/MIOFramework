@@ -3,10 +3,11 @@ const fs = require("fs");
 const concat = require("gulp-concat");
 const rimraf = require("rimraf");
 const uglify = require("gulp-uglify");
+const sourcemaps = require("gulp-sourcemaps");
 
 let arrIndexFiles = [];
 
-function build(cb) {
+function build(done) {
 	var env = process.env["BUILD_ENV"];
 	var platform = process.env["BUILD_PLATFORM"];
 
@@ -24,10 +25,15 @@ function build(cb) {
 	else if (env == "prod" && platform == "web") {
 		buildWebProd();
 	}
-	cb();
+	done();
 }
 
-function parseIndexNodeTs(cb) {
+/********** PROD **********/
+/********** PROD **********/
+/********** PROD **********/
+
+/********** NODE **********/
+function parseIndexNodeTs(done) {
 	var regEx = /export\s.\sfrom \'.\/(.*)\'/gm;
 	var content = fs.readFileSync("./source/index.node.ts", "utf8");
 	var item;
@@ -37,65 +43,30 @@ function parseIndexNodeTs(cb) {
 	while (item = regEx.exec(content)) {		
 		arrIndexFiles.push("./source/" + item[1] + ".ts");
 	}
-	cb();
+	done();
 }
 
 function concatNodeTsFiles() {		
 	return gulp.src(arrIndexFiles)
 	.pipe(concat("foundation.node.ts"))
-	.pipe(gulp.dest("./source/"))
+	.pipe(gulp.dest("./source/"));
 }
 
-function cleanNodeFoundation(cb) {
+function cleanNodeFoundation(done) {
 	const path = "./source/foundation.node.ts";
 	var originalContent = fs.readFileSync(path, "utf8");
 	var newContent =  originalContent.replace(/import(.*)/g, "");
 	fs.writeFileSync(path, newContent);
-	cb();
+	done();
 }
 
-function minifyNodeProd(cb) {
+function minifyNodeProd() {
 	return gulp.src('./dist/foundation.node.js')
 	.pipe(uglify())
 	.pipe(gulp.dest('./.build/node-prod/'));
-	cb();
 }
 
-function parseIndexWebTs(cb) {
-	var regEx = /export\s.\sfrom \'.\/(.*)\'/gm;
-	var content = fs.readFileSync("./source/index.web.ts", "utf8");
-	var item;
-
-	arrIndexFiles = [];
-
-	while (item = regEx.exec(content)) {		
-		arrIndexFiles.push("./source/" + item[1] + ".ts");
-	}
-	cb();
-}
-
-function concatWebTsFiles() {		
-	return gulp.src(arrIndexFiles)
-	.pipe(concat("foundation.web.ts"))
-	.pipe(gulp.dest("./source/"))
-}
-
-function cleanWebFoundation(cb) {
-	const path = "./source/foundation.web.ts";
-	var originalContent = fs.readFileSync(path, "utf8");
-	var newContent =  originalContent.replace(/import(.*)/g, "");
-	fs.writeFileSync(path, newContent);
-	cb();
-}
-
-function minifyWebProd(cb) {
-	return gulp.src('./dist/foundation.web.js')
-	.pipe(uglify())
-	.pipe(gulp.dest('./.build/web-prod/'));
-	cb();
-}
-
-function createNodePackage(cb) {
+function createNodePackage(done) {
 	const SRC = __dirname + "/.build/";
 	const DEST = __dirname + "/packages/mio-foundation-node/";
 
@@ -120,10 +91,72 @@ function createNodePackage(cb) {
 	} else {
 		console.log("/.build directory does not exist - Execute first gulp minifyNodeProd");
 	}
-	cb();
+	done();
 }
 
-function createWebPackage(cb) {
+function buildNodePackageFile(done) {
+	var platform = "node";
+	var regEx = /{%platform%}/gm;
+	const DEST = "packages/mio-foundation-node/";
+
+	//Create package.platform.json
+	fs.copyFileSync("package.platform.json", DEST + "package.json"); 
+	
+	var content = fs.readFileSync("packages/mio-foundation-" + platform + "/package.json", "utf8");
+	content = content.replace(regEx, platform);
+	fs.writeFileSync("packages/mio-foundation-" + platform + "/package.json", content);
+	done();
+}
+
+/********** WEB **********/
+function parseIndexWebTs(done) {
+	var regEx = /export\s.\sfrom \'.\/(.*)\'/gm;
+	var content = fs.readFileSync("./source/index.web.ts", "utf8");
+	var item;
+
+	arrIndexFiles = [];
+
+	while (item = regEx.exec(content)) {		
+		arrIndexFiles.push("./source/" + item[1] + ".ts");
+	}
+	done();
+}
+
+function concatWebTsFiles() {		
+	return gulp.src(arrIndexFiles)
+	.pipe(concat("foundation.web.ts"))
+	.pipe(gulp.dest("./source/"));
+}
+
+function cleanWebFoundation(done) {
+	const path = "./source/foundation.web.ts";
+	var originalContent = fs.readFileSync(path, "utf8");
+	var newContent =  originalContent.replace(/import(.*)/g, "");
+	fs.writeFileSync(path, newContent);
+	done();
+}
+
+function cleanWebJsFile(done) {
+	const path = "./dist/foundation.web.js";
+	const regExObject = /\}\)\((.*) = exports.*\{\}\)\);/g;
+	const ObjectReplace = "})($1 || ($1 = {}));";
+	const regExExport = /exports\..*;/g;
+	const regExObjectProperties = 'Object.defineProperty(exports, "__esModule", { value: true });';
+
+	let content = fs.readFileSync(path, "utf8");
+	let newContent = content.replace(regExObject, ObjectReplace).replace(regExExport, " ").replace(regExObjectProperties, " ");
+	
+	fs.writeFileSync(path, newContent);
+	done();
+}
+
+function minifyWebProd() {
+	return gulp.src('./dist/foundation.web.js')
+	.pipe(uglify())
+	.pipe(gulp.dest('./.build/web-prod/'));
+}
+
+function createWebPackage(done) {
 	const SRC = __dirname + "/.build/";
 	const DEST = __dirname + "/packages/mio-foundation-web/";
 
@@ -145,24 +178,10 @@ function createWebPackage(cb) {
 	} else {
 		console.log("/.build directory does not exist - Execute first gulp minifyWebProd");
 	}
-	cb();
+	done();
 }
 
-function buildNodePackageFile(cb) {
-	var platform = "node";
-	var regEx = /{%platform%}/gm;
-	const DEST = "packages/mio-foundation-node/";
-
-	//Create package.platform.json
-	fs.copyFileSync("package.platform.json", DEST + "package.json"); 
-	
-	var content = fs.readFileSync("packages/mio-foundation-" + platform + "/package.json", "utf8");
-	content = content.replace(regEx, platform);
-	fs.writeFileSync("packages/mio-foundation-" + platform + "/package.json", content);
-	cb();
-}
-
-function buildWebPackageFile(cb) {
+function buildWebPackageFile(done) {
 	var platform = "web";
 	var regEx = /{%platform%}/gm;
 	const DEST = "packages/mio-foundation-web/";
@@ -173,10 +192,44 @@ function buildWebPackageFile(cb) {
 	var content = fs.readFileSync("packages/mio-foundation-" + platform + "/package.json", "utf8");
 	content = content.replace(regEx, platform);
 	fs.writeFileSync("packages/mio-foundation-" + platform + "/package.json", content);
-	cb();
+	done();
 }
 
-function removeTempFolders(cb) {
+/********** *** **********/
+/********** DEV **********/
+/********** *** **********/
+function buildWebDevPackage(done) {
+	const SRC = __dirname + "/dist/";
+	const DEST = __dirname + "/packages/mio-foundation-web-dev/";
+
+	if(fs.existsSync(SRC)) {
+		//Create package and types folder
+		fs.mkdirSync(DEST + "types", {recursive: true});
+		
+		//Copy foundation.d.ts to types folder
+		fs.copyFileSync("./dist/foundation.web.d.ts", DEST + "types/foundation.web.d.ts");
+
+		//Copy foundation.web.js
+		fs.copyFileSync("./dist/foundation.web.js", DEST + "foundation-web.js");
+
+		//Copy foundation.web.js.map
+		fs.copyFileSync("./dist/foundation.web.js.map", DEST + "foundation.web.js.map");
+
+		//Copy package.json, LICENSE AND README
+		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
+		fs.copyFileSync(__dirname + "/../../README.md", DEST + "README.md");
+
+		console.log("Package created succesfully");
+	} else {
+		console.log("/.build directory does not exist - Execute first gulp minifyWebProd");
+	}
+	done();
+}
+
+/********** ***** **********/
+/********** UTILS **********/
+/********** ***** **********/
+function removeTempFolders(done) {
 	const buildDir = __dirname + "/.build";
 	const distDir =  __dirname + "/dist";
 
@@ -197,16 +250,24 @@ function removeTempFolders(cb) {
 	} else {
 		console.log("/dist directory does not exist");
 	}
-	cb();
+	done();
 }
 
 module.exports = {
 	build: build, //Not working, fix it when implementing dev building
+	//NODE PROD
 	buildNodeProd: gulp.series(parseIndexNodeTs, concatNodeTsFiles, cleanNodeFoundation),
-	buildWebProd: gulp.series(parseIndexWebTs, concatWebTsFiles, cleanWebFoundation),
 	minifyNodeProd,
-	minifyWebProd,
 	buildNodePackage: gulp.series(createNodePackage, buildNodePackageFile),
+
+	//WEB PROD
+	buildWebProd: gulp.series(parseIndexWebTs, concatWebTsFiles, cleanWebFoundation),
+	cleanWebJsFile,
+	minifyWebProd,
 	buildWebPackage: gulp.series(createWebPackage, buildWebPackageFile),
-	removeTempFolders
+
+	removeTempFolders,
+
+	//WEB DEV
+	buildWebDevPackage
 }
