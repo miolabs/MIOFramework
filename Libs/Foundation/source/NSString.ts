@@ -1,18 +1,8 @@
-import { MIOCoreStringLastPathComponent, MIOCoreStringPathExtension, MIOCoreStringLocalizeString, MIOCoreStringAppendPathComponent, MIOCoreStringDeletingLastPathComponent, MIOCoreStringHasPreffix, MIOCoreStringHasSuffix } from "./core/MIOCoreString";
+import "./core/MIOCoreExtensions";
+import { MIOCoreStringPathExtension, MIOCoreStringHasPreffix, MIOCoreStringHasSuffix, MIOCoreStringLastPathComponent, MIOCoreStringAppendPathComponent, MIOCoreStringDeletingLastPathComponent, MIOCoreStringLocalizeString } from "./core/MIOCoreString";
 
-interface String 
-{ 
-    lastPathComponent():string, 
-    pathExtension():string,     
-    stringByAppendingPathComponent(path:string):string,
-    stringByDeletingLastPathComponent():string, 
-    hasPreffix(preffix:string):boolean, 
-    hasSuffix(suffix:string):boolean 
-};
-
-//For code completion the interface is defined in types/mio/index.d.ts
-String.prototype.lastPathComponent = function(){
-    return MIOCoreStringLastPathComponent(this);
+String.prototype.lastPathComponent = function() {
+    return MIOCoreStringLastPathComponent(this);    
 }
 
 String.prototype.pathExtension = function(){

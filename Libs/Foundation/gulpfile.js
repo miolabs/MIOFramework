@@ -49,7 +49,7 @@ function concatNodeTsFiles() {
 function cleanNodeFoundation(cb) {
 	const path = "./source/foundation.node.ts";
 	var originalContent = fs.readFileSync(path, "utf8");
-	var newContent =  originalContent.replace(/import(.*)/g, "");
+	var newContent = originalContent.replace(/import(.*)/g, "");
 	fs.writeFileSync(path, newContent);
 	cb();
 }
@@ -83,7 +83,7 @@ function concatWebTsFiles() {
 function cleanWebFoundation(cb) {
 	const path = "./source/foundation.web.ts";
 	var originalContent = fs.readFileSync(path, "utf8");
-	var newContent =  originalContent.replace(/import(.*)/g, "");
+	var newContent =  originalContent.replace(/import(.*)["|']\..*/g, "");
 	fs.writeFileSync(path, newContent);
 	cb();
 }

@@ -1,17 +1,4 @@
-//For code completion the interface is defined in types/mio/index.d.ts
-
-interface Array<T>
-{
-    count():number;
-    addObject(object:any):void;
-    removeObject(object:any):void;
-    removeObjectAtIndex(index:number):void;
-    indexOfObject(object:any):number;
-    containsObject(object:any):boolean;
-    objectAtIndex(index:number):any;
-    firstObject():any;
-    lastObject():any;
-};
+import "./core/MIOCoreExtensions"
 
 Array.prototype.addObject = function(){
     return this.length;
