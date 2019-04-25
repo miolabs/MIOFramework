@@ -17,6 +17,8 @@ export * from './NSObject'
 export * from './NSNull'
 export * from './NSError'
 
+export * from './NSBundle'
+
 export * from './NSCoder'
 export * from './NSKeyedUnarchiver'
 

@@ -1,6 +1,8 @@
-import {NSURLRequest, NSURLConnection, NSPropertyListSerialization, NSURL, MIOCoreGetLanguages, MIOCoreAddLanguage, MIOCoreGetPlatformLanguage} from "mio-foundation-web";
+import {NSURLRequest, NSURLConnection, NSPropertyListSerialization, NSURL, MIOCoreGetLanguages, MIOCoreAddLanguage, MIOCoreGetPlatformLanguage, MIOCoreBundleSetAppResource} from "mio-foundation-web";
 import { UIWindow } from "./UIWindow";
 import { MIOCoreStringSetLocalizedStrings } from "mio-foundation-web";
+import { MUICoreBundleLoadNibName } from "./core/MUICoreBundle";
+import { UIViewController } from "./UIViewController";
 
 /**
  * Created by godshadow on 11/3/16.
@@ -78,7 +80,7 @@ export class UIApplication {
         let con = new NSURLConnection();
         con.initWithRequestBlock(request, this, function(code, data){
             if (code == 200) {                
-                _MIOBundleAppSetResource("app", "plist", data);
+                MIOCoreBundleSetAppResource("app", "plist", data);
             }
             completion.call(target, data);
         });        
@@ -88,10 +90,14 @@ export class UIApplication {
     run(){
         this.downloadAppPlist(this, function(data){
             if (data == null) throw new Error("We couldn't download the app.plist");
-            
+                        
             // Get Languages from the app.plist
-            let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);
+            let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);            
+            this.mainResourceURLString = config["UIMainStoryboardFile"];
+
             let langs = config["Languages"];
+            if (langs == null) this._run();
+
             for (let key in langs) {
                 let url = langs[key];
                 MIOCoreAddLanguage(key, url);
@@ -103,13 +109,25 @@ export class UIApplication {
         });
     }
 
+    private mainResourceURLString:string = null;
     private _run() {        
 
-        this.delegate.didFinishLaunching();
-        
+        this.delegate.didFinishLaunching();        
+        this._mainWindow = this.delegate.window;
+
+        if (this._mainWindow == null) {
+            MUICoreBundleLoadNibName(this.mainResourceURLString, this, function(vc:UIViewController){
+                this.delegate.window = new UIWindow();
+                this.delegate.window.initWithRootViewController(vc);
+                this._launchApp()
+            });
+        }
+        else this._launchApp();         
+    }
+
+    private _launchApp(){
         this.delegate.window.makeKeyAndVisible();
-        this._mainWindow = this.delegate.window;        
-        
+
         this.delegate.window.rootViewController.onLoadView(this, function () {
             
             this.delegate.window.rootViewController.viewWillAppear(false);
@@ -117,9 +135,10 @@ export class UIApplication {
 
             this.ready = true;
 
-            MIOCoreEventRegisterObserverForType(MIOCoreEventType.Click, this, this._clickEvent);
-            MIOCoreEventRegisterObserverForType(MIOCoreEventType.Resize, this, this._resizeEvent);
+            // MIOCoreEventRegisterObserverForType(MIOCoreEventType.Click, this, this._clickEvent);
+            // MIOCoreEventRegisterObserverForType(MIOCoreEventType.Resize, this, this._resizeEvent);
         });
+
     }
 
     setLanguageURL(key, url) {

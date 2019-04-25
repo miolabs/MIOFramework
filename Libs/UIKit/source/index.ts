@@ -2,11 +2,16 @@
  * Created by godshadow on 05/12/2016.
  */
 
-export * from './core/MUICore'
 export * from './core/MUICoreLayer'
 export * from './core/MUICoreAnimation'
+export * from './platform/web/MUICore_web'
+export * from './core/MUICoreBundle'
 
 export * from "./UIView"
+export * from "./UIViewController"
+
+export * from './core/MUICore'
+
 export * from "./UIWindow"
 
 export * from "./UITabBar"
@@ -35,7 +40,6 @@ export * from "./UIPageControl"
 export * from "./UIToolbar"
 export * from "./UINavigationBar"
 
-export * from "./UIViewController"
 export * from "./UINavigationItem"
 export * from "./UINavigationController"
 export * from "./UIPageController"

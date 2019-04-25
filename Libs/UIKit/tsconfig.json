@@ -1,11 +1,13 @@
 {
 	"compilerOptions": {
 		"declaration": true,
+		"sourceMap": true,
 		"module": "commonjs",
 		"outDir": "./dist",
 		"target": "es5",
-		"noImplicitAny": false
-	},
+		"noImplicitAny": false,
+		"types": ["node_modules/mio-foundation-web/types"]
+	},	
 	"include": [
 		"source/core/MUICore.ts",
 		"source/core/MIOCoreAnimation.ts",

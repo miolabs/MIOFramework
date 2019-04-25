@@ -2,7 +2,7 @@
 // Main entry point
 function main(args)
 {    
-    var app = MUIWebApplication.sharedInstance();
+    var app = UIApplication.sharedInstance();
 
     app.delegate = new AppDelegate();
     app.run();

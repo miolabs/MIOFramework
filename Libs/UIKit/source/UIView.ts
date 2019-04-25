@@ -1,86 +1,21 @@
-import { MIOObject, MIORect, MIOLocale, MIOLog } from "../MIOFoundation";
+
 import { UIWindow } from "./UIWindow";
 import { UICoreLayerIDFromObject, UICoreLayerCreate, UICoreLayerAddStyle } from "./MIOUI_CoreLayer";
 import { MIOClassFromString } from "../MIOCore/platform";
 import { UIGestureRecognizer, UIEvent, UIGestureRecognizerState } from ".";
+import { NSObject } from "mio-foundation-web";
 
 /**
  * Created by godshadow on 11/3/16.
  */
 
 
-export function UILayerSearchElementByAttribute(layer, key)
-{
-    if (layer.tagName != "DIV" && layer.tagName != "INPUT" && layer.tagName != "SECTION")
-            return null;
-
-    if (layer.getAttribute(key) == "true") return layer;
-    
-    let elementFound = null;
-
-    for (let count = 0; count < layer.childNodes.length; count++){
-        let l = layer.childNodes[count];
-        elementFound = UILayerSearchElementByAttribute(l, key);
-        if (elementFound != null) return elementFound;
-    }
-
-    return null;
-}
-
-
-
-export function UILayerSearchElementByID(layer, elementID)
-{
-    if (layer.tagName != "DIV" && layer.tagName != "INPUT" && layer.tagName != "SECTION")
-            return null;
-
-    if (layer.getAttribute("data-outlet") == elementID)
-        return layer;
-    
-    // Deprecated. For old code we still mantein
-    if (layer.getAttribute("id") == elementID)
-        return layer;
-
-    let elementFound = null;
-
-    for (let count = 0; count < layer.childNodes.length; count++){
-        let l = layer.childNodes[count];
-        elementFound = UILayerSearchElementByID(l, elementID);
-        if (elementFound != null)
-            return elementFound;
-
-    }
-
-    return null;
-}
-
-export function UILayerGetFirstElementWithTag(layer, tag)
-{
-    let foundLayer = null;
-
-    if (layer.childNodes.length > 0) {
-        let index = 0;
-        foundLayer = layer.childNodes[index];
-        while (foundLayer.tagName != tag) {
-            index++;
-            if (index >= layer.childNodes.length) {
-                foundLayer = null;
-                break;
-            }
-
-            foundLayer = layer.childNodes[index];
-        }
-    }
-
-    return foundLayer;
-}
-
-function MIOViewSearchViewTag(view, tag){
+function MUICoreViewSearchViewTag(view, tag){
     if (view.tag == tag) return view;
 
     for (let index = 0; index < view.subviews.length; index++){
         let v:UIView = view.subviews[index];
-        v = MIOViewSearchViewTag(v, tag);
+        v = MUICoreViewSearchViewTag(v, tag);
         if (v != null) return v;        
     }
 
@@ -88,7 +23,7 @@ function MIOViewSearchViewTag(view, tag){
 }
 
 
-export class UIView extends MIOObject
+export class UIView extends NSObject
 {
     layerID = null;
     layer = null;

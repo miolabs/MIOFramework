@@ -1,6 +1,6 @@
 
 
-class ViewController extends MUIViewController{
+class ViewController extends UIViewController{
 static readonly $infoAddress = '0x7fe47800acf8'
 
 textLabel$internal

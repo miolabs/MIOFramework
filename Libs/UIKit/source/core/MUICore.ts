@@ -1,36 +1,37 @@
 
 import { NSClassFromString, NSSize, MIOCoreIsPhone } from "mio-foundation-web";
-import { UIView, UILayerSearchElementByID } from "../UIView";
+import { UIView } from "../UIView";
 import { UIViewController } from "../UIViewController";
 import { UIModalPresentationStyle, UIPresentationController } from "../UIViewController_PresentationController";
 import { _UIAnimationStart } from "./MUICoreAnimation";
+import { MUICoreLayerSearchElementByID } from "./MUICoreLayer";
 
 export interface Window {
     prototype;
 }
 
-export function UIOutletRegister(owner, layerID, c)
+export function MUIOutletRegister(owner, layerID, c)
 {
     owner._outlets[layerID] = c;
 }
 
-export function UIOutletQuery(owner, layerID)
+export function MUIOutletQuery(owner, layerID)
 {
     return owner._outlets[layerID];
 }
 
-export function UIOutlet(owner, elementID, className?, options?)
+export function MUIOutlet(owner, elementID, className?, options?)
 {
     //var layer = document.getElementById(elementID);
-    let query = UIOutletQuery(owner, elementID);
+    let query = MUIOutletQuery(owner, elementID);
     if (query != null) return query;
 
     let layer = null;
 
     if (owner instanceof UIView)
-        layer = UILayerSearchElementByID(owner.layer, elementID);
+        layer = MUICoreLayerSearchElementByID(owner.layer, elementID);
     else if (owner instanceof UIViewController)
-        layer = UILayerSearchElementByID(owner.view.layer, elementID);
+        layer = MUICoreLayerSearchElementByID(owner.view.layer, elementID);
 
     if (layer == null) return null; // Element not found
         //throw new Error(`DIV identifier specified is not valid (${elementID})`);
@@ -44,7 +45,7 @@ export function UIOutlet(owner, elementID, className?, options?)
     let classInstance = NSClassFromString(className);
     classInstance.initWithLayer(layer, owner, options);
     // Track outlets inside view controller (owner)
-    UIOutletRegister(owner, elementID, classInstance);
+    MUIOutletRegister(owner, elementID, classInstance);
 
     if (owner instanceof UIView)
         owner._linkViewToSubview(classInstance);

@@ -1,4 +1,4 @@
-import { MIOObject, MIOSize, MIOBundle } from "../MIOFoundation";
+import { NSObject, NSSize, NSLocalizeString, MIOCoreIsPhone } from "mio-foundation-web";
 import { UIView, UILayerSearchElementByID } from "./UIView";
 import { UINavigationItem, UINavItemSearchInLayer } from "./UINavigationItem";
 import { UINavigationController } from "./UINavigationController";
@@ -7,15 +7,16 @@ import { UIPopoverPresentationController } from "./UIViewController_PopoverPrese
 import { UICoreLayerIDFromObject, UICoreLayerAddStyle } from "./MIOUI_CoreLayer";
 import { _MIUShowViewController, _UIHideViewController } from "./core/MUICore";
 import { UIWindow } from "./UIWindow";
-import { MIOLocalizeString } from "../MIOCore";
 import { UISplitViewController } from "./UISplitViewController";
-import { MIOCoreIsPhone } from "../MIOCore/platform";
+import { NSBundle } from "mio-foundation-web";
+import { NSCoder } from "mio-foundation-web";
+
 
 /**
  * Created by godshadow on 11/3/16.
  */
 
-export class UIViewController extends MIOObject
+export class UIViewController extends NSObject
 {
     layerID:string = null;
 
@@ -46,7 +47,7 @@ export class UIViewController extends MIOObject
     modalTransitionStyle = UIModalTransitionStyle.CoverVertical;
     transitioningDelegate = null;
 
-    protected _contentSize = new MIOSize(320, 200);
+    protected _contentSize = new NSSize(320, 200);
     protected _preferredContentSize = null;
 
     _outlets = {};
@@ -59,6 +60,10 @@ export class UIViewController extends MIOObject
     init(){
         super.init();        
         this.loadView();        
+    }
+
+    initWithCoder(coder:NSCoder){
+
     }
 
     initWithLayer(layer, owner, options?){
@@ -93,7 +98,7 @@ export class UIViewController extends MIOObject
 
             var key = layer.getAttribute("data-localize-key");
             if (key != null)
-                layer.innerHTML = MIOLocalizeString(key, key);
+                layer.innerHTML = NSLocalizeString(key, key);
 
             this.localizeSubLayers(layer.childNodes);
         }
@@ -101,7 +106,7 @@ export class UIViewController extends MIOObject
 
     localizeLayerIDWithKey(layerID, key){
         let layer = UILayerSearchElementByID(this.view.layer, layerID);
-        layer.innerHTML = MIOLocalizeString(key, key);
+        layer.innerHTML = NSLocalizeString(key, key);
     }
 
     loadView(){
@@ -119,16 +124,38 @@ export class UIViewController extends MIOObject
             return;
         }
         
-        let mainBundle = MIOBundle.mainBundle();
-        mainBundle.loadHTMLNamed(this._htmlResourcePath, this.layerID, this, function (layer) {            
-            
-            // Search for navigation item
-            this.navigationItem = UINavItemSearchInLayer(layer);
+        let mainBundle = NSBundle.mainBundle();
+        mainBundle.loadNibNamed(this._htmlResourcePath, this, null);
 
-            this.view.initWithLayer(layer);
-            this.view.awakeFromHTML();
-            this._didLoadView();
-        });        
+        // mainBundle.loadHTMLNamed(this._htmlResourcePath, this.layerID, this, function (layer) {            
+            
+        //     let domParser = new DOMParser();
+        //     let items = domParser.parseFromString(layerData, "text/html");
+        //     let layer = items.getElementById(layerID);
+
+        //     if (target != null && completion != null)
+        //         completion.call(target, layer);
+
+
+        //     // Search for navigation item
+        //     this.navigationItem = UINavItemSearchInLayer(layer);
+
+        //     this.view.initWithLayer(layer);
+        //     this.view.awakeFromHTML();
+        //     this._didLoadView();
+        // });        
+    }
+
+    _didLoadNibWithLayer(layerData){
+        let domParser = new DOMParser();
+        let items = domParser.parseFromString(layerData, "text/html");
+        let layer = items.getElementById("kk");
+
+        this.navigationItem = UINavItemSearchInLayer(layer);
+
+        this.view.initWithLayer(layer, this);
+        this.view.awakeFromHTML();
+        this._didLoadView();
     }
 
     _didLoadView(){

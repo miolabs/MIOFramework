@@ -54,7 +54,7 @@ var ViewController = /** @class */ (function (_super) {
     ViewController.$infoAddress = '0x7fe47800acf8';
     ViewController.initCoderNSCoder$failable = true;
     return ViewController;
-}(MUIViewController));
+}(UIViewController));
 var AppDelegate = /** @class */ (function (_super) {
     __extends(AppDelegate, _super);
     function AppDelegate() {
