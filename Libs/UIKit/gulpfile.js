@@ -108,5 +108,5 @@ module.exports = {
 	UIBuildWebProd: gulp.series(UIParseIndexWebTs, UIConcatWebTsFiles, UICleanWebFoundation),
 	UIMinifyWebProd,
 	UIBuildWebPackage: gulp.series(UICreateWebPackage, UIBuildWebPackageFile),
-	UIRemoveTempFolders: UIRemoveTempFolders
+	UIRemoveTempFolders
 }

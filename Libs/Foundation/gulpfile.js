@@ -154,7 +154,7 @@ function buildNodePackageFile(cb) {
 	const DEST = "packages/mio-foundation-node/";
 
 	//Create package.platform.json
-	fs.copyFileSync("package.platform.json", DEST + "package.json");
+	fs.copyFileSync("package.platform.json", DEST + "package.json"); 
 	
 	var content = fs.readFileSync("packages/mio-foundation-" + platform + "/package.json", "utf8");
 	content = content.replace(regEx, platform);
@@ -204,9 +204,9 @@ module.exports = {
 	build: build, //Not working, fix it when implementing dev building
 	buildNodeProd: gulp.series(parseIndexNodeTs, concatNodeTsFiles, cleanNodeFoundation),
 	buildWebProd: gulp.series(parseIndexWebTs, concatWebTsFiles, cleanWebFoundation),
-	minifyNodeProd: minifyNodeProd,
-	minifyWebProd: minifyWebProd,
+	minifyNodeProd,
+	minifyWebProd,
 	buildNodePackage: gulp.series(createNodePackage, buildNodePackageFile),
 	buildWebPackage: gulp.series(createWebPackage, buildWebPackageFile),
-	removeTempFolders: removeTempFolders
+	removeTempFolders
 }
