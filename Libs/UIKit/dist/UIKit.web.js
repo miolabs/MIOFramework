@@ -18,6 +18,7 @@ var mio_foundation_web_2 = require("mio-foundation-web");
 var mio_foundation_web_3 = require("mio-foundation-web");
 var mio_foundation_web_4 = require("mio-foundation-web");
 var mio_foundation_web_5 = require("mio-foundation-web");
+require("mio-foundation-web/_extensions");
 var mio_foundation_web_6 = require("mio-foundation-web");
 var mio_foundation_web_7 = require("mio-foundation-web");
 var mio_foundation_web_8 = require("mio-foundation-web");

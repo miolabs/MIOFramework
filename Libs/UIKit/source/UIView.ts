@@ -7,6 +7,7 @@ import { NSObject } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 import { MUICoreLayerSearchElementByID } from "./core/MUICoreLayer";
+import "mio-foundation-web/_extensions"
 
 /**
  * Created by godshadow on 11/3/16.

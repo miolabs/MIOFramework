@@ -5,12 +5,7 @@
 		"module": "commonjs",
 		"outDir": "./dist",
 		"target": "es5",
-		"noImplicitAny": false,
-		"types": ["node_modules/mio-foundation-web/types"]
+		"noImplicitAny": false		
 	},	
-	"files": ["source/UIKit.web.ts"],
-	"exclude": [
-		"node_modules",
-		"platform/index.ts"
-	]
+	"files": ["source/UIKit.web.ts"]
 }

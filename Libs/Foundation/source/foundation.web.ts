@@ -1700,6 +1700,7 @@ export class NSDecimalNumber extends NSNumber
 
 
 
+
 String.prototype.lastPathComponent = function() {
     return MIOCoreStringLastPathComponent(this);    
 }

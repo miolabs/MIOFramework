@@ -7,7 +7,7 @@ interface String
     stringByDeletingLastPathComponent():string; 
     hasPreffix(preffix:string):boolean; 
     hasSuffix(suffix:string):boolean;     
-};
+}
 
 interface Array<T>
 {
@@ -20,5 +20,5 @@ interface Array<T>
     objectAtIndex(index:number):any;
     firstObject():any;
     lastObject():any;
-};
+}
 

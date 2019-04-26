@@ -1,4 +1,5 @@
-import "./core/MIOCoreExtensions";
+import "./platform/_extensions";
+
 import { MIOCoreStringPathExtension, MIOCoreStringHasPreffix, MIOCoreStringHasSuffix, MIOCoreStringLastPathComponent, MIOCoreStringAppendPathComponent, MIOCoreStringDeletingLastPathComponent, MIOCoreStringLocalizeString } from "./core/MIOCoreString";
 
 String.prototype.lastPathComponent = function() {
