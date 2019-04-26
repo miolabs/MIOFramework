@@ -1,7 +1,6 @@
 import { NSLocalizeString } from "mio-foundation-web";
 import { UIControl } from "./UIControl";
-import { UILayerGetFirstElementWithTag } from "./UIView";
-import { MUICoreLayerAddStyle, MUICoreLayerRemoveStyle } from "./core/MUICoreLayer";
+import { MUICoreLayerAddStyle, MUICoreLayerRemoveStyle, MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
 
 /**
  * Created by godshadow on 12/3/16.
@@ -48,12 +47,12 @@ export class UIButton extends UIControl
             this.type = UIButtonType.PushIn;
 
         // Check for title layer
-        this._titleLayer = UILayerGetFirstElementWithTag(this.layer, "SPAN");
+        this._titleLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "SPAN");
 
 
         // Check for img layer
-        this._imageLayer = UILayerGetFirstElementWithTag(this.layer, "IMG");
-        if (this._imageLayer == null) this._imageLayer = UILayerGetFirstElementWithTag(this.layer, "DIV");
+        this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "IMG");
+        if (this._imageLayer == null) this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "DIV");
 
         // Check for status
         let status = this.layer.getAttribute("data-status");

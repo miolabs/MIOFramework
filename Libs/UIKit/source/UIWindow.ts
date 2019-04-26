@@ -1,8 +1,8 @@
-import { UIWebApplication } from "./UIWebApplication";
+import { UIApplication } from "./UIApplication";
 import { UIViewController } from "./UIViewController";
 import { UIView } from "./UIView";
 import { UIPopoverPresentationController } from "./UIViewController_PopoverPresentationController";
-import { UICoreLayerAddStyle } from ".";
+import { MUICoreLayerAddStyle } from ".";
 
 /**
  * Created by godshadow on 11/3/16.
@@ -16,7 +16,7 @@ export class UIWindow extends UIView
 
     init(){
         super.init();
-        UICoreLayerAddStyle(this.layer, "view");
+        MUICoreLayerAddStyle(this.layer, "view");
     }
 
     initWithRootViewController(vc){
@@ -27,7 +27,7 @@ export class UIWindow extends UIView
     }
 
     makeKey(){
-        UIWebApplication.sharedInstance().makeKeyWindow(this);
+        UIApplication.sharedInstance().makeKeyWindow(this);
     }
 
     makeKeyAndVisible(){

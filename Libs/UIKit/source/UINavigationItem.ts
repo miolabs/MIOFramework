@@ -1,8 +1,9 @@
-import { MIOObject } from "../MIOFoundation";
-import { UIView, UILayerSearchElementByAttribute } from "./UIView";
+import { NSObject } from "mio-foundation-web";
+import { UIView } from "./UIView";
 import { UIButton } from "./UIButton";
+import { MUICoreLayerSearchElementByAttribute } from "./core/MUICoreLayer";
 
-export class UINavigationItem extends MIOObject
+export class UINavigationItem extends NSObject
 {    
     backBarButtonItem:UIButton = null;
     titleView:UIView = null;
@@ -35,7 +36,7 @@ export class UINavigationItem extends MIOObject
                 }
             }
 
-            let backButtonLayer = UILayerSearchElementByAttribute(layer, "data-nav-item-back");
+            let backButtonLayer = MUICoreLayerSearchElementByAttribute(layer, "data-nav-item-back");
             if (backButtonLayer != null) {
                 this.backBarButtonItem = new UIButton();
                 this.backBarButtonItem.initWithLayer(backButtonLayer, this);

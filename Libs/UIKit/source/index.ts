@@ -9,8 +9,23 @@ export * from './core/MUICoreBundle'
 export * from './core/MUICoreEvents'
 
 export * from './UIEvent'
+
+export * from './UIGestureRecognizer'
+export * from './UITapGestureRecognizer'
+export * from './UIPanGestureRecognizer'
+
 export * from './UIView'
+
+export * from './UIControl'
+export * from './UIButton'
+
 export * from './UIViewController'
+export * from './UIViewController_PresentationController'
+export * from './UIViewController_PopoverPresentationController'
+
+export * from './UINavigationItem'
+export * from './UINavigationController'
+export * from './UISplitViewController'
 
 export * from './core/MUICore'
 

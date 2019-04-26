@@ -1,15 +1,19 @@
-import { NSObject, NSSize, NSLocalizeString, MIOCoreIsPhone } from "mio-foundation-web";
-import { UIView, UILayerSearchElementByID } from "./UIView";
+import { NSObject } from "mio-foundation-web";
+import { NSSize } from "mio-foundation-web";
+import { NSLocalizeString } from "mio-foundation-web";
+import { MIOCoreIsPhone } from "mio-foundation-web";
+import { NSBundle } from "mio-foundation-web";
+import { NSCoder } from "mio-foundation-web";
+
+import { UIView } from "./UIView";
 import { UINavigationItem, UINavItemSearchInLayer } from "./UINavigationItem";
 import { UINavigationController } from "./UINavigationController";
 import { UIPresentationController, UIModalPresentationStyle, UIModalTransitionStyle } from "./UIViewController_PresentationController";
 import { UIPopoverPresentationController } from "./UIViewController_PopoverPresentationController";
-import { UICoreLayerIDFromObject, UICoreLayerAddStyle } from "./MIOUI_CoreLayer";
-import { _MIUShowViewController, _UIHideViewController } from "./core/MUICore";
+import { MUICoreLayerIDFromObject, MUICoreLayerAddStyle, MUICoreLayerSearchElementByID } from "./core/MUICoreLayer";
+import { _MUIShowViewController, _MUIHideViewController } from "./core/MUICore";
 import { UIWindow } from "./UIWindow";
 import { UISplitViewController } from "./UISplitViewController";
-import { NSBundle } from "mio-foundation-web";
-import { NSCoder } from "mio-foundation-web";
 
 
 /**
@@ -54,7 +58,7 @@ export class UIViewController extends NSObject
 
     constructor(layerID?){
         super();
-        this.layerID = layerID ? layerID : UICoreLayerIDFromObject(this);
+        this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(this);
     }
 
     init(){
@@ -73,7 +77,7 @@ export class UIViewController extends NSObject
         this.view.initWithLayer(layer, owner, options);
         
         // Search for navigation item
-        this.navigationItem = UINavItemSearchInLayer(layer);
+        //this.navigationItem = UINavItemSearchInLayer(layer);
         
         this.loadView();        
     }
@@ -105,7 +109,7 @@ export class UIViewController extends NSObject
     }
 
     localizeLayerIDWithKey(layerID, key){
-        let layer = UILayerSearchElementByID(this.view.layer, layerID);
+        let layer = MUICoreLayerSearchElementByID(this.view.layer, layerID);
         layer.innerHTML = NSLocalizeString(key, key);
     }
 
@@ -119,7 +123,7 @@ export class UIViewController extends NSObject
         
         if (this._htmlResourcePath == null) {
             this.view.init();            
-            UICoreLayerAddStyle(this.view.layer, "page");
+            MUICoreLayerAddStyle(this.view.layer, "page");
             this._didLoadView();
             return;
         }
@@ -151,7 +155,7 @@ export class UIViewController extends NSObject
         let items = domParser.parseFromString(layerData, "text/html");
         let layer = items.getElementById("kk");
 
-        this.navigationItem = UINavItemSearchInLayer(layer);
+        //this.navigationItem = UINavItemSearchInLayer(layer);
 
         this.view.initWithLayer(layer, this);
         this.view.awakeFromHTML();
@@ -160,7 +164,7 @@ export class UIViewController extends NSObject
 
     _didLoadView(){
         this._layerIsReady = true;        
-        if (MIOCoreIsPhone() == true) UICoreLayerAddStyle(this.view.layer, "phone");
+        if (MIOCoreIsPhone() == true) MUICoreLayerAddStyle(this.view.layer, "phone");
         
         if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null){
             this._onLoadLayerAction.call(this._onLoadLayerTarget);
@@ -288,7 +292,7 @@ export class UIViewController extends NSObject
     }       
     
     private _popoverPresentationController:UIPopoverPresentationController = null;
-    get popoverPresentationController():UIPopoverPresentationController{
+    get popoverPresentationController():UIPopoverPresentationController {
         if (this._popoverPresentationController == null){
             this._popoverPresentationController = new UIPopoverPresentationController();
             this._popoverPresentationController.init();
@@ -305,7 +309,7 @@ export class UIViewController extends NSObject
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);
 
-            _MIUShowViewController(this, vc, this, animated);
+            _MUIShowViewController(this, vc, this, animated);
         });
     }
 
@@ -344,7 +348,7 @@ export class UIViewController extends NSObject
             if (vc.modalPresentationStyle == UIModalPresentationStyle.CurrentContext){
                 this.view.addSubview(vc.presentationController.presentedView);
                 this.addChildViewController(vc);
-                _MIUShowViewController(this, vc, null, animated, this, function () {
+                _MUIShowViewController(this, vc, null, animated, this, function () {
                 });    
             }
             else{
@@ -361,7 +365,7 @@ export class UIViewController extends NSObject
                 }
                 w.setHidden(false);
 
-                _MIUShowViewController(this, vc, null, animated, this, function () {
+                _MUIShowViewController(this, vc, null, animated, this, function () {
                     w.makeKey();
                 });    
             }
@@ -379,7 +383,7 @@ export class UIViewController extends NSObject
         let fromVC = pc.presentedViewController;
         let fromView = pc.presentedView;
 
-        _UIHideViewController(fromVC, toVC, null, this, function () {
+        _MUIHideViewController(fromVC, toVC, null, this, function () {
 
             if (fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext){
                 toVC.removeChildViewController(fromVC);

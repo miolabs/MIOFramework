@@ -1,6 +1,6 @@
 
+import { NSPoint } from "mio-foundation-web";
 import { UIEvent, UIGestureRecognizer, UIGestureRecognizerState } from ".";
-import { MIOPoint } from "../MIOFoundation";
 import { UIView } from "./UIView";
 
 export class UIPanGestureRecognizer extends UIGestureRecognizer
@@ -40,8 +40,8 @@ export class UIPanGestureRecognizer extends UIGestureRecognizer
 
     private deltaX = 0;
     private deltaY = 0;
-    translationInView(view:UIView):MIOPoint {
-        return new MIOPoint(this.deltaX, this.deltaY);
+    translationInView(view:UIView):NSPoint {
+        return new NSPoint(this.deltaX, this.deltaY);
     }
 
 }

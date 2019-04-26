@@ -1,5 +1,7 @@
 
-import { NSClassFromString, NSSize, MIOCoreIsPhone } from "mio-foundation-web";
+import { NSClassFromString } from "mio-foundation-web";
+import { NSSize } from "mio-foundation-web";
+import { MIOCoreIsPhone } from "mio-foundation-web";
 import { UIView } from "../UIView";
 import { UIViewController } from "../UIViewController";
 import { UIModalPresentationStyle, UIPresentationController } from "../UIViewController_PresentationController";

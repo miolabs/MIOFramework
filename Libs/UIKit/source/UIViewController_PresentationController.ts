@@ -1,10 +1,14 @@
-import { MIOObject, MIORect, MIOSize } from "../MIOFoundation";
+import { NSObject } from "mio-foundation-web";
+import { NSRect } from "mio-foundation-web";
+import { NSSize } from "mio-foundation-web";
+import { MIOCoreIsPhone } from "mio-foundation-web";
+import { MIOCoreIsMobile } from "mio-foundation-web";
+
 import { UIViewController } from "./UIViewController";
-import { MIOCoreIsPhone, MIOCoreIsMobile } from "../MIOCore/platform";
-import { UIWindowSize } from "./core/MUICore";
+import { MUIWindowSize } from "./core/MUICore";
 import { UIWindow } from "./UIWindow";
-import { UIClassListForAnimationType, UIAnimationType } from "./MIOUI_CoreAnimation";
-import { UICoreLayerAddStyle } from ".";
+import { MUIClassListForAnimationType, MUIAnimationType } from "./core/MUICoreAnimation";
+import { MUICoreLayerAddStyle } from ".";
 
 /**
  * Created by godshadow on 06/12/2016.
@@ -30,7 +34,7 @@ export enum UIModalTransitionStyle
     CrossDisolve
 }
 
-export class UIPresentationController extends MIOObject
+export class UIPresentationController extends NSObject
 {
     presentationStyle = UIModalPresentationStyle.PageSheet;
     shouldPresentInFullscreen = false;
@@ -66,7 +70,7 @@ export class UIPresentationController extends MIOObject
 
     get transitioningDelegate(){
         if (this._transitioningDelegate == null){
-            this._transitioningDelegate = new MIOModalTransitioningDelegate();
+            this._transitioningDelegate = new MUIModalTransitioningDelegate();
             this._transitioningDelegate.init();
         }
 
@@ -83,7 +87,7 @@ export class UIPresentationController extends MIOObject
             || toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
             || toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
             || MIOCoreIsPhone() == true){
-            UICoreLayerAddStyle(view.layer, "modal_window");
+            MUICoreLayerAddStyle(view.layer, "modal_window");
         }       
     }
 
@@ -112,51 +116,51 @@ export class UIPresentationController extends MIOObject
             let w = fromVC.view.getWidth();
             let h = fromVC.view.getHeight();
 
-            view.setFrame(MIORect.rectWithValues(0, 0, w, h));
+            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
         }
         else if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet)
         {
             // Present like desktop sheet window
-            let ws = UIWindowSize();
+            let ws = MUIWindowSize();
 
             let size = toVC.preferredContentSize;
-            if (size == null) size = new MIOSize(320, 200);
+            if (size == null) size = new NSSize(320, 200);
 
             let w = size.width;
             let h = size.height;
             let x = (ws.width - w) / 2;
 
-            view.setFrame(MIORect.rectWithValues(0, 0, w, h));
-            this.window.setFrame(MIORect.rectWithValues(x, 0, w, h))
+            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            this.window.setFrame(NSRect.rectWithValues(x, 0, w, h))
 
             view.layer.classList.add("modal");
         }
         else if (toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet)
         {
             // Present at the center of the screen
-            let ws = UIWindowSize();
+            let ws = MUIWindowSize();
 
             let size = toVC.preferredContentSize;
-            if (size == null) size = new MIOSize(320, 200);
+            if (size == null) size = new NSSize(320, 200);
 
             let w = size.width;
             let h = size.height;
             let x = (ws.width - w) / 2;
             let y = (ws.height - h) / 2;
 
-            view.setFrame(MIORect.rectWithValues(0, 0, w, h));
-            this.window.setFrame(MIORect.rectWithValues(x, y, w, h))
+            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            this.window.setFrame(NSRect.rectWithValues(x, y, w, h))
 
             view.layer.classList.add("modal");
         }
         else
         {
             let size = toVC.preferredContentSize;
-            if (size == null) size = new MIOSize(320, 200);
+            if (size == null) size = new NSSize(320, 200);
             let w = size.width;
             let h = size.height;
 
-            view.setFrame(MIORect.rectWithValues(0, 0, w, h));
+            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
         }        
     }
 
@@ -187,7 +191,7 @@ export class UIPresentationController extends MIOObject
 
 }
 
-export class MIOModalTransitioningDelegate extends MIOObject
+export class MUIModalTransitioningDelegate extends NSObject
 {
     modalTransitionStyle = null;
 
@@ -196,7 +200,7 @@ export class MIOModalTransitioningDelegate extends MIOObject
 
     animationControllerForPresentedController(presentedViewController, presentingViewController, sourceController){
         if (this._presentAnimationController == null) {
-            this._presentAnimationController = new MIOModalPresentAnimationController();
+            this._presentAnimationController = new UIModalPresentAnimationController();
             this._presentAnimationController.init();
         }
 
@@ -206,7 +210,7 @@ export class MIOModalTransitioningDelegate extends MIOObject
     animationControllerForDismissedController(dismissedController){
         if (this._dissmissAnimationController == null) {
 
-            this._dissmissAnimationController = new MIOModalDismissAnimationController();
+            this._dissmissAnimationController = new UIModalDismissAnimationController();
             this._dissmissAnimationController.init();
         }
 
@@ -214,7 +218,7 @@ export class MIOModalTransitioningDelegate extends MIOObject
     }
 }
 
-export class MIOAnimationController extends MIOObject
+export class MUIAnimationController extends NSObject
 {
     transitionDuration(transitionContext){
         return 0;
@@ -235,7 +239,7 @@ export class MIOAnimationController extends MIOObject
 
 }
 
-export class MIOModalPresentAnimationController extends MIOObject
+export class UIModalPresentAnimationController extends NSObject
 {
     transitionDuration(transitionContext){
         return 0.15;
@@ -260,16 +264,16 @@ export class MIOModalPresentAnimationController extends MIOObject
             || toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen){
             
             if (MIOCoreIsPhone() == true)
-                animations = UIClassListForAnimationType(UIAnimationType.SlideInUp);
+                animations = MUIClassListForAnimationType(MUIAnimationType.SlideInUp);
             else 
-                animations = UIClassListForAnimationType(UIAnimationType.BeginSheet);
+                animations = MUIClassListForAnimationType(MUIAnimationType.BeginSheet);
         }                            
 
         return animations;
     }
 }
 
-export class MIOModalDismissAnimationController extends MIOObject
+export class UIModalDismissAnimationController extends NSObject
 {
     transitionDuration(transitionContext){
         return 0.25;
@@ -294,9 +298,9 @@ export class MIOModalDismissAnimationController extends MIOObject
             || fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen){
             
             if (MIOCoreIsPhone() == true)                        
-                animations = UIClassListForAnimationType(UIAnimationType.SlideOutDown);
+                animations = MUIClassListForAnimationType(MUIAnimationType.SlideOutDown);
             else 
-                animations = UIClassListForAnimationType(UIAnimationType.EndSheet);
+                animations = MUIClassListForAnimationType(MUIAnimationType.EndSheet);
         }          
                   
         return animations;

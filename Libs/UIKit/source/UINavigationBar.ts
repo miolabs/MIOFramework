@@ -1,4 +1,4 @@
-import { UIView, UINavigationItem, UICoreLayerAddStyle } from ".";
+import { UIView, UINavigationItem, MUICoreLayerAddStyle } from ".";
 
 export class UINavigationBar extends UIView
 {
@@ -13,7 +13,7 @@ export class UINavigationBar extends UIView
     }
 
     private setup(){
-        UICoreLayerAddStyle(this.layer, "navbar");
+        MUICoreLayerAddStyle(this.layer, "navbar");
     }
 
     private _items = [];

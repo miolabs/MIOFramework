@@ -1,9 +1,14 @@
 import { NSObject } from "mio-foundation-web";
 import { MIOCoreBundleGetMainURLString } from "mio-foundation-web"
-import { NSObject, NSSize, NSLocalizeString, MIOCoreIsPhone } from "mio-foundation-web";
+import { NSPoint } from "mio-foundation-web";
+import { NSRect } from "mio-foundation-web";
+import { NSClassFromString } from "mio-foundation-web";
+import { NSLocalizeString } from "mio-foundation-web";
+import { NSSize } from "mio-foundation-web";
+import { MIOCoreIsPhone } from "mio-foundation-web";
 import { NSBundle } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
-import { NSClassFromString, NSSize, MIOCoreIsPhone } from "mio-foundation-web";
+import { MIOCoreIsMobile } from "mio-foundation-web";
 import { NSURLRequest } from "mio-foundation-web";
 import { NSURLConnection } from "mio-foundation-web";
 import { NSPropertyListSerialization } from "mio-foundation-web";
@@ -185,7 +190,7 @@ export interface UIViewControllerAnimatedTransitioning extends NSObject
 }
 
 // ANIMATION TYPES
-export function UIClassListForAnimationType(type)
+export function MUIClassListForAnimationType(type)
 {
     var array = [];
     array.push("animated");
@@ -626,6 +631,154 @@ export class UIEvent extends NSObject
 
 
 
+export enum UIGestureRecognizerState {
+    Possible,
+    Began,
+    Changed,
+    Ended,
+    Cancelled,
+    Failed,
+    Recognized
+}
+
+export class UIGestureRecognizer extends NSObject
+{
+    delegate = null;
+
+    set view(v:UIView){this.setView(v);}
+    get view(){ return this._view;}
+    
+    set state(value:UIGestureRecognizerState) {this.setState(value);}
+    get state() {return this._state;}
+    isEnabled = true;
+
+    name:string = null;
+    
+    private target = null;
+    private block = null;
+    initWithTarget(target, block){
+        super.init();
+
+        this.target = target;
+        this.block = block;
+    }
+
+    private _view:UIView = null;        
+    setView(view:UIView){                
+        this._view = view;
+    }
+    
+    private _state:UIGestureRecognizerState = UIGestureRecognizerState.Possible;
+    private setState(state:UIGestureRecognizerState){
+        if (this.isEnabled == false) return;
+        if (this._state == state && state != UIGestureRecognizerState.Changed) return;
+        this._state = state;
+        this.block.call(this.target, this);
+    }
+    
+    
+    touchesBeganWithEvent(touches, ev:UIEvent){
+        this.state = UIGestureRecognizerState.Began;
+    }    
+
+    touchesMovedWithEvent(touches, ev:UIEvent){
+        this.state = UIGestureRecognizerState.Changed;
+    }
+
+    touchesEndedWithEvent(touches, ev:UIEvent){
+        this.state = UIGestureRecognizerState.Ended;
+    }
+
+    reset(){
+        this.state = UIGestureRecognizerState.Possible;
+    }
+
+    // To call from UIView. Only for internal use
+    _viewTouchesBeganWithEvent(touches, ev:UIEvent){
+        this.reset();
+        this.touchesBeganWithEvent(touches, ev);
+    }
+
+    _viewTouchesMovedWithEvent(touches, ev:UIEvent){
+        this.touchesMovedWithEvent(touches, ev);
+    }
+
+    _viewTouchesEndedWithEvent(touches, ev:UIEvent){
+        this.touchesEndedWithEvent(touches, ev);
+    }
+
+}
+
+
+
+export class UITapGestureRecognizer extends UIGestureRecognizer
+{
+    numberOfTapsRequired = 1;
+    
+    touchesBeganWithEvent(touches, ev:UIEvent){
+        super.touchesBeganWithEvent(touches, ev);
+        this.state = UIGestureRecognizerState.Began;
+    }
+
+    touchesEndedWithEvent(touches, ev:UIEvent){
+        super.touchesEndedWithEvent(touches, ev);
+        this.state = UIGestureRecognizerState.Ended;
+    }
+
+}
+
+
+
+
+
+export class UIPanGestureRecognizer extends UIGestureRecognizer
+{
+    minimumNumberOfTouches = 1;
+    maximumNumberOfTouches = 0;
+    
+    private initialX = null;
+    private initialY = null;
+
+    private touchDown = false;
+    touchesBeganWithEvent(touches, ev:UIEvent){        
+        this.initialX = ev.x;
+        this.initialY = ev.y;
+        this.touchDown = true;
+    }
+
+    touchesEndedWithEvent(touches, ev:UIEvent){
+        super.touchesEndedWithEvent(touches, ev);
+        this.initialX = null;
+        this.initialY = null;
+        this.hasStarted = false;
+        this.touchDown = false;
+    }
+
+    private hasStarted = false;
+    touchesMovedWithEvent(touches, ev:UIEvent){
+        if (this.touchDown == false) return;
+        if (this.hasStarted == false) this.state = UIGestureRecognizerState.Began;
+
+        this.hasStarted = true;
+        this.deltaX = this.initialX - ev.x;
+        this.deltaY = this.initialY - ev.y;
+
+        this.state = UIGestureRecognizerState.Changed;
+    }
+
+    private deltaX = 0;
+    private deltaY = 0;
+    translationInView(view:UIView):NSPoint {
+        return new NSPoint(this.deltaX, this.deltaY);
+    }
+
+}
+
+
+
+
+
+
 
 
 
@@ -676,11 +829,11 @@ export class UIView extends NSObject
 
     constructor(layerID?){
         super();
-        this.layerID = layerID ? layerID : UICoreLayerIDFromObject(this);
+        this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(this);
     }
 
     init(){
-        this.layer = UICoreLayerCreate(this.layerID);        
+        this.layer = MUICoreLayerCreate(this.layerID);        
         //UICoreLayerAddStyle(this.layer, "view");
         //UICoreLayerAddStyle(this.layer, "view");
         //this.layer.style.position = "absolute";
@@ -691,8 +844,8 @@ export class UIView extends NSObject
         //this.layer.style.background = "rgb(255, 255, 255)";                
     }
 
-    initWithFrame(frame:MIORect){
-        this.layer = UICoreLayerCreate(this.layerID);
+    initWithFrame(frame:NSRect){
+        this.layer = MUICoreLayerCreate(this.layerID);
         this.layer.style.position = "absolute";
         this.setX(frame.origin.x);
         this.setY(frame.origin.y);
@@ -722,7 +875,7 @@ export class UIView extends NSObject
                 let className = subLayer.getAttribute("data-class");
                 if (className == null || className.length == 0) className = "UIView";
                 
-                let sv = MIOClassFromString(className);
+                let sv = NSClassFromString(className);
                 sv.initWithLayer(subLayer, this); 
                 this._linkViewToSubview(sv);            
             }
@@ -733,11 +886,10 @@ export class UIView extends NSObject
     copy() {
         let objLayer = this.layer.cloneNode(true);
         
-        let className = this.getClassName();
-        MIOLog("UIView:copy:Copying class name " + className);
+        let className = this.getClassName();        
         if (className == null) throw Error("UIView:copy: Error classname is null");
         
-        let view = MIOClassFromString(className);
+        let view = NSClassFromString(className);
         view.initWithLayer(objLayer, null);   
 
         return view;
@@ -855,7 +1007,7 @@ export class UIView extends NSObject
 
     viewWithTag(tag):UIView{
         // TODO: Use also the view tag component
-        let view = MIOViewSearchViewTag(this, tag);
+        let view = MUICoreViewSearchViewTag(this, tag);
         return view;
     }
 
@@ -889,7 +1041,7 @@ export class UIView extends NSObject
     }
 
     layerWithItemID(itemID){
-        return UILayerSearchElementByID(this.layer, itemID);
+        return MUICoreLayerSearchElementByID(this.layer, itemID);
     }
 
     private _hidden:boolean = false;
@@ -1056,11 +1208,11 @@ export class UIView extends NSObject
     }
     
     get frame() {        
-        return MIORect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        return NSRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
     }
 
     public get bounds(){
-        return MIORect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
+        return NSRect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
     }
 
     //
@@ -1248,6 +1400,234 @@ export class UIView extends NSObject
 
 
 
+/**
+ * Created by godshadow on 12/3/16.
+ */
+
+export class UIControl extends UIView
+{
+    // TODO: Make delegation of the methods above
+    mouseOverTarget = null;
+    mouseOverAction = null;
+    mouseOutTarget = null;
+    mouseOutAction = null;
+
+    private _enabled = true;
+    get enabled(){return this._enabled;}
+    set enabled(value:boolean){this.setEnabled(value);}
+
+    setEnabled(enabled:boolean){
+        this._enabled = enabled;
+
+        if (enabled == true)
+            this.layer.style.opacity = "1.0";
+        else
+            this.layer.style.opacity = "0.10";
+    }
+
+    setOnMouseOverAction(target, action)
+    {
+         this.mouseOverTarget = target;
+         this.mouseOverAction = action;
+         var instance = this;
+
+         this.layer.onmouseover = function()
+         {
+             if (instance.enabled)
+                 instance.mouseOverAction.call(target);
+         }
+    }
+
+    setOnMouseOutAction(target, action)
+    {
+         this.mouseOutTarget = target;
+         this.mouseOutAction = action;
+         var instance = this;
+
+         this.layer.onmouseout = function()
+         {
+             if (instance.enabled)
+                 instance.mouseOutAction.call(target);
+         }
+    }
+}
+
+
+
+
+
+
+/**
+ * Created by godshadow on 12/3/16.
+ */
+
+export enum UIButtonType
+{
+    MomentaryPushIn,
+    PushOnPushOff,
+    PushIn
+}
+
+export class UIButton extends UIControl
+{
+    private _statusStyle = null;
+
+    private _titleStatusStyle = null;
+    private _titleLayer = null;
+
+    private _imageStatusStyle = null;
+    private _imageLayer = null;
+
+    target = null;
+    action = null;
+
+    private _selected = false;
+    type = UIButtonType.MomentaryPushIn;
+
+    init(){
+        super.init();
+        MUICoreLayerAddStyle(this.layer, "btn");
+        this.setupLayers();
+    }
+
+    initWithLayer(layer, owner, options?){
+        super.initWithLayer(layer, owner, options);
+
+        let type = this.layer.getAttribute("data-type");
+        if (type == "MomentaryPushIn")
+            this.type = UIButtonType.MomentaryPushIn;
+        else if (type == "PushOnPushOff")
+            this.type = UIButtonType.PushOnPushOff;
+        else if (type == "PushIn")
+            this.type = UIButtonType.PushIn;
+
+        // Check for title layer
+        this._titleLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "SPAN");
+
+
+        // Check for img layer
+        this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "IMG");
+        if (this._imageLayer == null) this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "DIV");
+
+        // Check for status
+        let status = this.layer.getAttribute("data-status");
+        if (status == "selected")
+            this.setSelected(true);
+
+        this.setupLayers();
+    }
+
+    private setupLayers(){
+        //UICoreLayerRemoveStyle(this.layer, "view");
+        //UICoreLayerAddStyle(this.layer, "btn");
+
+        if (this._titleLayer == null) {
+            this._titleLayer = document.createElement("span");
+            this.layer.appendChild(this._titleLayer);
+        }
+
+        let key = this.layer.getAttribute("data-title");
+        if (key != null) this.setTitle(NSLocalizeString(key, key));
+        
+        // Prevent click
+        this.layer.addEventListener("click", function(e) {
+            e.stopPropagation();
+        });
+        
+        this.layer.addEventListener("mousedown", function(e) {
+            e.stopPropagation();
+            if (this.enabled == false) return;
+
+            switch (this.type){
+                case UIButtonType.MomentaryPushIn:
+                case UIButtonType.PushIn:
+                this.setSelected(true);
+                break;
+
+                case UIButtonType.PushOnPushOff:
+                this.setSelected(!this.selected);
+                break;
+            }
+            
+        }.bind(this));
+
+        this.layer.addEventListener("mouseup", function(e) {
+            e.stopPropagation();
+            if (this.enabled == false) return;            
+            if (this.type == UIButtonType.MomentaryPushIn) this.setSelected(false);
+
+            if (this.action != null && this.target != null)
+                this.action.call(this.target, this);
+            
+        }.bind(this));
+    }
+
+    initWithAction(target, action){
+        this.init();
+        this.setAction(target, action);
+    }
+
+    setAction(target, action){
+        this.target = target;
+        this.action = action;
+    }
+
+    setTitle(title){
+        this._titleLayer.innerHTML = title;
+    }
+
+    set title(title){
+        this.setTitle(title);
+    }
+
+    get title(){
+        return this._titleLayer.innerHTML;
+    }
+
+    set selected(value){
+        this.setSelected(value);
+    }
+
+    get selected(){
+        return this._selected;
+    }
+    
+    setSelected(value){
+        if (this._selected == value)
+            return;
+
+        if (value == true) {
+            MUICoreLayerAddStyle(this.layer, "selected");
+            //UICoreLayerRemoveStyle(this.layer, "deselected");
+        }
+        else {
+            //UICoreLayerAddStyle(this.layer, "deselected");
+            MUICoreLayerRemoveStyle(this.layer, "selected");
+        }
+
+        this._selected = value;
+    }
+
+    setImageURL(urlString:string){
+        if (urlString != null){
+            this._imageLayer.setAttribute("src", urlString);
+        }
+        else {
+            this._imageLayer.removeAttribute("src");
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1302,7 +1682,7 @@ export class UIViewController extends NSObject
 
     constructor(layerID?){
         super();
-        this.layerID = layerID ? layerID : UICoreLayerIDFromObject(this);
+        this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(this);
     }
 
     init(){
@@ -1321,7 +1701,7 @@ export class UIViewController extends NSObject
         this.view.initWithLayer(layer, owner, options);
         
         // Search for navigation item
-        this.navigationItem = UINavItemSearchInLayer(layer);
+        //this.navigationItem = UINavItemSearchInLayer(layer);
         
         this.loadView();        
     }
@@ -1353,7 +1733,7 @@ export class UIViewController extends NSObject
     }
 
     localizeLayerIDWithKey(layerID, key){
-        let layer = UILayerSearchElementByID(this.view.layer, layerID);
+        let layer = MUICoreLayerSearchElementByID(this.view.layer, layerID);
         layer.innerHTML = NSLocalizeString(key, key);
     }
 
@@ -1367,7 +1747,7 @@ export class UIViewController extends NSObject
         
         if (this._htmlResourcePath == null) {
             this.view.init();            
-            UICoreLayerAddStyle(this.view.layer, "page");
+            MUICoreLayerAddStyle(this.view.layer, "page");
             this._didLoadView();
             return;
         }
@@ -1399,7 +1779,7 @@ export class UIViewController extends NSObject
         let items = domParser.parseFromString(layerData, "text/html");
         let layer = items.getElementById("kk");
 
-        this.navigationItem = UINavItemSearchInLayer(layer);
+        //this.navigationItem = UINavItemSearchInLayer(layer);
 
         this.view.initWithLayer(layer, this);
         this.view.awakeFromHTML();
@@ -1408,7 +1788,7 @@ export class UIViewController extends NSObject
 
     _didLoadView(){
         this._layerIsReady = true;        
-        if (MIOCoreIsPhone() == true) UICoreLayerAddStyle(this.view.layer, "phone");
+        if (MIOCoreIsPhone() == true) MUICoreLayerAddStyle(this.view.layer, "phone");
         
         if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null){
             this._onLoadLayerAction.call(this._onLoadLayerTarget);
@@ -1536,7 +1916,7 @@ export class UIViewController extends NSObject
     }       
     
     private _popoverPresentationController:UIPopoverPresentationController = null;
-    get popoverPresentationController():UIPopoverPresentationController{
+    get popoverPresentationController():UIPopoverPresentationController {
         if (this._popoverPresentationController == null){
             this._popoverPresentationController = new UIPopoverPresentationController();
             this._popoverPresentationController.init();
@@ -1553,7 +1933,7 @@ export class UIViewController extends NSObject
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);
 
-            _MIUShowViewController(this, vc, this, animated);
+            _MUIShowViewController(this, vc, this, animated);
         });
     }
 
@@ -1592,7 +1972,7 @@ export class UIViewController extends NSObject
             if (vc.modalPresentationStyle == UIModalPresentationStyle.CurrentContext){
                 this.view.addSubview(vc.presentationController.presentedView);
                 this.addChildViewController(vc);
-                _MIUShowViewController(this, vc, null, animated, this, function () {
+                _MUIShowViewController(this, vc, null, animated, this, function () {
                 });    
             }
             else{
@@ -1609,7 +1989,7 @@ export class UIViewController extends NSObject
                 }
                 w.setHidden(false);
 
-                _MIUShowViewController(this, vc, null, animated, this, function () {
+                _MUIShowViewController(this, vc, null, animated, this, function () {
                     w.makeKey();
                 });    
             }
@@ -1627,7 +2007,7 @@ export class UIViewController extends NSObject
         let fromVC = pc.presentedViewController;
         let fromView = pc.presentedView;
 
-        _UIHideViewController(fromVC, toVC, null, this, function () {
+        _MUIHideViewController(fromVC, toVC, null, this, function () {
 
             if (fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext){
                 toVC.removeChildViewController(fromVC);
@@ -1729,6 +2109,1035 @@ export class UIViewController extends NSObject
         this.didChangeValue("preferredContentSize");
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Created by godshadow on 06/12/2016.
+ */
+
+export enum UIModalPresentationStyle
+{
+    FullScreen,
+    PageSheet, // normal modal sheet in osx
+    FormSheet, // normal modal like floating window but horizontal and vertically centered
+    CurrentContext,
+    Custom,
+    OverFullScreen,     // Similar to FullScreen but the view beneath doesnpt dissappear
+    OverCurrentContext, // Similuar like previus, but in current context
+    Popover, // the popover, almost like FormSheet but no centered
+    None
+}
+
+export enum UIModalTransitionStyle
+{
+    CoverVertical,
+    FlipHorizontal,
+    CrossDisolve
+}
+
+export class UIPresentationController extends NSObject
+{
+    presentationStyle = UIModalPresentationStyle.PageSheet;
+    shouldPresentInFullscreen = false;
+
+    protected _presentedViewController:UIViewController = null; //ToVC
+    presentingViewController = null; //FromVC
+    presentedView = null;
+
+    protected _transitioningDelegate = null;
+    private _window = null;
+
+    _isPresented:boolean = false;
+
+    initWithPresentedViewControllerAndPresentingViewController(presentedViewController, presentingViewController){
+        super.init();
+
+        this.presentedViewController = presentedViewController;
+        this.presentingViewController = presentingViewController;        
+    }
+
+    setPresentedViewController(vc:UIViewController){
+        this._presentedViewController = vc;
+        this.presentedView = vc.view;
+    }
+
+    set presentedViewController(vc:UIViewController){
+        this.setPresentedViewController(vc);
+    }
+
+    get presentedViewController():UIViewController{
+        return this._presentedViewController;
+    }
+
+    get transitioningDelegate(){
+        if (this._transitioningDelegate == null){
+            this._transitioningDelegate = new MUIModalTransitioningDelegate();
+            this._transitioningDelegate.init();
+        }
+
+        return this._transitioningDelegate;
+    }
+
+    presentationTransitionWillBegin(){
+        let toVC = this.presentedViewController;
+        let view = this.presentedView;
+
+        this._calculateFrame();
+
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet 
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
+            || MIOCoreIsPhone() == true){
+            MUICoreLayerAddStyle(view.layer, "modal_window");
+        }       
+    }
+
+    presentationTransitionDidEnd(completed){        
+    }
+
+    dismissalTransitionWillBegin(){
+    }
+
+    dismissalTransitionDidEnd(completed){        
+    }
+
+    _calculateFrame(){
+        let fromVC = this.presentingViewController;
+        let toVC = this.presentedViewController;
+        let view = this.presentedView;
+
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen){
+            view.layer.style.left = "0px";
+            view.layer.style.top = "0px";
+            view.layer.style.width = "100%";
+            view.layer.style.height = "100%";
+        }
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext)
+        {
+            let w = fromVC.view.getWidth();
+            let h = fromVC.view.getHeight();
+
+            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+        }
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet)
+        {
+            // Present like desktop sheet window
+            let ws = MUIWindowSize();
+
+            let size = toVC.preferredContentSize;
+            if (size == null) size = new NSSize(320, 200);
+
+            let w = size.width;
+            let h = size.height;
+            let x = (ws.width - w) / 2;
+
+            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            this.window.setFrame(NSRect.rectWithValues(x, 0, w, h))
+
+            view.layer.classList.add("modal");
+        }
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet)
+        {
+            // Present at the center of the screen
+            let ws = MUIWindowSize();
+
+            let size = toVC.preferredContentSize;
+            if (size == null) size = new NSSize(320, 200);
+
+            let w = size.width;
+            let h = size.height;
+            let x = (ws.width - w) / 2;
+            let y = (ws.height - h) / 2;
+
+            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            this.window.setFrame(NSRect.rectWithValues(x, y, w, h))
+
+            view.layer.classList.add("modal");
+        }
+        else
+        {
+            let size = toVC.preferredContentSize;
+            if (size == null) size = new NSSize(320, 200);
+            let w = size.width;
+            let h = size.height;
+
+            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+        }        
+    }
+
+    get window(){
+        return this._window;
+    }
+    
+    set window(window:UIWindow){
+        let vc = this.presentedViewController;
+        this._window = window;
+        
+        // Track view frame changes
+        if (MIOCoreIsMobile() == false && vc.modalPresentationStyle != UIModalPresentationStyle.CurrentContext){
+            vc.addObserver(this, "preferredContentSize");
+        }
+    }
+
+    observeValueForKeyPath(key, type, object) {
+
+        if (key == "preferredContentSize" && type == "did")
+        {
+            let vc = this.presentedView;
+            //this.window.layer.style.transition = "left 0.25s, width 0.25s, height 0.25s";
+            vc.layer.style.transition = "left 0.25s, width 0.25s, height 0.25s";
+            this._calculateFrame();            
+        }
+    }
+
+}
+
+export class MUIModalTransitioningDelegate extends NSObject
+{
+    modalTransitionStyle = null;
+
+    private _presentAnimationController = null;
+    private _dissmissAnimationController = null;
+
+    animationControllerForPresentedController(presentedViewController, presentingViewController, sourceController){
+        if (this._presentAnimationController == null) {
+            this._presentAnimationController = new UIModalPresentAnimationController();
+            this._presentAnimationController.init();
+        }
+
+        return this._presentAnimationController
+    }
+
+    animationControllerForDismissedController(dismissedController){
+        if (this._dissmissAnimationController == null) {
+
+            this._dissmissAnimationController = new UIModalDismissAnimationController();
+            this._dissmissAnimationController.init();
+        }
+
+        return this._dissmissAnimationController;
+    }
+}
+
+export class MUIAnimationController extends NSObject
+{
+    transitionDuration(transitionContext){
+        return 0;
+    }
+
+    animateTransition(transitionContext){
+        // make view configurations before transitions        
+    }
+
+    animationEnded(transitionCompleted){
+        // make view configurations after transitions
+    }
+
+    // TODO: Not iOS like transitions. For now we use css animations
+    animations(transitionContext){
+        return null;
+    }
+
+}
+
+export class UIModalPresentAnimationController extends NSObject
+{
+    transitionDuration(transitionContext){
+        return 0.15;
+    }
+
+    animateTransition(transitionContext){
+        // make view configurations before transitions
+    }
+
+    animationEnded(transitionCompleted){
+        // make view configurations after transitions
+    }
+
+    // TODO: Not iOS like transitions. For now we use css animations
+    animations(transitionContext){
+        let animations = null;
+
+        let toVC = transitionContext.presentedViewController;
+
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet 
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen){
+            
+            if (MIOCoreIsPhone() == true)
+                animations = MUIClassListForAnimationType(MUIAnimationType.SlideInUp);
+            else 
+                animations = MUIClassListForAnimationType(MUIAnimationType.BeginSheet);
+        }                            
+
+        return animations;
+    }
+}
+
+export class UIModalDismissAnimationController extends NSObject
+{
+    transitionDuration(transitionContext){
+        return 0.25;
+    }
+
+    animateTransition(transitionContext){
+        // make view configurations after transitions
+    }
+
+    animationEnded(transitionCompleted){
+        // make view configurations before transitions
+    }
+
+    // TODO: Not iOS like transitions. For now we use css animations
+    animations(transitionContext){
+        let animations = null;
+
+        let fromVC = transitionContext.presentingViewController;
+
+        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet 
+            || fromVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
+            || fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen){
+            
+            if (MIOCoreIsPhone() == true)                        
+                animations = MUIClassListForAnimationType(MUIAnimationType.SlideOutDown);
+            else 
+                animations = MUIClassListForAnimationType(MUIAnimationType.EndSheet);
+        }          
+                  
+        return animations;
+    }
+
+}
+
+
+
+
+
+
+
+
+/**
+ * Created by godshadow on 11/11/2016.
+ */
+
+export enum UIPopoverArrowDirection
+{
+    Any,
+    Up,
+    Down,
+    Left,
+    Right
+}
+
+export interface UIPopoverPresentationControllerDelegate {
+    popoverPresentationControllerDidDismissPopover?(popoverPresentationController:UIPopoverPresentationController);
+}
+
+export class UIPopoverPresentationController extends UIPresentationController
+{
+    permittedArrowDirections = UIPopoverArrowDirection.Any;
+
+    sourceView = null;
+    sourceRect = NSRect.Zero();
+
+    delegate = null;
+
+    private _contentSize = null;
+    private _canvasLayer = null;
+    private _contentView = null;
+
+    get transitioningDelegate(){
+        if (this._transitioningDelegate == null){
+            this._transitioningDelegate = new MIOModalPopOverTransitioningDelegate();
+            this._transitioningDelegate.init();
+        }
+
+        return this._transitioningDelegate;
+    }
+
+    presentationTransitionWillBegin(){
+        //if (MIOCoreIsPhone() == true) return;
+        
+        this._calculateFrame();
+        MUICoreLayerAddStyle(this.presentedView.layer, "popover_window");                
+    }
+
+    dismissalTransitionDidEnd(completed){     
+        if (completed == false) return;   
+        if (this.delegate != null && (typeof this.delegate.popoverPresentationControllerDidDismissPopover === "function")){
+            this.delegate.popoverPresentationControllerDidDismissPopover(this);
+        } 
+    }
+
+    _calculateFrame(){
+        let vc = this.presentedViewController;
+        let view = this.presentedView;
+
+        let w = vc.preferredContentSize.width;
+        let h = vc.preferredContentSize.height;
+        let v = vc.popoverPresentationController.sourceView;
+        let f = vc.popoverPresentationController.sourceRect;
+
+        let xShift = false;
+
+        // Below
+        let y = v.layer.getBoundingClientRect().top + f.size.height + 10;
+        if ((y + h) > window.innerHeight) // Below no, Up?
+            y = v.layer.getBoundingClientRect().top - h - 10;
+        if (y < 0) // Up no, horizonal shift
+        {
+            xShift = true;
+            y = (window.innerHeight - h) / 2;
+        }
+
+        let x = 0;
+
+        if (xShift == false)
+        {
+            x = v.layer.getBoundingClientRect().left + 10;
+            if ((x + w) > window.innerWidth)
+                x = v.layer.getBoundingClientRect().left +f.size.width - w + 10;
+        }
+        else
+        {
+            x = v.layer.getBoundingClientRect().left + f.size.width + 10;
+            if ((x + w) > window.innerWidth)
+                x = v.layer.getBoundingClientRect().left - w - 10;
+        }
+
+        view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+        this.window.setFrame(NSRect.rectWithValues(x, y, w, h))
+    }
+
+    private _drawRoundRect(x, y, width, height, radius) {
+
+        let ctx = this._canvasLayer.getContext('2d');
+
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+
+        let color = 'rgba(208, 208, 219, 1)';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
+
+}
+
+export class MIOModalPopOverTransitioningDelegate extends NSObject
+{
+    modalTransitionStyle = null;
+
+    private _showAnimationController = null;
+    private _dissmissAnimationController = null;
+
+    animationControllerForPresentedController(presentedViewController, presentingViewController, sourceController){
+        if (this._showAnimationController == null) {
+
+            // if (MIOCoreIsPhone() == false) {
+                this._showAnimationController = new MIOPopOverPresentAnimationController();
+                this._showAnimationController.init();
+            // }
+            // else {
+            //     this._showAnimationController = new MIOModalPresentAnimationController();
+            //     this._showAnimationController.init();
+            // }
+        }
+
+        return this._showAnimationController;
+    }
+
+    animationControllerForDismissedController(dismissedController){
+        if (this._dissmissAnimationController == null) {
+
+//            if (MIOCoreIsPhone() == false) {
+                this._dissmissAnimationController = new MIOPopOverDismissAnimationController();
+                this._dissmissAnimationController.init();    
+            // }
+            // else {
+            //     this._dissmissAnimationController = new MIOModalDismissAnimationController();
+            //     this._dissmissAnimationController.init();    
+            // }
+        }
+
+        return this._dissmissAnimationController;
+    }
+}
+
+export class MIOPopOverPresentAnimationController extends NSObject
+{
+    transitionDuration(transitionContext)
+    {
+        return 0.25;
+    }
+
+    animateTransition(transitionContext)
+    {
+        // make view configurations before transitions
+    }
+
+    animationEnded(transitionCompleted)
+    {
+        // make view configurations after transitions
+    }
+
+    // TODO: Not iOS like transitions. For now we use css animations
+    animations(transitionContext){
+        let animations = MUIClassListForAnimationType(MUIAnimationType.FadeIn);
+        return animations;
+    }
+
+}
+
+export class MIOPopOverDismissAnimationController extends NSObject
+{
+    transitionDuration(transitionContext){
+        return 0.25;
+    }
+
+    animateTransition(transitionContext){
+        // make view configurations after transitions
+    }
+
+    animationEnded(transitionCompleted){
+        // make view configurations before transitions
+    }
+
+    // TODO: Not iOS like transitions. For now we use css animations
+    animations(transitionContext){
+        let animations = MUIClassListForAnimationType(MUIAnimationType.FadeOut);
+        return animations;
+    }
+
+}
+
+
+
+
+
+export class UINavigationItem extends NSObject
+{    
+    backBarButtonItem:UIButton = null;
+    titleView:UIView = null;
+    title:string = null;
+
+    private leftView:UIView = null;    
+    private rightView:UIView = null;
+    
+    initWithLayer(layer){
+        if (layer.childNodes.length > 0) {
+            for (let index = 0; index < layer.childNodes.length; index++) {
+                let subLayer = layer.childNodes[index];
+        
+                if (subLayer.tagName != "DIV") continue;
+    
+                if (subLayer.getAttribute("data-nav-item-left") != null) {
+                    let v:UIView = new UIView();
+                    v.initWithLayer(subLayer, this);
+                    this.leftView = v;
+                }
+                else if (subLayer.getAttribute("data-nav-item-center") != null) {
+                    let v:UIView = new UIView();
+                    v.initWithLayer(subLayer, this);
+                    this.titleView = v;
+                }
+                else if (subLayer.getAttribute("data-nav-item-right") != null) {
+                    let v:UIView = new UIView();
+                    v.initWithLayer(subLayer, this);
+                    this.rightView = v;
+                }
+            }
+
+            let backButtonLayer = MUICoreLayerSearchElementByAttribute(layer, "data-nav-item-back");
+            if (backButtonLayer != null) {
+                this.backBarButtonItem = new UIButton();
+                this.backBarButtonItem.initWithLayer(backButtonLayer, this);
+            }
+        }
+    }
+}
+
+export function UINavItemSearchInLayer(layer)
+{
+    if (layer.childNodes.length > 0) {
+        for (let index = 0; index < layer.childNodes.length; index++) {
+            let subLayer = layer.childNodes[index];
+    
+            if (subLayer.tagName != "DIV") continue;
+
+            if (subLayer.getAttribute("data-nav-item") != null) {
+                let ni = new UINavigationItem();
+                ni.initWithLayer(subLayer);  
+                
+                // Check for tittle if center view doesn't exists
+                if (ni.titleView == null) {
+                    let title = subLayer.getAttribute("data-nav-item-title");
+                    if (title != null) ni.title = title;
+                }
+
+                return ni;             
+            }
+        }
+    }
+
+    return null;
+ }
+
+
+
+
+
+
+/**
+ * Created by godshadow on 9/4/16.
+ */
+
+export class UINavigationController extends UIViewController
+{
+    rootViewController = null;
+    viewControllersStack = [];
+    currentViewControllerIndex = -1;
+
+    init(){
+        super.init();
+        this.view.layer.style.overflow = "hidden";        
+    }
+
+    initWithRootViewController(vc:UIViewController){
+        this.init();
+        this.setRootViewController(vc);
+    }
+
+    setRootViewController(vc:UIViewController){
+        //this.transitioningDelegate = this;
+        
+        this.rootViewController = vc;
+        this.view.addSubview(vc.view);
+
+        this.viewControllersStack.push(vc);
+        this.currentViewControllerIndex = 0;
+
+        this.rootViewController.navigationController = this;
+
+        this.addChildViewController(vc);
+        // if (this.presentationController != null) {
+        //     var size = vc.preferredContentSize;
+        //     this.contentSize = size;
+        // }
+    }
+
+    viewWillAppear(animated?:boolean){
+        if (this.currentViewControllerIndex < 0) return;
+        let vc = this.viewControllersStack[this.currentViewControllerIndex];
+        vc.viewWillAppear(animated);
+    }
+
+    viewDidAppear(animated?){
+        if (this.currentViewControllerIndex < 0) return;
+        let vc = this.viewControllersStack[this.currentViewControllerIndex];
+        vc.viewDidAppear(animated);
+    }
+
+    viewWillDisappear(animated?){
+        if (this.currentViewControllerIndex < 0) return;
+        let vc = this.viewControllersStack[this.currentViewControllerIndex];
+        vc.viewWillDisappear(animated);
+    }
+
+    viewDidDisappear(animated?){
+        if (this.currentViewControllerIndex < 0) return;
+        let vc = this.viewControllersStack[this.currentViewControllerIndex];
+        vc.viewDidDisappear(animated);
+    }
+
+    pushViewController(vc:UIViewController, animated?:boolean){
+        let lastVC = this.viewControllersStack[this.currentViewControllerIndex];
+
+        this.viewControllersStack.push(vc);
+        this.currentViewControllerIndex++;
+
+        vc.navigationController = this;
+
+        vc.onLoadView(this, function () {
+
+            if (vc.navigationItem != null && vc.navigationItem.backBarButtonItem != null) {
+                vc.navigationItem.backBarButtonItem.setAction(this, function(){
+                    vc.navigationController.popViewController();
+                });
+            }
+
+            this.view.addSubview(vc.view);
+            this.addChildViewController(vc);
+
+            if (vc.preferredContentSize != null)
+                this.preferredContentSize = vc.preferredContentSize;
+
+            _MUIShowViewController(lastVC, vc, this, animated);
+        });
+    }
+
+    popViewController(animated?:boolean){
+        if (this.currentViewControllerIndex == 0)
+            return;
+
+        let fromVC = this.viewControllersStack[this.currentViewControllerIndex];
+
+        this.currentViewControllerIndex--;
+        this.viewControllersStack.pop();
+
+        let toVC = this.viewControllersStack[this.currentViewControllerIndex];
+
+        // if (toVC.transitioningDelegate == null)
+        //     toVC.transitioningDelegate = this;
+
+        if (toVC.preferredContentSize != null)
+            this.contentSize = toVC.preferredContentSize;
+
+        _MUIHideViewController(fromVC, toVC, this, this, function () {
+            fromVC.removeChildViewController(this);
+            fromVC.view.removeFromSuperview();
+        });
+    }
+
+    popToRootViewController(animated?:boolean){
+        if(this.viewControllersStack.length == 1) return;
+        
+        let currentVC = this.viewControllersStack.pop();
+
+        for(let index = this.currentViewControllerIndex - 1; index > 0; index--){
+            let vc = this.viewControllersStack.pop();
+            vc.view.removeFromSuperview();
+            this.removeChildViewController(vc);
+        }
+
+        this.currentViewControllerIndex = 0;
+        let rootVC = this.viewControllersStack[0];
+
+        this.contentSize = rootVC.preferredContentSize;
+
+        _MUIHideViewController(currentVC, rootVC, this, this, function () {
+            currentVC.view.removeFromSuperview();
+            this.removeChildViewController(currentVC);
+        });
+    }
+
+    public set preferredContentSize(size) {
+        this.setPreferredContentSize(size);
+    }
+
+    public get preferredContentSize(){
+        if (this.currentViewControllerIndex < 0) return this._preferredContentSize;
+        let vc = this.viewControllersStack[this.currentViewControllerIndex];
+        return vc.preferredContentSize;
+    }
+
+    // Transitioning delegate
+    private _pushAnimationController = null;
+    private _popAnimationController = null;
+
+    animationControllerForPresentedController(presentedViewController, presentingViewController, sourceController){
+        if (this._pushAnimationController == null) {
+
+            this._pushAnimationController = new MUIPushAnimationController();
+            this._pushAnimationController.init();
+        }
+
+        return this._pushAnimationController;
+    }
+
+    animationControllerForDismissedController(dismissedController)
+    {
+        if (this._popAnimationController == null) {
+
+            this._popAnimationController = new MUIPopAnimationController();
+            this._popAnimationController.init();
+        }
+
+        return this._popAnimationController;
+    }
+}
+
+/*
+    ANIMATIONS
+ */
+
+export class MUIPushAnimationController extends NSObject
+{
+    transitionDuration(transitionContext){
+        return 0.25;
+    }
+
+    animateTransition(transitionContext){
+        // make view configurations before transitions       
+    }
+
+    animationEnded(transitionCompleted){
+        // make view configurations after transitions
+    }
+
+    // TODO: Not iOS like transitions. For now we use css animations
+    animations(transitionContext){
+        let animations = MUIClassListForAnimationType(MUIAnimationType.Push);
+        return animations;
+    }
+
+}
+
+export class MUIPopAnimationController extends NSObject
+{
+    transitionDuration(transitionContext){
+        return 0.25;
+    }
+
+    animateTransition(transitionContext){
+        // make view configurations after transitions
+    }
+
+    animationEnded(transitionCompleted){
+        // make view configurations before transitions
+    }
+
+    // TODO: Not iOS like transitions. For now we use css animations
+    animations(transitionContext){
+        let animations = MUIClassListForAnimationType(MUIAnimationType.Pop);
+        return animations;
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+/**
+ * Created by godshadow on 05/08/16.
+ */
+
+export enum UISplitViewControllerDisplayMode
+{
+    Automatic,
+    PrimaryHidden,
+    AllVisible,
+    PrimaryOverlay
+}
+
+export class UISplitViewController extends UIViewController
+{
+    private masterView:UIView = null;
+    private detailView:UIView = null;
+
+    preferredDisplayMode = UISplitViewControllerDisplayMode.Automatic;
+    
+    init(){
+        super.init();
+
+        this.masterView = new UIView();
+        this.masterView.init();
+        if (MIOCoreIsPhone() == false) MUICoreLayerAddStyle(this.masterView.layer, "master-view");
+        this.view.addSubview(this.masterView);
+
+        if (MIOCoreIsPhone() == false) {
+            this.detailView = new UIView();
+            this.detailView.init();
+            MUICoreLayerAddStyle(this.detailView.layer, "detail-view");        
+            this.view.addSubview(this.detailView);
+        }
+    }
+    
+    get displayMode():UISplitViewControllerDisplayMode{
+        return UISplitViewControllerDisplayMode.Automatic;
+    }
+
+    private _displayModeButtonItem:UIButton = null;
+    get displayModeButtonItem():UIButton {
+        if (this._displayModeButtonItem != null) return this._displayModeButtonItem;
+
+        this._displayModeButtonItem = new UIButton();
+        this._displayModeButtonItem.initWithAction(this, this.displayModeButtonItemAction);        
+
+        return this._displayModeButtonItem;
+    }
+
+    private _collapsed = false;
+    get collapsed():boolean{
+        return this._collapsed;
+    }
+    private setCollapsed(value:boolean){
+        this.willChangeValue("collapsed");
+        this._collapsed = value;
+        this.didChangeValue("collapsed");
+    }
+
+    private _masterViewController = null;    
+    setMasterViewController(vc){
+        if (this._masterViewController != null){
+            this._masterViewController.view.removeFromSuperview();
+            this.removeChildViewController(this._masterViewController);
+            this._masterViewController = null;
+        }
+
+        if (vc != null){
+            vc.parent = this;
+            vc.splitViewController = this;
+
+            this.masterView.addSubview(vc.view);
+            this.addChildViewController(vc);
+            this._masterViewController = vc;
+        }
+    }
+
+    private _detailViewController = null;
+    setDetailViewController(vc){
+        if (MIOCoreIsPhone() == true) return;
+
+        if (this._detailViewController != null){
+            this._detailViewController.view.removeFromSuperview();
+            this.removeChildViewController(this._detailViewController);
+            this._detailViewController = null;
+        }
+
+        if (vc != null){
+            vc.parent = this;
+            vc.splitViewController = this;
+
+            this.detailView.addSubview(vc.view);
+            this.addChildViewController(vc);
+            this._detailViewController = vc;
+        }
+    }
+
+    showDetailViewController(vc:UIViewController){
+        vc.splitViewController = this;
+        if (MIOCoreIsPhone() == true) {
+            this._pushDetailViewController(vc);
+        }
+        else {
+            this._showDetailViewController(vc);
+        }
+    }
+
+    get masterViewController():UIViewController{
+        return this._masterViewController;
+    }
+
+    get detailViewController():UIViewController{
+        return this._detailViewController;
+    }
+
+    private _showDetailViewController(vc:UIViewController){
+        let oldVC = this._detailViewController;
+        let newVC = vc;
+
+        if (oldVC == newVC) return;
+
+        newVC.onLoadView(this, function () {
+
+            this.detailView.addSubview(newVC.view);
+            this.addChildViewController(newVC);
+            this._detailViewController = vc;
+
+            _MUIShowViewController(oldVC, newVC, this, false, this, function () {
+
+                oldVC.view.removeFromSuperview();
+                this.removeChildViewController(oldVC);
+            });
+        });
+    }
+
+    private _pushDetailViewController(vc:UIViewController){
+        let oldVC = this._masterViewController;
+
+        //if (vc.transitioningDelegate == null) vc.transitioningDelegate = this;
+
+        vc.onLoadView(this, function () {
+
+            this.view.addSubview(vc.view);
+            this.addChildViewController(vc);
+            this._detailViewController = vc;
+
+            if (vc.preferredContentSize != null)
+                this.preferredContentSize = vc.preferredContentSize;
+
+            _MUIShowViewController(oldVC, vc, this, true, this, function(){
+                this.setCollapsed(true);
+            });
+        });
+    }
+
+    private _popViewController(){
+        let fromVC = this.detailViewController;
+        let toVC = this.masterViewController;
+
+        // if (toVC.transitioningDelegate == null)
+        //     toVC.transitioningDelegate = this;
+
+        if (toVC.preferredContentSize != null)
+            this.contentSize = toVC.preferredContentSize;
+
+        _MUIHideViewController(fromVC, toVC, this, this, function () {
+            fromVC.removeChildViewController(this);
+            fromVC.view.removeFromSuperview();
+        });
+    }
+
+    private displayModeButtonItemAction(){
+        if (MIOCoreIsPhone() == true) this._popViewController();
+    }
+
+    // Transitioning delegate
+    private _pushAnimationController = null;
+    private _popAnimationController = null;
+
+    animationControllerForPresentedController(presentedViewController, presentingViewController, sourceController){
+        if (MIOCoreIsPhone() == false) return;
+
+        if (this._pushAnimationController == null) {
+            this._pushAnimationController = new MUIPushAnimationController();
+            this._pushAnimationController.init();
+        }
+
+        return this._pushAnimationController;
+    }
+
+    animationControllerForDismissedController(dismissedController:UIViewController){
+        if (MIOCoreIsPhone() == false) return;
+
+        if (this._popAnimationController == null) {
+            this._popAnimationController = new MUIPopAnimationController();
+            this._popAnimationController.init();
+        }
+
+        return this._popAnimationController;
+    }
+    
+}
+
 
 
 
@@ -2003,7 +3412,7 @@ export class UIWindow extends UIView
 
     init(){
         super.init();
-        UICoreLayerAddStyle(this.layer, "view");
+        MUICoreLayerAddStyle(this.layer, "view");
     }
 
     initWithRootViewController(vc){
@@ -2014,7 +3423,7 @@ export class UIWindow extends UIView
     }
 
     makeKey(){
-        UIWebApplication.sharedInstance().makeKeyWindow(this);
+        UIApplication.sharedInstance().makeKeyWindow(this);
     }
 
     makeKeyAndVisible(){

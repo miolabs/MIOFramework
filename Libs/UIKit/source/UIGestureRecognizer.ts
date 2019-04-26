@@ -1,4 +1,4 @@
-import { MIOObject } from "../MIOFoundation";
+import { NSObject } from "mio-foundation-web";
 import { UIView, UIEvent } from ".";
 
 export enum UIGestureRecognizerState {
@@ -11,7 +11,7 @@ export enum UIGestureRecognizerState {
     Recognized
 }
 
-export class UIGestureRecognizer extends MIOObject
+export class UIGestureRecognizer extends NSObject
 {
     delegate = null;
 

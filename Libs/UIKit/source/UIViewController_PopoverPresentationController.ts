@@ -1,9 +1,10 @@
-import { UIPresentationController, MIOModalPresentAnimationController, MIOModalDismissAnimationController } from "./UIViewController_PresentationController";
-import { MIOObject, MIORect } from "../MIOFoundation";
-import { UIView } from "./UIView";
-import { UIClassListForAnimationType, UIAnimationType } from "./MIOUI_CoreAnimation";
-import { UICoreLayerAddStyle } from ".";
-import { MIOCoreIsPhone } from "../MIOCore/platform";
+
+import { NSRect } from "mio-foundation-web";
+import { NSObject } from "mio-foundation-web";
+import { UIPresentationController } from "./UIViewController_PresentationController";
+import { MUIClassListForAnimationType, MUIAnimationType } from "./core/MUICoreAnimation";
+import { MUICoreLayerAddStyle } from ".";
+
 
 /**
  * Created by godshadow on 11/11/2016.
@@ -27,7 +28,7 @@ export class UIPopoverPresentationController extends UIPresentationController
     permittedArrowDirections = UIPopoverArrowDirection.Any;
 
     sourceView = null;
-    sourceRect = MIORect.Zero();
+    sourceRect = NSRect.Zero();
 
     delegate = null;
 
@@ -48,7 +49,7 @@ export class UIPopoverPresentationController extends UIPresentationController
         //if (MIOCoreIsPhone() == true) return;
         
         this._calculateFrame();
-        UICoreLayerAddStyle(this.presentedView.layer, "popover_window");                
+        MUICoreLayerAddStyle(this.presentedView.layer, "popover_window");                
     }
 
     dismissalTransitionDidEnd(completed){     
@@ -94,8 +95,8 @@ export class UIPopoverPresentationController extends UIPresentationController
                 x = v.layer.getBoundingClientRect().left - w - 10;
         }
 
-        view.setFrame(MIORect.rectWithValues(0, 0, w, h));
-        this.window.setFrame(MIORect.rectWithValues(x, y, w, h))
+        view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+        this.window.setFrame(NSRect.rectWithValues(x, y, w, h))
     }
 
     private _drawRoundRect(x, y, width, height, radius) {
@@ -122,7 +123,7 @@ export class UIPopoverPresentationController extends UIPresentationController
 
 }
 
-export class MIOModalPopOverTransitioningDelegate extends MIOObject
+export class MIOModalPopOverTransitioningDelegate extends NSObject
 {
     modalTransitionStyle = null;
 
@@ -162,7 +163,7 @@ export class MIOModalPopOverTransitioningDelegate extends MIOObject
     }
 }
 
-export class MIOPopOverPresentAnimationController extends MIOObject
+export class MIOPopOverPresentAnimationController extends NSObject
 {
     transitionDuration(transitionContext)
     {
@@ -181,13 +182,13 @@ export class MIOPopOverPresentAnimationController extends MIOObject
 
     // TODO: Not iOS like transitions. For now we use css animations
     animations(transitionContext){
-        let animations = UIClassListForAnimationType(UIAnimationType.FadeIn);
+        let animations = MUIClassListForAnimationType(MUIAnimationType.FadeIn);
         return animations;
     }
 
 }
 
-export class MIOPopOverDismissAnimationController extends MIOObject
+export class MIOPopOverDismissAnimationController extends NSObject
 {
     transitionDuration(transitionContext){
         return 0.25;
@@ -203,7 +204,7 @@ export class MIOPopOverDismissAnimationController extends MIOObject
 
     // TODO: Not iOS like transitions. For now we use css animations
     animations(transitionContext){
-        let animations = UIClassListForAnimationType(UIAnimationType.FadeOut);
+        let animations = MUIClassListForAnimationType(MUIAnimationType.FadeOut);
         return animations;
     }
 

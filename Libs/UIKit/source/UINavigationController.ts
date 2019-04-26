@@ -1,8 +1,7 @@
+import { NSObject } from "mio-foundation-web";
 import { UIViewController } from "./UIViewController";
-import { MIOObject } from "../MIOFoundation";
-import { _UIHideViewController, _MIUShowViewController } from "./core/MUICore";
-import { UIClassListForAnimationType, UIAnimationType } from "./MIOUI_CoreAnimation";
-import { UIView } from "./UIView";
+import { _MUIHideViewController, _MUIShowViewController } from "./core/MUICore";
+import { MUIClassListForAnimationType, MUIAnimationType } from "./core/MUICoreAnimation";
 
 /**
  * Created by godshadow on 9/4/16.
@@ -88,7 +87,7 @@ export class UINavigationController extends UIViewController
             if (vc.preferredContentSize != null)
                 this.preferredContentSize = vc.preferredContentSize;
 
-            _MIUShowViewController(lastVC, vc, this, animated);
+            _MUIShowViewController(lastVC, vc, this, animated);
         });
     }
 
@@ -109,7 +108,7 @@ export class UINavigationController extends UIViewController
         if (toVC.preferredContentSize != null)
             this.contentSize = toVC.preferredContentSize;
 
-        _UIHideViewController(fromVC, toVC, this, this, function () {
+        _MUIHideViewController(fromVC, toVC, this, this, function () {
             fromVC.removeChildViewController(this);
             fromVC.view.removeFromSuperview();
         });
@@ -131,7 +130,7 @@ export class UINavigationController extends UIViewController
 
         this.contentSize = rootVC.preferredContentSize;
 
-        _UIHideViewController(currentVC, rootVC, this, this, function () {
+        _MUIHideViewController(currentVC, rootVC, this, this, function () {
             currentVC.view.removeFromSuperview();
             this.removeChildViewController(currentVC);
         });
@@ -154,7 +153,7 @@ export class UINavigationController extends UIViewController
     animationControllerForPresentedController(presentedViewController, presentingViewController, sourceController){
         if (this._pushAnimationController == null) {
 
-            this._pushAnimationController = new UIPushAnimationController();
+            this._pushAnimationController = new MUIPushAnimationController();
             this._pushAnimationController.init();
         }
 
@@ -165,7 +164,7 @@ export class UINavigationController extends UIViewController
     {
         if (this._popAnimationController == null) {
 
-            this._popAnimationController = new UIPopAnimationController();
+            this._popAnimationController = new MUIPopAnimationController();
             this._popAnimationController.init();
         }
 
@@ -177,7 +176,7 @@ export class UINavigationController extends UIViewController
     ANIMATIONS
  */
 
-export class UIPushAnimationController extends MIOObject
+export class MUIPushAnimationController extends NSObject
 {
     transitionDuration(transitionContext){
         return 0.25;
@@ -193,13 +192,13 @@ export class UIPushAnimationController extends MIOObject
 
     // TODO: Not iOS like transitions. For now we use css animations
     animations(transitionContext){
-        let animations = UIClassListForAnimationType(UIAnimationType.Push);
+        let animations = MUIClassListForAnimationType(MUIAnimationType.Push);
         return animations;
     }
 
 }
 
-export class UIPopAnimationController extends MIOObject
+export class MUIPopAnimationController extends NSObject
 {
     transitionDuration(transitionContext){
         return 0.25;
@@ -215,7 +214,7 @@ export class UIPopAnimationController extends MIOObject
 
     // TODO: Not iOS like transitions. For now we use css animations
     animations(transitionContext){
-        let animations = UIClassListForAnimationType(UIAnimationType.Pop);
+        let animations = MUIClassListForAnimationType(MUIAnimationType.Pop);
         return animations;
     }
 

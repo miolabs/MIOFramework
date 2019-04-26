@@ -27,6 +27,11 @@ var mio_foundation_web_11 = require("mio-foundation-web");
 var mio_foundation_web_12 = require("mio-foundation-web");
 var mio_foundation_web_13 = require("mio-foundation-web");
 var mio_foundation_web_14 = require("mio-foundation-web");
+var mio_foundation_web_15 = require("mio-foundation-web");
+var mio_foundation_web_16 = require("mio-foundation-web");
+var mio_foundation_web_17 = require("mio-foundation-web");
+var mio_foundation_web_18 = require("mio-foundation-web");
+var mio_foundation_web_19 = require("mio-foundation-web");
 exports._MUICoreLayerIDCount = 0;
 function MUICoreLayerIDFromObject(object) {
     var classname = object.constructor.name.substring(3);
@@ -155,7 +160,7 @@ var MUIAnimationType;
     MUIAnimationType[MUIAnimationType["ZoomOut"] = 21] = "ZoomOut";
 })(MUIAnimationType = exports.MUIAnimationType || (exports.MUIAnimationType = {}));
 // ANIMATION TYPES
-function UIClassListForAnimationType(type) {
+function MUIClassListForAnimationType(type) {
     var array = [];
     array.push("animated");
     switch (type) {
@@ -216,7 +221,7 @@ function UIClassListForAnimationType(type) {
     }
     return array;
 }
-exports.UIClassListForAnimationType = UIClassListForAnimationType;
+exports.MUIClassListForAnimationType = MUIClassListForAnimationType;
 function _MUIAddAnimations(layer, animations) {
     var w = layer.offsetWidth;
     for (var index = 0; index < animations.length; index++)
@@ -509,6 +514,143 @@ var UIEvent = /** @class */ (function (_super) {
     return UIEvent;
 }(mio_foundation_web_1.NSObject));
 exports.UIEvent = UIEvent;
+var UIGestureRecognizerState;
+(function (UIGestureRecognizerState) {
+    UIGestureRecognizerState[UIGestureRecognizerState["Possible"] = 0] = "Possible";
+    UIGestureRecognizerState[UIGestureRecognizerState["Began"] = 1] = "Began";
+    UIGestureRecognizerState[UIGestureRecognizerState["Changed"] = 2] = "Changed";
+    UIGestureRecognizerState[UIGestureRecognizerState["Ended"] = 3] = "Ended";
+    UIGestureRecognizerState[UIGestureRecognizerState["Cancelled"] = 4] = "Cancelled";
+    UIGestureRecognizerState[UIGestureRecognizerState["Failed"] = 5] = "Failed";
+    UIGestureRecognizerState[UIGestureRecognizerState["Recognized"] = 6] = "Recognized";
+})(UIGestureRecognizerState = exports.UIGestureRecognizerState || (exports.UIGestureRecognizerState = {}));
+var UIGestureRecognizer = /** @class */ (function (_super) {
+    __extends(UIGestureRecognizer, _super);
+    function UIGestureRecognizer() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.delegate = null;
+        _this.isEnabled = true;
+        _this.name = null;
+        _this.target = null;
+        _this.block = null;
+        _this._view = null;
+        _this._state = UIGestureRecognizerState.Possible;
+        return _this;
+    }
+    Object.defineProperty(UIGestureRecognizer.prototype, "view", {
+        get: function () { return this._view; },
+        set: function (v) { this.setView(v); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(UIGestureRecognizer.prototype, "state", {
+        get: function () { return this._state; },
+        set: function (value) { this.setState(value); },
+        enumerable: true,
+        configurable: true
+    });
+    UIGestureRecognizer.prototype.initWithTarget = function (target, block) {
+        _super.prototype.init.call(this);
+        this.target = target;
+        this.block = block;
+    };
+    UIGestureRecognizer.prototype.setView = function (view) {
+        this._view = view;
+    };
+    UIGestureRecognizer.prototype.setState = function (state) {
+        if (this.isEnabled == false)
+            return;
+        if (this._state == state && state != UIGestureRecognizerState.Changed)
+            return;
+        this._state = state;
+        this.block.call(this.target, this);
+    };
+    UIGestureRecognizer.prototype.touchesBeganWithEvent = function (touches, ev) {
+        this.state = UIGestureRecognizerState.Began;
+    };
+    UIGestureRecognizer.prototype.touchesMovedWithEvent = function (touches, ev) {
+        this.state = UIGestureRecognizerState.Changed;
+    };
+    UIGestureRecognizer.prototype.touchesEndedWithEvent = function (touches, ev) {
+        this.state = UIGestureRecognizerState.Ended;
+    };
+    UIGestureRecognizer.prototype.reset = function () {
+        this.state = UIGestureRecognizerState.Possible;
+    };
+    // To call from UIView. Only for internal use
+    UIGestureRecognizer.prototype._viewTouchesBeganWithEvent = function (touches, ev) {
+        this.reset();
+        this.touchesBeganWithEvent(touches, ev);
+    };
+    UIGestureRecognizer.prototype._viewTouchesMovedWithEvent = function (touches, ev) {
+        this.touchesMovedWithEvent(touches, ev);
+    };
+    UIGestureRecognizer.prototype._viewTouchesEndedWithEvent = function (touches, ev) {
+        this.touchesEndedWithEvent(touches, ev);
+    };
+    return UIGestureRecognizer;
+}(mio_foundation_web_1.NSObject));
+exports.UIGestureRecognizer = UIGestureRecognizer;
+var UITapGestureRecognizer = /** @class */ (function (_super) {
+    __extends(UITapGestureRecognizer, _super);
+    function UITapGestureRecognizer() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.numberOfTapsRequired = 1;
+        return _this;
+    }
+    UITapGestureRecognizer.prototype.touchesBeganWithEvent = function (touches, ev) {
+        _super.prototype.touchesBeganWithEvent.call(this, touches, ev);
+        this.state = UIGestureRecognizerState.Began;
+    };
+    UITapGestureRecognizer.prototype.touchesEndedWithEvent = function (touches, ev) {
+        _super.prototype.touchesEndedWithEvent.call(this, touches, ev);
+        this.state = UIGestureRecognizerState.Ended;
+    };
+    return UITapGestureRecognizer;
+}(UIGestureRecognizer));
+exports.UITapGestureRecognizer = UITapGestureRecognizer;
+var UIPanGestureRecognizer = /** @class */ (function (_super) {
+    __extends(UIPanGestureRecognizer, _super);
+    function UIPanGestureRecognizer() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.minimumNumberOfTouches = 1;
+        _this.maximumNumberOfTouches = 0;
+        _this.initialX = null;
+        _this.initialY = null;
+        _this.touchDown = false;
+        _this.hasStarted = false;
+        _this.deltaX = 0;
+        _this.deltaY = 0;
+        return _this;
+    }
+    UIPanGestureRecognizer.prototype.touchesBeganWithEvent = function (touches, ev) {
+        this.initialX = ev.x;
+        this.initialY = ev.y;
+        this.touchDown = true;
+    };
+    UIPanGestureRecognizer.prototype.touchesEndedWithEvent = function (touches, ev) {
+        _super.prototype.touchesEndedWithEvent.call(this, touches, ev);
+        this.initialX = null;
+        this.initialY = null;
+        this.hasStarted = false;
+        this.touchDown = false;
+    };
+    UIPanGestureRecognizer.prototype.touchesMovedWithEvent = function (touches, ev) {
+        if (this.touchDown == false)
+            return;
+        if (this.hasStarted == false)
+            this.state = UIGestureRecognizerState.Began;
+        this.hasStarted = true;
+        this.deltaX = this.initialX - ev.x;
+        this.deltaY = this.initialY - ev.y;
+        this.state = UIGestureRecognizerState.Changed;
+    };
+    UIPanGestureRecognizer.prototype.translationInView = function (view) {
+        return new mio_foundation_web_3.NSPoint(this.deltaX, this.deltaY);
+    };
+    return UIPanGestureRecognizer;
+}(UIGestureRecognizer));
+exports.UIPanGestureRecognizer = UIPanGestureRecognizer;
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -547,7 +689,7 @@ var UIView = /** @class */ (function (_super) {
         _this._userInteraction = false;
         _this.isMouseDown = false;
         _this.gestureRecognizers = [];
-        _this.layerID = layerID ? layerID : UICoreLayerIDFromObject(_this);
+        _this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(_this);
         return _this;
     }
     Object.defineProperty(UIView.prototype, "parent", {
@@ -564,7 +706,7 @@ var UIView = /** @class */ (function (_super) {
         configurable: true
     });
     UIView.prototype.init = function () {
-        this.layer = UICoreLayerCreate(this.layerID);
+        this.layer = MUICoreLayerCreate(this.layerID);
         //UICoreLayerAddStyle(this.layer, "view");
         //UICoreLayerAddStyle(this.layer, "view");
         //this.layer.style.position = "absolute";
@@ -575,7 +717,7 @@ var UIView = /** @class */ (function (_super) {
         //this.layer.style.background = "rgb(255, 255, 255)";                
     };
     UIView.prototype.initWithFrame = function (frame) {
-        this.layer = UICoreLayerCreate(this.layerID);
+        this.layer = MUICoreLayerCreate(this.layerID);
         this.layer.style.position = "absolute";
         this.setX(frame.origin.x);
         this.setY(frame.origin.y);
@@ -600,7 +742,7 @@ var UIView = /** @class */ (function (_super) {
                 var className = subLayer.getAttribute("data-class");
                 if (className == null || className.length == 0)
                     className = "UIView";
-                var sv = MIOClassFromString(className);
+                var sv = mio_foundation_web_5.NSClassFromString(className);
                 sv.initWithLayer(subLayer, this);
                 this._linkViewToSubview(sv);
             }
@@ -609,10 +751,9 @@ var UIView = /** @class */ (function (_super) {
     UIView.prototype.copy = function () {
         var objLayer = this.layer.cloneNode(true);
         var className = this.getClassName();
-        MIOLog("UIView:copy:Copying class name " + className);
         if (className == null)
             throw Error("UIView:copy: Error classname is null");
-        var view = MIOClassFromString(className);
+        var view = mio_foundation_web_5.NSClassFromString(className);
         view.initWithLayer(objLayer, null);
         return view;
     };
@@ -705,7 +846,7 @@ var UIView = /** @class */ (function (_super) {
     };
     UIView.prototype.viewWithTag = function (tag) {
         // TODO: Use also the view tag component
-        var view = MIOViewSearchViewTag(this, tag);
+        var view = MUICoreViewSearchViewTag(this, tag);
         return view;
     };
     UIView.prototype.layoutSubviews = function () {
@@ -734,7 +875,7 @@ var UIView = /** @class */ (function (_super) {
         }
     };
     UIView.prototype.layerWithItemID = function (itemID) {
-        return UILayerSearchElementByID(this.layer, itemID);
+        return MUICoreLayerSearchElementByID(this.layer, itemID);
     };
     UIView.prototype.setHidden = function (hidden) {
         this._hidden = hidden;
@@ -874,14 +1015,14 @@ var UIView = /** @class */ (function (_super) {
     };
     Object.defineProperty(UIView.prototype, "frame", {
         get: function () {
-            return MIORect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            return mio_foundation_web_4.NSRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(UIView.prototype, "bounds", {
         get: function () {
-            return MIORect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
+            return mio_foundation_web_4.NSRect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
         },
         enumerable: true,
         configurable: true
@@ -1049,6 +1190,198 @@ var UIView = /** @class */ (function (_super) {
 }(mio_foundation_web_1.NSObject));
 exports.UIView = UIView;
 /**
+ * Created by godshadow on 12/3/16.
+ */
+var UIControl = /** @class */ (function (_super) {
+    __extends(UIControl, _super);
+    function UIControl() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        // TODO: Make delegation of the methods above
+        _this.mouseOverTarget = null;
+        _this.mouseOverAction = null;
+        _this.mouseOutTarget = null;
+        _this.mouseOutAction = null;
+        _this._enabled = true;
+        return _this;
+    }
+    Object.defineProperty(UIControl.prototype, "enabled", {
+        get: function () { return this._enabled; },
+        set: function (value) { this.setEnabled(value); },
+        enumerable: true,
+        configurable: true
+    });
+    UIControl.prototype.setEnabled = function (enabled) {
+        this._enabled = enabled;
+        if (enabled == true)
+            this.layer.style.opacity = "1.0";
+        else
+            this.layer.style.opacity = "0.10";
+    };
+    UIControl.prototype.setOnMouseOverAction = function (target, action) {
+        this.mouseOverTarget = target;
+        this.mouseOverAction = action;
+        var instance = this;
+        this.layer.onmouseover = function () {
+            if (instance.enabled)
+                instance.mouseOverAction.call(target);
+        };
+    };
+    UIControl.prototype.setOnMouseOutAction = function (target, action) {
+        this.mouseOutTarget = target;
+        this.mouseOutAction = action;
+        var instance = this;
+        this.layer.onmouseout = function () {
+            if (instance.enabled)
+                instance.mouseOutAction.call(target);
+        };
+    };
+    return UIControl;
+}(UIView));
+exports.UIControl = UIControl;
+/**
+ * Created by godshadow on 12/3/16.
+ */
+var UIButtonType;
+(function (UIButtonType) {
+    UIButtonType[UIButtonType["MomentaryPushIn"] = 0] = "MomentaryPushIn";
+    UIButtonType[UIButtonType["PushOnPushOff"] = 1] = "PushOnPushOff";
+    UIButtonType[UIButtonType["PushIn"] = 2] = "PushIn";
+})(UIButtonType = exports.UIButtonType || (exports.UIButtonType = {}));
+var UIButton = /** @class */ (function (_super) {
+    __extends(UIButton, _super);
+    function UIButton() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._statusStyle = null;
+        _this._titleStatusStyle = null;
+        _this._titleLayer = null;
+        _this._imageStatusStyle = null;
+        _this._imageLayer = null;
+        _this.target = null;
+        _this.action = null;
+        _this._selected = false;
+        _this.type = UIButtonType.MomentaryPushIn;
+        return _this;
+    }
+    UIButton.prototype.init = function () {
+        _super.prototype.init.call(this);
+        MUICoreLayerAddStyle(this.layer, "btn");
+        this.setupLayers();
+    };
+    UIButton.prototype.initWithLayer = function (layer, owner, options) {
+        _super.prototype.initWithLayer.call(this, layer, owner, options);
+        var type = this.layer.getAttribute("data-type");
+        if (type == "MomentaryPushIn")
+            this.type = UIButtonType.MomentaryPushIn;
+        else if (type == "PushOnPushOff")
+            this.type = UIButtonType.PushOnPushOff;
+        else if (type == "PushIn")
+            this.type = UIButtonType.PushIn;
+        // Check for title layer
+        this._titleLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "SPAN");
+        // Check for img layer
+        this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "IMG");
+        if (this._imageLayer == null)
+            this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "DIV");
+        // Check for status
+        var status = this.layer.getAttribute("data-status");
+        if (status == "selected")
+            this.setSelected(true);
+        this.setupLayers();
+    };
+    UIButton.prototype.setupLayers = function () {
+        //UICoreLayerRemoveStyle(this.layer, "view");
+        //UICoreLayerAddStyle(this.layer, "btn");
+        if (this._titleLayer == null) {
+            this._titleLayer = document.createElement("span");
+            this.layer.appendChild(this._titleLayer);
+        }
+        var key = this.layer.getAttribute("data-title");
+        if (key != null)
+            this.setTitle(mio_foundation_web_6.NSLocalizeString(key, key));
+        // Prevent click
+        this.layer.addEventListener("click", function (e) {
+            e.stopPropagation();
+        });
+        this.layer.addEventListener("mousedown", function (e) {
+            e.stopPropagation();
+            if (this.enabled == false)
+                return;
+            switch (this.type) {
+                case UIButtonType.MomentaryPushIn:
+                case UIButtonType.PushIn:
+                    this.setSelected(true);
+                    break;
+                case UIButtonType.PushOnPushOff:
+                    this.setSelected(!this.selected);
+                    break;
+            }
+        }.bind(this));
+        this.layer.addEventListener("mouseup", function (e) {
+            e.stopPropagation();
+            if (this.enabled == false)
+                return;
+            if (this.type == UIButtonType.MomentaryPushIn)
+                this.setSelected(false);
+            if (this.action != null && this.target != null)
+                this.action.call(this.target, this);
+        }.bind(this));
+    };
+    UIButton.prototype.initWithAction = function (target, action) {
+        this.init();
+        this.setAction(target, action);
+    };
+    UIButton.prototype.setAction = function (target, action) {
+        this.target = target;
+        this.action = action;
+    };
+    UIButton.prototype.setTitle = function (title) {
+        this._titleLayer.innerHTML = title;
+    };
+    Object.defineProperty(UIButton.prototype, "title", {
+        get: function () {
+            return this._titleLayer.innerHTML;
+        },
+        set: function (title) {
+            this.setTitle(title);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(UIButton.prototype, "selected", {
+        get: function () {
+            return this._selected;
+        },
+        set: function (value) {
+            this.setSelected(value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    UIButton.prototype.setSelected = function (value) {
+        if (this._selected == value)
+            return;
+        if (value == true) {
+            MUICoreLayerAddStyle(this.layer, "selected");
+            //UICoreLayerRemoveStyle(this.layer, "deselected");
+        }
+        else {
+            //UICoreLayerAddStyle(this.layer, "deselected");
+            MUICoreLayerRemoveStyle(this.layer, "selected");
+        }
+        this._selected = value;
+    };
+    UIButton.prototype.setImageURL = function (urlString) {
+        if (urlString != null) {
+            this._imageLayer.setAttribute("src", urlString);
+        }
+        else {
+            this._imageLayer.removeAttribute("src");
+        }
+    };
+    return UIButton;
+}(UIControl));
+exports.UIButton = UIButton;
+/**
  * Created by godshadow on 11/3/16.
  */
 var UIViewController = /** @class */ (function (_super) {
@@ -1072,10 +1405,10 @@ var UIViewController = /** @class */ (function (_super) {
         _this.navigationItem = null;
         _this.splitViewController = null;
         _this.tabBarController = null;
-        _this.modalPresentationStyle = mio_foundation_web_3.MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
+        _this.modalPresentationStyle = mio_foundation_web_8.MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
         _this.modalTransitionStyle = UIModalTransitionStyle.CoverVertical;
         _this.transitioningDelegate = null;
-        _this._contentSize = new mio_foundation_web_3.NSSize(320, 200);
+        _this._contentSize = new mio_foundation_web_7.NSSize(320, 200);
         _this._preferredContentSize = null;
         _this._outlets = {};
         // removeFromParentViewController()
@@ -1087,7 +1420,7 @@ var UIViewController = /** @class */ (function (_super) {
         // }
         _this._presentationController = null;
         _this._popoverPresentationController = null;
-        _this.layerID = layerID ? layerID : UICoreLayerIDFromObject(_this);
+        _this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(_this);
         return _this;
     }
     UIViewController.prototype.init = function () {
@@ -1101,7 +1434,7 @@ var UIViewController = /** @class */ (function (_super) {
         this.view = new UIView(this.layerID);
         this.view.initWithLayer(layer, owner, options);
         // Search for navigation item
-        this.navigationItem = UINavItemSearchInLayer(layer);
+        //this.navigationItem = UINavItemSearchInLayer(layer);
         this.loadView();
     };
     UIViewController.prototype.initWithResource = function (path) {
@@ -1120,13 +1453,13 @@ var UIViewController = /** @class */ (function (_super) {
                 continue;
             var key = layer.getAttribute("data-localize-key");
             if (key != null)
-                layer.innerHTML = mio_foundation_web_3.NSLocalizeString(key, key);
+                layer.innerHTML = mio_foundation_web_6.NSLocalizeString(key, key);
             this.localizeSubLayers(layer.childNodes);
         }
     };
     UIViewController.prototype.localizeLayerIDWithKey = function (layerID, key) {
-        var layer = UILayerSearchElementByID(this.view.layer, layerID);
-        layer.innerHTML = mio_foundation_web_3.NSLocalizeString(key, key);
+        var layer = MUICoreLayerSearchElementByID(this.view.layer, layerID);
+        layer.innerHTML = mio_foundation_web_6.NSLocalizeString(key, key);
     };
     UIViewController.prototype.loadView = function () {
         if (this.view != null) {
@@ -1136,11 +1469,11 @@ var UIViewController = /** @class */ (function (_super) {
         this.view = new UIView(this.layerID);
         if (this._htmlResourcePath == null) {
             this.view.init();
-            UICoreLayerAddStyle(this.view.layer, "page");
+            MUICoreLayerAddStyle(this.view.layer, "page");
             this._didLoadView();
             return;
         }
-        var mainBundle = mio_foundation_web_4.NSBundle.mainBundle();
+        var mainBundle = mio_foundation_web_9.NSBundle.mainBundle();
         mainBundle.loadNibNamed(this._htmlResourcePath, this, null);
         // mainBundle.loadHTMLNamed(this._htmlResourcePath, this.layerID, this, function (layer) {            
         //     let domParser = new DOMParser();
@@ -1159,15 +1492,15 @@ var UIViewController = /** @class */ (function (_super) {
         var domParser = new DOMParser();
         var items = domParser.parseFromString(layerData, "text/html");
         var layer = items.getElementById("kk");
-        this.navigationItem = UINavItemSearchInLayer(layer);
+        //this.navigationItem = UINavItemSearchInLayer(layer);
         this.view.initWithLayer(layer, this);
         this.view.awakeFromHTML();
         this._didLoadView();
     };
     UIViewController.prototype._didLoadView = function () {
         this._layerIsReady = true;
-        if (mio_foundation_web_3.MIOCoreIsPhone() == true)
-            UICoreLayerAddStyle(this.view.layer, "phone");
+        if (mio_foundation_web_8.MIOCoreIsPhone() == true)
+            MUICoreLayerAddStyle(this.view.layer, "phone");
         if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null) {
             this._onLoadLayerAction.call(this._onLoadLayerTarget);
             this._onLoadLayerTarget = null;
@@ -1290,7 +1623,7 @@ var UIViewController = /** @class */ (function (_super) {
         vc.onLoadView(this, function () {
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);
-            _MIUShowViewController(this, vc, this, animated);
+            _MUIShowViewController(this, vc, this, animated);
         });
     };
     UIViewController.prototype.presentViewController = function (vc, animated) {
@@ -1321,7 +1654,7 @@ var UIViewController = /** @class */ (function (_super) {
             if (vc.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
                 this.view.addSubview(vc.presentationController.presentedView);
                 this.addChildViewController(vc);
-                _MIUShowViewController(this, vc, null, animated, this, function () {
+                _MUIShowViewController(this, vc, null, animated, this, function () {
                 });
             }
             else {
@@ -1336,7 +1669,7 @@ var UIViewController = /** @class */ (function (_super) {
                     pc.window = w_1;
                 }
                 w_1.setHidden(false);
-                _MIUShowViewController(this, vc, null, animated, this, function () {
+                _MUIShowViewController(this, vc, null, animated, this, function () {
                     w_1.makeKey();
                 });
             }
@@ -1352,7 +1685,7 @@ var UIViewController = /** @class */ (function (_super) {
         var toVC = pc.presentingViewController;
         var fromVC = pc.presentedViewController;
         var fromView = pc.presentedView;
-        _UIHideViewController(fromVC, toVC, null, this, function () {
+        _MUIHideViewController(fromVC, toVC, null, this, function () {
             if (fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
                 toVC.removeChildViewController(fromVC);
                 var pc1 = fromVC.presentationController;
@@ -1434,6 +1767,897 @@ var UIViewController = /** @class */ (function (_super) {
     return UIViewController;
 }(mio_foundation_web_1.NSObject));
 exports.UIViewController = UIViewController;
+/**
+ * Created by godshadow on 06/12/2016.
+ */
+var UIModalPresentationStyle;
+(function (UIModalPresentationStyle) {
+    UIModalPresentationStyle[UIModalPresentationStyle["FullScreen"] = 0] = "FullScreen";
+    UIModalPresentationStyle[UIModalPresentationStyle["PageSheet"] = 1] = "PageSheet";
+    UIModalPresentationStyle[UIModalPresentationStyle["FormSheet"] = 2] = "FormSheet";
+    UIModalPresentationStyle[UIModalPresentationStyle["CurrentContext"] = 3] = "CurrentContext";
+    UIModalPresentationStyle[UIModalPresentationStyle["Custom"] = 4] = "Custom";
+    UIModalPresentationStyle[UIModalPresentationStyle["OverFullScreen"] = 5] = "OverFullScreen";
+    UIModalPresentationStyle[UIModalPresentationStyle["OverCurrentContext"] = 6] = "OverCurrentContext";
+    UIModalPresentationStyle[UIModalPresentationStyle["Popover"] = 7] = "Popover";
+    UIModalPresentationStyle[UIModalPresentationStyle["None"] = 8] = "None";
+})(UIModalPresentationStyle = exports.UIModalPresentationStyle || (exports.UIModalPresentationStyle = {}));
+var UIModalTransitionStyle;
+(function (UIModalTransitionStyle) {
+    UIModalTransitionStyle[UIModalTransitionStyle["CoverVertical"] = 0] = "CoverVertical";
+    UIModalTransitionStyle[UIModalTransitionStyle["FlipHorizontal"] = 1] = "FlipHorizontal";
+    UIModalTransitionStyle[UIModalTransitionStyle["CrossDisolve"] = 2] = "CrossDisolve";
+})(UIModalTransitionStyle = exports.UIModalTransitionStyle || (exports.UIModalTransitionStyle = {}));
+var UIPresentationController = /** @class */ (function (_super) {
+    __extends(UIPresentationController, _super);
+    function UIPresentationController() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.presentationStyle = UIModalPresentationStyle.PageSheet;
+        _this.shouldPresentInFullscreen = false;
+        _this._presentedViewController = null; //ToVC
+        _this.presentingViewController = null; //FromVC
+        _this.presentedView = null;
+        _this._transitioningDelegate = null;
+        _this._window = null;
+        _this._isPresented = false;
+        return _this;
+    }
+    UIPresentationController.prototype.initWithPresentedViewControllerAndPresentingViewController = function (presentedViewController, presentingViewController) {
+        _super.prototype.init.call(this);
+        this.presentedViewController = presentedViewController;
+        this.presentingViewController = presentingViewController;
+    };
+    UIPresentationController.prototype.setPresentedViewController = function (vc) {
+        this._presentedViewController = vc;
+        this.presentedView = vc.view;
+    };
+    Object.defineProperty(UIPresentationController.prototype, "presentedViewController", {
+        get: function () {
+            return this._presentedViewController;
+        },
+        set: function (vc) {
+            this.setPresentedViewController(vc);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(UIPresentationController.prototype, "transitioningDelegate", {
+        get: function () {
+            if (this._transitioningDelegate == null) {
+                this._transitioningDelegate = new MUIModalTransitioningDelegate();
+                this._transitioningDelegate.init();
+            }
+            return this._transitioningDelegate;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    UIPresentationController.prototype.presentationTransitionWillBegin = function () {
+        var toVC = this.presentedViewController;
+        var view = this.presentedView;
+        this._calculateFrame();
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
+            || mio_foundation_web_8.MIOCoreIsPhone() == true) {
+            MUICoreLayerAddStyle(view.layer, "modal_window");
+        }
+    };
+    UIPresentationController.prototype.presentationTransitionDidEnd = function (completed) {
+    };
+    UIPresentationController.prototype.dismissalTransitionWillBegin = function () {
+    };
+    UIPresentationController.prototype.dismissalTransitionDidEnd = function (completed) {
+    };
+    UIPresentationController.prototype._calculateFrame = function () {
+        var fromVC = this.presentingViewController;
+        var toVC = this.presentedViewController;
+        var view = this.presentedView;
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen) {
+            view.layer.style.left = "0px";
+            view.layer.style.top = "0px";
+            view.layer.style.width = "100%";
+            view.layer.style.height = "100%";
+        }
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+            var w = fromVC.view.getWidth();
+            var h = fromVC.view.getHeight();
+            view.setFrame(mio_foundation_web_4.NSRect.rectWithValues(0, 0, w, h));
+        }
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet) {
+            // Present like desktop sheet window
+            var ws = MUIWindowSize();
+            var size = toVC.preferredContentSize;
+            if (size == null)
+                size = new mio_foundation_web_7.NSSize(320, 200);
+            var w = size.width;
+            var h = size.height;
+            var x = (ws.width - w) / 2;
+            view.setFrame(mio_foundation_web_4.NSRect.rectWithValues(0, 0, w, h));
+            this.window.setFrame(mio_foundation_web_4.NSRect.rectWithValues(x, 0, w, h));
+            view.layer.classList.add("modal");
+        }
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet) {
+            // Present at the center of the screen
+            var ws = MUIWindowSize();
+            var size = toVC.preferredContentSize;
+            if (size == null)
+                size = new mio_foundation_web_7.NSSize(320, 200);
+            var w = size.width;
+            var h = size.height;
+            var x = (ws.width - w) / 2;
+            var y = (ws.height - h) / 2;
+            view.setFrame(mio_foundation_web_4.NSRect.rectWithValues(0, 0, w, h));
+            this.window.setFrame(mio_foundation_web_4.NSRect.rectWithValues(x, y, w, h));
+            view.layer.classList.add("modal");
+        }
+        else {
+            var size = toVC.preferredContentSize;
+            if (size == null)
+                size = new mio_foundation_web_7.NSSize(320, 200);
+            var w = size.width;
+            var h = size.height;
+            view.setFrame(mio_foundation_web_4.NSRect.rectWithValues(0, 0, w, h));
+        }
+    };
+    Object.defineProperty(UIPresentationController.prototype, "window", {
+        get: function () {
+            return this._window;
+        },
+        set: function (window) {
+            var vc = this.presentedViewController;
+            this._window = window;
+            // Track view frame changes
+            if (mio_foundation_web_10.MIOCoreIsMobile() == false && vc.modalPresentationStyle != UIModalPresentationStyle.CurrentContext) {
+                vc.addObserver(this, "preferredContentSize");
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    UIPresentationController.prototype.observeValueForKeyPath = function (key, type, object) {
+        if (key == "preferredContentSize" && type == "did") {
+            var vc = this.presentedView;
+            //this.window.layer.style.transition = "left 0.25s, width 0.25s, height 0.25s";
+            vc.layer.style.transition = "left 0.25s, width 0.25s, height 0.25s";
+            this._calculateFrame();
+        }
+    };
+    return UIPresentationController;
+}(mio_foundation_web_1.NSObject));
+exports.UIPresentationController = UIPresentationController;
+var MUIModalTransitioningDelegate = /** @class */ (function (_super) {
+    __extends(MUIModalTransitioningDelegate, _super);
+    function MUIModalTransitioningDelegate() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.modalTransitionStyle = null;
+        _this._presentAnimationController = null;
+        _this._dissmissAnimationController = null;
+        return _this;
+    }
+    MUIModalTransitioningDelegate.prototype.animationControllerForPresentedController = function (presentedViewController, presentingViewController, sourceController) {
+        if (this._presentAnimationController == null) {
+            this._presentAnimationController = new UIModalPresentAnimationController();
+            this._presentAnimationController.init();
+        }
+        return this._presentAnimationController;
+    };
+    MUIModalTransitioningDelegate.prototype.animationControllerForDismissedController = function (dismissedController) {
+        if (this._dissmissAnimationController == null) {
+            this._dissmissAnimationController = new UIModalDismissAnimationController();
+            this._dissmissAnimationController.init();
+        }
+        return this._dissmissAnimationController;
+    };
+    return MUIModalTransitioningDelegate;
+}(mio_foundation_web_1.NSObject));
+exports.MUIModalTransitioningDelegate = MUIModalTransitioningDelegate;
+var MUIAnimationController = /** @class */ (function (_super) {
+    __extends(MUIAnimationController, _super);
+    function MUIAnimationController() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    MUIAnimationController.prototype.transitionDuration = function (transitionContext) {
+        return 0;
+    };
+    MUIAnimationController.prototype.animateTransition = function (transitionContext) {
+        // make view configurations before transitions        
+    };
+    MUIAnimationController.prototype.animationEnded = function (transitionCompleted) {
+        // make view configurations after transitions
+    };
+    // TODO: Not iOS like transitions. For now we use css animations
+    MUIAnimationController.prototype.animations = function (transitionContext) {
+        return null;
+    };
+    return MUIAnimationController;
+}(mio_foundation_web_1.NSObject));
+exports.MUIAnimationController = MUIAnimationController;
+var UIModalPresentAnimationController = /** @class */ (function (_super) {
+    __extends(UIModalPresentAnimationController, _super);
+    function UIModalPresentAnimationController() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    UIModalPresentAnimationController.prototype.transitionDuration = function (transitionContext) {
+        return 0.15;
+    };
+    UIModalPresentAnimationController.prototype.animateTransition = function (transitionContext) {
+        // make view configurations before transitions
+    };
+    UIModalPresentAnimationController.prototype.animationEnded = function (transitionCompleted) {
+        // make view configurations after transitions
+    };
+    // TODO: Not iOS like transitions. For now we use css animations
+    UIModalPresentAnimationController.prototype.animations = function (transitionContext) {
+        var animations = null;
+        var toVC = transitionContext.presentedViewController;
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen) {
+            if (mio_foundation_web_8.MIOCoreIsPhone() == true)
+                animations = MUIClassListForAnimationType(MUIAnimationType.SlideInUp);
+            else
+                animations = MUIClassListForAnimationType(MUIAnimationType.BeginSheet);
+        }
+        return animations;
+    };
+    return UIModalPresentAnimationController;
+}(mio_foundation_web_1.NSObject));
+exports.UIModalPresentAnimationController = UIModalPresentAnimationController;
+var UIModalDismissAnimationController = /** @class */ (function (_super) {
+    __extends(UIModalDismissAnimationController, _super);
+    function UIModalDismissAnimationController() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    UIModalDismissAnimationController.prototype.transitionDuration = function (transitionContext) {
+        return 0.25;
+    };
+    UIModalDismissAnimationController.prototype.animateTransition = function (transitionContext) {
+        // make view configurations after transitions
+    };
+    UIModalDismissAnimationController.prototype.animationEnded = function (transitionCompleted) {
+        // make view configurations before transitions
+    };
+    // TODO: Not iOS like transitions. For now we use css animations
+    UIModalDismissAnimationController.prototype.animations = function (transitionContext) {
+        var animations = null;
+        var fromVC = transitionContext.presentingViewController;
+        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet
+            || fromVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
+            || fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen) {
+            if (mio_foundation_web_8.MIOCoreIsPhone() == true)
+                animations = MUIClassListForAnimationType(MUIAnimationType.SlideOutDown);
+            else
+                animations = MUIClassListForAnimationType(MUIAnimationType.EndSheet);
+        }
+        return animations;
+    };
+    return UIModalDismissAnimationController;
+}(mio_foundation_web_1.NSObject));
+exports.UIModalDismissAnimationController = UIModalDismissAnimationController;
+/**
+ * Created by godshadow on 11/11/2016.
+ */
+var UIPopoverArrowDirection;
+(function (UIPopoverArrowDirection) {
+    UIPopoverArrowDirection[UIPopoverArrowDirection["Any"] = 0] = "Any";
+    UIPopoverArrowDirection[UIPopoverArrowDirection["Up"] = 1] = "Up";
+    UIPopoverArrowDirection[UIPopoverArrowDirection["Down"] = 2] = "Down";
+    UIPopoverArrowDirection[UIPopoverArrowDirection["Left"] = 3] = "Left";
+    UIPopoverArrowDirection[UIPopoverArrowDirection["Right"] = 4] = "Right";
+})(UIPopoverArrowDirection = exports.UIPopoverArrowDirection || (exports.UIPopoverArrowDirection = {}));
+var UIPopoverPresentationController = /** @class */ (function (_super) {
+    __extends(UIPopoverPresentationController, _super);
+    function UIPopoverPresentationController() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.permittedArrowDirections = UIPopoverArrowDirection.Any;
+        _this.sourceView = null;
+        _this.sourceRect = mio_foundation_web_4.NSRect.Zero();
+        _this.delegate = null;
+        _this._contentSize = null;
+        _this._canvasLayer = null;
+        _this._contentView = null;
+        return _this;
+    }
+    Object.defineProperty(UIPopoverPresentationController.prototype, "transitioningDelegate", {
+        get: function () {
+            if (this._transitioningDelegate == null) {
+                this._transitioningDelegate = new MIOModalPopOverTransitioningDelegate();
+                this._transitioningDelegate.init();
+            }
+            return this._transitioningDelegate;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    UIPopoverPresentationController.prototype.presentationTransitionWillBegin = function () {
+        //if (MIOCoreIsPhone() == true) return;
+        this._calculateFrame();
+        MUICoreLayerAddStyle(this.presentedView.layer, "popover_window");
+    };
+    UIPopoverPresentationController.prototype.dismissalTransitionDidEnd = function (completed) {
+        if (completed == false)
+            return;
+        if (this.delegate != null && (typeof this.delegate.popoverPresentationControllerDidDismissPopover === "function")) {
+            this.delegate.popoverPresentationControllerDidDismissPopover(this);
+        }
+    };
+    UIPopoverPresentationController.prototype._calculateFrame = function () {
+        var vc = this.presentedViewController;
+        var view = this.presentedView;
+        var w = vc.preferredContentSize.width;
+        var h = vc.preferredContentSize.height;
+        var v = vc.popoverPresentationController.sourceView;
+        var f = vc.popoverPresentationController.sourceRect;
+        var xShift = false;
+        // Below
+        var y = v.layer.getBoundingClientRect().top + f.size.height + 10;
+        if ((y + h) > window.innerHeight) // Below no, Up?
+            y = v.layer.getBoundingClientRect().top - h - 10;
+        if (y < 0) // Up no, horizonal shift
+         {
+            xShift = true;
+            y = (window.innerHeight - h) / 2;
+        }
+        var x = 0;
+        if (xShift == false) {
+            x = v.layer.getBoundingClientRect().left + 10;
+            if ((x + w) > window.innerWidth)
+                x = v.layer.getBoundingClientRect().left + f.size.width - w + 10;
+        }
+        else {
+            x = v.layer.getBoundingClientRect().left + f.size.width + 10;
+            if ((x + w) > window.innerWidth)
+                x = v.layer.getBoundingClientRect().left - w - 10;
+        }
+        view.setFrame(mio_foundation_web_4.NSRect.rectWithValues(0, 0, w, h));
+        this.window.setFrame(mio_foundation_web_4.NSRect.rectWithValues(x, y, w, h));
+    };
+    UIPopoverPresentationController.prototype._drawRoundRect = function (x, y, width, height, radius) {
+        var ctx = this._canvasLayer.getContext('2d');
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        var color = 'rgba(208, 208, 219, 1)';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    };
+    return UIPopoverPresentationController;
+}(UIPresentationController));
+exports.UIPopoverPresentationController = UIPopoverPresentationController;
+var MIOModalPopOverTransitioningDelegate = /** @class */ (function (_super) {
+    __extends(MIOModalPopOverTransitioningDelegate, _super);
+    function MIOModalPopOverTransitioningDelegate() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.modalTransitionStyle = null;
+        _this._showAnimationController = null;
+        _this._dissmissAnimationController = null;
+        return _this;
+    }
+    MIOModalPopOverTransitioningDelegate.prototype.animationControllerForPresentedController = function (presentedViewController, presentingViewController, sourceController) {
+        if (this._showAnimationController == null) {
+            // if (MIOCoreIsPhone() == false) {
+            this._showAnimationController = new MIOPopOverPresentAnimationController();
+            this._showAnimationController.init();
+            // }
+            // else {
+            //     this._showAnimationController = new MIOModalPresentAnimationController();
+            //     this._showAnimationController.init();
+            // }
+        }
+        return this._showAnimationController;
+    };
+    MIOModalPopOverTransitioningDelegate.prototype.animationControllerForDismissedController = function (dismissedController) {
+        if (this._dissmissAnimationController == null) {
+            //            if (MIOCoreIsPhone() == false) {
+            this._dissmissAnimationController = new MIOPopOverDismissAnimationController();
+            this._dissmissAnimationController.init();
+            // }
+            // else {
+            //     this._dissmissAnimationController = new MIOModalDismissAnimationController();
+            //     this._dissmissAnimationController.init();    
+            // }
+        }
+        return this._dissmissAnimationController;
+    };
+    return MIOModalPopOverTransitioningDelegate;
+}(mio_foundation_web_1.NSObject));
+exports.MIOModalPopOverTransitioningDelegate = MIOModalPopOverTransitioningDelegate;
+var MIOPopOverPresentAnimationController = /** @class */ (function (_super) {
+    __extends(MIOPopOverPresentAnimationController, _super);
+    function MIOPopOverPresentAnimationController() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    MIOPopOverPresentAnimationController.prototype.transitionDuration = function (transitionContext) {
+        return 0.25;
+    };
+    MIOPopOverPresentAnimationController.prototype.animateTransition = function (transitionContext) {
+        // make view configurations before transitions
+    };
+    MIOPopOverPresentAnimationController.prototype.animationEnded = function (transitionCompleted) {
+        // make view configurations after transitions
+    };
+    // TODO: Not iOS like transitions. For now we use css animations
+    MIOPopOverPresentAnimationController.prototype.animations = function (transitionContext) {
+        var animations = MUIClassListForAnimationType(MUIAnimationType.FadeIn);
+        return animations;
+    };
+    return MIOPopOverPresentAnimationController;
+}(mio_foundation_web_1.NSObject));
+exports.MIOPopOverPresentAnimationController = MIOPopOverPresentAnimationController;
+var MIOPopOverDismissAnimationController = /** @class */ (function (_super) {
+    __extends(MIOPopOverDismissAnimationController, _super);
+    function MIOPopOverDismissAnimationController() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    MIOPopOverDismissAnimationController.prototype.transitionDuration = function (transitionContext) {
+        return 0.25;
+    };
+    MIOPopOverDismissAnimationController.prototype.animateTransition = function (transitionContext) {
+        // make view configurations after transitions
+    };
+    MIOPopOverDismissAnimationController.prototype.animationEnded = function (transitionCompleted) {
+        // make view configurations before transitions
+    };
+    // TODO: Not iOS like transitions. For now we use css animations
+    MIOPopOverDismissAnimationController.prototype.animations = function (transitionContext) {
+        var animations = MUIClassListForAnimationType(MUIAnimationType.FadeOut);
+        return animations;
+    };
+    return MIOPopOverDismissAnimationController;
+}(mio_foundation_web_1.NSObject));
+exports.MIOPopOverDismissAnimationController = MIOPopOverDismissAnimationController;
+var UINavigationItem = /** @class */ (function (_super) {
+    __extends(UINavigationItem, _super);
+    function UINavigationItem() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.backBarButtonItem = null;
+        _this.titleView = null;
+        _this.title = null;
+        _this.leftView = null;
+        _this.rightView = null;
+        return _this;
+    }
+    UINavigationItem.prototype.initWithLayer = function (layer) {
+        if (layer.childNodes.length > 0) {
+            for (var index = 0; index < layer.childNodes.length; index++) {
+                var subLayer = layer.childNodes[index];
+                if (subLayer.tagName != "DIV")
+                    continue;
+                if (subLayer.getAttribute("data-nav-item-left") != null) {
+                    var v = new UIView();
+                    v.initWithLayer(subLayer, this);
+                    this.leftView = v;
+                }
+                else if (subLayer.getAttribute("data-nav-item-center") != null) {
+                    var v = new UIView();
+                    v.initWithLayer(subLayer, this);
+                    this.titleView = v;
+                }
+                else if (subLayer.getAttribute("data-nav-item-right") != null) {
+                    var v = new UIView();
+                    v.initWithLayer(subLayer, this);
+                    this.rightView = v;
+                }
+            }
+            var backButtonLayer = MUICoreLayerSearchElementByAttribute(layer, "data-nav-item-back");
+            if (backButtonLayer != null) {
+                this.backBarButtonItem = new UIButton();
+                this.backBarButtonItem.initWithLayer(backButtonLayer, this);
+            }
+        }
+    };
+    return UINavigationItem;
+}(mio_foundation_web_1.NSObject));
+exports.UINavigationItem = UINavigationItem;
+function UINavItemSearchInLayer(layer) {
+    if (layer.childNodes.length > 0) {
+        for (var index = 0; index < layer.childNodes.length; index++) {
+            var subLayer = layer.childNodes[index];
+            if (subLayer.tagName != "DIV")
+                continue;
+            if (subLayer.getAttribute("data-nav-item") != null) {
+                var ni = new UINavigationItem();
+                ni.initWithLayer(subLayer);
+                // Check for tittle if center view doesn't exists
+                if (ni.titleView == null) {
+                    var title = subLayer.getAttribute("data-nav-item-title");
+                    if (title != null)
+                        ni.title = title;
+                }
+                return ni;
+            }
+        }
+    }
+    return null;
+}
+exports.UINavItemSearchInLayer = UINavItemSearchInLayer;
+/**
+ * Created by godshadow on 9/4/16.
+ */
+var UINavigationController = /** @class */ (function (_super) {
+    __extends(UINavigationController, _super);
+    function UINavigationController() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.rootViewController = null;
+        _this.viewControllersStack = [];
+        _this.currentViewControllerIndex = -1;
+        // Transitioning delegate
+        _this._pushAnimationController = null;
+        _this._popAnimationController = null;
+        return _this;
+    }
+    UINavigationController.prototype.init = function () {
+        _super.prototype.init.call(this);
+        this.view.layer.style.overflow = "hidden";
+    };
+    UINavigationController.prototype.initWithRootViewController = function (vc) {
+        this.init();
+        this.setRootViewController(vc);
+    };
+    UINavigationController.prototype.setRootViewController = function (vc) {
+        //this.transitioningDelegate = this;
+        this.rootViewController = vc;
+        this.view.addSubview(vc.view);
+        this.viewControllersStack.push(vc);
+        this.currentViewControllerIndex = 0;
+        this.rootViewController.navigationController = this;
+        this.addChildViewController(vc);
+        // if (this.presentationController != null) {
+        //     var size = vc.preferredContentSize;
+        //     this.contentSize = size;
+        // }
+    };
+    UINavigationController.prototype.viewWillAppear = function (animated) {
+        if (this.currentViewControllerIndex < 0)
+            return;
+        var vc = this.viewControllersStack[this.currentViewControllerIndex];
+        vc.viewWillAppear(animated);
+    };
+    UINavigationController.prototype.viewDidAppear = function (animated) {
+        if (this.currentViewControllerIndex < 0)
+            return;
+        var vc = this.viewControllersStack[this.currentViewControllerIndex];
+        vc.viewDidAppear(animated);
+    };
+    UINavigationController.prototype.viewWillDisappear = function (animated) {
+        if (this.currentViewControllerIndex < 0)
+            return;
+        var vc = this.viewControllersStack[this.currentViewControllerIndex];
+        vc.viewWillDisappear(animated);
+    };
+    UINavigationController.prototype.viewDidDisappear = function (animated) {
+        if (this.currentViewControllerIndex < 0)
+            return;
+        var vc = this.viewControllersStack[this.currentViewControllerIndex];
+        vc.viewDidDisappear(animated);
+    };
+    UINavigationController.prototype.pushViewController = function (vc, animated) {
+        var lastVC = this.viewControllersStack[this.currentViewControllerIndex];
+        this.viewControllersStack.push(vc);
+        this.currentViewControllerIndex++;
+        vc.navigationController = this;
+        vc.onLoadView(this, function () {
+            if (vc.navigationItem != null && vc.navigationItem.backBarButtonItem != null) {
+                vc.navigationItem.backBarButtonItem.setAction(this, function () {
+                    vc.navigationController.popViewController();
+                });
+            }
+            this.view.addSubview(vc.view);
+            this.addChildViewController(vc);
+            if (vc.preferredContentSize != null)
+                this.preferredContentSize = vc.preferredContentSize;
+            _MUIShowViewController(lastVC, vc, this, animated);
+        });
+    };
+    UINavigationController.prototype.popViewController = function (animated) {
+        if (this.currentViewControllerIndex == 0)
+            return;
+        var fromVC = this.viewControllersStack[this.currentViewControllerIndex];
+        this.currentViewControllerIndex--;
+        this.viewControllersStack.pop();
+        var toVC = this.viewControllersStack[this.currentViewControllerIndex];
+        // if (toVC.transitioningDelegate == null)
+        //     toVC.transitioningDelegate = this;
+        if (toVC.preferredContentSize != null)
+            this.contentSize = toVC.preferredContentSize;
+        _MUIHideViewController(fromVC, toVC, this, this, function () {
+            fromVC.removeChildViewController(this);
+            fromVC.view.removeFromSuperview();
+        });
+    };
+    UINavigationController.prototype.popToRootViewController = function (animated) {
+        if (this.viewControllersStack.length == 1)
+            return;
+        var currentVC = this.viewControllersStack.pop();
+        for (var index = this.currentViewControllerIndex - 1; index > 0; index--) {
+            var vc = this.viewControllersStack.pop();
+            vc.view.removeFromSuperview();
+            this.removeChildViewController(vc);
+        }
+        this.currentViewControllerIndex = 0;
+        var rootVC = this.viewControllersStack[0];
+        this.contentSize = rootVC.preferredContentSize;
+        _MUIHideViewController(currentVC, rootVC, this, this, function () {
+            currentVC.view.removeFromSuperview();
+            this.removeChildViewController(currentVC);
+        });
+    };
+    Object.defineProperty(UINavigationController.prototype, "preferredContentSize", {
+        get: function () {
+            if (this.currentViewControllerIndex < 0)
+                return this._preferredContentSize;
+            var vc = this.viewControllersStack[this.currentViewControllerIndex];
+            return vc.preferredContentSize;
+        },
+        set: function (size) {
+            this.setPreferredContentSize(size);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    UINavigationController.prototype.animationControllerForPresentedController = function (presentedViewController, presentingViewController, sourceController) {
+        if (this._pushAnimationController == null) {
+            this._pushAnimationController = new MUIPushAnimationController();
+            this._pushAnimationController.init();
+        }
+        return this._pushAnimationController;
+    };
+    UINavigationController.prototype.animationControllerForDismissedController = function (dismissedController) {
+        if (this._popAnimationController == null) {
+            this._popAnimationController = new MUIPopAnimationController();
+            this._popAnimationController.init();
+        }
+        return this._popAnimationController;
+    };
+    return UINavigationController;
+}(UIViewController));
+exports.UINavigationController = UINavigationController;
+/*
+    ANIMATIONS
+ */
+var MUIPushAnimationController = /** @class */ (function (_super) {
+    __extends(MUIPushAnimationController, _super);
+    function MUIPushAnimationController() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    MUIPushAnimationController.prototype.transitionDuration = function (transitionContext) {
+        return 0.25;
+    };
+    MUIPushAnimationController.prototype.animateTransition = function (transitionContext) {
+        // make view configurations before transitions       
+    };
+    MUIPushAnimationController.prototype.animationEnded = function (transitionCompleted) {
+        // make view configurations after transitions
+    };
+    // TODO: Not iOS like transitions. For now we use css animations
+    MUIPushAnimationController.prototype.animations = function (transitionContext) {
+        var animations = MUIClassListForAnimationType(MUIAnimationType.Push);
+        return animations;
+    };
+    return MUIPushAnimationController;
+}(mio_foundation_web_1.NSObject));
+exports.MUIPushAnimationController = MUIPushAnimationController;
+var MUIPopAnimationController = /** @class */ (function (_super) {
+    __extends(MUIPopAnimationController, _super);
+    function MUIPopAnimationController() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    MUIPopAnimationController.prototype.transitionDuration = function (transitionContext) {
+        return 0.25;
+    };
+    MUIPopAnimationController.prototype.animateTransition = function (transitionContext) {
+        // make view configurations after transitions
+    };
+    MUIPopAnimationController.prototype.animationEnded = function (transitionCompleted) {
+        // make view configurations before transitions
+    };
+    // TODO: Not iOS like transitions. For now we use css animations
+    MUIPopAnimationController.prototype.animations = function (transitionContext) {
+        var animations = MUIClassListForAnimationType(MUIAnimationType.Pop);
+        return animations;
+    };
+    return MUIPopAnimationController;
+}(mio_foundation_web_1.NSObject));
+exports.MUIPopAnimationController = MUIPopAnimationController;
+/**
+ * Created by godshadow on 05/08/16.
+ */
+var UISplitViewControllerDisplayMode;
+(function (UISplitViewControllerDisplayMode) {
+    UISplitViewControllerDisplayMode[UISplitViewControllerDisplayMode["Automatic"] = 0] = "Automatic";
+    UISplitViewControllerDisplayMode[UISplitViewControllerDisplayMode["PrimaryHidden"] = 1] = "PrimaryHidden";
+    UISplitViewControllerDisplayMode[UISplitViewControllerDisplayMode["AllVisible"] = 2] = "AllVisible";
+    UISplitViewControllerDisplayMode[UISplitViewControllerDisplayMode["PrimaryOverlay"] = 3] = "PrimaryOverlay";
+})(UISplitViewControllerDisplayMode = exports.UISplitViewControllerDisplayMode || (exports.UISplitViewControllerDisplayMode = {}));
+var UISplitViewController = /** @class */ (function (_super) {
+    __extends(UISplitViewController, _super);
+    function UISplitViewController() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.masterView = null;
+        _this.detailView = null;
+        _this.preferredDisplayMode = UISplitViewControllerDisplayMode.Automatic;
+        _this._displayModeButtonItem = null;
+        _this._collapsed = false;
+        _this._masterViewController = null;
+        _this._detailViewController = null;
+        // Transitioning delegate
+        _this._pushAnimationController = null;
+        _this._popAnimationController = null;
+        return _this;
+    }
+    UISplitViewController.prototype.init = function () {
+        _super.prototype.init.call(this);
+        this.masterView = new UIView();
+        this.masterView.init();
+        if (mio_foundation_web_8.MIOCoreIsPhone() == false)
+            MUICoreLayerAddStyle(this.masterView.layer, "master-view");
+        this.view.addSubview(this.masterView);
+        if (mio_foundation_web_8.MIOCoreIsPhone() == false) {
+            this.detailView = new UIView();
+            this.detailView.init();
+            MUICoreLayerAddStyle(this.detailView.layer, "detail-view");
+            this.view.addSubview(this.detailView);
+        }
+    };
+    Object.defineProperty(UISplitViewController.prototype, "displayMode", {
+        get: function () {
+            return UISplitViewControllerDisplayMode.Automatic;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(UISplitViewController.prototype, "displayModeButtonItem", {
+        get: function () {
+            if (this._displayModeButtonItem != null)
+                return this._displayModeButtonItem;
+            this._displayModeButtonItem = new UIButton();
+            this._displayModeButtonItem.initWithAction(this, this.displayModeButtonItemAction);
+            return this._displayModeButtonItem;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(UISplitViewController.prototype, "collapsed", {
+        get: function () {
+            return this._collapsed;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    UISplitViewController.prototype.setCollapsed = function (value) {
+        this.willChangeValue("collapsed");
+        this._collapsed = value;
+        this.didChangeValue("collapsed");
+    };
+    UISplitViewController.prototype.setMasterViewController = function (vc) {
+        if (this._masterViewController != null) {
+            this._masterViewController.view.removeFromSuperview();
+            this.removeChildViewController(this._masterViewController);
+            this._masterViewController = null;
+        }
+        if (vc != null) {
+            vc.parent = this;
+            vc.splitViewController = this;
+            this.masterView.addSubview(vc.view);
+            this.addChildViewController(vc);
+            this._masterViewController = vc;
+        }
+    };
+    UISplitViewController.prototype.setDetailViewController = function (vc) {
+        if (mio_foundation_web_8.MIOCoreIsPhone() == true)
+            return;
+        if (this._detailViewController != null) {
+            this._detailViewController.view.removeFromSuperview();
+            this.removeChildViewController(this._detailViewController);
+            this._detailViewController = null;
+        }
+        if (vc != null) {
+            vc.parent = this;
+            vc.splitViewController = this;
+            this.detailView.addSubview(vc.view);
+            this.addChildViewController(vc);
+            this._detailViewController = vc;
+        }
+    };
+    UISplitViewController.prototype.showDetailViewController = function (vc) {
+        vc.splitViewController = this;
+        if (mio_foundation_web_8.MIOCoreIsPhone() == true) {
+            this._pushDetailViewController(vc);
+        }
+        else {
+            this._showDetailViewController(vc);
+        }
+    };
+    Object.defineProperty(UISplitViewController.prototype, "masterViewController", {
+        get: function () {
+            return this._masterViewController;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(UISplitViewController.prototype, "detailViewController", {
+        get: function () {
+            return this._detailViewController;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    UISplitViewController.prototype._showDetailViewController = function (vc) {
+        var oldVC = this._detailViewController;
+        var newVC = vc;
+        if (oldVC == newVC)
+            return;
+        newVC.onLoadView(this, function () {
+            this.detailView.addSubview(newVC.view);
+            this.addChildViewController(newVC);
+            this._detailViewController = vc;
+            _MUIShowViewController(oldVC, newVC, this, false, this, function () {
+                oldVC.view.removeFromSuperview();
+                this.removeChildViewController(oldVC);
+            });
+        });
+    };
+    UISplitViewController.prototype._pushDetailViewController = function (vc) {
+        var oldVC = this._masterViewController;
+        //if (vc.transitioningDelegate == null) vc.transitioningDelegate = this;
+        vc.onLoadView(this, function () {
+            this.view.addSubview(vc.view);
+            this.addChildViewController(vc);
+            this._detailViewController = vc;
+            if (vc.preferredContentSize != null)
+                this.preferredContentSize = vc.preferredContentSize;
+            _MUIShowViewController(oldVC, vc, this, true, this, function () {
+                this.setCollapsed(true);
+            });
+        });
+    };
+    UISplitViewController.prototype._popViewController = function () {
+        var fromVC = this.detailViewController;
+        var toVC = this.masterViewController;
+        // if (toVC.transitioningDelegate == null)
+        //     toVC.transitioningDelegate = this;
+        if (toVC.preferredContentSize != null)
+            this.contentSize = toVC.preferredContentSize;
+        _MUIHideViewController(fromVC, toVC, this, this, function () {
+            fromVC.removeChildViewController(this);
+            fromVC.view.removeFromSuperview();
+        });
+    };
+    UISplitViewController.prototype.displayModeButtonItemAction = function () {
+        if (mio_foundation_web_8.MIOCoreIsPhone() == true)
+            this._popViewController();
+    };
+    UISplitViewController.prototype.animationControllerForPresentedController = function (presentedViewController, presentingViewController, sourceController) {
+        if (mio_foundation_web_8.MIOCoreIsPhone() == false)
+            return;
+        if (this._pushAnimationController == null) {
+            this._pushAnimationController = new MUIPushAnimationController();
+            this._pushAnimationController.init();
+        }
+        return this._pushAnimationController;
+    };
+    UISplitViewController.prototype.animationControllerForDismissedController = function (dismissedController) {
+        if (mio_foundation_web_8.MIOCoreIsPhone() == false)
+            return;
+        if (this._popAnimationController == null) {
+            this._popAnimationController = new MUIPopAnimationController();
+            this._popAnimationController.init();
+        }
+        return this._popAnimationController;
+    };
+    return UISplitViewController;
+}(UIViewController));
+exports.UISplitViewController = UISplitViewController;
 function MUIOutletRegister(owner, layerID, c) {
     owner._outlets[layerID] = c;
 }
@@ -1483,7 +2707,7 @@ function MUIWindowSize() {
     var w = document.body.clientWidth;
     //var h = document.body.clientHeight;window.innerHeight
     var h = window.innerHeight;
-    return new mio_foundation_web_3.NSSize(w, h);
+    return new mio_foundation_web_7.NSSize(w, h);
 }
 exports.MUIWindowSize = MUIWindowSize;
 function _MUIShowViewController(fromVC, toVC, sourceVC, animated, target, completion) {
@@ -1547,7 +2771,7 @@ exports._MUIAnimationDidStart = _MUIAnimationDidStart;
 function _MUIHideViewController(fromVC, toVC, sourceVC, target, completion) {
     if (fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
         || fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext
-        || mio_foundation_web_3.MIOCoreIsPhone() == true) {
+        || mio_foundation_web_8.MIOCoreIsPhone() == true) {
         toVC.viewWillAppear();
         //toVC._childControllersWillAppear();
         //toVC.view.layout();
@@ -1635,7 +2859,7 @@ var UIWindow = /** @class */ (function (_super) {
     }
     UIWindow.prototype.init = function () {
         _super.prototype.init.call(this);
-        UICoreLayerAddStyle(this.layer, "view");
+        MUICoreLayerAddStyle(this.layer, "view");
     };
     UIWindow.prototype.initWithRootViewController = function (vc) {
         this.init();
@@ -1643,7 +2867,7 @@ var UIWindow = /** @class */ (function (_super) {
         this.addSubview(vc.view);
     };
     UIWindow.prototype.makeKey = function () {
-        UIWebApplication.sharedInstance().makeKeyWindow(this);
+        UIApplication.sharedInstance().makeKeyWindow(this);
     };
     UIWindow.prototype.makeKeyAndVisible = function () {
         this.makeKey();
@@ -1742,7 +2966,7 @@ var UIApplication = /** @class */ (function () {
     };
     //TODO: Set language in the webworker also.
     UIApplication.prototype.setLanguage = function (lang, target, completion) {
-        var languages = mio_foundation_web_10.MIOCoreGetLanguages();
+        var languages = mio_foundation_web_15.MIOCoreGetLanguages();
         if (languages == null) {
             completion.call(target);
         }
@@ -1750,21 +2974,21 @@ var UIApplication = /** @class */ (function () {
         if (url == null) {
             completion.call(target);
         }
-        var request = mio_foundation_web_6.NSURLRequest.requestWithURL(mio_foundation_web_9.NSURL.urlWithString(url));
-        var con = new mio_foundation_web_7.NSURLConnection();
+        var request = mio_foundation_web_11.NSURLRequest.requestWithURL(mio_foundation_web_14.NSURL.urlWithString(url));
+        var con = new mio_foundation_web_12.NSURLConnection();
         con.initWithRequestBlock(request, this, function (code, data) {
             if (code == 200) {
-                mio_foundation_web_14.MIOCoreStringSetLocalizedStrings(JSON.parse(data.replace(/(\r\n|\n|\r)/gm, "")));
+                mio_foundation_web_19.MIOCoreStringSetLocalizedStrings(JSON.parse(data.replace(/(\r\n|\n|\r)/gm, "")));
             }
             completion.call(target);
         });
     };
     UIApplication.prototype.downloadAppPlist = function (target, completion) {
-        var request = mio_foundation_web_6.NSURLRequest.requestWithURL(mio_foundation_web_9.NSURL.urlWithString("app.plist"));
-        var con = new mio_foundation_web_7.NSURLConnection();
+        var request = mio_foundation_web_11.NSURLRequest.requestWithURL(mio_foundation_web_14.NSURL.urlWithString("app.plist"));
+        var con = new mio_foundation_web_12.NSURLConnection();
         con.initWithRequestBlock(request, this, function (code, data) {
             if (code == 200) {
-                mio_foundation_web_13.MIOCoreBundleSetAppResource("app", "plist", data);
+                mio_foundation_web_18.MIOCoreBundleSetAppResource("app", "plist", data);
             }
             completion.call(target, data);
         });
@@ -1774,16 +2998,16 @@ var UIApplication = /** @class */ (function () {
             if (data == null)
                 throw new Error("We couldn't download the app.plist");
             // Get Languages from the app.plist
-            var config = mio_foundation_web_8.NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);
+            var config = mio_foundation_web_13.NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);
             this.mainResourceURLString = config["UIMainStoryboardFile"];
             var langs = config["Languages"];
             if (langs == null)
                 this._run();
             for (var key in langs) {
                 var url = langs[key];
-                mio_foundation_web_11.MIOCoreAddLanguage(key, url);
+                mio_foundation_web_16.MIOCoreAddLanguage(key, url);
             }
-            var lang = mio_foundation_web_12.MIOCoreGetPlatformLanguage();
+            var lang = mio_foundation_web_17.MIOCoreGetPlatformLanguage();
             this.setLanguage(lang, this, function () {
                 this._run();
             });
@@ -1823,11 +3047,11 @@ var UIApplication = /** @class */ (function () {
     UIApplication.prototype.downloadLanguage = function (key, fn) {
         var url = this.languages[key];
         // Download
-        var conn = new mio_foundation_web_7.NSURLConnection();
-        conn.initWithRequestBlock(mio_foundation_web_6.NSURLRequest.requestWithURL(url), this, function (error, data) {
+        var conn = new mio_foundation_web_12.NSURLConnection();
+        conn.initWithRequestBlock(mio_foundation_web_11.NSURLRequest.requestWithURL(url), this, function (error, data) {
             if (data != null) {
                 var json = JSON.parse(data.replace(/(\r\n|\n|\r)/gm, ""));
-                mio_foundation_web_14.MIOCoreStringSetLocalizedStrings(json);
+                mio_foundation_web_19.MIOCoreStringSetLocalizedStrings(json);
             }
             fn.call(this);
         });

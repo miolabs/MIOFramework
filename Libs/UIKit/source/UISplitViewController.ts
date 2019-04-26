@@ -1,12 +1,12 @@
-import { _MIUShowViewController, _UIHideViewController } from "./core/MUICore";
+import { MIOCoreIsPhone } from "mio-foundation-web";
+import { NSObject } from "mio-foundation-web";
+import { _MUIShowViewController, _MUIHideViewController } from "./core/MUICore";
 import { UIView } from "./UIView";
 import { UIViewController } from "./UIViewController";
-import { UICoreLayerAddStyle } from ".";
-import { MIOCoreIsPhone } from "../MIOCore/platform";
-import { MIOObject } from "../MIOFoundation";
-import { UIAnimationType } from "../MIOUI";
-import { UIClassListForAnimationType } from "./MIOUI_CoreAnimation";
+import { MUICoreLayerAddStyle } from ".";
 import { UIButton } from "./UIButton";
+import { MUIPushAnimationController } from "./UINavigationController";
+import { MUIPopAnimationController } from "./UINavigationController";
 
 /**
  * Created by godshadow on 05/08/16.
@@ -32,13 +32,13 @@ export class UISplitViewController extends UIViewController
 
         this.masterView = new UIView();
         this.masterView.init();
-        if (MIOCoreIsPhone() == false) UICoreLayerAddStyle(this.masterView.layer, "master-view");
+        if (MIOCoreIsPhone() == false) MUICoreLayerAddStyle(this.masterView.layer, "master-view");
         this.view.addSubview(this.masterView);
 
         if (MIOCoreIsPhone() == false) {
             this.detailView = new UIView();
             this.detailView.init();
-            UICoreLayerAddStyle(this.detailView.layer, "detail-view");        
+            MUICoreLayerAddStyle(this.detailView.layer, "detail-view");        
             this.view.addSubview(this.detailView);
         }
     }
@@ -135,7 +135,7 @@ export class UISplitViewController extends UIViewController
             this.addChildViewController(newVC);
             this._detailViewController = vc;
 
-            _MIUShowViewController(oldVC, newVC, this, false, this, function () {
+            _MUIShowViewController(oldVC, newVC, this, false, this, function () {
 
                 oldVC.view.removeFromSuperview();
                 this.removeChildViewController(oldVC);
@@ -157,7 +157,7 @@ export class UISplitViewController extends UIViewController
             if (vc.preferredContentSize != null)
                 this.preferredContentSize = vc.preferredContentSize;
 
-            _MIUShowViewController(oldVC, vc, this, true, this, function(){
+            _MUIShowViewController(oldVC, vc, this, true, this, function(){
                 this.setCollapsed(true);
             });
         });
@@ -173,7 +173,7 @@ export class UISplitViewController extends UIViewController
         if (toVC.preferredContentSize != null)
             this.contentSize = toVC.preferredContentSize;
 
-        _UIHideViewController(fromVC, toVC, this, this, function () {
+        _MUIHideViewController(fromVC, toVC, this, this, function () {
             fromVC.removeChildViewController(this);
             fromVC.view.removeFromSuperview();
         });
@@ -191,7 +191,7 @@ export class UISplitViewController extends UIViewController
         if (MIOCoreIsPhone() == false) return;
 
         if (this._pushAnimationController == null) {
-            this._pushAnimationController = new UIPushAnimationController();
+            this._pushAnimationController = new MUIPushAnimationController();
             this._pushAnimationController.init();
         }
 
@@ -202,7 +202,7 @@ export class UISplitViewController extends UIViewController
         if (MIOCoreIsPhone() == false) return;
 
         if (this._popAnimationController == null) {
-            this._popAnimationController = new UIPopAnimationController();
+            this._popAnimationController = new MUIPopAnimationController();
             this._popAnimationController.init();
         }
 
@@ -210,52 +210,3 @@ export class UISplitViewController extends UIViewController
     }
     
 }
-
-/*
-    ANIMATIONS
- */
-
-class UIPushAnimationController extends MIOObject
-{
-    transitionDuration(transitionContext){
-        return 0.25;
-    }
-
-    animateTransition(transitionContext){
-        // make view configurations before transitions       
-    }
-
-    animationEnded(transitionCompleted){
-        // make view configurations after transitions
-    }
-
-    // TODO: Not iOS like transitions. For now we use css animations
-    animations(transitionContext){
-        let animations = UIClassListForAnimationType(UIAnimationType.Push);
-        return animations;
-    }
-
-}
-
-class UIPopAnimationController extends MIOObject
-{
-    transitionDuration(transitionContext){
-        return 0.25;
-    }
-
-    animateTransition(transitionContext){
-        // make view configurations after transitions
-    }
-
-    animationEnded(transitionCompleted){
-        // make view configurations before transitions
-    }
-
-    // TODO: Not iOS like transitions. For now we use css animations
-    animations(transitionContext){
-        let animations = UIClassListForAnimationType(UIAnimationType.Pop);
-        return animations;
-    }
-
-}
-

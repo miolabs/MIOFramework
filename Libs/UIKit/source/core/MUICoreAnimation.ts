@@ -46,7 +46,7 @@ export interface UIViewControllerAnimatedTransitioning extends NSObject
 }
 
 // ANIMATION TYPES
-export function UIClassListForAnimationType(type)
+export function MUIClassListForAnimationType(type)
 {
     var array = [];
     array.push("animated");
