@@ -1,5 +1,5 @@
 import {MIOCoreBundle} from "../../core/MIOCoreBundle";
-import { MIOCoreBundleGetContentsFromURLString } from "../../core/MIOCore"
+import { MIOCoreBundleGetContentsFromURLString } from "../../core/MIOCore";
 import { MIOCoreBundleHTMLParser } from "../../core/MIOCoreBundleHTMLParser";
 
 export class MIOCoreBundle_web extends MIOCoreBundle
