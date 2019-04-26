@@ -188,10 +188,10 @@ function buildWebDevPackage(done) {
 		fs.copyFileSync("./dist/foundation.web.d.ts", DEST + "types/mio-foundation-web.d.ts");
 
 		//Copy foundation.web.js
-		fs.copyFileSync("./dist/foundation.web.js", DEST + "foundation-web.js");
+		fs.copyFileSync("./dist/foundation.web.js", DEST + "mio-foundation-web.js");
 
 		//Copy foundation.web.js.map
-		fs.copyFileSync("./dist/foundation.web.js.map", DEST + "foundation-web.js.map");
+		fs.copyFileSync("./dist/foundation.web.js.map", DEST + "mio-foundation-web.js.map");
 
 		//Copy package.json, LICENSE AND README
 		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");

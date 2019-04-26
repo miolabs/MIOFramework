@@ -2,8 +2,8 @@
   "name": "mio-foundation-{%platform%}",
   "version": "1.0.7",
   "description": "Apple foundation framework for {%platform%}",
-  "main": "foundation.{%platform%}.js",
-  "types": "types/foundation.{%platform%}.d.ts",
+  "main": "mio-foundation-{%platform%}.js",
+  "types": "types/mio-foundation-{%platform%}.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
