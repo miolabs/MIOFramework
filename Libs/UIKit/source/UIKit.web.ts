@@ -3,7 +3,7 @@ import { MIOCoreBundleGetMainURLString } from "mio-foundation-web"
 import { NSPoint } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
-import "mio-foundation-web/_extensions"
+import "mio-foundation-web/extensions"
 import { NSLocalizeString } from "mio-foundation-web";
 import { NSSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";

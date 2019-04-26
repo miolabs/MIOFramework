@@ -12,13 +12,13 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
+ 
 var mio_foundation_web_1 = require("mio-foundation-web");
 var mio_foundation_web_2 = require("mio-foundation-web");
 var mio_foundation_web_3 = require("mio-foundation-web");
 var mio_foundation_web_4 = require("mio-foundation-web");
 var mio_foundation_web_5 = require("mio-foundation-web");
-require("mio-foundation-web/_extensions");
+require("mio-foundation-web/extensions");
 var mio_foundation_web_6 = require("mio-foundation-web");
 var mio_foundation_web_7 = require("mio-foundation-web");
 var mio_foundation_web_8 = require("mio-foundation-web");
@@ -33,12 +33,12 @@ var mio_foundation_web_16 = require("mio-foundation-web");
 var mio_foundation_web_17 = require("mio-foundation-web");
 var mio_foundation_web_18 = require("mio-foundation-web");
 var mio_foundation_web_19 = require("mio-foundation-web");
-exports._MUICoreLayerIDCount = 0;
+ 
 function MUICoreLayerIDFromObject(object) {
     var classname = object.constructor.name.substring(3);
     return MUICoreLayerIDFromClassname(classname);
 }
-exports.MUICoreLayerIDFromObject = MUICoreLayerIDFromObject;
+ 
 function MUICoreLayerIDFromClassname(classname) {
     var digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
     var random = "";
@@ -48,10 +48,10 @@ function MUICoreLayerIDFromClassname(classname) {
         random += randomDigit;
     }
     var layerID = classname.toLowerCase() + "_" + random;
-    exports._MUICoreLayerIDCount++;
+     
     return layerID;
 }
-exports.MUICoreLayerIDFromClassname = MUICoreLayerIDFromClassname;
+ 
 function MUICoreLayerCreate(layerID) {
     var layer = document.createElement("DIV");
     if (layerID != null)
@@ -59,29 +59,29 @@ function MUICoreLayerCreate(layerID) {
     //layer.style.position = "absolute";
     return layer;
 }
-exports.MUICoreLayerCreate = MUICoreLayerCreate;
+ 
 function MUICoreLayerAddSublayer(layer, subLayer) {
     layer.appendChild(subLayer);
 }
-exports.MUICoreLayerAddSublayer = MUICoreLayerAddSublayer;
+ 
 function MUICoreLayerRemoveSublayer(layer, subLayer) {
     layer.removeChild(subLayer);
 }
-exports.MUICoreLayerRemoveSublayer = MUICoreLayerRemoveSublayer;
+ 
 function MUICoreLayerCreateWithStyle(style, layerID) {
     var layer = MUICoreLayerCreate(layerID);
     MUICoreLayerAddStyle(layer, style);
     return layer;
 }
-exports.MUICoreLayerCreateWithStyle = MUICoreLayerCreateWithStyle;
+ 
 function MUICoreLayerAddStyle(layer, style) {
     layer.classList.add(style);
 }
-exports.MUICoreLayerAddStyle = MUICoreLayerAddStyle;
+ 
 function MUICoreLayerRemoveStyle(layer, style) {
     layer.classList.remove(style);
 }
-exports.MUICoreLayerRemoveStyle = MUICoreLayerRemoveStyle;
+ 
 function MUICoreLayerSearchElementByAttribute(layer, key) {
     if (layer.tagName != "DIV" && layer.tagName != "INPUT" && layer.tagName != "SECTION")
         return null;
@@ -96,7 +96,7 @@ function MUICoreLayerSearchElementByAttribute(layer, key) {
     }
     return null;
 }
-exports.MUICoreLayerSearchElementByAttribute = MUICoreLayerSearchElementByAttribute;
+ 
 function MUICoreLayerSearchElementByID(layer, elementID) {
     if (layer.tagName != "DIV" && layer.tagName != "INPUT" && layer.tagName != "SECTION")
         return null;
@@ -114,7 +114,7 @@ function MUICoreLayerSearchElementByID(layer, elementID) {
     }
     return null;
 }
-exports.MUICoreLayerSearchElementByID = MUICoreLayerSearchElementByID;
+ 
 function MUICoreLayerGetFirstElementWithTag(layer, tag) {
     var foundLayer = null;
     if (layer.childNodes.length > 0) {
@@ -131,7 +131,7 @@ function MUICoreLayerGetFirstElementWithTag(layer, tag) {
     }
     return foundLayer;
 }
-exports.MUICoreLayerGetFirstElementWithTag = MUICoreLayerGetFirstElementWithTag;
+ 
 /*
     ANIMATIONS
  */
@@ -159,7 +159,7 @@ var MUIAnimationType;
     MUIAnimationType[MUIAnimationType["HorizontalInFlip"] = 19] = "HorizontalInFlip";
     MUIAnimationType[MUIAnimationType["ZoomIn"] = 20] = "ZoomIn";
     MUIAnimationType[MUIAnimationType["ZoomOut"] = 21] = "ZoomOut";
-})(MUIAnimationType = exports.MUIAnimationType || (exports.MUIAnimationType = {}));
+})(MUIAnimationType || (MUIAnimationType = {}));
 // ANIMATION TYPES
 function MUIClassListForAnimationType(type) {
     var array = [];
@@ -222,19 +222,19 @@ function MUIClassListForAnimationType(type) {
     }
     return array;
 }
-exports.MUIClassListForAnimationType = MUIClassListForAnimationType;
+ 
 function _MUIAddAnimations(layer, animations) {
     var w = layer.offsetWidth;
     for (var index = 0; index < animations.length; index++)
         layer.classList.add(animations[index]);
     w++;
 }
-exports._MUIAddAnimations = _MUIAddAnimations;
+ 
 function _MUIRemoveAnimations(layer, animations) {
     for (var index = 0; index < animations.length; index++)
         layer.classList.remove(animations[index]);
 }
-exports._MUIRemoveAnimations = _MUIRemoveAnimations;
+ 
 function _MUIAnimationStart(layer, animationController, animationContext, target, completion) {
     if (animationController == null) {
         if (target != null && completion != null)
@@ -262,7 +262,7 @@ function _MUIAnimationStart(layer, animationController, animationContext, target
         layer.animationParams["completion"] = completion;
     layer.addEventListener("animationend", _UIAnimationDidFinish);
 }
-exports._MUIAnimationStart = _MUIAnimationStart;
+ 
 function _UIAnimationDidFinish(event) {
     var animationController = event.target.animationParams["animationController"];
     var animations = event.target.animationParams["animations"];
@@ -275,7 +275,7 @@ function _UIAnimationDidFinish(event) {
     if (target != null && completion != null)
         completion.call(target);
 }
-exports._UIAnimationDidFinish = _UIAnimationDidFinish;
+ 
 window.onload = function (e) {
     var url = mio_foundation_web_2.MIOCoreBundleGetMainURLString();
     console.log("Main URL: " + url);
@@ -296,7 +296,7 @@ function MUICoreEventRegisterObserverForType(eventType, observer, completion) {
     }
     array.push(item);
 }
-exports.MUICoreEventRegisterObserverForType = MUICoreEventRegisterObserverForType;
+ 
 function MUICoreEventUnregisterObserverForType(eventType, observer) {
     var obs = _miocore_events_event_observers[eventType];
     if (obs == null)
@@ -317,7 +317,7 @@ function MUICoreEventUnregisterObserverForType(eventType, observer) {
         console.log("removing event observer: " + _miocore_events_event_observers[eventType].length);
     }
 }
-exports.MUICoreEventUnregisterObserverForType = MUICoreEventUnregisterObserverForType;
+ 
 function _MUICoreEventSendToObservers(obs, event) {
     if (obs != null) {
         for (var index = 0; index < obs.length; index++) {
@@ -383,7 +383,7 @@ window.addEventListener("resize", function (e) {
 }, false);
 function MUICoreBundleLoadNibName(name, target, completion) {
 }
-exports.MUICoreBundleLoadNibName = MUICoreBundleLoadNibName;
+ 
 var MUICoreEventKeyCode;
 (function (MUICoreEventKeyCode) {
     MUICoreEventKeyCode[MUICoreEventKeyCode["Enter"] = 13] = "Enter";
@@ -392,7 +392,7 @@ var MUICoreEventKeyCode;
     MUICoreEventKeyCode[MUICoreEventKeyCode["ArrowUp"] = 38] = "ArrowUp";
     MUICoreEventKeyCode[MUICoreEventKeyCode["ArrowRight"] = 39] = "ArrowRight";
     MUICoreEventKeyCode[MUICoreEventKeyCode["ArrowDown"] = 40] = "ArrowDown";
-})(MUICoreEventKeyCode = exports.MUICoreEventKeyCode || (exports.MUICoreEventKeyCode = {}));
+})(MUICoreEventKeyCode || (MUICoreEventKeyCode = {}));
 var MUICoreEventType;
 (function (MUICoreEventType) {
     MUICoreEventType[MUICoreEventType["KeyUp"] = 0] = "KeyUp";
@@ -403,7 +403,7 @@ var MUICoreEventType;
     MUICoreEventType[MUICoreEventType["TouchEnd"] = 5] = "TouchEnd";
     MUICoreEventType[MUICoreEventType["Click"] = 6] = "Click";
     MUICoreEventType[MUICoreEventType["Resize"] = 7] = "Resize";
-})(MUICoreEventType = exports.MUICoreEventType || (exports.MUICoreEventType = {}));
+})(MUICoreEventType || (MUICoreEventType = {}));
 var MUICoreEvent = /** @class */ (function () {
     function MUICoreEvent() {
         this.eventType = null;
@@ -419,7 +419,7 @@ var MUICoreEvent = /** @class */ (function () {
     };
     return MUICoreEvent;
 }());
-exports.MUICoreEvent = MUICoreEvent;
+ 
 var MUICoreKeyEvent = /** @class */ (function (_super) {
     __extends(MUICoreKeyEvent, _super);
     function MUICoreKeyEvent() {
@@ -433,7 +433,7 @@ var MUICoreKeyEvent = /** @class */ (function (_super) {
     };
     return MUICoreKeyEvent;
 }(MUICoreEvent));
-exports.MUICoreKeyEvent = MUICoreKeyEvent;
+ 
 var MUICoreEventInput = /** @class */ (function (_super) {
     __extends(MUICoreEventInput, _super);
     function MUICoreEventInput() {
@@ -447,14 +447,14 @@ var MUICoreEventInput = /** @class */ (function (_super) {
     }
     return MUICoreEventInput;
 }(MUICoreEvent));
-exports.MUICoreEventInput = MUICoreEventInput;
+ 
 var MUICoreEventMouseButtonType;
 (function (MUICoreEventMouseButtonType) {
     MUICoreEventMouseButtonType[MUICoreEventMouseButtonType["None"] = 0] = "None";
     MUICoreEventMouseButtonType[MUICoreEventMouseButtonType["Left"] = 1] = "Left";
     MUICoreEventMouseButtonType[MUICoreEventMouseButtonType["Right"] = 2] = "Right";
     MUICoreEventMouseButtonType[MUICoreEventMouseButtonType["Middle"] = 3] = "Middle";
-})(MUICoreEventMouseButtonType = exports.MUICoreEventMouseButtonType || (exports.MUICoreEventMouseButtonType = {}));
+})(MUICoreEventMouseButtonType || (MUICoreEventMouseButtonType = {}));
 var MUICoreEventMouse = /** @class */ (function (_super) {
     __extends(MUICoreEventMouse, _super);
     function MUICoreEventMouse() {
@@ -472,7 +472,7 @@ var MUICoreEventMouse = /** @class */ (function (_super) {
     };
     return MUICoreEventMouse;
 }(MUICoreEventInput));
-exports.MUICoreEventMouse = MUICoreEventMouse;
+ 
 // Declare changedTouches interface for typescript
 // interface Event {
 //     touches:TouchList;
@@ -493,7 +493,7 @@ var MUICoreEventTouch = /** @class */ (function (_super) {
     };
     return MUICoreEventTouch;
 }(MUICoreEventInput));
-exports.MUICoreEventTouch = MUICoreEventTouch;
+ 
 var UIEvent = /** @class */ (function (_super) {
     __extends(UIEvent, _super);
     function UIEvent() {
@@ -514,7 +514,7 @@ var UIEvent = /** @class */ (function (_super) {
     };
     return UIEvent;
 }(mio_foundation_web_1.NSObject));
-exports.UIEvent = UIEvent;
+ 
 var UIGestureRecognizerState;
 (function (UIGestureRecognizerState) {
     UIGestureRecognizerState[UIGestureRecognizerState["Possible"] = 0] = "Possible";
@@ -524,7 +524,7 @@ var UIGestureRecognizerState;
     UIGestureRecognizerState[UIGestureRecognizerState["Cancelled"] = 4] = "Cancelled";
     UIGestureRecognizerState[UIGestureRecognizerState["Failed"] = 5] = "Failed";
     UIGestureRecognizerState[UIGestureRecognizerState["Recognized"] = 6] = "Recognized";
-})(UIGestureRecognizerState = exports.UIGestureRecognizerState || (exports.UIGestureRecognizerState = {}));
+})(UIGestureRecognizerState || (UIGestureRecognizerState = {}));
 var UIGestureRecognizer = /** @class */ (function (_super) {
     __extends(UIGestureRecognizer, _super);
     function UIGestureRecognizer() {
@@ -591,7 +591,7 @@ var UIGestureRecognizer = /** @class */ (function (_super) {
     };
     return UIGestureRecognizer;
 }(mio_foundation_web_1.NSObject));
-exports.UIGestureRecognizer = UIGestureRecognizer;
+ 
 var UITapGestureRecognizer = /** @class */ (function (_super) {
     __extends(UITapGestureRecognizer, _super);
     function UITapGestureRecognizer() {
@@ -609,7 +609,7 @@ var UITapGestureRecognizer = /** @class */ (function (_super) {
     };
     return UITapGestureRecognizer;
 }(UIGestureRecognizer));
-exports.UITapGestureRecognizer = UITapGestureRecognizer;
+ 
 var UIPanGestureRecognizer = /** @class */ (function (_super) {
     __extends(UIPanGestureRecognizer, _super);
     function UIPanGestureRecognizer() {
@@ -651,7 +651,7 @@ var UIPanGestureRecognizer = /** @class */ (function (_super) {
     };
     return UIPanGestureRecognizer;
 }(UIGestureRecognizer));
-exports.UIPanGestureRecognizer = UIPanGestureRecognizer;
+ 
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -1189,7 +1189,7 @@ var UIView = /** @class */ (function (_super) {
     UIView.animationCompletion = null;
     return UIView;
 }(mio_foundation_web_1.NSObject));
-exports.UIView = UIView;
+ 
 /**
  * Created by godshadow on 12/3/16.
  */
@@ -1238,7 +1238,7 @@ var UIControl = /** @class */ (function (_super) {
     };
     return UIControl;
 }(UIView));
-exports.UIControl = UIControl;
+ 
 /**
  * Created by godshadow on 12/3/16.
  */
@@ -1247,7 +1247,7 @@ var UIButtonType;
     UIButtonType[UIButtonType["MomentaryPushIn"] = 0] = "MomentaryPushIn";
     UIButtonType[UIButtonType["PushOnPushOff"] = 1] = "PushOnPushOff";
     UIButtonType[UIButtonType["PushIn"] = 2] = "PushIn";
-})(UIButtonType = exports.UIButtonType || (exports.UIButtonType = {}));
+})(UIButtonType || (UIButtonType = {}));
 var UIButton = /** @class */ (function (_super) {
     __extends(UIButton, _super);
     function UIButton() {
@@ -1381,7 +1381,7 @@ var UIButton = /** @class */ (function (_super) {
     };
     return UIButton;
 }(UIControl));
-exports.UIButton = UIButton;
+ 
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -1767,7 +1767,7 @@ var UIViewController = /** @class */ (function (_super) {
     };
     return UIViewController;
 }(mio_foundation_web_1.NSObject));
-exports.UIViewController = UIViewController;
+ 
 /**
  * Created by godshadow on 06/12/2016.
  */
@@ -1782,13 +1782,13 @@ var UIModalPresentationStyle;
     UIModalPresentationStyle[UIModalPresentationStyle["OverCurrentContext"] = 6] = "OverCurrentContext";
     UIModalPresentationStyle[UIModalPresentationStyle["Popover"] = 7] = "Popover";
     UIModalPresentationStyle[UIModalPresentationStyle["None"] = 8] = "None";
-})(UIModalPresentationStyle = exports.UIModalPresentationStyle || (exports.UIModalPresentationStyle = {}));
+})(UIModalPresentationStyle || (UIModalPresentationStyle = {}));
 var UIModalTransitionStyle;
 (function (UIModalTransitionStyle) {
     UIModalTransitionStyle[UIModalTransitionStyle["CoverVertical"] = 0] = "CoverVertical";
     UIModalTransitionStyle[UIModalTransitionStyle["FlipHorizontal"] = 1] = "FlipHorizontal";
     UIModalTransitionStyle[UIModalTransitionStyle["CrossDisolve"] = 2] = "CrossDisolve";
-})(UIModalTransitionStyle = exports.UIModalTransitionStyle || (exports.UIModalTransitionStyle = {}));
+})(UIModalTransitionStyle || (UIModalTransitionStyle = {}));
 var UIPresentationController = /** @class */ (function (_super) {
     __extends(UIPresentationController, _super);
     function UIPresentationController() {
@@ -1926,7 +1926,7 @@ var UIPresentationController = /** @class */ (function (_super) {
     };
     return UIPresentationController;
 }(mio_foundation_web_1.NSObject));
-exports.UIPresentationController = UIPresentationController;
+ 
 var MUIModalTransitioningDelegate = /** @class */ (function (_super) {
     __extends(MUIModalTransitioningDelegate, _super);
     function MUIModalTransitioningDelegate() {
@@ -1952,7 +1952,7 @@ var MUIModalTransitioningDelegate = /** @class */ (function (_super) {
     };
     return MUIModalTransitioningDelegate;
 }(mio_foundation_web_1.NSObject));
-exports.MUIModalTransitioningDelegate = MUIModalTransitioningDelegate;
+ 
 var MUIAnimationController = /** @class */ (function (_super) {
     __extends(MUIAnimationController, _super);
     function MUIAnimationController() {
@@ -1973,7 +1973,7 @@ var MUIAnimationController = /** @class */ (function (_super) {
     };
     return MUIAnimationController;
 }(mio_foundation_web_1.NSObject));
-exports.MUIAnimationController = MUIAnimationController;
+ 
 var UIModalPresentAnimationController = /** @class */ (function (_super) {
     __extends(UIModalPresentAnimationController, _super);
     function UIModalPresentAnimationController() {
@@ -2004,7 +2004,7 @@ var UIModalPresentAnimationController = /** @class */ (function (_super) {
     };
     return UIModalPresentAnimationController;
 }(mio_foundation_web_1.NSObject));
-exports.UIModalPresentAnimationController = UIModalPresentAnimationController;
+ 
 var UIModalDismissAnimationController = /** @class */ (function (_super) {
     __extends(UIModalDismissAnimationController, _super);
     function UIModalDismissAnimationController() {
@@ -2035,7 +2035,7 @@ var UIModalDismissAnimationController = /** @class */ (function (_super) {
     };
     return UIModalDismissAnimationController;
 }(mio_foundation_web_1.NSObject));
-exports.UIModalDismissAnimationController = UIModalDismissAnimationController;
+ 
 /**
  * Created by godshadow on 11/11/2016.
  */
@@ -2046,7 +2046,7 @@ var UIPopoverArrowDirection;
     UIPopoverArrowDirection[UIPopoverArrowDirection["Down"] = 2] = "Down";
     UIPopoverArrowDirection[UIPopoverArrowDirection["Left"] = 3] = "Left";
     UIPopoverArrowDirection[UIPopoverArrowDirection["Right"] = 4] = "Right";
-})(UIPopoverArrowDirection = exports.UIPopoverArrowDirection || (exports.UIPopoverArrowDirection = {}));
+})(UIPopoverArrowDirection || (UIPopoverArrowDirection = {}));
 var UIPopoverPresentationController = /** @class */ (function (_super) {
     __extends(UIPopoverPresentationController, _super);
     function UIPopoverPresentationController() {
@@ -2134,7 +2134,7 @@ var UIPopoverPresentationController = /** @class */ (function (_super) {
     };
     return UIPopoverPresentationController;
 }(UIPresentationController));
-exports.UIPopoverPresentationController = UIPopoverPresentationController;
+ 
 var MIOModalPopOverTransitioningDelegate = /** @class */ (function (_super) {
     __extends(MIOModalPopOverTransitioningDelegate, _super);
     function MIOModalPopOverTransitioningDelegate() {
@@ -2172,7 +2172,7 @@ var MIOModalPopOverTransitioningDelegate = /** @class */ (function (_super) {
     };
     return MIOModalPopOverTransitioningDelegate;
 }(mio_foundation_web_1.NSObject));
-exports.MIOModalPopOverTransitioningDelegate = MIOModalPopOverTransitioningDelegate;
+ 
 var MIOPopOverPresentAnimationController = /** @class */ (function (_super) {
     __extends(MIOPopOverPresentAnimationController, _super);
     function MIOPopOverPresentAnimationController() {
@@ -2194,7 +2194,7 @@ var MIOPopOverPresentAnimationController = /** @class */ (function (_super) {
     };
     return MIOPopOverPresentAnimationController;
 }(mio_foundation_web_1.NSObject));
-exports.MIOPopOverPresentAnimationController = MIOPopOverPresentAnimationController;
+ 
 var MIOPopOverDismissAnimationController = /** @class */ (function (_super) {
     __extends(MIOPopOverDismissAnimationController, _super);
     function MIOPopOverDismissAnimationController() {
@@ -2216,7 +2216,7 @@ var MIOPopOverDismissAnimationController = /** @class */ (function (_super) {
     };
     return MIOPopOverDismissAnimationController;
 }(mio_foundation_web_1.NSObject));
-exports.MIOPopOverDismissAnimationController = MIOPopOverDismissAnimationController;
+ 
 var UINavigationItem = /** @class */ (function (_super) {
     __extends(UINavigationItem, _super);
     function UINavigationItem() {
@@ -2259,7 +2259,7 @@ var UINavigationItem = /** @class */ (function (_super) {
     };
     return UINavigationItem;
 }(mio_foundation_web_1.NSObject));
-exports.UINavigationItem = UINavigationItem;
+ 
 function UINavItemSearchInLayer(layer) {
     if (layer.childNodes.length > 0) {
         for (var index = 0; index < layer.childNodes.length; index++) {
@@ -2281,7 +2281,7 @@ function UINavItemSearchInLayer(layer) {
     }
     return null;
 }
-exports.UINavItemSearchInLayer = UINavItemSearchInLayer;
+ 
 /**
  * Created by godshadow on 9/4/16.
  */
@@ -2422,7 +2422,7 @@ var UINavigationController = /** @class */ (function (_super) {
     };
     return UINavigationController;
 }(UIViewController));
-exports.UINavigationController = UINavigationController;
+ 
 /*
     ANIMATIONS
  */
@@ -2447,7 +2447,7 @@ var MUIPushAnimationController = /** @class */ (function (_super) {
     };
     return MUIPushAnimationController;
 }(mio_foundation_web_1.NSObject));
-exports.MUIPushAnimationController = MUIPushAnimationController;
+ 
 var MUIPopAnimationController = /** @class */ (function (_super) {
     __extends(MUIPopAnimationController, _super);
     function MUIPopAnimationController() {
@@ -2469,7 +2469,7 @@ var MUIPopAnimationController = /** @class */ (function (_super) {
     };
     return MUIPopAnimationController;
 }(mio_foundation_web_1.NSObject));
-exports.MUIPopAnimationController = MUIPopAnimationController;
+ 
 /**
  * Created by godshadow on 05/08/16.
  */
@@ -2479,7 +2479,7 @@ var UISplitViewControllerDisplayMode;
     UISplitViewControllerDisplayMode[UISplitViewControllerDisplayMode["PrimaryHidden"] = 1] = "PrimaryHidden";
     UISplitViewControllerDisplayMode[UISplitViewControllerDisplayMode["AllVisible"] = 2] = "AllVisible";
     UISplitViewControllerDisplayMode[UISplitViewControllerDisplayMode["PrimaryOverlay"] = 3] = "PrimaryOverlay";
-})(UISplitViewControllerDisplayMode = exports.UISplitViewControllerDisplayMode || (exports.UISplitViewControllerDisplayMode = {}));
+})(UISplitViewControllerDisplayMode || (UISplitViewControllerDisplayMode = {}));
 var UISplitViewController = /** @class */ (function (_super) {
     __extends(UISplitViewController, _super);
     function UISplitViewController() {
@@ -2658,15 +2658,15 @@ var UISplitViewController = /** @class */ (function (_super) {
     };
     return UISplitViewController;
 }(UIViewController));
-exports.UISplitViewController = UISplitViewController;
+ 
 function MUIOutletRegister(owner, layerID, c) {
     owner._outlets[layerID] = c;
 }
-exports.MUIOutletRegister = MUIOutletRegister;
+ 
 function MUIOutletQuery(owner, layerID) {
     return owner._outlets[layerID];
 }
-exports.MUIOutletQuery = MUIOutletQuery;
+ 
 function MUIOutlet(owner, elementID, className, options) {
     //var layer = document.getElementById(elementID);
     var query = MUIOutletQuery(owner, elementID);
@@ -2703,14 +2703,14 @@ function MUIOutlet(owner, elementID, className, options) {
         classInstance.awakeFromHTML();
     return classInstance;
 }
-exports.MUIOutlet = MUIOutlet;
+ 
 function MUIWindowSize() {
     var w = document.body.clientWidth;
     //var h = document.body.clientHeight;window.innerHeight
     var h = window.innerHeight;
     return new mio_foundation_web_7.NSSize(w, h);
 }
-exports.MUIWindowSize = MUIWindowSize;
+ 
 function _MUIShowViewController(fromVC, toVC, sourceVC, animated, target, completion) {
     toVC.viewWillAppear();
     //toVC._childControllersWillAppear();
@@ -2752,7 +2752,7 @@ function _MUIShowViewController(fromVC, toVC, sourceVC, animated, target, comple
         _MUIAnimationDidStart(fromVC, toVC, pc, target, completion);
     });
 }
-exports._MUIShowViewController = _MUIShowViewController;
+ 
 function _MUIAnimationDidStart(fromVC, toVC, pc, target, completion) {
     toVC.viewDidAppear();
     //toVC._childControllersDidAppear();
@@ -2768,7 +2768,7 @@ function _MUIAnimationDidStart(fromVC, toVC, pc, target, completion) {
     if (target != null && completion != null)
         completion.call(target);
 }
-exports._MUIAnimationDidStart = _MUIAnimationDidStart;
+ 
 function _MUIHideViewController(fromVC, toVC, sourceVC, target, completion) {
     if (fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
         || fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext
@@ -2818,7 +2818,7 @@ function _MUIHideViewController(fromVC, toVC, sourceVC, target, completion) {
             completion.call(target);
     });
 }
-exports._MUIHideViewController = _MUIHideViewController;
+ 
 function _MUITransitionFromViewControllerToViewController(fromVC, toVC, sourceVC, target, completion) {
     toVC.viewWillAppear();
     //toVC._childControllersWillAppear();
@@ -2846,7 +2846,7 @@ function _MUITransitionFromViewControllerToViewController(fromVC, toVC, sourceVC
             completion.call(target);
     });
 }
-exports._MUITransitionFromViewControllerToViewController = _MUITransitionFromViewControllerToViewController;
+ 
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -2926,7 +2926,7 @@ var UIWindow = /** @class */ (function (_super) {
     };
     return UIWindow;
 }(UIView));
-exports.UIWindow = UIWindow;
+ 
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -3157,5 +3157,5 @@ var UIApplication = /** @class */ (function () {
     };
     return UIApplication;
 }());
-exports.UIApplication = UIApplication;
+ 
 //# sourceMappingURL=UIKit.web.js.map

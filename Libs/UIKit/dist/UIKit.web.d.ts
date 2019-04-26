@@ -1,7 +1,7 @@
 import { NSObject } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
-import "mio-foundation-web/_extensions";
+import "mio-foundation-web/extensions";
 import { NSSize } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
 export declare var _MUICoreLayerIDCount: number;
