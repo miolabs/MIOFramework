@@ -3,30 +3,8 @@ const fs = require("fs");
 const concat = require("gulp-concat");
 const rimraf = require("rimraf");
 const uglify = require("gulp-uglify");
-const sourcemaps = require("gulp-sourcemaps");
 
 let arrIndexFiles = [];
-
-function build(done) {
-	var env = process.env["BUILD_ENV"];
-	var platform = process.env["BUILD_PLATFORM"];
-
-	console.log("Environment: " + env + " Platform: " + platform);
-
-	if (env == "dev" && platform == "node") {
-		//buildNodeDev();
-	}
-	else if (env == "dev" && platform == "web"){
-		//buildWebDev();
-	}
-	else if (env == "prod" && platform == "node") {
-		buildNodeProd();
-	}
-	else if (env == "prod" && platform == "web") {
-		buildWebProd();
-	}
-	done();
-}
 
 /********** PROD **********/
 /********** PROD **********/
@@ -55,7 +33,7 @@ function concatNodeTsFiles() {
 function cleanNodeFoundation(done) {
 	const path = "./source/foundation.node.ts";
 	var originalContent = fs.readFileSync(path, "utf8");
-	var newContent = originalContent.replace(/import(.*)/g, "");
+	var newContent = originalContent.replace(/import(.*)["|']\..*/g, "");
 	fs.writeFileSync(path, newContent);
 	done();
 }
@@ -75,7 +53,7 @@ function createNodePackage(done) {
 		fs.mkdirSync(DEST + "types", {recursive: true});
 		
 		//Copy foundation.d.ts to types folder
-		fs.copyFileSync("./dist/foundation.node.d.ts", DEST + "types/foundation.node.d.ts");
+		fs.copyFileSync("./dist/foundation.node.d.ts", DEST + "types/mio-foundation-node.d.ts");
 
 		//Copy foundation.min.js
 		fs.copyFileSync("./.build/node-prod/foundation.node.js", DEST + "mio-foundation-node.js");
@@ -165,7 +143,7 @@ function createWebPackage(done) {
 		fs.mkdirSync(DEST + "types", {recursive: true});
 		
 		//Copy foundation.d.ts to types folder
-		fs.copyFileSync("./dist/foundation.web.d.ts", DEST + "types/foundation.web.d.ts");
+		fs.copyFileSync("./dist/foundation.web.d.ts", DEST + "types/mio-foundation-web.d.ts");
 
 		//Copy foundation.min.js
 		fs.copyFileSync("./.build/web-prod/foundation.web.js", DEST + "mio-foundation-web.js");
@@ -207,13 +185,13 @@ function buildWebDevPackage(done) {
 		fs.mkdirSync(DEST + "types", {recursive: true});
 		
 		//Copy foundation.d.ts to types folder
-		fs.copyFileSync("./dist/foundation.web.d.ts", DEST + "types/foundation.web.d.ts");
+		fs.copyFileSync("./dist/foundation.web.d.ts", DEST + "types/mio-foundation-web.d.ts");
 
 		//Copy foundation.web.js
 		fs.copyFileSync("./dist/foundation.web.js", DEST + "foundation-web.js");
 
 		//Copy foundation.web.js.map
-		fs.copyFileSync("./dist/foundation.web.js.map", DEST + "foundation.web.js.map");
+		fs.copyFileSync("./dist/foundation.web.js.map", DEST + "foundation-web.js.map");
 
 		//Copy package.json, LICENSE AND README
 		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
@@ -223,6 +201,20 @@ function buildWebDevPackage(done) {
 	} else {
 		console.log("/.build directory does not exist - Execute first gulp minifyWebProd");
 	}
+	done();
+}
+
+function buildWebDevPackageFile(done) {
+	var platform = "web";
+	var regEx = /{%platform%}/gm;
+	const DEST = "packages/mio-foundation-web-dev/";
+
+	//Create package.platform.json
+	fs.copyFileSync("package.platform.json", DEST + "package.json");
+	
+	var content = fs.readFileSync("packages/mio-foundation-" + platform + "-dev/package.json", "utf8");
+	content = content.replace(regEx, platform);
+	fs.writeFileSync("packages/mio-foundation-" + platform + "-dev/package.json", content);
 	done();
 }
 
@@ -254,14 +246,13 @@ function removeTempFolders(done) {
 }
 
 module.exports = {
-	build: build, //Not working, fix it when implementing dev building
 	//NODE PROD
-	buildNodeProd: gulp.series(parseIndexNodeTs, concatNodeTsFiles, cleanNodeFoundation),
+	buildNode: gulp.series(parseIndexNodeTs, concatNodeTsFiles, cleanNodeFoundation),
 	minifyNodeProd,
 	buildNodePackage: gulp.series(createNodePackage, buildNodePackageFile),
 
 	//WEB PROD
-	buildWebProd: gulp.series(parseIndexWebTs, concatWebTsFiles, cleanWebFoundation),
+	buildWeb: gulp.series(parseIndexWebTs, concatWebTsFiles, cleanWebFoundation),
 	cleanWebJsFile,
 	minifyWebProd,
 	buildWebPackage: gulp.series(createWebPackage, buildWebPackageFile),
@@ -269,5 +260,6 @@ module.exports = {
 	removeTempFolders,
 
 	//WEB DEV
-	buildWebDevPackage
+	buildWebDevPackage,
+	buildWebDevPackageFile
 }

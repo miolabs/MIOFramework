@@ -12,19 +12,14 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:dev:node": "BUILD_ENV=dev BUILD_PLATFORM=node gulp build",
-    "build:dev:web": "BUILD_ENV=dev BUILD_PLATFORM=web gulp build",
-    "build:prod:node": "BUILD_ENV=prod BUILD_PLATFORM=node gulp build",
-    "build:prod:web": "BUILD_ENV=prod BUILD_PLATFORM=web gulp build",
-    "build-node-prod": "gulp buildNodeProd && tsc && gulp minifyNodeProd && gulp buildNodePackage && gulp buildNodePackageFile",
-    "build-web-prod": "gulp buildWebProd && tsc && gulp cleanWebJsFile && gulp minifyWebProd && gulp buildWebPackage && gulp buildWebPackageFile",
-    "build-web-dev": "gulp buildWebProd && tsc && gulp cleanWebJsFile && gulp buildWebDevPackage"
+    "build-node-prod": "gulp buildNode && tsc && gulp minifyNodeProd && gulp buildNodePackage && gulp removeTempFolders",
+    "build-web-prod": "gulp buildWeb && tsc && gulp cleanWebJsFile && gulp minifyWebProd && gulp buildWebPackage && gulp removeTempFolders",
+    "build-web-dev": "gulp buildWeb && tsc && gulp cleanWebJsFile && gulp buildWebDevPackage && gulp buildWebDevPackageFile && gulp removeTempFolders"
   },
   "devDependencies": {
     "decimal.js": "^10.1.1",
     "gulp": "^4.0.0",
     "gulp-concat": "^2.6.1",
-    "gulp-sourcemaps": "^2.6.5",
     "gulp-uglify": "^3.0.2",
     "readable-stream": "^3.3.0",
     "rimraf": "^2.6.3"
