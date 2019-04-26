@@ -7,3 +7,6 @@ export declare function MUICoreLayerRemoveSublayer(layer: any, subLayer: any): v
 export declare function MUICoreLayerCreateWithStyle(style: any, layerID?: any): HTMLElement;
 export declare function MUICoreLayerAddStyle(layer: any, style: any): void;
 export declare function MUICoreLayerRemoveStyle(layer: any, style: any): void;
+export declare function MUICoreLayerSearchElementByAttribute(layer: any, key: any): any;
+export declare function MUICoreLayerSearchElementByID(layer: any, elementID: any): any;
+export declare function MUICoreLayerGetFirstElementWithTag(layer: any, tag: any): any;

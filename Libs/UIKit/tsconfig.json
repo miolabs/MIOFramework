@@ -8,12 +8,7 @@
 		"noImplicitAny": false,
 		"types": ["node_modules/mio-foundation-web/types"]
 	},	
-	"include": [
-		"source/core/MUICore.ts",
-		"source/core/MIOCoreAnimation.ts",
-		"source/core/MIOCoreLayer.ts",
-		"source/**/*"
-	],
+	"files": ["source/UIKit.web.ts"],
 	"exclude": [
 		"node_modules",
 		"platform/index.ts"

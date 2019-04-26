@@ -92,7 +92,7 @@ function parseIndexWebTs(done) {
 	var content = fs.readFileSync("./source/index.web.ts", "utf8");
 	var item;
 
-	arrIndexFiles = [];
+	arrIndexFiles = [];	
 
 	while (item = regEx.exec(content)) {		
 		arrIndexFiles.push("./source/" + item[1] + ".ts");

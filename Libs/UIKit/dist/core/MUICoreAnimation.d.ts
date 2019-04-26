@@ -1,4 +1,4 @@
-import { NSObject } from "foundation";
+import { NSObject } from "mio-foundation-web";
 export declare enum UIAnimationType {
     None = 0,
     BeginSheet = 1,

@@ -5,24 +5,25 @@ var UIView_1 = require("../UIView");
 var UIViewController_1 = require("../UIViewController");
 var UIViewController_PresentationController_1 = require("../UIViewController_PresentationController");
 var MUICoreAnimation_1 = require("./MUICoreAnimation");
-function UIOutletRegister(owner, layerID, c) {
+var MUICoreLayer_1 = require("./MUICoreLayer");
+function MUIOutletRegister(owner, layerID, c) {
     owner._outlets[layerID] = c;
 }
-exports.UIOutletRegister = UIOutletRegister;
-function UIOutletQuery(owner, layerID) {
+exports.MUIOutletRegister = MUIOutletRegister;
+function MUIOutletQuery(owner, layerID) {
     return owner._outlets[layerID];
 }
-exports.UIOutletQuery = UIOutletQuery;
-function UIOutlet(owner, elementID, className, options) {
+exports.MUIOutletQuery = MUIOutletQuery;
+function MUIOutlet(owner, elementID, className, options) {
     //var layer = document.getElementById(elementID);
-    var query = UIOutletQuery(owner, elementID);
+    var query = MUIOutletQuery(owner, elementID);
     if (query != null)
         return query;
     var layer = null;
     if (owner instanceof UIView_1.UIView)
-        layer = UIView_1.UILayerSearchElementByID(owner.layer, elementID);
+        layer = MUICoreLayer_1.MUICoreLayerSearchElementByID(owner.layer, elementID);
     else if (owner instanceof UIViewController_1.UIViewController)
-        layer = UIView_1.UILayerSearchElementByID(owner.view.layer, elementID);
+        layer = MUICoreLayer_1.MUICoreLayerSearchElementByID(owner.view.layer, elementID);
     if (layer == null)
         return null; // Element not found
     //throw new Error(`DIV identifier specified is not valid (${elementID})`);
@@ -33,7 +34,7 @@ function UIOutlet(owner, elementID, className, options) {
     var classInstance = mio_foundation_web_1.NSClassFromString(className);
     classInstance.initWithLayer(layer, owner, options);
     // Track outlets inside view controller (owner)
-    UIOutletRegister(owner, elementID, classInstance);
+    MUIOutletRegister(owner, elementID, classInstance);
     if (owner instanceof UIView_1.UIView)
         owner._linkViewToSubview(classInstance);
     else if (owner instanceof UIViewController_1.UIViewController) {
@@ -49,7 +50,7 @@ function UIOutlet(owner, elementID, className, options) {
         classInstance.awakeFromHTML();
     return classInstance;
 }
-exports.UIOutlet = UIOutlet;
+exports.MUIOutlet = MUIOutlet;
 function UIWindowSize() {
     var w = document.body.clientWidth;
     //var h = document.body.clientHeight;window.innerHeight

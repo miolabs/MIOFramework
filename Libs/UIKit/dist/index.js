@@ -6,12 +6,13 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./core/MUICore"));
 __export(require("./core/MUICoreLayer"));
 __export(require("./core/MUICoreAnimation"));
-__export(require("./core/MUICoreBundle"));
 __export(require("./platform/web/MUICore_web"));
+__export(require("./core/MUICoreBundle"));
 __export(require("./UIView"));
+__export(require("./UIViewController"));
+__export(require("./core/MUICore"));
 __export(require("./UIWindow"));
 __export(require("./UITabBar"));
 __export(require("./UIImageView"));
@@ -36,7 +37,6 @@ __export(require("./UISegmentedControl"));
 __export(require("./UIPageControl"));
 __export(require("./UIToolbar"));
 __export(require("./UINavigationBar"));
-__export(require("./UIViewController"));
 __export(require("./UINavigationItem"));
 __export(require("./UINavigationController"));
 __export(require("./UIPageController"));

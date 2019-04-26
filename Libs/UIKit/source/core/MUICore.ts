@@ -3,12 +3,8 @@ import { NSClassFromString, NSSize, MIOCoreIsPhone } from "mio-foundation-web";
 import { UIView } from "../UIView";
 import { UIViewController } from "../UIViewController";
 import { UIModalPresentationStyle, UIPresentationController } from "../UIViewController_PresentationController";
-import { _UIAnimationStart } from "./MUICoreAnimation";
+import { _MUIAnimationStart } from "./MUICoreAnimation";
 import { MUICoreLayerSearchElementByID } from "./MUICoreLayer";
-
-export interface Window {
-    prototype;
-}
 
 export function MUIOutletRegister(owner, layerID, c)
 {
@@ -65,7 +61,7 @@ export function MUIOutlet(owner, elementID, className?, options?)
     return classInstance;
 }
 
-export function UIWindowSize()
+export function MUIWindowSize()
 {
     var w = document.body.clientWidth;
     //var h = document.body.clientHeight;window.innerHeight
@@ -74,7 +70,7 @@ export function UIWindowSize()
     return new NSSize(w, h);
 }
 
-export function _MIUShowViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, animated:boolean, target?, completion?)
+export function _MUIShowViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, animated:boolean, target?, completion?)
 {
     toVC.viewWillAppear();
     //toVC._childControllersWillAppear();
@@ -95,7 +91,7 @@ export function _MIUShowViewController(fromVC:UIViewController, toVC:UIViewContr
         view = toVC.view;
 
     if (animated == false) {
-        _UIAnimationDidStart(fromVC, toVC, pc, target, completion);
+        _MUIAnimationDidStart(fromVC, toVC, pc, target, completion);
         return;
     }
     
@@ -124,12 +120,12 @@ export function _MIUShowViewController(fromVC:UIViewController, toVC:UIViewContr
 
     let layer = view.layer;
             
-    _UIAnimationStart(layer, ac, animationContext, this, function () {
-        _UIAnimationDidStart(fromVC, toVC, pc, target, completion);
+    _MUIAnimationStart(layer, ac, animationContext, this, function () {
+        _MUIAnimationDidStart(fromVC, toVC, pc, target, completion);
     });
 
 }
-export function _UIAnimationDidStart(fromVC:UIViewController, toVC:UIViewController, pc:UIPresentationController, target?, completion?){
+export function _MUIAnimationDidStart(fromVC:UIViewController, toVC:UIViewController, pc:UIPresentationController, target?, completion?){
     toVC.viewDidAppear();
     //toVC._childControllersDidAppear();
 
@@ -149,7 +145,7 @@ export function _UIAnimationDidStart(fromVC:UIViewController, toVC:UIViewControl
 
 }
 
-export function _UIHideViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, target?, completion?)
+export function _MUIHideViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, target?, completion?)
 {
     if (fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
         || fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext
@@ -193,7 +189,7 @@ export function _UIHideViewController(fromVC:UIViewController, toVC:UIViewContro
     if (pc != null)
         pc.dismissalTransitionWillBegin();
 
-    _UIAnimationStart(layer, ac, animationContext, this, function () {
+    _MUIAnimationStart(layer, ac, animationContext, this, function () {
 
         if (fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
             || fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
@@ -215,7 +211,7 @@ export function _UIHideViewController(fromVC:UIViewController, toVC:UIViewContro
     });
 }
 
-export function _UITransitionFromViewControllerToViewController(fromVC, toVC, sourceVC, target?, completion?)
+export function _MUITransitionFromViewControllerToViewController(fromVC, toVC, sourceVC, target?, completion?)
 {
     toVC.viewWillAppear();
     //toVC._childControllersWillAppear();
@@ -242,7 +238,7 @@ export function _UITransitionFromViewControllerToViewController(fromVC, toVC, so
 
     let layer = toVC.view.layer;
 
-    _UIAnimationStart(layer, ac, animationContext, this, function () {
+    _MUIAnimationStart(layer, ac, animationContext, this, function () {
 
         toVC.viewDidAppear();
         //toVC._childControllersDidAppear();

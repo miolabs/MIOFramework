@@ -1,9 +1,12 @@
 
 import { UIWindow } from "./UIWindow";
-import { UICoreLayerIDFromObject, UICoreLayerCreate, UICoreLayerAddStyle } from "./MIOUI_CoreLayer";
-import { MIOClassFromString } from "../MIOCore/platform";
-import { UIGestureRecognizer, UIEvent, UIGestureRecognizerState } from ".";
+import { MUICoreLayerIDFromObject, MUICoreLayerCreate, MUICoreLayerAddStyle } from "./core/MUICoreLayer";
+import { UIGestureRecognizer, UIGestureRecognizerState } from "./UIGestureRecognizer";
+import { UIEvent } from "./UIEvent";
 import { NSObject } from "mio-foundation-web";
+import { NSRect } from "mio-foundation-web";
+import { NSClassFromString } from "mio-foundation-web";
+import { MUICoreLayerSearchElementByID } from "./core/MUICoreLayer";
 
 /**
  * Created by godshadow on 11/3/16.
@@ -51,11 +54,11 @@ export class UIView extends NSObject
 
     constructor(layerID?){
         super();
-        this.layerID = layerID ? layerID : UICoreLayerIDFromObject(this);
+        this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(this);
     }
 
     init(){
-        this.layer = UICoreLayerCreate(this.layerID);        
+        this.layer = MUICoreLayerCreate(this.layerID);        
         //UICoreLayerAddStyle(this.layer, "view");
         //UICoreLayerAddStyle(this.layer, "view");
         //this.layer.style.position = "absolute";
@@ -66,8 +69,8 @@ export class UIView extends NSObject
         //this.layer.style.background = "rgb(255, 255, 255)";                
     }
 
-    initWithFrame(frame:MIORect){
-        this.layer = UICoreLayerCreate(this.layerID);
+    initWithFrame(frame:NSRect){
+        this.layer = MUICoreLayerCreate(this.layerID);
         this.layer.style.position = "absolute";
         this.setX(frame.origin.x);
         this.setY(frame.origin.y);
@@ -97,7 +100,7 @@ export class UIView extends NSObject
                 let className = subLayer.getAttribute("data-class");
                 if (className == null || className.length == 0) className = "UIView";
                 
-                let sv = MIOClassFromString(className);
+                let sv = NSClassFromString(className);
                 sv.initWithLayer(subLayer, this); 
                 this._linkViewToSubview(sv);            
             }
@@ -108,11 +111,10 @@ export class UIView extends NSObject
     copy() {
         let objLayer = this.layer.cloneNode(true);
         
-        let className = this.getClassName();
-        MIOLog("UIView:copy:Copying class name " + className);
+        let className = this.getClassName();        
         if (className == null) throw Error("UIView:copy: Error classname is null");
         
-        let view = MIOClassFromString(className);
+        let view = NSClassFromString(className);
         view.initWithLayer(objLayer, null);   
 
         return view;
@@ -230,7 +232,7 @@ export class UIView extends NSObject
 
     viewWithTag(tag):UIView{
         // TODO: Use also the view tag component
-        let view = MIOViewSearchViewTag(this, tag);
+        let view = MUICoreViewSearchViewTag(this, tag);
         return view;
     }
 
@@ -264,7 +266,7 @@ export class UIView extends NSObject
     }
 
     layerWithItemID(itemID){
-        return UILayerSearchElementByID(this.layer, itemID);
+        return MUICoreLayerSearchElementByID(this.layer, itemID);
     }
 
     private _hidden:boolean = false;
@@ -431,11 +433,11 @@ export class UIView extends NSObject
     }
     
     get frame() {        
-        return MIORect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        return NSRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
     }
 
     public get bounds(){
-        return MIORect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
+        return NSRect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
     }
 
     //

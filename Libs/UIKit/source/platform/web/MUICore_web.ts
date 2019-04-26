@@ -1,4 +1,5 @@
 import { MIOCoreBundleGetMainURLString } from "mio-foundation-web"
+import { MUICoreEventType, MUICoreEvent, MUICoreKeyEvent, MUICoreEventMouse, MUICoreEventTouch } from "../../core/MUICoreEvents";
 
 // Declare main funciton so we can call after intizalization
 declare function main(args);
@@ -19,7 +20,7 @@ window.onerror = function (e) {
 
 var _miocore_events_event_observers = {};
 
-export function MIOCoreEventRegisterObserverForType(eventType:MIOCoreEventType, observer, completion)
+export function MUICoreEventRegisterObserverForType(eventType:MUICoreEventType, observer, completion)
 {
     let item = {"Target" : observer, "Completion" : completion};
 
@@ -33,7 +34,7 @@ export function MIOCoreEventRegisterObserverForType(eventType:MIOCoreEventType, 
     array.push(item);
 }
 
-export function MIOCoreEventUnregisterObserverForType(eventType:MIOCoreEventType, observer)
+export function MUICoreEventUnregisterObserverForType(eventType:MUICoreEventType, observer)
 {    
     let obs = _miocore_events_event_observers[eventType];
     if (obs == null) return;
@@ -57,7 +58,7 @@ export function MIOCoreEventUnregisterObserverForType(eventType:MIOCoreEventType
     }
 }
 
-function _MIOCoreEventSendToObservers(obs, event:MIOCoreEvent){
+function _MUICoreEventSendToObservers(obs, event:MUICoreEvent){
 
     if (obs != null)
     {
@@ -81,22 +82,22 @@ function _MIOCoreEventSendToObservers(obs, event:MIOCoreEvent){
 window.addEventListener("keydown", function(e){
         
         // Create event
-        let event = new MIOCoreKeyEvent();
-        event.initWithKeyCode(MIOCoreEventType.KeyDown, e.keyCode, e);
+        let event = new MUICoreKeyEvent();
+        event.initWithKeyCode(MUICoreEventType.KeyDown, e.keyCode, e);
 
-        let observers = _miocore_events_event_observers[MIOCoreEventType.KeyDown];
-        _MIOCoreEventSendToObservers(observers, event);
+        let observers = _miocore_events_event_observers[MUICoreEventType.KeyDown];
+        _MUICoreEventSendToObservers(observers, event);
     },
 false);
 
 window.addEventListener('keyup', function(e){
         
         // Create event
-        let event = new MIOCoreKeyEvent();
-        event.initWithKeyCode(MIOCoreEventType.KeyUp, e.keyCode, e);
+        let event = new MUICoreKeyEvent();
+        event.initWithKeyCode(MUICoreEventType.KeyUp, e.keyCode, e);
 
-        let observers = _miocore_events_event_observers[MIOCoreEventType.KeyUp];
-        _MIOCoreEventSendToObservers(observers, event);
+        let observers = _miocore_events_event_observers[MUICoreEventType.KeyUp];
+        _MUICoreEventSendToObservers(observers, event);
     },
 false);
 
@@ -105,52 +106,52 @@ false);
 window.addEventListener('mousedown', function(e){
         
         // Create event
-        let event = new MIOCoreKeyEvent();
-        event.initWithType(MIOCoreEventType.MouseDown, e);
+        let event = new MUICoreKeyEvent();
+        event.initWithType(MUICoreEventType.MouseDown, e);
 
-        let observers = _miocore_events_event_observers[MIOCoreEventType.MouseDown];
-        _MIOCoreEventSendToObservers(observers, event);        
+        let observers = _miocore_events_event_observers[MUICoreEventType.MouseDown];
+        _MUICoreEventSendToObservers(observers, event);        
     },
 false);
 
 window.addEventListener('mouseup', function(e){
         
         // Create event
-        var event = new MIOCoreEventMouse();
-        event.initWithType(MIOCoreEventType.MouseUp, e);
+        var event = new MUICoreEventMouse();
+        event.initWithType(MUICoreEventType.MouseUp, e);
 
-        let observers_mouseup = _miocore_events_event_observers[MIOCoreEventType.MouseUp];
-        _MIOCoreEventSendToObservers(observers_mouseup, event);
+        let observers_mouseup = _miocore_events_event_observers[MUICoreEventType.MouseUp];
+        _MUICoreEventSendToObservers(observers_mouseup, event);
 
         // Send click event
-        let observers_click = _miocore_events_event_observers[MIOCoreEventType.Click];
-        _MIOCoreEventSendToObservers(observers_click, event);
+        let observers_click = _miocore_events_event_observers[MUICoreEventType.Click];
+        _MUICoreEventSendToObservers(observers_click, event);
     },
 false);
 
 window.addEventListener('touchend', function(e:TouchEvent){
     
         // Create event
-        let event = new MIOCoreEventTouch();
-        event.initWithType(MIOCoreEventType.TouchEnd, e);
+        let event = new MUICoreEventTouch();
+        event.initWithType(MUICoreEventType.TouchEnd, e);
 
-        let observers_touchend = _miocore_events_event_observers[MIOCoreEventType.TouchEnd];
-        _MIOCoreEventSendToObservers(observers_touchend, event);
+        let observers_touchend = _miocore_events_event_observers[MUICoreEventType.TouchEnd];
+        _MUICoreEventSendToObservers(observers_touchend, event);
 
         // Send click event
-        let observers_click = _miocore_events_event_observers[MIOCoreEventType.Click];
-        _MIOCoreEventSendToObservers(observers_click, event);
+        let observers_click = _miocore_events_event_observers[MUICoreEventType.Click];
+        _MUICoreEventSendToObservers(observers_click, event);
 
 }, false);
 
 // UI events
 window.addEventListener("resize", function(e) {
         
-        let event = new MIOCoreEvent();
-        event.initWithType(MIOCoreEventType.Resize, e);
+        let event = new MUICoreEvent();
+        event.initWithType(MUICoreEventType.Resize, e);
 
-        let observers = _miocore_events_event_observers[MIOCoreEventType.Resize];
-        _MIOCoreEventSendToObservers(observers, event);
+        let observers = _miocore_events_event_observers[MUICoreEventType.Resize];
+        _MUICoreEventSendToObservers(observers, event);
 
 }, false);
 

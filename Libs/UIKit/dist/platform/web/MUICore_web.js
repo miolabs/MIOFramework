@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var mio_foundation_web_1 = require("mio-foundation-web");
 window.onload = function (e) {
-    var url = MIOCoreGetMainBundleURLString();
+    var url = mio_foundation_web_1.MIOCoreBundleGetMainURLString();
     console.log("Main URL: " + url);
     var args = url; // Todo get only the query string
     main(args);

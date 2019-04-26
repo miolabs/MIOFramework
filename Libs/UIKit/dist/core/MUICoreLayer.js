@@ -49,4 +49,54 @@ function MUICoreLayerRemoveStyle(layer, style) {
     layer.classList.remove(style);
 }
 exports.MUICoreLayerRemoveStyle = MUICoreLayerRemoveStyle;
+function MUICoreLayerSearchElementByAttribute(layer, key) {
+    if (layer.tagName != "DIV" && layer.tagName != "INPUT" && layer.tagName != "SECTION")
+        return null;
+    if (layer.getAttribute(key) == "true")
+        return layer;
+    var elementFound = null;
+    for (var count = 0; count < layer.childNodes.length; count++) {
+        var l = layer.childNodes[count];
+        elementFound = MUICoreLayerSearchElementByAttribute(l, key);
+        if (elementFound != null)
+            return elementFound;
+    }
+    return null;
+}
+exports.MUICoreLayerSearchElementByAttribute = MUICoreLayerSearchElementByAttribute;
+function MUICoreLayerSearchElementByID(layer, elementID) {
+    if (layer.tagName != "DIV" && layer.tagName != "INPUT" && layer.tagName != "SECTION")
+        return null;
+    if (layer.getAttribute("data-outlet") == elementID)
+        return layer;
+    // Deprecated. For old code we still mantein
+    if (layer.getAttribute("id") == elementID)
+        return layer;
+    var elementFound = null;
+    for (var count = 0; count < layer.childNodes.length; count++) {
+        var l = layer.childNodes[count];
+        elementFound = MUICoreLayerSearchElementByID(l, elementID);
+        if (elementFound != null)
+            return elementFound;
+    }
+    return null;
+}
+exports.MUICoreLayerSearchElementByID = MUICoreLayerSearchElementByID;
+function MUICoreLayerGetFirstElementWithTag(layer, tag) {
+    var foundLayer = null;
+    if (layer.childNodes.length > 0) {
+        var index = 0;
+        foundLayer = layer.childNodes[index];
+        while (foundLayer.tagName != tag) {
+            index++;
+            if (index >= layer.childNodes.length) {
+                foundLayer = null;
+                break;
+            }
+            foundLayer = layer.childNodes[index];
+        }
+    }
+    return foundLayer;
+}
+exports.MUICoreLayerGetFirstElementWithTag = MUICoreLayerGetFirstElementWithTag;
 //# sourceMappingURL=MUICoreLayer.js.map

@@ -1,8 +1,18 @@
-import {NSURLRequest, NSURLConnection, NSPropertyListSerialization, NSURL, MIOCoreGetLanguages, MIOCoreAddLanguage, MIOCoreGetPlatformLanguage, MIOCoreBundleSetAppResource} from "mio-foundation-web";
-import { UIWindow } from "./UIWindow";
+import { NSURLRequest } from "mio-foundation-web";
+import { NSURLConnection } from "mio-foundation-web";
+import { NSPropertyListSerialization } from "mio-foundation-web";
+import { NSURL } from "mio-foundation-web";
+import { MIOCoreGetLanguages } from "mio-foundation-web";
+import { MIOCoreAddLanguage } from "mio-foundation-web";
+import { MIOCoreGetPlatformLanguage } from "mio-foundation-web";
+import { MIOCoreBundleSetAppResource } from "mio-foundation-web";
 import { MIOCoreStringSetLocalizedStrings } from "mio-foundation-web";
+import { UIWindow } from "./UIWindow";
+
 import { MUICoreBundleLoadNibName } from "./core/MUICoreBundle";
 import { UIViewController } from "./UIViewController";
+import { MUICoreEvent } from "./core/MUICoreEvents"
+import { MUICoreEventInput } from "./core/MUICoreEvents"
 
 /**
  * Created by godshadow on 11/3/16.
@@ -205,11 +215,11 @@ export class UIApplication {
         }
     }
 
-    private _resizeEvent(event:MIOCoreEvent) {        
+    private _resizeEvent(event:MUICoreEvent) {        
         this.delegate.window.layoutSubviews();
     }
 
-    private _clickEvent(event:MIOCoreEventInput){
+    private _clickEvent(event:MUICoreEventInput){
         var target = event.coreEvent.target;
         var x = event.x;
         var y = event.y;

@@ -13,69 +13,19 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var MIOFoundation_1 = require("../MIOFoundation");
 var MIOUI_CoreLayer_1 = require("./MIOUI_CoreLayer");
 var platform_1 = require("../MIOCore/platform");
 var _1 = require(".");
+var mio_foundation_web_1 = require("mio-foundation-web");
 /**
  * Created by godshadow on 11/3/16.
  */
-function UILayerSearchElementByAttribute(layer, key) {
-    if (layer.tagName != "DIV" && layer.tagName != "INPUT" && layer.tagName != "SECTION")
-        return null;
-    if (layer.getAttribute(key) == "true")
-        return layer;
-    var elementFound = null;
-    for (var count = 0; count < layer.childNodes.length; count++) {
-        var l = layer.childNodes[count];
-        elementFound = UILayerSearchElementByAttribute(l, key);
-        if (elementFound != null)
-            return elementFound;
-    }
-    return null;
-}
-exports.UILayerSearchElementByAttribute = UILayerSearchElementByAttribute;
-function UILayerSearchElementByID(layer, elementID) {
-    if (layer.tagName != "DIV" && layer.tagName != "INPUT" && layer.tagName != "SECTION")
-        return null;
-    if (layer.getAttribute("data-outlet") == elementID)
-        return layer;
-    // Deprecated. For old code we still mantein
-    if (layer.getAttribute("id") == elementID)
-        return layer;
-    var elementFound = null;
-    for (var count = 0; count < layer.childNodes.length; count++) {
-        var l = layer.childNodes[count];
-        elementFound = UILayerSearchElementByID(l, elementID);
-        if (elementFound != null)
-            return elementFound;
-    }
-    return null;
-}
-exports.UILayerSearchElementByID = UILayerSearchElementByID;
-function UILayerGetFirstElementWithTag(layer, tag) {
-    var foundLayer = null;
-    if (layer.childNodes.length > 0) {
-        var index = 0;
-        foundLayer = layer.childNodes[index];
-        while (foundLayer.tagName != tag) {
-            index++;
-            if (index >= layer.childNodes.length) {
-                foundLayer = null;
-                break;
-            }
-            foundLayer = layer.childNodes[index];
-        }
-    }
-    return foundLayer;
-}
-exports.UILayerGetFirstElementWithTag = UILayerGetFirstElementWithTag;
-function MIOViewSearchViewTag(view, tag) {
+function MUICoreViewSearchViewTag(view, tag) {
     if (view.tag == tag)
         return view;
     for (var index = 0; index < view.subviews.length; index++) {
         var v = view.subviews[index];
-        v = MIOViewSearchViewTag(v, tag);
+        v = MUICoreViewSearchViewTag(v, tag);
         if (v != null)
             return v;
     }
@@ -167,7 +117,7 @@ var UIView = /** @class */ (function (_super) {
     UIView.prototype.copy = function () {
         var objLayer = this.layer.cloneNode(true);
         var className = this.getClassName();
-        MIOFoundation_1.MIOLog("UIView:copy:Copying class name " + className);
+        MIOLog("UIView:copy:Copying class name " + className);
         if (className == null)
             throw Error("UIView:copy: Error classname is null");
         var view = platform_1.MIOClassFromString(className);
@@ -432,14 +382,14 @@ var UIView = /** @class */ (function (_super) {
     };
     Object.defineProperty(UIView.prototype, "frame", {
         get: function () {
-            return MIOFoundation_1.MIORect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            return MIORect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(UIView.prototype, "bounds", {
         get: function () {
-            return MIOFoundation_1.MIORect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
+            return MIORect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
         },
         enumerable: true,
         configurable: true
@@ -604,6 +554,6 @@ var UIView = /** @class */ (function (_super) {
     UIView.animationTarget = null;
     UIView.animationCompletion = null;
     return UIView;
-}(MIOFoundation_1.MIOObject));
+}(mio_foundation_web_1.NSObject));
 exports.UIView = UIView;
 //# sourceMappingURL=UIView.js.map

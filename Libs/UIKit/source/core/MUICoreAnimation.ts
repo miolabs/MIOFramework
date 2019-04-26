@@ -4,7 +4,7 @@ import { NSObject } from "mio-foundation-web";
     ANIMATIONS
  */
 
-export enum UIAnimationType
+export enum MUIAnimationType
 {
     None,
     BeginSheet,
@@ -53,75 +53,75 @@ export function UIClassListForAnimationType(type)
 
     switch (type)
     {
-        case UIAnimationType.BeginSheet:
+        case MUIAnimationType.BeginSheet:
             array.push("slideInDown");
             break;
 
-        case UIAnimationType.EndSheet:
+        case MUIAnimationType.EndSheet:
             array.push("slideOutUp");
             break;
 
-        case UIAnimationType.Push:
+        case MUIAnimationType.Push:
             array.push("slideInRight");
             break;
 
-        case UIAnimationType.Pop:
+        case MUIAnimationType.Pop:
             array.push("slideOutRight");
             break;
 
-        case UIAnimationType.FadeIn:
+        case MUIAnimationType.FadeIn:
             array.push("fadeIn");
             break;
 
-        case UIAnimationType.FadeOut:
+        case MUIAnimationType.FadeOut:
             array.push("fadeOut");
             break;
 
-        case UIAnimationType.LightSpeedOut:
+        case MUIAnimationType.LightSpeedOut:
             array.push("lightSpeedOut");
             break;
 
-        case UIAnimationType.Hinge:
+        case MUIAnimationType.Hinge:
             array.push("hinge");
             break;
 
-        case UIAnimationType.SlideInUp:
+        case MUIAnimationType.SlideInUp:
             array.push("slideInUp");
             break;
 
-        case UIAnimationType.SlideOutDown:
+        case MUIAnimationType.SlideOutDown:
             array.push("slideOutDown");            
             break;
 
-        case UIAnimationType.SlideInRight:
+        case MUIAnimationType.SlideInRight:
             array.push("slideInRight");
             break;
 
-        case UIAnimationType.SlideOutRight:
+        case MUIAnimationType.SlideOutRight:
             array.push("slideOutRight");
             break;
 
-        case UIAnimationType.SlideInLeft:
+        case MUIAnimationType.SlideInLeft:
             array.push("slideInLeft");
             break;
 
-        case UIAnimationType.SlideOutLeft:
+        case MUIAnimationType.SlideOutLeft:
             array.push("slideOutLeft");
             break;
 
-        case UIAnimationType.HorizontalOutFlip:
+        case MUIAnimationType.HorizontalOutFlip:
             array.push("flipOutY");
             break;            
 
-        case UIAnimationType.HorizontalInFlip:
+        case MUIAnimationType.HorizontalInFlip:
             array.push("flipInY");
             break;    
             
-        case UIAnimationType.ZoomIn:
+        case MUIAnimationType.ZoomIn:
             array.push("zoomIn");
             break;
 
-        case UIAnimationType.ZoomOut:
+        case MUIAnimationType.ZoomOut:
             array.push("zoomOut");
             break;
     }
@@ -129,7 +129,7 @@ export function UIClassListForAnimationType(type)
     return array;
 }
 
-export function _UIAddAnimations(layer, animations)
+export function _MUIAddAnimations(layer, animations)
 {
     let w = layer.offsetWidth;
     for (var index = 0; index < animations.length; index++)
@@ -137,13 +137,13 @@ export function _UIAddAnimations(layer, animations)
     w++;
 }
 
-export function _UIRemoveAnimations(layer, animations)
+export function _MUIRemoveAnimations(layer, animations)
 {
     for (var index = 0; index < animations.length; index++)
         layer.classList.remove(animations[index]);
 }
 
-export function _UIAnimationStart(layer, animationController, animationContext, target?, completion?)
+export function _MUIAnimationStart(layer, animationController, animationContext, target?, completion?)
 {
     if (animationController == null)
     {
@@ -169,7 +169,7 @@ export function _UIAnimationStart(layer, animationController, animationContext, 
     }
 
     layer.style.animationDuration = duration + "s";
-    _UIAddAnimations(layer, animations);
+    _MUIAddAnimations(layer, animations);
 
     layer.animationParams = {};
     layer.animationParams["animationController"] = animationController;
@@ -191,7 +191,7 @@ export function _UIAnimationDidFinish(event)
     let completion = event.target.animationParams["completion"];
     let layer = event.target;
 
-    _UIRemoveAnimations(layer, animations);
+    _MUIRemoveAnimations(layer, animations);
     layer.removeEventListener("animationend", _UIAnimationDidFinish);
     animationController.animationEnded(true);
 
