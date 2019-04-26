@@ -8,13 +8,15 @@
   },
   "author": "MIOLabs Team",
   "license": "Apache-2.0",
-  "devDependencies": {
+  "dependencies": {
     "decimal.js": "^10.1.1",
+    "mio-foundation-web": "^1.0.6"
+  },
+  "devDependencies": {    
     "gulp": "^4.0.0",
     "gulp-concat": "^2.6.1",
     "gulp-uglify": "^3.0.2",
     "readable-stream": "^3.3.0",
-    "rimraf": "^2.6.3",
-    "mio-foundation-web": "^1.0.6"
+    "rimraf": "^2.6.3"    
   }
 }
