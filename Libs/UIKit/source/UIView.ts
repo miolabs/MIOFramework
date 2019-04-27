@@ -1,13 +1,15 @@
 
+import { NSObject } from "mio-foundation-web";
+import { NSRect } from "mio-foundation-web";
+import { NSClassFromString } from "mio-foundation-web";
+import "mio-foundation-web/extensions"
+
 import { UIWindow } from "./UIWindow";
 import { MUICoreLayerIDFromObject, MUICoreLayerCreate, MUICoreLayerAddStyle } from "./core/MUICoreLayer";
 import { UIGestureRecognizer, UIGestureRecognizerState } from "./UIGestureRecognizer";
 import { UIEvent } from "./UIEvent";
-import { NSObject } from "mio-foundation-web";
-import { NSRect } from "mio-foundation-web";
-import { NSClassFromString } from "mio-foundation-web";
 import { MUICoreLayerSearchElementByID } from "./core/MUICoreLayer";
-import "mio-foundation-web/extensions"
+
 
 /**
  * Created by godshadow on 11/3/16.

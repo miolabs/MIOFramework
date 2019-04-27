@@ -5,7 +5,7 @@
 		"module": "commonjs",
 		"outDir": "./dist",
 		"target": "es5",
-		"noImplicitAny": false		
+		"noImplicitAny": false
 	},	
 	"files": ["source/UIKit.web.ts"]
 }

@@ -9,7 +9,7 @@ import { MIOCoreBundleSetAppResource } from "mio-foundation-web";
 import { MIOCoreStringSetLocalizedStrings } from "mio-foundation-web";
 import { UIWindow } from "./UIWindow";
 
-import { MUICoreBundleLoadNibName } from "./core/MUICoreBundle";
+import { MUICoreBundleLoadNibName } from "./core/MUICoreNibParser";
 import { UIViewController } from "./UIViewController";
 import { MUICoreEvent } from "./core/MUICoreEvents"
 import { MUICoreEventInput } from "./core/MUICoreEvents"
@@ -106,23 +106,26 @@ export class UIApplication {
             this.mainResourceURLString = config["UIMainStoryboardFile"];
 
             let langs = config["Languages"];
-            if (langs == null) this._run();
-
-            for (let key in langs) {
-                let url = langs[key];
-                MIOCoreAddLanguage(key, url);
-            }
-            let lang = MIOCoreGetPlatformLanguage();
-            this.setLanguage(lang, this, function(){
+            if (langs == null) {
                 this._run();
-            });            
+            }
+            else {
+                for (let key in langs) {
+                    let url = langs[key];
+                    MIOCoreAddLanguage(key, url);
+                }
+                let lang = MIOCoreGetPlatformLanguage();
+                this.setLanguage(lang, this, function(){
+                    this._run();
+                });                
+            }
         });
     }
 
     private mainResourceURLString:string = null;
     private _run() {        
 
-        this.delegate.didFinishLaunching();        
+        this.delegate.applicationDidFinishLaunchingWithOptions();        
         this._mainWindow = this.delegate.window;
 
         if (this._mainWindow == null) {

@@ -1,7 +1,7 @@
 import { NSObject } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
-import "mio-foundation-web/_extensions";
+import "mio-foundation-web/extensions";
 import { NSSize } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
 export declare var _MUICoreLayerIDCount: number;
@@ -572,6 +572,8 @@ export declare class UIWindow extends UIView {
     _becameKeyWindow(): void;
     _resignKeyWindow(): void;
     private _dismissRootViewController;
+}
+export declare class UIResponder extends NSObject {
 }
 /**
  * Created by godshadow on 11/3/16.

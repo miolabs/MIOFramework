@@ -3,6 +3,7 @@ const fs = require("fs");
 const concat = require("gulp-concat");
 const rimraf = require("rimraf");
 const uglify = require("gulp-uglify");
+const execSync = require('child_process').execSync;
 
 let arrIndexFiles = [];
 
@@ -60,7 +61,11 @@ function UICleanWebJsFile(done) {
 	const regExObjectProperties = 'Object.defineProperty(exports, "__esModule", { value: true });';
 
 	let content = fs.readFileSync(path, "utf8");
-	let newContent = content.replace(regExObject, ObjectReplace).replace(regExExport, " ").replace(regExObjectProperties, " ");
+	let newContent = content.replace(regExObject, ObjectReplace)
+							.replace(regExExport, " ")
+							.replace(regExObjectProperties, " ")
+							.replace(/.*require.*/g, "")							
+							.replace(/mio_foundation_web_[0-9]*\./g, "");
 	
 	fs.writeFileSync(path, newContent);
 	done();
@@ -73,18 +78,23 @@ function UIMinifyWebProd() {
 }
 
 function UICreateWebPackage(done) {
-	const SRC = __dirname + "/.build/";
+	const SRC = __dirname + "/dist/";
 	const DEST = __dirname + "/packages/mio-uikit-web/";
 
 	if(fs.existsSync(SRC)) {
-		//Create package and types folder
-		fs.mkdirSync(DEST + "types", {recursive: true});
+		//Create package and types folder				
+		//fs.mkdirSync(DEST + "types", {recursive: true});	 ??? WHY this functions doesn't work? who knows... 	
+		execSync('mkdir -p ' + DEST + "types"); // Always you can relay on bash :)
 		
 		//Copy UIKit.d.ts to types folder
 		fs.copyFileSync("./dist/UIKit.web.d.ts", DEST + "types/mio-uikit-web.d.ts");
 
 		//Copy UIKit js
-		fs.copyFileSync("./.build/web-prod/UIKit.web.js", DEST + "mio-uikit-web.js");
+		fs.copyFileSync("./dist/UIKit.web.js", DEST + "mio-uikit-web.js");
+		//Copy UIKit js map if exists
+		if(fs.existsSync("./dist/UIKit.web.js.map")) {
+			fs.copyFileSync("./dist/UIKit.web.js.map", DEST + "mio-uikit-web.js.map");
+		}
 
 		//Copy package.json, LICENSE AND README
 		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");

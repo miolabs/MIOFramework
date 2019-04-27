@@ -1,4 +1,4 @@
-import "./platform/_extensions";
+import "./extensions/extensions";
 
 import { MIOCoreStringPathExtension, MIOCoreStringHasPreffix, MIOCoreStringHasSuffix, MIOCoreStringLastPathComponent, MIOCoreStringAppendPathComponent, MIOCoreStringDeletingLastPathComponent, MIOCoreStringLocalizeString } from "./core/MIOCoreString";
 

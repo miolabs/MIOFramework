@@ -5,7 +5,7 @@
 export * from './core/MUICoreLayer'
 export * from './core/MUICoreAnimation'
 export * from './platform/web/MUICore_web'
-export * from './core/MUICoreBundle'
+export * from './core/MUICoreNibParser'
 export * from './core/MUICoreEvents'
 
 export * from './UIEvent'
@@ -31,4 +31,5 @@ export * from './core/MUICore'
 
 export * from './UIWindow'
 
+export * from './UIResponder'
 export * from './UIApplication'
