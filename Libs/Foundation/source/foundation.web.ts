@@ -1,3 +1,4 @@
+
 export enum MIOCorePlatformType
 {
     Unknown,
@@ -5,8 +6,6 @@ export enum MIOCorePlatformType
     Safari,
     Chrome    
 }
-
-
 
 export function NSClassFromString(className:string){
     let classObject = window[className];
