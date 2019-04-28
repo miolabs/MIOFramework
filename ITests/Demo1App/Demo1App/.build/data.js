@@ -34,7 +34,8 @@ var ViewController = /** @class */ (function (_super) {
     };
     ViewController.prototype.buttonClicked = function ($info0x7fe4780ace58, sender) {
         var _this = this;
-        _this.textLabel[0]._text = _injectIntoOptional("Bye");
+        //_this.textLabel[0]._text = _injectIntoOptional("Bye");
+        console.log("??");
     };
     ViewController.prototype.initNibNameOptionalBundleOptional = function ($info0x7fe47877a470, nibNameOrNil, nibBundleOrNil) {
         var _this = this;
