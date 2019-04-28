@@ -104,7 +104,7 @@ export class UIView extends NSObject
                 if (className == null || className.length == 0) className = "UIView";
                 
                 let sv = NSClassFromString(className);
-                sv.initWithLayer(subLayer, this); 
+                sv.initWithLayer(subLayer, owner); 
                 this._linkViewToSubview(sv);            
             }
         }

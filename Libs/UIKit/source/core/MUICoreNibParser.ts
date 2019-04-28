@@ -3,34 +3,46 @@ import { MIOCoreHTMLParser } from "mio-foundation-web";
 import { MIOCoreHTMLParserDelegate } from "mio-foundation-web";
 import { NSLocalizeString } from "mio-foundation-web";
 import { MIOCoreBundleGetContentsFromURLString } from "mio-foundation-web";
+import { NSClassFromString } from "mio-foundation-web";
 
-export function MUICoreBundleLoadNibName(name:string, target, completion){
+export function MUICoreBundleLoadNibName(name:string, target:any, completion:any){
+
+    let parser = new MUICoreNibParser();
+    parser.target = target;
+    parser.completion = completion;    
 
     MIOCoreBundleGetContentsFromURLString(name, this, function(code, data){
-        let parser = new MUICoreNibParser();
-        parser.target;
-        parser.completion = completion;    
-
-        parser.parseString(data);
+        if (code == 200) parser.parseString(data);
+        else throw new Error("MUICoreBundleLoadNibName: Couldn't download resource " + name);
     });    
 }
 
 class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 {
     target = null;
-    completion = null;
-
-    private text = null;
+    completion = null;    
 
     private result = "";
-    private isCapturing = false;
+    private isCapturing = false;    
     private elementCapturingCount = 0;
+
+    private layerID = null;
+    private rootClassname = null;
 
     parseString(data:string){
         let parser = new MIOCoreHTMLParser();
         parser.initWithString(data, this);
 
         parser.parse();
+
+        let domParser = new DOMParser();
+        let items = domParser.parseFromString(this.result, "text/html");
+        let layer = items.getElementById(this.layerID);
+
+        let vc = NSClassFromString(this.rootClassname);
+        vc.initWithLayer(layer, vc);                
+
+        this.completion.call(this.target, vc);
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){
@@ -42,9 +54,11 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         
         if (element.toLocaleLowerCase() == "div"){
             
-            if (attributes["data-main-view-controller"] == "true") {
+            if (attributes["data-root-view-controller"] == "true") {
                 // Start capturing   
                 this.isCapturing = true;
+                this.layerID = attributes["id"];
+                this.rootClassname = attributes["data-class"];
             }
         }
 
@@ -88,9 +102,7 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 
     parserDidEndDocument(parser:MIOCoreHTMLParser){
         console.log("html parser finished");
-        console.log(this.result);
-
-        this.completion.call(this.target, this.result);
+        console.log(this.result);        
     }
 
     private openTag(element, attributes){

@@ -24,15 +24,23 @@ function parserDidStartElement(parser, element, attributes){
 	if (element == "scene"){				
 		let id = attributes["sceneID"];
 		currentFileName = "scene-" + id + ".html";		
-		currentFileContent = "<html><head><link rel='stylesheet' type='text/css' href='base.css'></head><body><div class='scene' id='"+ id +"'>";
+		currentFileContent = '<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="base.css"></head><body><div class="scene" id="' + id + '">';
 	}
 	else if (element == "viewController"){
 		let id = attributes["id"];
-		let customClass = attributes["customClass"];
+		let customClass = attributes["customClass"] || "UIViewController";
 					
-		currentFileContent += "<div class='viewController' id='" + id + "' data-main-view-controller='true'";	
-		if (customClass != null) currentFileContent += " data-class='" + customClass + "'";
-		currentFileContent += ">";											
+		currentFileContent += '<div class="view-controller" id="' + id + '" data-root-view-controller="true"';	
+		currentFileContent += ' data-class="' + customClass + '"';
+		currentFileContent += '>';
+	}
+	else if (element == "navigationController"){
+		let id = attributes["id"];
+		let customClass = attributes["customClass"] || "UINavigationController";
+					
+		currentFileContent += '<div class="nav-controller" id="' + id + '" data-root-view-controller="true"';	
+		currentFileContent += ' data-class="' + customClass + '"';
+		currentFileContent += '>';
 	}
 	else if (element == "view"){
 		pushNewElement(element, attributes);
@@ -61,7 +69,7 @@ function parserDidStartElement(parser, element, attributes){
 		parseBorderStyle(attributes["borderStyle"], inputClasses);
 		if (inputClasses.length > 0) inputAttrs.push(classesStringify(inputClasses));		
 		
-		item["Content"] = item["Content"] + "<input type='text' " + inputAttrs.join(" ") + ">"			
+		item["Content"] = item["Content"] + '<input type="text" ' + inputAttrs.join(" ") + '>'
 	}
 	else if (element == "rect"){
 		let styles = currentElement["Styles"];
@@ -76,9 +84,21 @@ function parserDidStartElement(parser, element, attributes){
 		let styles = currentElement["Styles"];
 		let key = parseColorKey(attributes["key"]);
 		if (key == null) return;
-		let r = parseFloat(attributes["red"]) * 255;
-		let g = parseFloat(attributes["green"]) * 255;
-		let b = parseFloat(attributes["blue"]) * 255;
+
+		let r = 0;
+		let g = 0;
+		let b = 0;
+		if (attributes["white"] == "1") {
+			r = 255;
+			g = 255;
+			b = 255;	
+		}
+		else {
+			let r = parseFloat(attributes["red"]) * 255;
+			let g = parseFloat(attributes["green"]) * 255;
+			let b = parseFloat(attributes["blue"]) * 255;		
+		}
+		
 		let a = parseFloat(attributes["alpha"]);
 		
 		let value = key + ":rgba(" + r + ", " + g + ", " + b + ", " + a + ");";
@@ -91,21 +111,26 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "state"){
 		let title = attributes["title"];
-		if (title != null) currentElement["Content"] = currentElement["Content"] + "<span>" + title + "</span>";	
+		if (title != null) currentElement["Content"] = currentElement["Content"] + '<span>' + title + '</span>';	
+	}
+	else if (element == "action") {
+		let selector =  attributes["selector"];
+		//TODO: let eventType = attributes["eventType"];		
+		currentElement["Content"] = currentElement["Content"] + '<div class="hidden" data-action-selector="' + selector.replace(":", "") +'"></div>';
 	}	
 }
 
 function parserDidEndElement(parser, element){
 
 	if (element == "scene"){				
-		currentFileContent += "</div></body></html>";
+		currentFileContent += '</div></body></html>';
 		generateHtmlFile();			
 		console.log(currentFileContent);
 		currentFileName = null;
 		currentFileContent = null;
 	}
-	else if (element == "viewController"){
-		currentFileContent += "</div>";		
+	else if (element == "viewController" || element == "navigationController"){
+		currentFileContent += '</div>';		
 	}
 	else if (element == "view"){
 		popElement();
@@ -131,7 +156,13 @@ function pushNewElement(element, attributes){
 	item["ID"] = id;
 	item["Content"] = "";
 	item["Styles"] = styles;
-	item["Classes"] = classes;		
+	item["Classes"] = classes;	
+	
+	if (attributes["customClass"] != null) item["ExtraAttributes"] = ['data-class="' + attributes["customClass"] + '"'];
+	else if (element == "view") item["ExtraAttributes"] = ['data-class="UIView"'];
+	else if (element == "label") item["ExtraAttributes"] = ['data-class="UILabel"'];
+	else if (element == "button") item["ExtraAttributes"] = ['data-class="UIButton"'];
+
 	classes.push(parseClassType(element));
 	if (contenMode != null) classes.push(contenMode);
 
@@ -154,13 +185,14 @@ function popElement(){
 	let id = item["ID"];
 	let classes = item["Classes"];
 	let styles = item["Styles"];
-	classes = classes.length > 0 ? "class='" + classes.join(" ") + "'": "";		
-	styles = styles.length > 0 ? "style='" + styles.join("") + "'": "";		
+	let extraAttributes = item["ExtraAttributes"];
+	classes = classes.length > 0 ? 'class="' + classes.join(" ") + '"': '';		
+	styles = styles.length > 0 ? 'style="' + styles.join("") + '"': '';		
 	let content = item["Content"];
 
-	addContentToParentItem("<div " + classes + "id='" + id + "'" + styles + ">", parentItem);
+	addContentToParentItem('<div ' + classes + 'id="' + id + '"' + extraAttributes.join(" ") + styles + '>', parentItem);
 	if (content != null) addContentToParentItem(content, parentItem);			
-	addContentToParentItem("</div>", parentItem);		
+	addContentToParentItem('</div>', parentItem);		
 
 }
 

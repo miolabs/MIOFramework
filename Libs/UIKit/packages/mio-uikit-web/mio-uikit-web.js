@@ -384,11 +384,14 @@ window.addEventListener("resize", function (e) {
     _MUICoreEventSendToObservers(observers, event);
 }, false);
 function MUICoreBundleLoadNibName(name, target, completion) {
+    var parser = new MUICoreNibParser();
+    parser.target = target;
+    parser.completion = completion;
     MIOCoreBundleGetContentsFromURLString(name, this, function (code, data) {
-        var parser = new MUICoreNibParser();
-        parser.target;
-        parser.completion = completion;
-        parser.parseString(data);
+        if (code == 200)
+            parser.parseString(data);
+        else
+            throw new Error("MUICoreBundleLoadNibName: Couldn't download resource " + name);
     });
 }
  
@@ -398,10 +401,11 @@ var MUICoreNibParser = /** @class */ (function (_super) {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.target = null;
         _this.completion = null;
-        _this.text = null;
         _this.result = "";
         _this.isCapturing = false;
         _this.elementCapturingCount = 0;
+        _this.layerID = null;
+        _this.rootClassname = null;
         _this.currentString = null;
         _this.currentStringLocalizedKey = null;
         return _this;
@@ -410,6 +414,12 @@ var MUICoreNibParser = /** @class */ (function (_super) {
         var parser = new MIOCoreHTMLParser();
         parser.initWithString(data, this);
         parser.parse();
+        var domParser = new DOMParser();
+        var items = domParser.parseFromString(this.result, "text/html");
+        var layer = items.getElementById(this.layerID);
+        var vc = NSClassFromString(this.rootClassname);
+        vc.initWithLayer(layer, vc);
+        this.completion.call(this.target, vc);
     };
     MUICoreNibParser.prototype.parserDidStartDocument = function (parser) {
         console.log("parser started");
@@ -417,9 +427,11 @@ var MUICoreNibParser = /** @class */ (function (_super) {
     // HTML Parser delegate
     MUICoreNibParser.prototype.parserDidStartElement = function (parser, element, attributes) {
         if (element.toLocaleLowerCase() == "div") {
-            if (attributes["data-main-view-controller"] == "true") {
+            if (attributes["data-root-view-controller"] == "true") {
                 // Start capturing   
                 this.isCapturing = true;
+                this.layerID = attributes["id"];
+                this.rootClassname = attributes["data-class"];
             }
         }
         if (this.isCapturing == true) {
@@ -454,7 +466,6 @@ var MUICoreNibParser = /** @class */ (function (_super) {
     MUICoreNibParser.prototype.parserDidEndDocument = function (parser) {
         console.log("html parser finished");
         console.log(this.result);
-        this.completion.call(this.target, this.result);
     };
     MUICoreNibParser.prototype.openTag = function (element, attributes) {
         this.translateCharacters();
@@ -851,7 +862,7 @@ var UIView = /** @class */ (function (_super) {
                 if (className == null || className.length == 0)
                     className = "UIView";
                 var sv = NSClassFromString(className);
-                sv.initWithLayer(subLayer, this);
+                sv.initWithLayer(subLayer, owner);
                 this._linkViewToSubview(sv);
             }
         }
@@ -1298,6 +1309,82 @@ var UIView = /** @class */ (function (_super) {
 }(NSObject));
  
 /**
+ * Created by godshadow on 11/3/16.
+ */
+var UILabel = /** @class */ (function (_super) {
+    __extends(UILabel, _super);
+    function UILabel() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._textLayer = null;
+        _this.autoAdjustFontSize = "none";
+        _this.autoAdjustFontSizeValue = 4;
+        return _this;
+    }
+    UILabel.prototype.init = function () {
+        _super.prototype.init.call(this);
+        MUICoreLayerAddStyle(this.layer, "label");
+        this.setupLayers();
+    };
+    UILabel.prototype.initWithLayer = function (layer, owner, options) {
+        _super.prototype.initWithLayer.call(this, layer, owner, options);
+        this._textLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "SPAN");
+        this.setupLayers();
+    };
+    UILabel.prototype.setupLayers = function () {
+        //UICoreLayerAddStyle(this.layer, "lbl");
+        if (this._textLayer == null) {
+            this.layer.innerHTML = "";
+            this._textLayer = document.createElement("span");
+            this._textLayer.style.top = "3px";
+            this._textLayer.style.left = "3px";
+            this._textLayer.style.right = "3px";
+            this._textLayer.style.bottom = "3px";
+            //this._textLayer.style.font = "inherit";
+            //this._textLayer.style.fontSize = "inherit";
+            this.layer.appendChild(this._textLayer);
+        }
+    };
+    UILabel.prototype.setText = function (text) {
+        this.text = text;
+    };
+    Object.defineProperty(UILabel.prototype, "text", {
+        get: function () {
+            return this._textLayer.innerHTML;
+        },
+        set: function (text) {
+            this._textLayer.innerHTML = text != null ? text : "";
+        },
+        enumerable: true,
+        configurable: true
+    });
+    UILabel.prototype.setTextAlignment = function (alignment) {
+        this.layer.style.textAlign = alignment;
+    };
+    UILabel.prototype.setHightlighted = function (value) {
+        if (value == true) {
+            this._textLayer.classList.add("label_highlighted_color");
+        }
+        else {
+            this._textLayer.classList.remove("label_highlighted_color");
+        }
+    };
+    UILabel.prototype.setTextRGBColor = function (r, g, b) {
+        var value = "rgb(" + r + ", " + g + ", " + b + ")";
+        this._textLayer.style.color = value;
+    };
+    UILabel.prototype.setFontSize = function (size) {
+        this._textLayer.style.fontSize = size + "px";
+    };
+    UILabel.prototype.setFontStyle = function (style) {
+        this._textLayer.style.fontWeight = style;
+    };
+    UILabel.prototype.setFontFamily = function (fontFamily) {
+        this._textLayer.style.fontFamily = fontFamily;
+    };
+    return UILabel;
+}(UIView));
+ 
+/**
  * Created by godshadow on 12/3/16.
  */
 var UIControl = /** @class */ (function (_super) {
@@ -1394,6 +1481,29 @@ var UIButton = /** @class */ (function (_super) {
         var status = this.layer.getAttribute("data-status");
         if (status == "selected")
             this.setSelected(true);
+        // Check for actions
+        if (this.layer.childNodes.length > 0) {
+            var _loop_1 = function (index) {
+                var subLayer = this_1.layer.childNodes[index];
+                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION")
+                    return "continue";
+                var actionSelector = subLayer.getAttribute("data-action-selector");
+                if (actionSelector != null) {
+                    this_1.setAction(this_1, function () {
+                        owner[actionSelector](this);
+                        // let action = owner[actionSelector];
+                        // action.call(owner);
+                    });
+                    return "break";
+                }
+            };
+            var this_1 = this;
+            for (var index = 0; index < this.layer.childNodes.length; index++) {
+                var state_1 = _loop_1(index);
+                if (state_1 === "break")
+                    break;
+            }
+        }
         this.setupLayers();
     };
     UIButton.prototype.setupLayers = function () {
@@ -1539,15 +1649,16 @@ var UIViewController = /** @class */ (function (_super) {
     };
     UIViewController.prototype.initWithLayer = function (layer, owner, options) {
         _super.prototype.init.call(this);
-        this.view = new UIView(this.layerID);
-        this.view.initWithLayer(layer, owner, options);
+        var viewLayer = MUICoreLayerGetFirstElementWithTag(layer, "DIV");
+        this.view = new UIView();
+        this.view.initWithLayer(viewLayer, owner, options);
         // Search for navigation item
         //this.navigationItem = UINavItemSearchInLayer(layer);
         this.loadView();
     };
     UIViewController.prototype.initWithResource = function (path) {
         if (path == null)
-            throw new Error("MIOViewController:initWithResource can't be null");
+            throw new Error("UIViewController:initWithResource can't be null");
         _super.prototype.init.call(this);
         this._htmlResourcePath = path;
         this.loadView();

@@ -18,7 +18,8 @@ class ViewController: UIViewController {
     }
     
     @IBAction func buttonClicked(sender: UIButton){
-        textLabel.text = "Bye"
+        NSLog("Button clicked!!")
+        //textLabel.text = "Bye"
     }
 }
 

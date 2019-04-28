@@ -59,6 +59,25 @@ export class UIButton extends UIControl
         if (status == "selected")
             this.setSelected(true);
 
+        // Check for actions
+        if (this.layer.childNodes.length > 0) {
+            for (let index = 0; index < this.layer.childNodes.length; index++) {
+                let subLayer = this.layer.childNodes[index];
+
+                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+
+                let actionSelector = subLayer.getAttribute("data-action-selector");
+                if (actionSelector != null) {                    
+                    this.setAction(this, function(){
+                        owner[actionSelector](this);
+                        // let action = owner[actionSelector];
+                        // action.call(owner);
+                    });
+                    break;                    
+                }
+            }
+        }
+
         this.setupLayers();
     }
 

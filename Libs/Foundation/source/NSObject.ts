@@ -169,4 +169,13 @@ export class NSObject
         
         return obj;
     }
+
+    performSelector(selector:string){
+        return this[selector]();
+    }
+
+    performSelectorOnMainThread(selector:string, arg:any, waitUntilDone:boolean){
+        this[selector](arg);
+    }
+
 }

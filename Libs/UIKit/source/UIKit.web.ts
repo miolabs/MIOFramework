@@ -4,9 +4,9 @@ import { MIOCoreHTMLParser } from "mio-foundation-web";
 import { MIOCoreHTMLParserDelegate } from "mio-foundation-web";
 import { NSLocalizeString } from "mio-foundation-web";
 import { MIOCoreBundleGetContentsFromURLString } from "mio-foundation-web";
+import { NSClassFromString } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
-import { NSClassFromString } from "mio-foundation-web";
 import "mio-foundation-web/extensions"
 import { NSSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
@@ -511,33 +511,45 @@ window.addEventListener("resize", function(e) {
 
 
 
-export function MUICoreBundleLoadNibName(name:string, target, completion){
+
+export function MUICoreBundleLoadNibName(name:string, target:any, completion:any){
+
+    let parser = new MUICoreNibParser();
+    parser.target = target;
+    parser.completion = completion;    
 
     MIOCoreBundleGetContentsFromURLString(name, this, function(code, data){
-        let parser = new MUICoreNibParser();
-        parser.target;
-        parser.completion = completion;    
-
-        parser.parseString(data);
+        if (code == 200) parser.parseString(data);
+        else throw new Error("MUICoreBundleLoadNibName: Couldn't download resource " + name);
     });    
 }
 
 class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 {
     target = null;
-    completion = null;
-
-    private text = null;
+    completion = null;    
 
     private result = "";
-    private isCapturing = false;
+    private isCapturing = false;    
     private elementCapturingCount = 0;
+
+    private layerID = null;
+    private rootClassname = null;
 
     parseString(data:string){
         let parser = new MIOCoreHTMLParser();
         parser.initWithString(data, this);
 
         parser.parse();
+
+        let domParser = new DOMParser();
+        let items = domParser.parseFromString(this.result, "text/html");
+        let layer = items.getElementById(this.layerID);
+
+        let vc = NSClassFromString(this.rootClassname);
+        vc.initWithLayer(layer, vc);                
+
+        this.completion.call(this.target, vc);
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){
@@ -549,9 +561,11 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         
         if (element.toLocaleLowerCase() == "div"){
             
-            if (attributes["data-main-view-controller"] == "true") {
+            if (attributes["data-root-view-controller"] == "true") {
                 // Start capturing   
                 this.isCapturing = true;
+                this.layerID = attributes["id"];
+                this.rootClassname = attributes["data-class"];
             }
         }
 
@@ -595,9 +609,7 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 
     parserDidEndDocument(parser:MIOCoreHTMLParser){
         console.log("html parser finished");
-        console.log(this.result);
-
-        this.completion.call(this.target, this.result);
+        console.log(this.result);        
     }
 
     private openTag(element, attributes){
@@ -1015,7 +1027,7 @@ export class UIView extends NSObject
                 if (className == null || className.length == 0) className = "UIView";
                 
                 let sv = NSClassFromString(className);
-                sv.initWithLayer(subLayer, this); 
+                sv.initWithLayer(subLayer, owner); 
                 this._linkViewToSubview(sv);            
             }
         }
@@ -1539,6 +1551,92 @@ export class UIView extends NSObject
 
 
 
+
+
+/**
+ * Created by godshadow on 11/3/16.
+ */
+
+
+export class UILabel extends UIView
+{
+    private _textLayer = null;
+    autoAdjustFontSize = "none";
+    autoAdjustFontSizeValue = 4;
+
+    init(){
+        super.init();
+        MUICoreLayerAddStyle(this.layer, "label");
+        this.setupLayers();
+    }
+
+    initWithLayer(layer, owner, options?){
+        super.initWithLayer(layer, owner, options);
+        this._textLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "SPAN");
+        this.setupLayers();
+    }
+
+    private setupLayers(){
+        //UICoreLayerAddStyle(this.layer, "lbl");
+    
+        if (this._textLayer == null){
+            this.layer.innerHTML = "";
+            this._textLayer = document.createElement("span");
+            this._textLayer.style.top = "3px";
+            this._textLayer.style.left = "3px";
+            this._textLayer.style.right = "3px";
+            this._textLayer.style.bottom = "3px";
+            //this._textLayer.style.font = "inherit";
+            //this._textLayer.style.fontSize = "inherit";
+            this.layer.appendChild(this._textLayer);
+        }
+    }
+
+    setText(text){
+        this.text = text;
+    }
+    
+    get text(){
+        return this._textLayer.innerHTML;
+    }
+
+    set text(text){
+        this._textLayer.innerHTML = text != null ? text : "";
+    }
+
+    setTextAlignment(alignment){
+        this.layer.style.textAlign = alignment;
+    }
+
+    setHightlighted(value){
+        if (value == true){
+            this._textLayer.classList.add("label_highlighted_color");
+        }
+        else{
+            this._textLayer.classList.remove("label_highlighted_color");
+        }
+    }
+
+    setTextRGBColor(r, g, b){
+        var value = "rgb(" + r + ", " + g + ", " + b + ")";
+        this._textLayer.style.color = value;
+    }
+
+    setFontSize(size){
+        this._textLayer.style.fontSize = size + "px";
+    }
+
+    setFontStyle(style){
+        this._textLayer.style.fontWeight = style;
+    }
+
+    setFontFamily(fontFamily){
+        this._textLayer.style.fontFamily = fontFamily;
+    }
+}
+
+
+
 /**
  * Created by godshadow on 12/3/16.
  */
@@ -1652,6 +1750,25 @@ export class UIButton extends UIControl
         let status = this.layer.getAttribute("data-status");
         if (status == "selected")
             this.setSelected(true);
+
+        // Check for actions
+        if (this.layer.childNodes.length > 0) {
+            for (let index = 0; index < this.layer.childNodes.length; index++) {
+                let subLayer = this.layer.childNodes[index];
+
+                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+
+                let actionSelector = subLayer.getAttribute("data-action-selector");
+                if (actionSelector != null) {                    
+                    this.setAction(this, function(){
+                        owner[actionSelector](this);
+                        // let action = owner[actionSelector];
+                        // action.call(owner);
+                    });
+                    break;                    
+                }
+            }
+        }
 
         this.setupLayers();
     }
@@ -1836,8 +1953,10 @@ export class UIViewController extends NSObject
     initWithLayer(layer, owner, options?){
         super.init();
 
-        this.view = new UIView(this.layerID);
-        this.view.initWithLayer(layer, owner, options);
+        let viewLayer = MUICoreLayerGetFirstElementWithTag(layer, "DIV");
+
+        this.view = new UIView();
+        this.view.initWithLayer(viewLayer, owner, options);
         
         // Search for navigation item
         //this.navigationItem = UINavItemSearchInLayer(layer);
@@ -1846,7 +1965,7 @@ export class UIViewController extends NSObject
     }
 
     initWithResource(path){
-        if (path == null) throw new Error("MIOViewController:initWithResource can't be null");
+        if (path == null) throw new Error("UIViewController:initWithResource can't be null");
 
         super.init();        
 
