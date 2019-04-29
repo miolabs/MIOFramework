@@ -105,7 +105,10 @@ export class UIView extends NSObject
                 
                 let sv = NSClassFromString(className);
                 sv.initWithLayer(subLayer, owner); 
-                this._linkViewToSubview(sv);            
+                this._linkViewToSubview(sv);
+                
+                let id = subLayer.getAttribute("id");
+                if (id != null ) owner._outlets[id] = sv;
             }
         }
 

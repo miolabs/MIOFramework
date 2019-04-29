@@ -10,7 +10,7 @@ import { UINavigationItem, UINavItemSearchInLayer } from "./UINavigationItem";
 import { UINavigationController } from "./UINavigationController";
 import { UIPresentationController, UIModalPresentationStyle, UIModalTransitionStyle } from "./UIViewController_PresentationController";
 import { UIPopoverPresentationController } from "./UIViewController_PopoverPresentationController";
-import { MUICoreLayerIDFromObject, MUICoreLayerAddStyle, MUICoreLayerSearchElementByID } from "./core/MUICoreLayer";
+import { MUICoreLayerIDFromObject, MUICoreLayerAddStyle, MUICoreLayerSearchElementByID, MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
 import { _MUIShowViewController, _MUIHideViewController } from "./core/MUICore";
 import { UIWindow } from "./UIWindow";
 import { UISplitViewController } from "./UISplitViewController";
@@ -160,7 +160,8 @@ export class UIViewController extends NSObject
         //this.navigationItem = UINavItemSearchInLayer(layer);
 
         this.view.initWithLayer(layer, this);
-        this.view.awakeFromHTML();
+        this.view.awakeFromHTML();        
+
         this._didLoadView();
     }
 

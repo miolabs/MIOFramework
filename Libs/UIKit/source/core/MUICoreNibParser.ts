@@ -42,7 +42,37 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         let vc = NSClassFromString(this.rootClassname);
         vc.initWithLayer(layer, vc);                
 
+        // Check outlets
+        if (layer.childNodes.length > 0) {
+            for (let index = 0; index < layer.childNodes.length; index++) {
+                let subLayer = layer.childNodes[index] as HTMLElement;
+
+                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+
+                if (subLayer.getAttribute("data-outlets") == "true") {
+                    for (let index2 = 0; index2 < subLayer.childNodes.length; index2 ++){
+                        let d = subLayer.childNodes[index2] as HTMLElement;
+                        if (d.tagName != "DIV") continue;
+
+                        let prop = d.getAttribute("data-property");
+                        let outlet = d.getAttribute("data-outlet");
+
+                        this.connectOutlet(vc, prop, outlet);
+                    }
+                }
+                
+            }
+        }
+        
+
         this.completion.call(this.target, vc);
+    }
+
+    private connectOutlet(owner, property, outletID){
+        console.log("prop: " + property + " - outluet: " + outletID);
+
+        let obj = owner._outlets[outletID];
+        owner[property] = obj;
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){
