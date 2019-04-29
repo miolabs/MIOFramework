@@ -16,6 +16,8 @@ export * from './UIPanGestureRecognizer'
 
 export * from './UIView'
 
+export * from './UILabel'
+
 export * from './UIControl'
 export * from './UIButton'
 

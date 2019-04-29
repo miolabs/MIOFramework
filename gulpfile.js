@@ -43,9 +43,9 @@ function uglifyJs() {
 	return pipeline( 
 			//sourcemaps.init({largeFile: true}),
 			gulp.src("./ITests/Demo1App/Demo1App/.build/app.js"),
-			uglify({
-				sourceMap: true
-			}),
+			// uglify({
+			// 	sourceMap: true
+			// }),
 			//sourcemaps.write(),
 			gulp.dest("./ITests/Demo1App/Demo1App/dist/")
 		);

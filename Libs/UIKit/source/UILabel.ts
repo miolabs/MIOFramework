@@ -1,5 +1,6 @@
-import { UIView, UILayerGetFirstElementWithTag } from "./UIView";
-import { UICoreLayerAddStyle } from ".";
+import { UIView } from "./UIView";
+import { MUICoreLayerAddStyle } from ".";
+import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
 
 /**
  * Created by godshadow on 11/3/16.
@@ -14,13 +15,13 @@ export class UILabel extends UIView
 
     init(){
         super.init();
-        UICoreLayerAddStyle(this.layer, "label");
+        MUICoreLayerAddStyle(this.layer, "label");
         this.setupLayers();
     }
 
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
-        this._textLayer = UILayerGetFirstElementWithTag(this.layer, "SPAN");
+        this._textLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "SPAN");
         this.setupLayers();
     }
 
@@ -39,38 +40,7 @@ export class UILabel extends UIView
             this.layer.appendChild(this._textLayer);
         }
     }
-/*
-    layout()
-    {
-        super.layout();
 
-        //var h = this.getHeight();
-        //this.textLayer.style.lineHeight = h + "px";
-
-        if (this.autoAdjustFontSize == "width")
-        {
-            var w = this.getWidth();
-            var size = w / this.autoAdjustFontSizeValue;
-            this.layer.style.fontSize = size + 'px';
-            var maxSize = this.getHeight();
-            if (size > maxSize)
-                this.layer.style.fontSize = maxSize + 'px';
-            else
-                this.layer.style.fontSize = size + 'px';
-        }
-        else if (this.autoAdjustFontSize == "height")
-        {
-            var h = this.getHeight();
-            var size = h / this.autoAdjustFontSizeValue;
-            this.layer.style.fontSize = size + 'px';
-            var maxSize = this.getHeight();
-            if (size > maxSize)
-                this.layer.style.fontSize = maxSize + 'px';
-            else
-                this.layer.style.fontSize = size + 'px';
-        }
-    }
-*/
     setText(text){
         this.text = text;
     }
@@ -83,41 +53,33 @@ export class UILabel extends UIView
         this._textLayer.innerHTML = text != null ? text : "";
     }
 
-    setTextAlignment(alignment)
-    {
+    setTextAlignment(alignment){
         this.layer.style.textAlign = alignment;
     }
 
-    setHightlighted(value)
-    {
-        if (value == true)
-        {
+    setHightlighted(value){
+        if (value == true){
             this._textLayer.classList.add("label_highlighted_color");
         }
-        else
-        {
+        else{
             this._textLayer.classList.remove("label_highlighted_color");
         }
     }
 
-    setTextRGBColor(r, g, b)
-    {
+    setTextRGBColor(r, g, b){
         var value = "rgb(" + r + ", " + g + ", " + b + ")";
         this._textLayer.style.color = value;
     }
 
-    setFontSize(size)
-    {
+    setFontSize(size){
         this._textLayer.style.fontSize = size + "px";
     }
 
-    setFontStyle(style)
-    {
+    setFontStyle(style){
         this._textLayer.style.fontWeight = style;
     }
 
-    setFontFamily(fontFamily)
-    {
+    setFontFamily(fontFamily){
         this._textLayer.style.fontFamily = fontFamily;
     }
 }

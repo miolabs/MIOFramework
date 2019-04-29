@@ -73,8 +73,10 @@ export class UIViewController extends NSObject
     initWithLayer(layer, owner, options?){
         super.init();
 
-        this.view = new UIView(this.layerID);
-        this.view.initWithLayer(layer, owner, options);
+        let viewLayer = MUICoreLayerGetFirstElementWithTag(layer, "DIV");
+
+        this.view = new UIView();
+        this.view.initWithLayer(viewLayer, owner, options);
         
         // Search for navigation item
         //this.navigationItem = UINavItemSearchInLayer(layer);
@@ -83,7 +85,7 @@ export class UIViewController extends NSObject
     }
 
     initWithResource(path){
-        if (path == null) throw new Error("MIOViewController:initWithResource can't be null");
+        if (path == null) throw new Error("UIViewController:initWithResource can't be null");
 
         super.init();        
 
