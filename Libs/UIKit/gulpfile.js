@@ -31,7 +31,7 @@ function UIConcatWebTsFiles() {
 	.pipe(gulp.dest("./source/"));
 }
 
-function UICleanWebFoundation(done) {
+function UICleanWebUIkit(done) {
 	const path = "./source/UIKit.web.ts";
 	var originalContent = fs.readFileSync(path, "utf8");
 	var newContent = originalContent.replace(/import(.*)["|']\..*/g, "");
@@ -54,7 +54,7 @@ function UICleanWebFoundation(done) {
 }
 
 function UICleanWebJsFile(done) {
-	const path = "./dist/uikit.web.js";
+	const path = "./dist/UIKit.web.js";
 	const regExObject = /\}\)\((.*) = exports.*\{\}\)\);/g;
 	const ObjectReplace = "})($1 || ($1 = {}));";
 	const regExExport = /exports\..*;/g;
@@ -77,7 +77,7 @@ function UIMinifyWebProd() {
 	.pipe(gulp.dest('./.build/web-prod/'));
 }
 
-function UICreateWebPackage(done) {
+function UICreateWebProdPackage(done) {
 	const SRC = __dirname + "/dist/";
 	const DEST = __dirname + "/packages/mio-uikit-web/";
 
@@ -90,11 +90,38 @@ function UICreateWebPackage(done) {
 		fs.copyFileSync("./dist/UIKit.web.d.ts", DEST + "types/mio-uikit-web.d.ts");
 
 		//Copy UIKit js
-		fs.copyFileSync("./dist/UIKit.web.js", DEST + "mio-uikit-web.js");
+		fs.copyFileSync("./.build/web-prod/UIKit.web.js", DEST + "mio-uikit-web.js");
+
 		//Copy UIKit js map if exists
 		if(fs.existsSync("./dist/UIKit.web.js.map")) {
 			fs.copyFileSync("./dist/UIKit.web.js.map", DEST + "mio-uikit-web.js.map");
 		}
+
+		//Copy package.json, LICENSE AND README
+		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
+		fs.copyFileSync(__dirname + "/../../README.md", DEST + "README.md");
+
+		console.log("Package created succesfully");
+	} else {
+		console.log("/.build directory does not exist - Execute first gulp UIminifyWebProd");
+	}
+	done();
+}
+
+function UICreateWebDevPackage(done) {
+	const SRC = __dirname + "/dist/";
+	const DEST = __dirname + "/packages/mio-uikit-web-dev/";
+
+	if(fs.existsSync(SRC)) {
+		//Create package and types folder				
+		//fs.mkdirSync(DEST + "types", {recursive: true});	 ??? WHY this functions doesn't work? who knows... 	
+		execSync('mkdir -p ' + DEST + "types"); // Always you can relay on bash :)
+		
+		//Copy UIKit.d.ts to types folder
+		fs.copyFileSync("./dist/UIKit.web.d.ts", DEST + "types/mio-uikit-web.d.ts");
+
+		//Copy UIKit js
+		fs.copyFileSync("./dist/UIKit.web.js", DEST + "mio-uikit-web.js");
 
 		//Copy package.json, LICENSE AND README
 		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
@@ -154,10 +181,11 @@ function UIRemoveTempFolders(done) {
 
 module.exports = {
 	//WEB PROD
-	UIBuildWeb: gulp.series(UIParseIndexWebTs, UIConcatWebTsFiles, UICleanWebFoundation),
+	UIBuildWeb: gulp.series(UIParseIndexWebTs, UIConcatWebTsFiles, UICleanWebUIkit),
 	UICleanWebJsFile,
 	UIMinifyWebProd,
-	UIBuildWebPackage: gulp.series(UICreateWebPackage, UIBuildWebPackageFile),
+	UIBuildWebProdPackage: gulp.series(UICreateWebProdPackage, UIBuildWebPackageFile),
+	UIBuildWebDevPackage: gulp.series(UICreateWebDevPackage, UIBuildWebPackageFile),
 
 	//WEB DEV
 

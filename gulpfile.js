@@ -10,7 +10,7 @@ var sourcemaps = require("gulp-sourcemaps");
 var sb = require("./ITests/Demo1App/Demo1App/gulp.storyboard");
 var utils = require("./ITests/Demo1App/Demo1App/gulp.utils");
 
-function unifySwiftFiles(cb) {
+function unifySwiftFiles(done) {
 	var fileArr = [];
 	fs.recurseSync("./ITests/Demo1App/Demo1App/", ["*.swift"], function(filepath, relative, filename) {
 		if(filename === "data.swift") {
@@ -25,9 +25,9 @@ function unifySwiftFiles(cb) {
 		var filteredItem = utils.filterSwiftFile(currentItem);
 		fs.appendFileSync("./ITests/Demo1App/Demo1App/.build/data.swift", filteredItem, "utf8");
 	});
-	cb();
+	done();
 }
-function transpileTsToJs(cb) {
+function transpileTsToJs() {
 	return gulp.src("./ITests/Demo1App/Demo1App/.build/data.ts")
 				.pipe(ts({
 					outFile: "app.js",
@@ -38,9 +38,8 @@ function transpileTsToJs(cb) {
 					target: "es5"
 				}))
 				.pipe(gulp.dest("./ITests/Demo1App/Demo1App/dist/"));
-	cb();
 }
-function uglifyJs(cb) {
+function uglifyJs() {
 	return pipeline( 
 			//sourcemaps.init({largeFile: true}),
 			gulp.src("./ITests/Demo1App/Demo1App/.build/app.js"),
@@ -50,9 +49,8 @@ function uglifyJs(cb) {
 			//sourcemaps.write(),
 			gulp.dest("./ITests/Demo1App/Demo1App/dist/")
 		);
-	cb(); 
 }
-function parseStoryBoard(cb) {
+function parseStoryBoard(done) {
 	var filesArr = [];
 	var pathStoryBoard = "ITests/Demo1App/Demo1App/Base.lproj/";
 
@@ -63,12 +61,23 @@ function parseStoryBoard(cb) {
 		var fileString = fs.readFileSync(pathStoryBoard+item, "utf8");		
 		sb.parseDocument(fileString);		
 	}
-	cb();
+	done();
+}
+
+function copyLibsFiles(done) {
+	const FOUNDATION_NODE_PATH = "node_modules/mio-foundation-node/foundation.node.js";
+	const FOUNDATION_WEB_PATH = "node_modules/mio-foundation-web/foundation.web.js";
+	const DEST_PATH = "ITests/Demo1App/dist/libs/";
+
+	
+
+	done();
 }
 
 module.exports = {
-	unifySwiftFiles: unifySwiftFiles,
-	transpileTsToJs: transpileTsToJs,
-	uglifyJs: uglifyJs,
-	parseStoryBoard: parseStoryBoard
+	unifySwiftFiles,
+	transpileTsToJs,
+	uglifyJs,
+	parseStoryBoard,
+	copyLibsFiles
 }
