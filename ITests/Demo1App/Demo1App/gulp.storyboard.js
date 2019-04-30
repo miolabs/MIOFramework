@@ -6,6 +6,7 @@ var currentFileName = null;
 var currentFileContent = null;
 var elementsStack = [];
 var currentElement = null;
+var outletsStack = [];
 
 function parseDocument(xmlString) {	
 	console.log('Entering Document');			
@@ -33,6 +34,9 @@ function parserDidStartElement(parser, element, attributes){
 		currentFileContent += '<div class="view-controller" id="' + id + '" data-root-view-controller="true"';	
 		currentFileContent += ' data-class="' + customClass + '"';
 		currentFileContent += '>';
+
+		let outlets = {};
+		outletsStack.push(outlets);
 	}
 	else if (element == "navigationController"){
 		let id = attributes["id"];
@@ -41,6 +45,9 @@ function parserDidStartElement(parser, element, attributes){
 		currentFileContent += '<div class="nav-controller" id="' + id + '" data-root-view-controller="true"';	
 		currentFileContent += ' data-class="' + customClass + '"';
 		currentFileContent += '>';
+
+		let outlets = {};
+		outletsStack.push(outlets);
 	}
 	else if (element == "view"){
 		pushNewElement(element, attributes);
@@ -117,7 +124,14 @@ function parserDidStartElement(parser, element, attributes){
 		let selector =  attributes["selector"];
 		//TODO: let eventType = attributes["eventType"];		
 		currentElement["Content"] = currentElement["Content"] + '<div class="hidden" data-action-selector="' + selector.replace(":", "") +'"></div>';
-	}	
+	}
+	else if (element == "outlet") {
+		let outlet = attributes["property"];
+		let destination = attributes["destination"];
+						
+		let outlets = outletsStack[outletsStack.length - 1];
+		outlets[outlet] = destination;		
+	}
 }
 
 function parserDidEndElement(parser, element){
@@ -130,7 +144,13 @@ function parserDidEndElement(parser, element){
 		currentFileContent = null;
 	}
 	else if (element == "viewController" || element == "navigationController"){
-		currentFileContent += '</div>';		
+		let outlets = outletsStack.pop();
+		currentFileContent += '<div data-outlets="true">';
+		for (let key in outlets){
+			let id = outlets[key];
+			currentFileContent += '<div data-outlet="' + id + '" data-property="' + key + '"></div>';
+		}
+		currentFileContent += '</div></div>';				
 	}
 	else if (element == "view"){
 		popElement();
@@ -143,6 +163,9 @@ function parserDidEndElement(parser, element){
 	}
 	else if (element == "textField"){
 		popElement();
+	}
+	else if (element == "connections"){
+
 	}
 }
 
