@@ -5,6 +5,7 @@ import { NSLocalizeString } from "mio-foundation-web";
 import { MIOCoreBundleGetContentsFromURLString } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 
+
 export function MUICoreBundleLoadNibName(name:string, target:any, completion:any){
 
     let parser = new MUICoreNibParser();
@@ -16,6 +17,9 @@ export function MUICoreBundleLoadNibName(name:string, target:any, completion:any
         else throw new Error("MUICoreBundleLoadNibName: Couldn't download resource " + name);
     });    
 }
+
+
+declare function _injectIntoOptional(param:any);
 
 class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 {
@@ -72,7 +76,7 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         console.log("prop: " + property + " - outluet: " + outletID);
 
         let obj = owner._outlets[outletID];
-        owner[property] = obj;
+        owner[property] = _injectIntoOptional(obj);
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){
