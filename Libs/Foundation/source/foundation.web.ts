@@ -310,15 +310,15 @@ export function MIOCoreGetLanguages()
 
 
 export interface MIOCoreHTMLParserDelegate {
-    parserDidStartElement(parser:MIOCoreHTMLParser, element, attributes);
-    parserDidEndElement(parser:MIOCoreHTMLParser, element);
+    parserDidStartElement(parser:MIOCoreHTMLParser, element:string, attributes:any):void;
+    parserDidEndElement(parser:MIOCoreHTMLParser, element:string):void;
 
-    parserFoundCharacters(parser:MIOCoreHTMLParser, characters:string);
+    parserFoundCharacters(parser:MIOCoreHTMLParser, characters:string):void;
 
-    parserFoundComment(parser:MIOCoreHTMLParser, comment:string);
+    parserFoundComment(parser:MIOCoreHTMLParser, comment:string):void;
 
-    parserDidStartDocument(parser:MIOCoreHTMLParser);
-    parserDidEndDocument(parser:MIOCoreHTMLParser);
+    parserDidStartDocument(parser:MIOCoreHTMLParser):void;
+    parserDidEndDocument(parser:MIOCoreHTMLParser):void;
 }
 
 export enum MIOCoreHTMLParserTokenType {
@@ -719,7 +719,7 @@ export class MIOCoreHTMLParser
         
         let [type, value] = this.nextToken();
         if (type != MIOCoreHTMLParserTokenType.Identifier) this.unexpectedToken(value);
-        let element = value;
+        let element = value as string;
 
         [type, value] = this.nextToken();
         if (type != MIOCoreHTMLParserTokenType.CloseTag) this.unexpectedToken(value);
@@ -1360,6 +1360,15 @@ export class NSObject
         
         return obj;
     }
+
+    performSelector(selector:string){
+        return this[selector]();
+    }
+
+    performSelectorOnMainThread(selector:string, arg:any, waitUntilDone:boolean){
+        this[selector](arg);
+    }
+
 }
 
 
