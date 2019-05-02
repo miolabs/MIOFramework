@@ -1,0 +1,177 @@
+----Swift.(file).String.count
+return this.length
+----Swift.(file).print(_:[Any],separator:String,terminator:String)
+console.log.apply(null, #A0)
+----Swift.(file).Dictionary.subscript(_:Dictionary<Key, Value>.Index)
+if(this.has(#AA)) return Optional.some(this.get(#AA), {})
+return Optional.none
+----Swift.(file).Dictionary.subscript(_:Key)
+if(this.has(#AA)) return Optional.some(this.get(#AA), {})
+return Optional.none
+----Swift.(file).Dictionary.subscript(_:Key)#ASS
+if(#A0.rawValue === 'none') this.delete(#A1)
+else this.set(#A1, _cloneStruct(#A0[0]))
+----Swift.(file).Dictionary.count
+return this.size
+----Swift.(file).Dictionary.makeIterator()
+//TODO use _create for Array
+//TODO change SwiftIterator because now only Dictionary is using it to use js Map.iterator (much faster)
+//TODO preferably move to Swift and use the proper Iterator (then remove SwiftIterator.js too)
+return new SwiftIterator((current) => _injectIntoOptional(Array.from(this)[current]))
+----Swift.(file).Array.subscript(_:Int)
+return this[#AA]
+----Swift.(file).Array.subscript(_:Int)#ASS
+return this[#A1] = #A0
+----Swift.(file).String.subscript(_:Int)
+return this[#AA]
+----Swift.(file).Array.count
+return this.length
+----Swift.(file).Array.insert(_:Element,at:Int)
+this.splice(#A1, 0, _cloneStruct(#A0))
+----Swift.(file).Array.remove(at:Int)
+return this.splice(#AA, 1)[0]
+----Swift.(file).Set.insert(_:Element)
+this.add(_cloneStruct(#AA))
+----Swift.(file).Set.count
+return this.size
+----Swift.(file).Range.lowerBound
+return this.lowerBound$internal
+----Swift.(file).Range.upperBound
+return this.upperBound$internal
+----Swift.(file).ClosedRange.lowerBound
+return this.lowerBound$internal
+----Swift.(file).ClosedRange.upperBound
+return this.upperBound$internal
+----Swift.(file).Array.init()
+return []
+----Swift.(file).Dictionary.init()
+return new Map()
+----Swift.(file).Set.init()
+return new Set()
+----Swift.(file).Set.init(_:Source)
+return new Set(#AA)
+----Swift.(file).Set.init(arrayLiteral:[Element])
+return new Set(#AA)
+----Swift.(file).Array.init()
+return []
+----Swift.(file).Int.init(_:Double)
+return #AA | 0
+----Swift.(file).Double.init(_:Int)
+return #AA
+----Swift.(file).String.init(_:Character)
+return #AA
+----Swift.(file).ExpressibleByIntegerLiteral.init(integerLiteral:Self)
+return #AA
+----Swift.(file).String.init()
+return ""
+----Swift.(file).Character.init(unchecked:String)
+return #AA
+----Swift.(file).BinaryInteger./infix(_:Self,_:Self)
+return (#A0 / #A1) | 0
+----Swift.(file).BinaryInteger./=infix(_:Self,_:Self)
+lhs$inout.set((lhs$inout.get() / rhs) | 0)
+----Swift.(file).Int8.<<infix(_:Int8,_:Int8)
+let binaryRepr = lhs.toString(2)
+let result = 0
+for(let i = 0; i < binaryRepr.length; i++) {
+let j = i - rhs
+if(binaryRepr[j] !== '1') continue
+result += j === 0 ? -128 : Math.pow(2, 7 - j)
+}
+return result
+----Swift.(file).UInt8.<<infix(_:UInt8,_:UInt8)
+let binaryRepr = lhs.toString(2)
+let result = 0
+for(let i = 0; i < binaryRepr.length; i++) {
+let j = i - rhs
+if(binaryRepr[j] !== '1') continue
+result += Math.pow(2, 7 - j)
+}
+return result
+----Swift.(file).ObjectIdentifier.init(_:AnyObject)
+this._value = #AA
+----Swift.(file).ObjectIdentifier.==infix(_:ObjectIdentifier,_:ObjectIdentifier)
+return #A0._value === #A1._value
+----Darwin.(file).arc4random_uniform(_:UInt32)
+return Math.floor(Math.random() * #AA)
+----Darwin.(file).arc4random()
+return arc4random_uniform(Math.pow(2, 32), {})
+----Darwin.(file).ceil(_:T)
+return Math.ceil(#A0)
+----Darwin.(file).floor(_:T)
+return Math.floor(#A0)
+----Darwin.(file).pow(_:Float80,_:Float80)
+return Math.pow(#A0, #A1)
+----Darwin.(file).pow(_:Float,_:Float)
+return Math.pow(#A0, #A1)
+----Darwin.(file).sqrt(_:T)
+return Math.sqrt(#A0)
+----Swift.(file).String.subscript(_:R)
+return this.slice(bounds.lowerBound, bounds.upperBound)
+----Swift.(file).Range.init(uncheckedBounds:(lower: Bound, upper: Bound))
+this.lowerBound$internal = #AA[0]
+this.upperBound$internal = #AA[1]
+----Swift.(file).ClosedRange.init(uncheckedBounds:(lower: Bound, upper: Bound))
+this.lowerBound$internal = #AA[0]
+this.upperBound$internal = #AA[1]
+----Swift.(file).SignedNumeric.negate()
+$info.$setThis(-this)
+----Swift.(file).String.append(_:Character)
+$info.$setThis(this + c)
+----Swift.(file).String.startIndex
+//TODO change once we know what String.Index is about
+return 0
+----Swift.(file).String.endIndex
+return this.length
+----Swift.(file).String.index(after:String.Index)
+return i + 1
+----Swift.(file).String.index(before:String.Index)
+return i - 1
+----Swift.(file).String.index(_:String.Index,offsetBy:String.IndexDistance)
+return i + n
+----Swift.(file).MutableCollection.sort(by:(Self.Element, Self.Element) throws -> Bool)
+//TODO move to swift
+return this.sort((a, b) => areInIncreasingOrder(a, b, {}) ? -1 : 1)
+----Swift.(file).String.init(_:S)
+return String(other)
+----Swift.(file).FixedWidthInteger.init(_:S,radix:Int)
+let result = parseInt(_text)
+if(isNaN(result)) return Optional.none
+return Optional.some(result, {})
+----Swift.(file).Double.infinity
+return Infinity
+----Swift.(file).Double.greatestFiniteMagnitude
+return Number.MAX_VALUE
+----Swift.(file).UnsignedInteger.max
+return Number.MAX_SAFE_INTEGER
+----Swift.(file).BinaryInteger.description
+return this.toString()
+----Swift.(file).Double.description
+let result = this.toString()
+if(!result.includes('.')) result += '.0';
+return result
+----Swift.(file).Float.description
+let result = this.toString()
+if(!result.includes('.')) result += '.0';
+return result
+----Swift.(file).Float80.description
+let result = this.toString()
+if(!result.includes('.')) result += '.0';
+return result
+----Swift.(file).String.hashValue
+//FIXME compute proper hash, e.g. by xoring
+return this.length
+----XCTest.(file).XCTestCase.init()
+var proto = Object.getPrototypeOf(this)
+var protoKeys = Object.keys(proto)
+for(const testFunction of protoKeys) {
+if(!testFunction.startsWith('test') || testFunction.endsWith('$get') || testFunction.endsWith('$set') || typeof Object.getOwnPropertyDescriptor(proto, testFunction).value !== 'function' || this[testFunction].length !== 1) continue
+this.init$vars()
+if(this.setUp) this.setUp()
+this[testFunction]()
+if(this.tearDown) this.tearDown()
+}
+----Swift.(file).AnyIterator.init(_:() -> Element?)
+//slightly bodgy; in principle, the passed function becomes the next, so that's exactly what we're doing here
+this.next = #AA
+----closing dashes needed for the last definition to be processed

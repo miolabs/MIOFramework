@@ -1,21 +1,20 @@
-class DoubleFun {
-    subscript(index: Int) -> Int {
-        get {
-            return index * 2
+struct Chessboard {
+    let boardColors: [Bool] = {
+        var temporaryBoard = [Bool]()
+        var isBlack = false
+        for i in 1...8 {
+            for j in 1...8 {
+                temporaryBoard.append(isBlack)
+                isBlack = !isBlack
+            }
+            isBlack = !isBlack
         }
-        set {}
-    }
-    subscript(index: String) -> String {
-        get {
-            return index + index
-        }
-        set(newValue) {}
-    }
-    subscript(index0: Int, index1: Int) -> Int {
-        return index0 + index1
+        return temporaryBoard
+    }()
+    func squareIsBlackAt(row: Int, column: Int) -> Bool {
+        return boardColors[(row * 8) + column]
     }
 }
-var doubleFun = DoubleFun()
-print(doubleFun[2])
-print(doubleFun["hello"])
-print(doubleFun[2, 3])
+let board = Chessboard()
+print(board.squareIsBlackAt(row: 0, column: 1))
+print(board.squareIsBlackAt(row: 7, column: 7))
