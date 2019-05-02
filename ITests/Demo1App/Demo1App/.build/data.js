@@ -28,23 +28,22 @@ var ViewController = /** @class */ (function (_super) {
         this.textLabel$internal = $newValue;
     };
     ;
-    ViewController.prototype.viewDidLoad = function ($info0x7fe4780aca98) {
+    ViewController.prototype.viewDidLoad = function ($info) {
         var _this = this;
         _super.prototype.viewDidLoad.call(this, {});
     };
-    ViewController.prototype.buttonClicked = function ($info0x7fe4780ace58, sender) {
+    ViewController.prototype.buttonClickedWithSender = function (sender, $info) {
         var _this = this;
-        //_this.textLabel[0]._text = _injectIntoOptional("Bye");
-        console.log("??");
+        this.textLabel[0]._text = _injectIntoOptional("Bye");
     };
-    ViewController.prototype.initNibNameOptionalBundleOptional = function ($info0x7fe47877a470, nibNameOrNil, nibBundleOrNil) {
+    ViewController.prototype.initNibNameOptionalBundleOptional = function (nibNameOrNil, nibBundleOrNil, $info) {
         var _this = this;
-        _super.prototype.initNibNameOptionalBundleOptional.call(this, {}, nibNameOrNil, nibBundleOrNil);
+        _super.prototype.initNibNameOptionalBundleOptional.call(this, nibNameOrNil, nibBundleOrNil, {});
         return;
     };
-    ViewController.prototype.initCoderNSCoder = function ($info0x7fe47877b880, aDecoder) {
+    ViewController.prototype.initCoderNSCoder = function (aDecoder, $info) {
         var _this = this;
-        _super.prototype.initCoderNSCoder.call(this, {}, aDecoder);
+        _super.prototype.initCoderNSCoder.call(this, aDecoder, {});
         return;
     };
     ViewController.prototype.init$vars = function () {
@@ -52,10 +51,9 @@ var ViewController = /** @class */ (function (_super) {
             _super.prototype.init$vars.call(this);
         this.textLabel$internal = Optional.none;
     };
-    ViewController.$infoAddress = '0x7fe47800acf8';
     ViewController.initCoderNSCoder$failable = true;
     return ViewController;
-}(UIViewController));
+}(MUIViewController));
 var AppDelegate = /** @class */ (function (_super) {
     __extends(AppDelegate, _super);
     function AppDelegate() {
@@ -73,26 +71,26 @@ var AppDelegate = /** @class */ (function (_super) {
         this._window$internal = $newValue;
     };
     ;
-    AppDelegate.prototype.applicationDidFinishLaunchingWithOptions = function ($info0x7fe4780ad828, application, launchOptions) {
+    AppDelegate.prototype.applicationDidFinishLaunchingWithOptions = function (application, launchOptions, $info) {
         var _this = this;
         return true;
     };
-    AppDelegate.prototype.applicationWillResignActive = function ($info0x7fe4780b2938, application) {
+    AppDelegate.prototype.applicationWillResignActive = function (application, $info) {
         var _this = this;
     };
-    AppDelegate.prototype.applicationDidEnterBackground = function ($info0x7fe4780b2bd8, application) {
+    AppDelegate.prototype.applicationDidEnterBackground = function (application, $info) {
         var _this = this;
     };
-    AppDelegate.prototype.applicationWillEnterForeground = function ($info0x7fe4780b2e78, application) {
+    AppDelegate.prototype.applicationWillEnterForeground = function (application, $info) {
         var _this = this;
     };
-    AppDelegate.prototype.applicationDidBecomeActive = function ($info0x7fe4780b3118, application) {
+    AppDelegate.prototype.applicationDidBecomeActive = function (application, $info) {
         var _this = this;
     };
-    AppDelegate.prototype.applicationWillTerminate = function ($info0x7fe4780b33b8, application) {
+    AppDelegate.prototype.applicationWillTerminate = function (application, $info) {
         var _this = this;
     };
-    AppDelegate.prototype.init = function ($info0x7fe47a803258) {
+    AppDelegate.prototype.init = function ($info) {
         var _this = this;
         _super.prototype.init.call(this, {});
         return;
@@ -102,7 +100,6 @@ var AppDelegate = /** @class */ (function (_super) {
             _super.prototype.init$vars.call(this);
         this._window$internal = Optional.none;
     };
-    AppDelegate.$infoAddress = '0x7fe4780ad1b0';
     return AppDelegate;
 }(MUIResponder));
 if (typeof MUIApplicationDelegate$implementation != 'undefined')
