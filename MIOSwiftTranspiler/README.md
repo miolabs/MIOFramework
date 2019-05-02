@@ -1,368 +1,91 @@
-Swift to JavaScript/TypeScript and Java transpiler
-==============
+# Parent repo for our swift transpiler projects
 
-This is an open source Swift3 to JavaScript/TypeScript and Java transpiler.
-It's written in Java using antlr4 parser generator.
+* [Initial setup](#initial-setup)
+* [Usage](#usage)
 
-Visit http://typeswift.com for live transpilation preview.
+A parent repo for apple/swift fork & MIOJSLibs. Contains additional tests and scripts for transpiling native swift libs.
 
-It has support for Swift:
+## **Initial setup:**
 
-- data types (primitives, tuples, arrays, dictionaries, sets)
-- control flow (if, for-in, while)
-- optionals & chaining
-- functions & closures (no Java support yet)
-- classes (no Java support)
+**Cloning this repo**
 
-To get a better sense of supported features, have a look inside the test directory,
-which contains Swift code snippets that demonstrate supported features in greater detail.
+Clone with an additional flag `git clone --recurse-submodules https://github.com/miolabs/MIOSwiftTranspiler.git`.
+That ensures that it's cloned together with the submodule MIOJSLibs.
 
-The transpiler currently lacks support for:
+**Cloning the swift repo (separate for now) & building the executable**
 
-- overloading operators
-- enums
-- switch
-- binary operators
+We've decided not to include the swift submodule, because it was failing when running the
+`./swift/utils/update-checkout --clone` for some reason. For now, you need to clone it *separately*.
 
-Also, check out my reverse project (TypeScript to Swift transpiler): https://github.com/marcelganczak/ts-swift-transpiler
+Go to the *parent directory* of MIOSwiftTranspiler and run `mkdir swift-source && cd swift-source`. Then
+clone our fork of the apple swift repo `git clone https://github.com/miolabs/swift.git`. Then run another command
+that swift needs to work `cd .. && ./swift/utils/update-checkout --clone`.
 
-Examples
-==============
+Then you need to build the C++ executable. We need to additionally include the `--ios` flag, so that we can target UIKit.
+Run `./swift/utils/build-script --release-debuginfo --ios`.
 
-#### Data types
-Arrays
-```Swift
-let array = ["Swift", "is", "ace"]
-print(array.count)
-print(array[0].characters.count)
-```
-```Typescript
-const array:Array<string> = [ "Swift" , "is" , "ace" ] ;
-console.log(array.length);
-console.log(array[0 ].length);
-```
-```Java
-List<String> array = new ArrayList<String>(Arrays.asList("Swift", "is", "ace"));
-System.out.println(array.size());
-System.out.println(array.get(0 ).length());
-```
+After the executable is built, you need to switch the branch `cd swift && git checkout ts-transpiler-synced`.
+I'm trying to keep it up to date, so that the only different file is `lib/AST/ASTDumper.cpp`. That should help us
+avoid problems related to building the executable (if the branch is not up to date, all hell breaks loose,
+because the code and libs aren't in sync).
 
-Dictionaries
-```Swift
-var dictionary: [String:Int] = ["key" : "val"]
-print(dictionary.count)
-dictionary["key"] = nil
-```
-```Typescript
-let dictionary:Object = {"key" :"val" };
-console.log(_.size(dictionary));
-delete dictionary["key" ];
-```
-```Java
-Map<String, Integer> dictionary = new InitializableHashMap<String, Integer>(new Pair<String, Integer>("key" , "val" ));
-System.out.println(dictionary.size());
-dictionary.remove("key" );
-```
+After switching the branch, you need to rebuild the executable with ninja one final time as described in Usage.
 
-Tuples
-```Swift
-let tuple: (a:String, count:Int) = ("str", 3)
-print(tuple.a)
-print(tuple.count)
-```
-```Typescript
-const tuple:Object = {'a':"str" ,'count':3 };
-console.log(tuple.a);
-console.log(tuple.count);
-```
-```Java
-Map<String, ?> tuple = new InitializableHashMap<String, Object>(new Pair<String, String>("a", "str" ),new Pair<String, Integer>("count", 3 ));
-System.out.println(((String)tuple.get("a")));
-System.out.println(((Integer)tuple.get("count")));
-```
+The initial setup is complete 🎉🎉.
 
-#### Control flow
-For in range
-```Swift
-for number in 0...10 {
-    guard number < 3 else {
-        break
-    }
-    print(number)
-}
-```
-```Typescript
-for(let number = 0 ; number <= 10 ; number++) {
-    if(!(number < 3 )) {
-        break;
-    }
-    console.log(number);
-}
-```
-```Java
-for(int number = 0 ; number <= 10 ; number++) {
-    if(!(number < 3 )) {
-        break ;
-    }
-    System.out.println(number);
-}
-```
+## **Usage:**
 
-For in collection
-```Swift
-let numberOfLegs = ["ant": 6, "cat": 4, "spider": 8]
-for (animalName, legCount) in numberOfLegs {
-    print(animalName)
-    print(legCount)
-}
-```
-```Typescript
-const numberOfLegs:Object = {"ant" :6 , "cat" :4 , "spider" :8 };
-for(let animalName in numberOfLegs) {
-    let legCount = (numberOfLegs)[animalName];
-    console.log(animalName);
-    console.log(legCount);
-}
-```
-```Java
-Map<String, Integer> numberOfLegs = new InitializableHashMap<String, Integer>(new Pair<String, Integer>("ant" , 6 ), new Pair<String, Integer>("cat" , 4 ), new Pair<String, Integer>("spider" , 8 ));
-for(Map.Entry<String, Integer> $ : (numberOfLegs).entrySet()) {
-    String animalName = $.getKey();
-    Integer legCount = $.getValue();
-    System.out.println(animalName);
-    System.out.println(legCount);
-}
-```
-
-If let
-```Swift
-let numberOfLegs = ["ant": 6, "cat": 4, "spider": 8]
-if let catLegs = numberOfLegs["cat"] {
-    print(catLegs);
-}
-```
-```Typescript
-const numberOfLegs:Object = {"ant" :6 , "cat" :4 , "spider" :8 };
-if(numberOfLegs["cat" ] != null) {
-    const catLegs:number = numberOfLegs["cat" ];
-    console.log(catLegs);
-}
-```
-```Java
-Map<String, Integer> numberOfLegs = new InitializableHashMap<String, Integer>(new Pair<String, Integer>("ant" , 6 ), new Pair<String, Integer>("cat" , 4 ), new Pair<String, Integer>("spider" , 8 ));
-if(numberOfLegs.get("cat" ) != null) {
-    Integer catLegs = numberOfLegs.get("cat" );
-    System.out.println(catLegs);
-}
-```
-
-#### Optionals & chaining
-```Swift
-var dictionary = ["key" : "val"]
-print(dictionary["non-existent"]?.characters.count)
-print(dictionary["non-existent"] ?? "key doesn't exist!")
-dictionary?["key2"] = "val2"
-```
-```Typescript
-let dictionary:Object = {"key" :"val" };
-console.log((dictionary["non-existent" ]!= null ? dictionary["non-existent" ].length : null ));
-console.log((dictionary["non-existent" ] != null ? dictionary["non-existent" ] : "key doesn't exist!" ));
-if(dictionary != null) { dictionary["key2" ] = "val2" ; };
-```
-```Java
-Map<String, String> dictionary = new InitializableHashMap<String, String>(new Pair<String, String>("key" , "val" ));
-System.out.println((dictionary.get("non-existent" ) != null ? dictionary.get("non-existent" ).length() : null ));
-System.out.println((dictionary.get("non-existent" ) != null ? dictionary.get("non-existent" ) : "key doesn't exist!" ));
-if(dictionary != null) { dictionary.put("key2" , "val2" ); };
-```
-
-#### Functions
-Overloading
-```Swift
-func justPrint(_ printed: String) {
-    print("String: \(printed)")
-}
-func justPrint(_ printed: Int) {
-    print("Int: \(printed)")
-}
-func justPrint(_ printed: Double) {
-    print("Double: \(printed)")
-}
-justPrint("message")
-justPrint(1)
-justPrint(2.1)
-```
-```Typescript
-function justPrint$_String(printed : string):void{
-    console.log("String: "  + (printed) + "" );
-}
-function justPrint$_Int(printed : number):void{
-    console.log("Int: "  + (printed) + "" );
-}
-function justPrint$_Double(printed : number):void{
-    console.log("Double: "  + (printed) + "" );
-}
-justPrint$_String("message" );
-justPrint$_Int(1 );
-justPrint$_Double(2.1 );
-```
-```Java
-No support in Java yet.
-```
-
-Non-primitive return types
-```Swift
-func returnOptionalTuple(shouldReturn: Bool) -> (Int,String)? {
-    return shouldReturn ? (0, "val") : nil
-}
-print(returnOptionalTuple(shouldReturn: false)?.0)
-print((returnOptionalTuple(shouldReturn: true)?.0)!)
-```
-```Typescript
-function returnTuple():Object{
-    return {'0':0 ,'1':"val" };
-}
-console.log(returnTuple()[0 ]);
-```
-```Java
-No support in Java yet.
-```
-
-In-Out parameters
-```Swift
-func incr(_ a: inout Int) {
-    a = a + 1
-}
-var a = 0
-incr(&a)
-print(a)
-```
-```Typescript
-function incr$_Int(a : {get: () => number, set: (val: number) => void}):void{
-    a.set( a.get() + 1 );
-}
-let a:number = 0 ;
-incr$_Int({get: () => a, set: $val => a = $val});
-console.log(a);
-```
-```Java
-No support in Java yet.
-```
-
-#### Closures
-Operator methods
-```Swift
-var numbers = [5, 2, 3, 1, 4]
-numbers.sort(by: <)
-```
-```Typescript
-let numbers:Array<number> = [ 5 , 2 , 3 , 1 , 4 ] ;
-numbers.sortBool((a, b) => a < b);
-```
-```Java
-No support in Java yet.
-```
-
-Shorthand argument names
-```Swift
-var numbers = [5, 2, 3, 1, 4]
-let sum = numbers.filter {
-        $0 % 2 == 1 //select all the odd numbers
-    }.map {
-        $0 * $0 // square them
-    }.reduce(0) {
-        $0 + $1 // get their sum
-    }
-```
-```Typescript
-let numbers:Array<number> = [ 5 , 2 , 3 , 1 , 4 ] ;
-const sum:number = numbers.filter(
-        () => arguments[0] % 2  == 1
-    ).map(
-        () => arguments[0] * arguments[0]
-    ).reduce(
-        () => arguments[0] + arguments[1]
-    , 0);
-```
-```Java
-No support in Java yet.
-```
-
-#### Classes
-Getter/setter Properties
-```Swift
-struct Square {
-    var a = 1.0
-    var perimeter: Double {
-        get {
-            return a * 4
-        }
-        set(newPerimeter) {
-            a = newPerimeter / 4
-        }
-    }
-}
-var square = Square()
-square.perimeter = 16
-print(square.perimeter)
-```
-```Typescript
-class Square {
-    a:number = 1.0 ;
-    perimeter$get(): number {
-        return this.a * 4 ;
-    }
-    perimeter$set(newPerimeter:number) {
-        this.a = newPerimeter / 4 ;
-    } ;
-} ;
-let square:Square = new Square();
-square.perimeter$set( 16 );
-console.log(square.perimeter$get());
-```
-```Java
-No support in Java yet.
-```
-
-Motivation & Development
-==============
-
-Swift is the official new language behind iOS apps.
-On top of that, its ease of use coupled with great performance make it a strong contender for a future back-end language
-(a compiler has already been released for linux).
-
-Wouldn't it be great to be able to share business logic across the whole mobile environment?
-No need to maintain four different code bases (back-end, iOS, Android and browser)!
-
-This transpiler is more robust than any solution I could find online.
-Using antlr4 is a huge advantage over hand coding lexers & parsers -- it's more reliable and more maintainable.
-
-The project is undergoing rapid development and ideally it would have complete Swift support.
-I welcome any contributions. Feel free to drop me a line at marcelganczak@gmail.com
-
-Usage
-==============
-
-You will need Java to run the transpiler.
-
-It will grab the contents of example.swift in the root folder and print the transpiled TypeScript into console.
-
-To find out how to then transpile TypeScript further to JavaScript, check https://www.typescriptlang.org/
-
-Testing
-==============
-
-In order to run the tests, you need xcode and node as well as typescript and mocha npm packages installed globally.
+**Rebuilding the executable after updating swift repo/changing a .cpp file**
 
 ```
-cd test
+cd ./swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64
+ninja swift
+```
+
+**Testing our transpiler - both local & github tests**
+
+```
+cd ./test
 mocha
 ```
 
-The test will iterate through all swift files within the test directory,
-run both the original Swift code and the transpiled TypeScript/Java code and compare the console output.
+**Transpiling a given file**
 
-License
-==============
+```
+../swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks example.swift
+```
 
-MIT
+For UIKit:
+
+```
+../swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk -target arm64-apple-ios12.2 -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks example.swift
+```
+
+**Outputting the AST tree (untouched ASTDumper)**
+
+```
+swiftc -dump-ast -O example.swift
+```
+
+**Building the transpiled swift libraries**
+
+```
+node ./include/build-bodies/build.js from-step-2
+```
+
+**Running templates/project**
+
+```
+cd ./MIOJSLibs/templates/project
+```
+
+Then to start the basic http server serving the files `npm start`.
+
+To compile the project's ts - for the first time, run `npm run init`.
+Later on you can just do `npm run tsc` to run the tsc compiler in watch mode.
+
+The project needs to include two sets of libraries: MIOJSLibs and the one generated by the transpiler.
+
+The first time and then any time transpiler gets updated, run `npm run build-swift-libs`
+
+The first time and then any time MIOJSLibs get updated, run `npm run build-miojs-libs`

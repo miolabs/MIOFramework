@@ -1,0 +1,428 @@
+----Swift.(file).Array.==infix(_:Array<Element>,_:Array<Element>)
+extension Array where Element: Equatable {
+  public static func ==(lhs: Array<Element>, rhs: Array<Element>) -> Bool {
+    let lhsCount = lhs.count
+    if lhsCount != rhs.count {
+      return false
+    }
+
+    if lhsCount == 0 {
+      return true
+    }
+
+    for idx in 0..<lhsCount {
+      if lhs[idx] != rhs[idx] {
+        return false
+      }
+    }
+
+    return true
+  }
+}
+----Swift.(file).Array.append(contentsOf:S)
+extension Array {
+  public mutating func append<S: Sequence>(contentsOf newElements: __owned S)
+    where S.Element == Element {
+
+      for el in newElements {
+        append(el)
+      }
+  }
+}
+----Swift.(file).Array.append(_:Element)
+extension Array: RangeReplaceableCollection  {
+  public mutating func append(_ newElement: __owned Element) {
+    self.replaceSubrange(count..<count, with: CollectionOfOne(newElement))
+  }
+}
+----Swift.(file).Array.replaceSubrange(_:Range<Int>,with:C)
+extension Array  {
+  public mutating func replaceSubrange<C>(
+    _ subrange: Range<Int>,
+    with newElements: __owned C
+    ) where C: Collection, C.Element == Element {
+
+    for _ in subrange {
+      remove(at: subrange.startIndex)
+    }
+
+    var i = subrange.startIndex
+    for el in newElements {
+      insert(el, at: i)
+      i += 1
+    }
+  }
+}
+----Swift.(file).Array.removeAll(keepingCapacity:Bool)
+extension Array {
+  public mutating func removeAll(keepingCapacity keepCapacity: Bool = false) {
+    self.replaceSubrange(indices, with: EmptyCollection())
+  }
+}
+----Swift.(file).Array.init(repeating:Element,count:Int)
+extension Array: RangeReplaceableCollection  {
+  public init(repeating repeatedValue: Element, count: Int) {
+    var result = Array<Element>()
+    for _ in 0..<count {
+      result.append(repeatedValue)
+    }
+  }
+}
+----Swift.(file).Array.init(repeating:Element,count:Int)#SUFFIX
+ result
+----Swift.(file).BidirectionalCollection.joined(separator:String)
+extension BidirectionalCollection where Element == String  {
+  public func joined(separator: String = "") -> String {
+    var result = ""
+    if separator.isEmpty {
+      for x in self {
+        result.append(String(x))
+      }
+      return result
+    }
+
+    var iter = makeIterator()
+    if let first = iter.next() {
+      result.append(String(first))
+      while let next = iter.next() {
+        result.append(separator)
+        result.append(String(next))
+      }
+    }
+    return result
+  }
+}
+----Swift.(file).Sequence.joined(separator:String)
+extension Sequence where Element: StringProtocol  {
+  public func joined(separator: String = "") -> String {
+    var result = ""
+    if separator.isEmpty {
+      for x in self {
+        result.append(String(x))
+      }
+      return result
+    }
+
+    var iter = makeIterator()
+    if let first = iter.next() {
+      result.append(String(first))
+      while let next = iter.next() {
+        result.append(separator)
+        result.append(String(next))
+      }
+    }
+    return result
+  }
+}
+----Swift.(file)._ArrayProtocol.filter(_:(Self.Element) throws -> Bool)
+extension Array  {
+  public __consuming func filter(
+    _ isIncluded: (Element) throws -> Bool
+    ) rethrows -> [Element] {
+    var result = Array<Element>()
+
+    var iterator = self.makeIterator()
+
+    while let element = iterator.next() {
+      if try isIncluded(element) {
+        result.append(element)
+      }
+    }
+
+    return Array(result)
+  }
+}
+----Swift.(file).Array.endIndex
+extension Array: RandomAccessCollection, MutableCollection  {
+  public var endIndex: Int {
+    return count
+  }
+}
+----Swift.(file).Array.subscript(_:Range<Int>)
+extension Array: RandomAccessCollection, MutableCollection  {
+  public subscript(bounds: Range<Int>) -> ArraySlice<Element> {
+    get {
+      var result = Array<Element>()
+      for index in bounds {
+        result.append(self[index])
+      }
+      return result
+    }
+    set(rhs) {
+      self.replaceSubrange(bounds, with: rhs)
+    }
+  }
+}
+----Swift.(file).IndexingIterator.init(_elements:Elements)
+public struct IndexingIterator<Elements : Collection> {
+  internal let _elements: Elements
+  internal var _position: Elements.Index
+}
+"--ignore-before"
+extension IndexingIterator {
+  init(_elements: Elements) {
+    self._elements = _elements
+    self._position = _elements.startIndex
+  }
+}
+----Swift.(file).StrideThrough.init(_start:Element,end:Element,stride:Element.Stride)
+public struct StrideThrough<Element: Strideable> {
+  @usableFromInline
+  internal let _start: Element
+  @usableFromInline
+  internal let _end: Element
+  @usableFromInline
+  internal let _stride: Element.Stride
+}
+"--ignore-before"
+extension StrideThrough {
+  internal init(_start: Element, end: Element, stride: Element.Stride) {
+    precondition(stride != 0, "Stride size must not be zero")
+    self._start = _start
+    self._end = end
+    self._stride = stride
+  }
+}
+----Swift.(file).IndexingIterator.init(_elements:Elements,_position:Elements.Index)
+public struct IndexingIterator<Elements : Collection> {
+  internal let _elements: Elements
+  internal var _position: Elements.Index
+}
+"--ignore-before"
+extension IndexingIterator {
+  init(_elements: Elements, _position: Elements.Index) {
+    self._elements = _elements
+    self._position = _position
+  }
+}
+----Swift.(file).CollectionOfOne.Iterator.init(_elements:CollectionOfOne<Element>.Iterator.Element?)
+public struct Iterator<Element> {
+  internal var _elements: Element?
+}
+"--ignore-before"
+extension Iterator {
+  init(_elements: Element?) {
+    self._elements = _elements
+  }
+}
+----Swift.(file).Collection.map(_:(Self.Element) throws -> T)
+extension Collection  {
+  public func map<T>(
+    _ transform: (Element) throws -> T
+    ) rethrows -> [T] {
+    // TODO: swift-3-indexing-model - review the following
+    let n = self.count
+    if n == 0 {
+      return []
+    }
+
+    var result = Array<T>()
+
+    var i = self.startIndex
+
+    for _ in 0..<n {
+      result.append(try transform(self[i]))
+      formIndex(after: &i)
+    }
+
+    //_expectEnd(of: self, is: i)
+    return result
+  }
+}
+----Swift.(file).Sequence.map(_:(Self.Element) throws -> T)
+extension Sequence  {
+  public func map<T>(
+    _ transform: (Element) throws -> T
+  ) rethrows -> [T] {
+    var result = Array<T>()
+
+    var iterator = self.makeIterator()
+
+    // Add remaining elements, if any.
+    while let element = iterator.next() {
+      result.append(try transform(element))
+    }
+    return result
+  }
+}
+----Swift.(file).swap(_:T,_:T)
+public func swap<T>(_ a: inout T, _ b: inout T) {
+  (a, b) = (b, a)
+}
+----Swift.(file).Sequence.sorted(by:(Self.Element, Self.Element) throws -> Bool)
+extension Sequence  {
+  public func sorted(
+    by areInIncreasingOrder:
+      (Element, Element) throws -> Bool
+  ) rethrows -> [Element] {
+    var result = Array(self)
+    try result.sort(by: areInIncreasingOrder)
+    return result
+  }
+}
+----Swift.(file).Int.advanced(by:Int)
+extension Int {
+  public func advanced(by n: Int) -> Int {
+    return self + n
+  }
+}
+----Swift.(file).StrideThrough.init(_start:Element,end:Element,stride:Element.Stride)
+extension StrideThrough {
+  internal init(_start: Element, end: Element, stride: Element.Stride) {
+    //precondition(stride != 0, "Stride size must not be zero")
+    self._start = _start
+    self._end = end
+    self._stride = stride
+  }
+}
+----Swift.(file).abs(_:T)
+public func abs<T : SignedNumeric & Comparable>(_ x: T) -> T {
+  "#clarifyGeneric#T#x.constructor"
+  return x < (0 as T) ? -x : x
+}
+----Swift.(file).Int.distance(to:Int)
+extension Int {
+  public func distance(to other: Int) -> Int {
+    return other - self
+  }
+}
+----Swift.(file).Dictionary.filter(_:(Dictionary<Key, Value>.Element) throws -> Bool)
+extension Dictionary {
+  public __consuming func filter(
+    _ isIncluded: (Element) throws -> Bool
+  ) rethrows -> [Key: Value] {
+    var result = Dictionary<Key, Value>()
+    for element in self {
+      if try isIncluded(element) {
+        result[element.key] = element.value
+      }
+    }
+    return result
+  }
+}
+----Swift.(file).Array.init(_:S)
+extension Array: RangeReplaceableCollection  {
+  public init<S: Sequence>(_ s: S) where S.Element == Element {
+
+    var result = Array<Element>()
+    var iterator = s.makeIterator()
+    while let element = iterator.next() {
+      result.append(element)
+    }
+  }
+}
+----Swift.(file).Array.init(_:S)#SUFFIX
+ result
+----Swift.(file).Array.description
+extension Array: CustomStringConvertible, CustomDebugStringConvertible  {
+  public var description: String {
+    var result = ""
+    //if let type = type {
+    //  result += "\(type)(["
+    //} else {
+      result += "["
+    //}
+
+    var first = true
+    for item in self {
+      if first {
+        first = false
+      } else {
+        result += ", "
+      }
+      result += "\(item)"
+    }
+    //if type != nil {
+    //  result += "])"
+    //}
+    //else {
+      result += "]"
+    //}
+    return result
+  }
+}
+----XCTest.(file).XCTAssert(_:() throws -> Bool,_:() -> String,file:StaticString,line:UInt)
+public func XCTAssert(_ expression: @autoclosure () -> Bool, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+  precondition(expression(), message())
+}
+----XCTest.(file).XCTAssertFalse(_:() throws -> Bool,_:() -> String,file:StaticString,line:UInt)
+public func XCTAssertFalse(_ expression: @autoclosure () -> Bool, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+  precondition(!expression(), message())
+}
+----XCTest.(file).XCTAssertGreaterThan(_:() throws -> T,_:() throws -> T,_:() -> String,file:StaticString,line:UInt)
+public func XCTAssertGreaterThan<T : Comparable>(_ expression1: @autoclosure () -> T, _ expression2: @autoclosure () -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+  precondition(expression1() > expression2(), message())
+}
+----XCTest.(file).XCTAssertGreaterThanOrEqual(_:() throws -> T,_:() throws -> T,_:() -> String,file:StaticString,line:UInt)
+public func XCTAssertGreaterThanOrEqual<T : Comparable>(_ expression1: @autoclosure () -> T, _ expression2: @autoclosure () -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+  precondition(expression1() >= expression2(), message())
+}
+----XCTest.(file).XCTAssertLessThan(_:() throws -> T,_:() throws -> T,_:() -> String,file:StaticString,line:UInt)
+public func XCTAssertLessThan<T : Comparable>(_ expression1: @autoclosure () -> T, _ expression2: @autoclosure () -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+  precondition(expression1() < expression2(), message())
+}
+----XCTest.(file).XCTAssertLessThanOrEqual(_:() throws -> T,_:() throws -> T,_:() -> String,file:StaticString,line:UInt)
+public func XCTAssertLessThanOrEqual<T : Comparable>(_ expression1: @autoclosure () -> T, _ expression2: @autoclosure () -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+  precondition(expression1() <= expression2(), message())
+}
+----XCTest.(file).XCTAssertNil(_:() throws -> Any?,_:() -> String,file:StaticString,line:UInt)
+public func XCTAssertNil(_ expression: @autoclosure () -> Any?, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+  precondition(expression() == nil, message())
+}
+----XCTest.(file).XCTAssertNotNil(_:() throws -> Any?,_:() -> String,file:StaticString,line:UInt)
+public func XCTAssertNotNil(_ expression: @autoclosure () -> Any?, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+  precondition(expression() != nil, message())
+}
+----XCTest.(file).XCTAssertTrue(_:() throws -> Bool,_:() -> String,file:StaticString,line:UInt)
+public func XCTAssertTrue(_ expression: @autoclosure () -> Bool, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+  precondition(expression() == true, message())
+}
+----XCTest.(file).XCTAssertEqual(_:() throws -> T,_:() throws -> T,_:() -> String,file:StaticString,line:UInt)
+public func XCTAssertEqual<T : Equatable>(_ expression1: @autoclosure () -> T, _ expression2: @autoclosure () -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+  precondition(expression1() == expression2(), message())
+}
+----XCTest.(file).XCTAssertNotEqual(_:() throws -> T,_:() throws -> T,_:() -> String,file:StaticString,line:UInt)
+public func XCTAssertNotEqual<T : Equatable>(_ expression1: @autoclosure () -> T, _ expression2: @autoclosure () -> T, _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line) {
+  precondition(expression1() != expression2(), message())
+}
+----XCTest.(file).XCTFail(_:String,file:StaticString,line:UInt)
+public func XCTFail(_ message: String = "", file: StaticString = #file, line: UInt = #line) {
+  assertionFailure(message)
+}
+----Swift.(file).precondition(_:() -> Bool,_:() -> String,file:StaticString,line:UInt)
+public func precondition(
+  _ condition: @autoclosure () -> Bool,
+  _ message: @autoclosure () -> String = String(),
+  file: StaticString = #file, line: UInt = #line
+) {
+  if !condition() {
+    assertionFailure(message())
+  }
+}
+----Swift.(file).assert(_:() -> Bool,_:() -> String,file:StaticString,line:UInt)
+public func assert(
+  _ condition: @autoclosure () -> Bool,
+  _ message: @autoclosure () -> String = String(),
+  file: StaticString = #file, line: UInt = #line
+) {
+  if(!condition()) assertionFailure(message())
+}
+----Swift.(file).assertionFailure(_:() -> String,file:StaticString,line:UInt)
+extension String: Error {}
+public func assertionFailure(
+  _ message: @autoclosure () -> String = String(),
+  file: StaticString = #file, line: UInt = #line
+) throws {
+  throw message()
+}
+----XCTest.(file).XCTest.setUp()
+
+----XCTest.(file).XCTest.tearDown()
+
+----Swift.(file)._OptionalNilComparisonType.init(nilLiteral:())
+
+----XCTest.(file).XCTestCase.measure(_:() -> Void)
+
+----ObjectiveC.(file).NSObject.init()
+
+----closing dashes needed for the last definition to be processed
