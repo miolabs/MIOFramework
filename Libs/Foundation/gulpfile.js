@@ -123,6 +123,8 @@ function cleanWebJsFile(done) {
 
 	let content = fs.readFileSync(path, "utf8");
 	let newContent = content.replace(regExObject, ObjectReplace).replace(regExExport, " ").replace(regExObjectProperties, " ");
+
+	newContent = newContent.replace(/.*require.*/g, "").replace(/mio_foundation_web_[0-9]*\./g, "");
 	
 	fs.writeFileSync(path, newContent);
 	done();

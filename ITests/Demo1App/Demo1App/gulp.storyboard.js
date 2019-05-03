@@ -123,7 +123,7 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "action") {
 		let selector =  attributes["selector"];
 		//TODO: let eventType = attributes["eventType"];		
-		currentElement["Content"] = currentElement["Content"] + '<div class="hidden" data-action-selector="' + selector.replace(":", "") +'"></div>';
+		currentElement["Content"] = currentElement["Content"] + '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "") +'"></div>';
 	}
 	else if (element == "outlet") {
 		let outlet = attributes["property"];
@@ -163,9 +163,6 @@ function parserDidEndElement(parser, element){
 	}
 	else if (element == "textField"){
 		popElement();
-	}
-	else if (element == "connections"){
-
 	}
 }
 
