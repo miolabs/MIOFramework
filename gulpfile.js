@@ -1,12 +1,7 @@
 var gulp = require("gulp");
-var { series, parallel } = require("gulp");
-var uglify = require("gulp-uglify");
 var pipeline = require('readable-stream').pipeline;
 var ts = require("gulp-typescript");
 var fs = require("file-system");
-var rf = require("rimraf");
-var parseString = require('xml2js').parseString;
-var sourcemaps = require("gulp-sourcemaps");
 var sb = require("./ITests/Demo1App/Demo1App/gulp.storyboard");
 var utils = require("./ITests/Demo1App/Demo1App/gulp.utils");
 
