@@ -2,15 +2,15 @@ var gulp = require("gulp");
 var pipeline = require('readable-stream').pipeline;
 var ts = require("gulp-typescript");
 var fs = require("file-system");
-var sb = require("./Demo1App/gulp.storyboard");
-var utils = require("./Demo1App/gulp.utils");
+var sb = require("../../Tools/gulp.storyboard");
+var utils = require("../../Tools/gulp.utils");
 
 function unifySwiftFiles(done) {
 	var fileArr = [];
 	fs.recurseSync("./Demo1App/", ["*.swift"], function(filepath, relative, filename) {
 		if(filename === "data.swift") {
 			//remove data.swift if exists
-			fs.unlinkSync("./Demo1App/data.swift");
+			fs.unlinkSync("./data.swift");
 		} else {
 			fileArr.push(filepath);
 		}
@@ -18,12 +18,12 @@ function unifySwiftFiles(done) {
 	fileArr.reverse().forEach((item) => {
 		var currentItem = fs.readFileSync(item, "utf8");
 		var filteredItem = utils.filterSwiftFile(currentItem);
-		fs.appendFileSync("./Demo1App/.build/data.swift", filteredItem, "utf8");
+		fs.appendFileSync("./.build/data.swift", filteredItem, "utf8");
 	});
 	done();
 }
-function transpileTsToJs() {
-	return gulp.src("./Demo1App/.build/data.ts")
+function transpileTsToJs() { //doesn't work
+	return gulp.src("./.build/data.ts")
 				.pipe(ts({
 					outFile: "app.js",
 					removeComments: true,
@@ -32,17 +32,17 @@ function transpileTsToJs() {
 					types: ["mio-foundation-web", "mio-uikit-web"],
 					target: "es5"
 				}))
-				.pipe(gulp.dest("./Demo1App/dist/"));
+				.pipe(gulp.dest("./dist/"));
 }
-function uglifyJs() {
+function uglifyJs() { 
 	return pipeline( 
 			//sourcemaps.init({largeFile: true}),
-			gulp.src("./Demo1App/.build/app.js"),
+			gulp.src("./.build/app.js"),
 			// uglify({
 			// 	sourceMap: true
 			// }),
 			//sourcemaps.write(),
-			gulp.dest("./Demo1App/dist/")
+			gulp.dest("./dist/")
 		);
 }
 function parseStoryBoard(done) {
@@ -59,9 +59,30 @@ function parseStoryBoard(done) {
 	done();
 }
 
+function generateAppPlist(done) {
+
+	done();
+}
+
+function copyResources(done) {
+	const SRC = "../../Tools/resources/";
+	const DEST = __dirname + "/dist/";
+
+	fs.copyFileSync(SRC + "index.html", DEST + "index.html");
+	fs.copyFileSync(SRC + "main.js", DEST + "scripts/main.js" );
+	fs.copyFileSync(SRC + "app.css", DEST + "styles/app.css" );
+
+	//Copiar las librerias de node_modules foundation y uikit (minificadas) a dist/libs
+	
+
+	done();
+}
+
 module.exports = {
 	unifySwiftFiles,
 	transpileTsToJs,
 	uglifyJs,
-	parseStoryBoard
+	parseStoryBoard,
+	generateAppPlist,
+	copyResources
 }
