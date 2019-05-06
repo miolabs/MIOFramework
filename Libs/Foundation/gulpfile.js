@@ -148,7 +148,7 @@ function createWebPackage(done) {
 		fs.copyFileSync("./dist/foundation.web.d.ts", DEST + "types/mio-foundation-web.d.ts");
 
 		//Copy foundation.min.js
-		fs.copyFileSync("./.build/web-prod/foundation.web.js", DEST + "mio-foundation-web.js");
+		fs.copyFileSync("./.build/web-prod/foundation.web.js", DEST + "mio-foundation-web.min.js");
 
 		//Copy package.json, LICENSE AND README
 		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
