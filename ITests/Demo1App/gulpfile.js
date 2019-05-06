@@ -66,14 +66,30 @@ function generateAppPlist(done) {
 
 function copyResources(done) {
 	const SRC = "../../Tools/resources/";
+	const FOUNDATION_PATH = "../../Libs/Foundation/packages/";
+	const UIKIT_PATH = "../../Libs/UIKit/packages/";
 	const DEST = __dirname + "/dist/";
 
 	fs.copyFileSync(SRC + "index.html", DEST + "index.html");
 	fs.copyFileSync(SRC + "main.js", DEST + "scripts/main.js" );
 	fs.copyFileSync(SRC + "app.css", DEST + "styles/app.css" );
 
-	//Copiar las librerias de node_modules foundation y uikit (minificadas) a dist/libs
-	
+	//FOUNDATION
+	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/types/mio-foundation-web.d.ts", DEST + "libs/mio-foundation-web/types/mio-foundation-web.d.ts");
+	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/extensions.ts", DEST + "libs/mio-foundation-web/extensions.ts");
+	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/LICENSE", DEST + "libs/mio-foundation-web/LICENSE");
+	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/mio-foundation-web.min.js", DEST + "libs/mio-foundation-web/mio-foundation-web.min.js");
+	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/package-lock.json", DEST + "libs/mio-foundation-web/package-lock.json");
+	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/package.json", DEST + "libs/mio-foundation-web/package.json");
+	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/README.md", DEST + "libs/mio-foundation-web/README.md");
+
+	//UIKIT
+	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web/types/mio-uikit-web.d.ts", DEST + "libs/mio-uikit-web/types/mio-uikit-web.d.ts");
+	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web/LICENSE", DEST + "libs/mio-uikit-web/LICENSE");
+	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web/mio-uikit-web.min.js", DEST + "libs/mio-uikit-web/mio-uikit-web.min.js");
+	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web/package-lock.json", DEST + "libs/mio-uikit-web/package-lock.json");
+	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web/package.json", DEST + "libs/mio-uikit-web/package.json");
+	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web/README.md", DEST + "libs/mio-uikit-web/README.md");
 
 	done();
 }
