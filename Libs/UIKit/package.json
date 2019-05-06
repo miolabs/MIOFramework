@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
 	"test": "echo \"Error: no test specified\" && exit 1",
-	"build-web-prod": "gulp UIBuildWeb && tsc && gulp UICleanWebJsFile && gulp UIMinifyWebProd && gulp UIBuildWebPackage && gulp UIRemoveTempFolders",
-	"build-web-dev": "gulp UIBuildWeb && tsc && gulp UICleanWebJsFile && gulp UIBuildWebPackage && gulp UIRemoveTempFolders" 
+	"build-web-prod": "gulp UIBuildWeb ; tsc ; gulp UICleanWebJsFile ; gulp UIMinifyWebProd ; gulp UIBuildWebPackage ; gulp UIRemoveTempFolders",
+	"build-web-dev": "gulp UIBuildWeb ; tsc ; gulp UICleanWebJsFile ; gulp UIBuildWebPackage ; gulp UIRemoveTempFolders" 
   },
   "author": "MIOLabs Team",
   "license": "Apache-2.0",
