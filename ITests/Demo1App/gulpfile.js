@@ -66,30 +66,30 @@ function generateAppPlist(done) {
 
 function copyResources(done) {
 	const SRC = "../../Tools/resources/";
-	const FOUNDATION_PATH = "../../Libs/Foundation/packages/";
-	const UIKIT_PATH = "../../Libs/UIKit/packages/";
+	const FOUNDATION_PATH = "node_modules/mio-foundation-web/";
+	const UIKIT_PATH = "node_modules/mio-uikit-web/";
 	const DEST = __dirname + "/dist/";
 
 	fs.copyFileSync(SRC + "index.html", DEST + "index.html");
 	fs.copyFileSync(SRC + "main.js", DEST + "scripts/main.js" );
 	fs.copyFileSync(SRC + "app.css", DEST + "styles/app.css" );
 
-	//FOUNDATION
-	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/types/mio-foundation-web.d.ts", DEST + "libs/mio-foundation-web/types/mio-foundation-web.d.ts");
-	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/extensions.ts", DEST + "libs/mio-foundation-web/extensions.ts");
-	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/LICENSE", DEST + "libs/mio-foundation-web/LICENSE");
-	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/mio-foundation-web.min.js", DEST + "libs/mio-foundation-web/mio-foundation-web.min.js");
-	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/package-lock.json", DEST + "libs/mio-foundation-web/package-lock.json");
-	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/package.json", DEST + "libs/mio-foundation-web/package.json");
-	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web/README.md", DEST + "libs/mio-foundation-web/README.md");
+	//FOUNDATION WEB
+	fs.copyFileSync(FOUNDATION_PATH + "types/mio-foundation-web.d.ts", DEST + "libs/mio-foundation-web/types/mio-foundation-web.d.ts");
+	fs.copyFileSync(FOUNDATION_PATH + "extensions.ts", DEST + "libs/mio-foundation-web/extensions.ts");
+	fs.copyFileSync(FOUNDATION_PATH + "LICENSE", DEST + "libs/mio-foundation-web/LICENSE");
+	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web.min.js", DEST + "libs/mio-foundation-web/mio-foundation-web.min.js");
+	fs.copyFileSync(FOUNDATION_PATH + "package-lock.json", DEST + "libs/mio-foundation-web/package-lock.json");
+	fs.copyFileSync(FOUNDATION_PATH + "package.json", DEST + "libs/mio-foundation-web/package.json");
+	fs.copyFileSync(FOUNDATION_PATH + "README.md", DEST + "libs/mio-foundation-web/README.md");
 
 	//UIKIT
-	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web/types/mio-uikit-web.d.ts", DEST + "libs/mio-uikit-web/types/mio-uikit-web.d.ts");
-	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web/LICENSE", DEST + "libs/mio-uikit-web/LICENSE");
-	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web/mio-uikit-web.min.js", DEST + "libs/mio-uikit-web/mio-uikit-web.min.js");
-	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web/package-lock.json", DEST + "libs/mio-uikit-web/package-lock.json");
-	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web/package.json", DEST + "libs/mio-uikit-web/package.json");
-	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web/README.md", DEST + "libs/mio-uikit-web/README.md");
+	fs.copyFileSync(UIKIT_PATH + "types/mio-uikit-web.d.ts", DEST + "libs/mio-uikit-web/types/mio-uikit-web.d.ts");
+	fs.copyFileSync(UIKIT_PATH + "LICENSE", DEST + "libs/mio-uikit-web/LICENSE");
+	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web.min.js", DEST + "libs/mio-uikit-web/mio-uikit-web.min.js");
+	fs.copyFileSync(UIKIT_PATH + "package-lock.json", DEST + "libs/mio-uikit-web/package-lock.json");
+	fs.copyFileSync(UIKIT_PATH + "package.json", DEST + "libs/mio-uikit-web/package.json");
+	fs.copyFileSync(UIKIT_PATH + "README.md", DEST + "libs/mio-uikit-web/README.md");
 
 	done();
 }
