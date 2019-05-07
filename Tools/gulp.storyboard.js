@@ -565,7 +565,7 @@ function classesStringify(classes){
 }
 
 function generateHtmlFile() {
-	fs.writeFileSync("./ITests/Demo1App/Demo1App/dist/" + currentFileName, currentFileContent);
+	fs.writeFileSync("./dist/layout/" + currentFileName, currentFileContent);
 }
 
 module.exports = {

@@ -10,9 +10,7 @@
     "stpull": "git subtree pull --prefix=MIOSwiftTranspiler https://github.com/miolabs/MIOSwiftTranspiler master --squash",
     "lpush": "git subtree push --prefix=MIOLibs https://github.com/miolabs/MIOLibs master",
     "lpull": "git subtree pull --prefix=MIOLibs https://github.com/miolabs/MIOLibs master --squash",
-    "pull": "npm run btpull && npm run stpull && npm run lpull",
-    "buildts": "../swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -Xfrontend -disable-access-control -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk -target arm64-apple-ios12.2 -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks ./ITests/Demo1App/Demo1App/.build/data.swift > ./ITests/Demo1App/Demo1App/.build/data.ts",
-    "transpilets": "tsc ./ITests/Demo1App/Demo1App/.build/data.ts"
+    "pull": "npm run btpull && npm run stpull && npm run lpull"
   },
   "repository": {
     "type": "git",
