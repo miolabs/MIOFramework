@@ -21,22 +21,5 @@
   "bugs": {
     "url": "https://github.com/miolabs/MIOFramework/issues"
   },
-  "homepage": "https://github.com/miolabs/MIOFramework#readme",
-  "devDependencies": {
-    "decimal.js": "^10.1.1",
-    "file-system": "^2.2.2",
-    "gulp": "^4.0.0",
-    "gulp-sourcemaps": "^2.6.5",
-    "gulp-typescript": "^5.0.1",
-    "gulp-uglify": "^3.0.2",
-    "mio-foundation-node": "^1.0.6",
-    "mio-foundation-web": "^1.0.6",
-    "rimraf": "^2.6.3",
-    "xml2js": "^0.4.19"
-  },
-  "dependencies": {
-    "miojslibs": "^0.9.128",
-    "readable-stream": "^3.3.0",
-    "typescript": "^3.4.1"
-  }
+  "homepage": "https://github.com/miolabs/MIOFramework#readme"
 }
