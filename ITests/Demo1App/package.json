@@ -26,7 +26,8 @@
     "gulp-typescript": "^5.0.1",
     "gulp-uglify": "^3.0.2",
     "mio-foundation-node": "^1.0.6",
-    "mio-foundation-web": "^1.0.6",
+    "mio-foundation-web": "^1.0.7",
+    "mio-uikit-web": "^1.0.0",
     "rimraf": "^2.6.3"
   },
   "dependencies": {
