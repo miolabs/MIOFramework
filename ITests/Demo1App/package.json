@@ -5,8 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "buildTs": "../../../swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -Xfrontend -disable-access-control -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk -target arm64-apple-ios12.2 -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks .build/data.swift > .build/data.ts",
-    "transpileTs": "tsc Demo1App/.build/data.ts",
-    "buildProject": "gulp unifySwiftFiles ; npm run buildTs ; npm run transpileTs ; gulp parseStoryBoard ; gulp generateAppPlist ; gulp copyResources"
+    "transpileTs": "tsc .build/data.ts",
+    "buildProject": "gulp unifySwiftFiles ; npm run buildTs ; npm run transpileTs ; gulp parseStoryBoard ; gulp generateAppPlist ; gulp copyResources ; gulp copyTemplates"
   },
   "repository": {
     "type": "git",
@@ -19,9 +19,9 @@
   },
   "homepage": "https://github.com/miolabs/MIOFramework#readme",
   "devDependencies": {
-    "decimal.js": "^10.1.1",
+    "decimal.js": "^10.2.0",
     "file-system": "^2.2.2",
-    "gulp": "^4.0.0",
+    "gulp": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-typescript": "^5.0.1",
     "gulp-uglify": "^3.0.2",
@@ -31,8 +31,8 @@
     "rimraf": "^2.6.3"
   },
   "dependencies": {
-    "miojslibs": "^0.9.128",
+    "miojslibs": "^0.9.135",
     "readable-stream": "^3.3.0",
-    "typescript": "^3.4.1"
+    "typescript": "^3.4.5"
   }
 }

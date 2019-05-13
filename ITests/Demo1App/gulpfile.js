@@ -2,15 +2,20 @@ var gulp = require("gulp");
 var pipeline = require('readable-stream').pipeline;
 var ts = require("gulp-typescript");
 var fs = require("file-system");
-var sb = require("../../Tools/gulp.storyboard");
-var utils = require("../../Tools/gulp.utils");
+var sb = require("./gulp.storyboard");
+var utils = require("./gulp.utils");
 
 function unifySwiftFiles(done) {
 	var fileArr = [];
+	var dir = "./.build";
+
+	if (!fs.existsSync(dir)){
+		fs.mkdirSync(dir);
+	}
 	fs.recurseSync("./Demo1App/", ["*.swift"], function(filepath, relative, filename) {
 		if(filename === "data.swift") {
 			//remove data.swift if exists
-			fs.unlinkSync("./data.swift");
+			fs.unlinkSync("./.build/data.swift");
 		} else {
 			fileArr.push(filepath);
 		}
@@ -79,7 +84,6 @@ function copyResources(done) {
 	fs.copyFileSync(FOUNDATION_PATH + "extensions.ts", DEST + "libs/mio-foundation-web/extensions.ts");
 	fs.copyFileSync(FOUNDATION_PATH + "LICENSE", DEST + "libs/mio-foundation-web/LICENSE");
 	fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web.min.js", DEST + "libs/mio-foundation-web/mio-foundation-web.min.js");
-	fs.copyFileSync(FOUNDATION_PATH + "package-lock.json", DEST + "libs/mio-foundation-web/package-lock.json");
 	fs.copyFileSync(FOUNDATION_PATH + "package.json", DEST + "libs/mio-foundation-web/package.json");
 	fs.copyFileSync(FOUNDATION_PATH + "README.md", DEST + "libs/mio-foundation-web/README.md");
 
@@ -87,12 +91,20 @@ function copyResources(done) {
 	fs.copyFileSync(UIKIT_PATH + "types/mio-uikit-web.d.ts", DEST + "libs/mio-uikit-web/types/mio-uikit-web.d.ts");
 	fs.copyFileSync(UIKIT_PATH + "LICENSE", DEST + "libs/mio-uikit-web/LICENSE");
 	fs.copyFileSync(UIKIT_PATH + "mio-uikit-web.min.js", DEST + "libs/mio-uikit-web/mio-uikit-web.min.js");
-	fs.copyFileSync(UIKIT_PATH + "package-lock.json", DEST + "libs/mio-uikit-web/package-lock.json");
 	fs.copyFileSync(UIKIT_PATH + "package.json", DEST + "libs/mio-uikit-web/package.json");
 	fs.copyFileSync(UIKIT_PATH + "README.md", DEST + "libs/mio-uikit-web/README.md");
 
 	done();
 }
+function copyTemplates(done) {
+	const SRC = "../../Tools/templates/";
+
+	fs.copyFileSync(SRC + "gulp.storyboard.template.js", __dirname + "/gulp.storyboard.js");
+	fs.copyFileSync(SRC + "gulp.utils.template.js", __dirname + "/gulp.utils.js");
+	fs.copyFileSync(SRC + "tsconfig.template.json", __dirname + "/tsconfig.json");
+
+	done();
+} 
 
 module.exports = {
 	unifySwiftFiles,
@@ -100,5 +112,6 @@ module.exports = {
 	uglifyJs,
 	parseStoryBoard,
 	generateAppPlist,
-	copyResources
+	copyResources,
+	copyTemplates
 }
