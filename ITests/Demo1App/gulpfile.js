@@ -1,7 +1,7 @@
 var gulp = require("gulp");
 var pipeline = require('readable-stream').pipeline;
 var ts = require("gulp-typescript");
-var fs = require('file-system');
+var fs = require("file-system");
 var sb = require("gulp.storyboard");
 var utils = require("gulp.utils");
 
@@ -98,6 +98,7 @@ function copyTemplates(done) {
 
 	fs.copyFileSync(SRC + "gulp.storyboard.template.js", __dirname + "/gulp.storyboard.js");
 	fs.copyFileSync(SRC + "gulp.utils.template.js", __dirname + "/gulp.utils.js");
+	fs.copyFileSync(SRC + "tsconfig.template.json", __dirname + "/tsconfig.json");
 
 	done();
 } 
