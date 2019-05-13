@@ -96,7 +96,7 @@ function copyResources(done) {
 
 	done();
 }
-function copyTemplates(done) {
+/*function copyTemplates(done) {
 	const SRC = "../../Tools/templates/";
 
 	fs.copyFileSync(SRC + "gulp.storyboard.template.js", __dirname + "/gulp.storyboard.js");
@@ -104,7 +104,7 @@ function copyTemplates(done) {
 	fs.copyFileSync(SRC + "tsconfig.template.json", __dirname + "/tsconfig.json");
 
 	done();
-} 
+}*/
 
 module.exports = {
 	unifySwiftFiles,
@@ -112,6 +112,6 @@ module.exports = {
 	uglifyJs,
 	parseStoryBoard,
 	generateAppPlist,
-	copyResources,
-	copyTemplates
+	copyResources
+	//copyTemplates
 }
