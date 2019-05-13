@@ -1,16 +1,16 @@
 var gulp = require("gulp");
 var pipeline = require('readable-stream').pipeline;
 var ts = require("gulp-typescript");
-var fs = require("file-system");
-var sb = require("../../Tools/gulp.storyboard");
-var utils = require("../../Tools/gulp.utils");
+var fs = require('file-system');
+var sb = require("gulp.storyboard");
+var utils = require("gulp.utils");
 
 function unifySwiftFiles(done) {
 	var fileArr = [];
 	fs.recurseSync("./Demo1App/", ["*.swift"], function(filepath, relative, filename) {
 		if(filename === "data.swift") {
 			//remove data.swift if exists
-			fs.unlinkSync("./data.swift");
+			fs.unlinkSync("./.build/data.swift");
 		} else {
 			fileArr.push(filepath);
 		}
@@ -93,6 +93,14 @@ function copyResources(done) {
 
 	done();
 }
+function copyTemplates(done) {
+	const SRC = "../../Tools/templates/";
+
+	fs.copyFileSync(SRC + "gulp.storyboard.template.js", __dirname + "/gulp.storyboard.js");
+	fs.copyFileSync(SRC + "gulp.utils.template.js", __dirname + "/gulp.utils.js");
+
+	done();
+} 
 
 module.exports = {
 	unifySwiftFiles,
@@ -100,5 +108,6 @@ module.exports = {
 	uglifyJs,
 	parseStoryBoard,
 	generateAppPlist,
-	copyResources
+	copyResources,
+	copyTemplates
 }
