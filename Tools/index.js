@@ -1,8 +1,12 @@
-#!/usr/bin/env node
-'use strict'
 const fs = require("file-system");
 const program = require('commander');
 
+module.exports = () => {
+    program.version("0.9").command("generateProject").description("Generate project to compile swift app in js").action(createApp);
+    program.parse(process.argv);
+
+    if (program.args.length === 0) program.help();
+}
 
 function createApp() {
 	const readline = require('readline').createInterface({
@@ -30,8 +34,3 @@ function createApp() {
 		fs.copyFileSync(TEMPLATES_PATH + "tsconfig.template.json", DEST + "/tsconfig.json");
 	});
 }
-
-program.version("0.9").command("generateProject").description("Generate project to compile swift app in js").action(createApp);
-program.parse(process.argv);
-
-if (program.args.length === 0) program.help();

@@ -2,12 +2,11 @@
   "name": "miotool",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "author": "MIO Framework Team",
+  "license": "Apache-2.0",
+  "bin": {
+    "miotool": "bin/miotool"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "commander": "^2.20.0"
   },
