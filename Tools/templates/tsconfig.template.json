@@ -9,8 +9,8 @@
             "./node_modules/@types/"
         ],
         "types": [
-            "",
-            ""        
+            "mio-foundation-web",
+            "mio-uikit-web"        
         ]
     }
 }
