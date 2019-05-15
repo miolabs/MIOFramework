@@ -9,28 +9,30 @@ module.exports = () => {
 }
 
 function createApp() {
-	const readline = require('readline').createInterface({
-		input: process.stdin,
-		output: process.stdout
-	});
-
-	console.log("########################################");
-	console.log("########################################");
-	console.log("########### CREATE A NEW APP ###########");
-	console.log("########################################");
-	console.log("########################################");
 	console.log("");
+	console.log("########################################");
+	console.log("########################################");
+	console.log("########### NEW APP CREATED ############");
+	console.log("########################################");
+	console.log("########################################");
 	console.log("");
 	
-	var appName = process.argv[1];
-	readline.question("App name (" + appName + "): " , (name) => {
-		readline.close()
-		const DEST = "../ITests/" + name;
-		const TEMPLATES_PATH = __dirname + "/templates/";
+	const TEMPLATES_PATH = __dirname + "/templates/";
 
-		fs.mkdirSync(DEST)
-		fs.copyFileSync(TEMPLATES_PATH + "gulp.storyboard.template.js", DEST + "/gulp.storyboard.js");
-		fs.copyFileSync(TEMPLATES_PATH + "gulp.utils.template.js", DEST + "/gulp.utils.js");
-		fs.copyFileSync(TEMPLATES_PATH + "tsconfig.template.json", DEST + "/tsconfig.json");
-	});
+	let appName = process.cwd();
+	appName = appName.substr(appName.lastIndexOf('/') + 1);
+
+	parseGulpfile(appName);
+
+	fs.copyFileSync(TEMPLATES_PATH + "gulp.storyboard.template.js", "./gulp.storyboard.js");
+	fs.copyFileSync(TEMPLATES_PATH + "gulp.utils.template.js", "./gulp.utils.js");
+	fs.copyFileSync(TEMPLATES_PATH + "tsconfig.template.json", "./tsconfig.json");
+}
+
+function parseGulpfile(appName) {
+	const GULPFILE_PATH = __dirname + "/templates/gulpfile.template.js";
+
+	let content = fs.readFileSync(GULPFILE_PATH, "utf8");
+	let newContent = content.replace(/{AppName}/g, appName);
+	fs.writeFileSync("./gulpfile.js", newContent, "utf8");
 }
