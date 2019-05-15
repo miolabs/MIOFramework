@@ -27,6 +27,7 @@ function unifySwiftFiles(done) {
 	});
 	done();
 }
+
 function transpileTsToJs() { //doesn't work
 	return gulp.src("./.build/data.ts")
 				.pipe(ts({
@@ -39,6 +40,7 @@ function transpileTsToJs() { //doesn't work
 				}))
 				.pipe(gulp.dest("./dist/"));
 }
+
 function uglifyJs() { 
 	return pipeline( 
 			//sourcemaps.init({largeFile: true}),
@@ -50,6 +52,7 @@ function uglifyJs() {
 			gulp.dest("./dist/")
 		);
 }
+
 function parseStoryBoard(done) {
 	var filesArr = [];
 	var pathStoryBoard = "./Demo1App/Base.lproj/";
@@ -96,15 +99,6 @@ function copyResources(done) {
 
 	done();
 }
-/*function copyTemplates(done) {
-	const SRC = "../../Tools/templates/";
-
-	fs.copyFileSync(SRC + "gulp.storyboard.template.js", __dirname + "/gulp.storyboard.js");
-	fs.copyFileSync(SRC + "gulp.utils.template.js", __dirname + "/gulp.utils.js");
-	fs.copyFileSync(SRC + "tsconfig.template.json", __dirname + "/tsconfig.json");
-
-	done();
-}*/
 
 module.exports = {
 	unifySwiftFiles,
@@ -113,5 +107,4 @@ module.exports = {
 	parseStoryBoard,
 	generateAppPlist,
 	copyResources
-	//copyTemplates
 }
