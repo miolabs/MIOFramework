@@ -34,4 +34,5 @@ export * from './core/MUICore'
 export * from './UIWindow'
 
 export * from './UIResponder'
+export * from './UIApplicationDelegate'
 export * from './UIApplication'

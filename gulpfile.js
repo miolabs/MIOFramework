@@ -40,7 +40,7 @@ function transpileTsToJs() {
 				.pipe(gulp.dest("./ITests/Demo1App/Demo1App/dist/"));
 }
 function uglifyJs() {
-	return pipeline( 
+	return pipeline(
 			//sourcemaps.init({largeFile: true}),
 			gulp.src("./ITests/Demo1App/Demo1App/.build/app.js"),
 			// uglify({
@@ -58,8 +58,8 @@ function parseStoryBoard(done) {
 		filesArr.unshift(item);
 	});
 	for(item of filesArr) {
-		var fileString = fs.readFileSync(pathStoryBoard+item, "utf8");		
-		sb.parseDocument(fileString);		
+		var fileString = fs.readFileSync(pathStoryBoard+item, "utf8");
+		sb.parseDocument(fileString);
 	}
 	done();
 }
