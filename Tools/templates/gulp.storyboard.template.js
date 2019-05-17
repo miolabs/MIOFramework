@@ -78,6 +78,31 @@ function parserDidStartElement(parser, element, attributes){
 		
 		item["Content"] = item["Content"] + '<input type="text" ' + inputAttrs.join(" ") + '>'
 	}
+	else if (element == "segmentedControl"){
+		let item = pushNewElement(element, attributes);						
+	
+		parseSegmentControlStyle(attributes["segmentControlStyle"], item["Classes"]);		
+	}
+	else if (element == "switch"){
+		let item = pushNewElement(element, attributes);
+	}
+	else if (element == "slider"){
+		let item = pushNewElement(element, attributes);
+	}
+	else if (element == "progressView"){
+		let item = pushNewElement(element, attributes);
+	}
+	else if (element == "activityIndicatorView"){
+		let item = pushNewElement(element, attributes);
+	}
+	else if (element == "pageControl"){
+		let item = pushNewElement(element, attributes);
+	}
+	else if (element == "stepper"){
+		let item = pushNewElement(element, attributes);
+	}
+
+	
 	else if (element == "rect"){
 		let styles = currentElement["Styles"];
 		styles.push("position:absolute;");
@@ -101,9 +126,9 @@ function parserDidStartElement(parser, element, attributes){
 			b = 255;	
 		}
 		else {
-			let r = parseFloat(attributes["red"]) * 255;
-			let g = parseFloat(attributes["green"]) * 255;
-			let b = parseFloat(attributes["blue"]) * 255;		
+			r = parseFloat(attributes["red"]) * 255;
+			g = parseFloat(attributes["green"]) * 255;
+			b = parseFloat(attributes["blue"]) * 255;		
 		}
 		
 		let a = parseFloat(attributes["alpha"]);
@@ -164,6 +189,29 @@ function parserDidEndElement(parser, element){
 	else if (element == "textField"){
 		popElement();
 	}
+	else if (element == "segmentedControl"){
+		popElement();
+	}
+	else if (element == "switch"){
+		popElement();
+	}
+	else if (element == "slider"){
+		popElement();
+	}
+	else if (element == "progressView"){
+		popElement();
+	}
+	else if (element == "activityIndicatorView"){
+		popElement();
+	}
+	else if (element == "pageControl"){
+		popElement();
+	}
+	else if (element == "stepper"){
+		popElement();
+	}
+
+
 }
 
 function pushNewElement(element, attributes){
@@ -182,6 +230,14 @@ function pushNewElement(element, attributes){
 	else if (element == "view") item["ExtraAttributes"] = ['data-class="UIView"'];
 	else if (element == "label") item["ExtraAttributes"] = ['data-class="UILabel"'];
 	else if (element == "button") item["ExtraAttributes"] = ['data-class="UIButton"'];
+	else if (element == "textField") item["ExtraAttributes"] = ['data-class="UITextField"'];	
+	else if (element == "segmentedControl") item["ExtraAttributes"] = ['data-class="UISegmentedControl"'];
+	else if (element == "switch") item["ExtraAttributes"] = ['data-class="UISwitch"'];
+	else if (element == "slider") item["ExtraAttributes"] = ['data-class="UISlider"'];
+	else if (element == "progressView") item["ExtraAttributes"] = ['data-class="UIProgressView"'];
+	else if (element == "activityIndicatorView") item["ExtraAttributes"] = ['data-class="UIActivityIndicatorView"'];
+	else if (element == "pageControl") item["ExtraAttributes"] = ['data-class="UIPPageControl"'];
+	else if (element == "stepper") item["ExtraAttributes"] = ['data-class="UIStepper"'];
 
 	classes.push(parseClassType(element));
 	if (contenMode != null) classes.push(contenMode);
@@ -232,9 +288,6 @@ function parserFoundCharacters(parser, characters){
 function parserDidEndDocument(parser){
 
 }
-
-
-
 
 function parseScenes(item){
 	console.log("Entering parseScenes");
@@ -293,6 +346,18 @@ function parseClassType(classType){
 	switch (classType){
 		case "textField":
 		return "text-field";
+		
+		case "segmentedControl":
+		return "segmented-control";
+
+		case "progressView":
+		return "progress-view";
+
+		case "activityIndicatorView":
+		return "activity-indicator-view";
+
+		case "pageControl":
+		return "page-control";
 	}
 
 	return classType;
@@ -369,7 +434,6 @@ function parseContentMode(contentMode){
 
 	return null;
 }
-
 
 function parseProperties(item, styles){
 	console.log("Entering parse Properties");
@@ -519,7 +583,6 @@ function parseButtonType(type, classes){
 	classes.push(value);
 }
 
-
 function parseButtonState(buttonState, key){
 	if (buttonState == null) return null;
 	let state = buttonState[0];
@@ -551,6 +614,18 @@ function parseBorderStyle(borderStyle, classes){
 	switch(borderStyle){
 		case "roundedRect":
 		value = "rounded-rect";
+		break;
+	}
+
+	if (value != null) classes.push(value);
+}
+
+function parseSegmentControlStyle(style, classes){
+	let value = null
+
+	switch(style){
+		case "plain":
+		value = "plain";
 		break;
 	}
 

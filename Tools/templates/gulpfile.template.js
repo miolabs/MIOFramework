@@ -13,9 +13,9 @@ function unifySwiftFiles(done) {
 		fs.mkdirSync(dir);
 	}
 	fs.recurseSync("./{AppName}/", ["*.swift"], function(filepath, relative, filename) {
-		if(filename === "data.swift") {
-			//remove data.swift if exists
-			fs.unlinkSync("./.build/data.swift");
+		if(filename === "app.swift") {
+			//remove app.swift if exists
+			fs.unlinkSync("./.build/app.swift");
 		} else {
 			fileArr.push(filepath);
 		}
@@ -23,13 +23,13 @@ function unifySwiftFiles(done) {
 	fileArr.reverse().forEach((item) => {
 		var currentItem = fs.readFileSync(item, "utf8");
 		var filteredItem = utils.filterSwiftFile(currentItem);
-		fs.appendFileSync("./.build/data.swift", filteredItem, "utf8");
+		fs.appendFileSync("./.build/app.swift", filteredItem, "utf8");
 	});
 	done();
 }
 
 function transpileTsToJs() { //doesn't work
-	return gulp.src("./.build/data.ts")
+	return gulp.src("./.build/app.ts")
 				.pipe(ts({
 					outFile: "app.js",
 					removeComments: true,
@@ -79,8 +79,9 @@ function copyResources(done) {
 	const DEST = __dirname + "/dist/";
 
 	fs.copyFileSync(SRC + "index.html", DEST + "index.html");
-	fs.copyFileSync(SRC + "main.js", DEST + "scripts/main.js" );
-	fs.copyFileSync(SRC + "app.css", DEST + "styles/app.css" );
+	fs.copyFileSync(SRC + "main.js", DEST + "scripts/main.js");
+	fs.copyFileSync("./.build/app.js", DEST + "scripts/app.js");
+	fs.copyFileSync(SRC + "app.css", DEST + "styles/app.css");
 
 	//FOUNDATION WEB
 	fs.copyFileSync(FOUNDATION_PATH + "types/mio-foundation-web.d.ts", DEST + "libs/mio-foundation-web/types/mio-foundation-web.d.ts");

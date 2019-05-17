@@ -1,31 +1,49 @@
-.label{
-	color: rgb(0, 0, 0);
-}
-.label.align-left{
-	text-align: left;	
-}
-.label.align-center{
-	text-align: center;	
-}
-.label.align-right{
-	text-align: right;	
-}
+/* VIEW */
 
-.button{
-	text-align: center;
-}
-.button.default{ 
-	color: #00bfbf;
-} 
-.button.rounded-rect {
-	background: #00bfbf;
-	color: #fff;
-	border-radius: 5px;
-}
 .view.scale-to-fill {
 	width: 100%;
 	height: 100%;
 }
+
+/* LABEL */
+
+.label {
+	/*color: rgb(0, 0, 0);*/
+}
+.label.align-left {
+	text-align: left;	
+}
+.label.align-center {
+	text-align: center;	
+}
+.label.align-right {
+	text-align: right;	
+}
+
+/* BUTTON */
+
+.button {
+	text-align: center;
+}
+.button:hover {
+	opacity: .82;
+}
+.button.default { 
+	background-color: #00bfbf;
+} 
+.button.rounded-rect {
+	background-color: #00bfbf;
+	color: #fff;
+	border-radius: 5px;
+	padding: 5px;
+	cursor: pointer;
+}
+.button.rounded-rect span {
+	line-height: 30px;
+}
+
+/* TEXT FIELD */
+
 .text-field input {
 	width: 100%;
 	font-size: inherit;
@@ -34,3 +52,17 @@
 .text-field input.rounded-rect {
 	border-radius: 5px;
 }
+
+/* SEGMENT */
+
+/* SWITCH */
+
+/* SLIDER */
+
+/* PROGRESS VIEW */
+
+/* ACTIVITY INDICATOR VIEW */
+
+/* PAGE CONTROL */
+
+/* STEPPER */
