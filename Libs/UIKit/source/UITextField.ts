@@ -1,7 +1,10 @@
+import { NSFormatter } from "mio-foundation-web";
+import { NSLocalizeString } from "mio-foundation-web";
+import "mio-foundation-web/extensions"
+
 import { UIControl } from "./UIControl";
-import { MIOFormatter } from "../MIOFoundation";
-import { UILayerGetFirstElementWithTag } from "./UIView";
-import { MIOLocalizeString } from "../MIOCore";
+import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
+
 
 /**
  * Created by godshadow on 12/3/16.
@@ -31,7 +34,7 @@ export class UITextField extends UIControl
     keyPressTarget   = null;
     keyPressAction   = null;
 
-    formatter:MIOFormatter = null;
+    formatter:NSFormatter = null;
 
     init(){
         super.init();
@@ -40,7 +43,7 @@ export class UITextField extends UIControl
 
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
-        this._inputLayer = UILayerGetFirstElementWithTag(this.layer, "INPUT");
+        this._inputLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "INPUT");
         this._setupLayer();
     }
 
@@ -63,7 +66,7 @@ export class UITextField extends UIControl
 
         const placeholderKey = this._inputLayer.getAttribute("data-placeholder");
         if (placeholderKey != null)
-            this._inputLayer.setAttribute("placeholder", MIOLocalizeString(placeholderKey, placeholderKey));
+            this._inputLayer.setAttribute("placeholder", NSLocalizeString(placeholderKey, placeholderKey));
 
         this._registerInputEvent();            
     }

@@ -20,6 +20,7 @@ export * from './UILabel'
 
 export * from './UIControl'
 export * from './UIButton'
+export * from './UITextField'
 
 export * from './UIViewController'
 export * from './UIViewController_PresentationController'
