@@ -1,7 +1,10 @@
 var fs = require("./node_modules/file-system");
 var NSXMLParser = require("./node_modules/mio-foundation-node").NSXMLParser;
+var NSPropertyListSerialization = require("./node_modules/mio-foundation-node").NSPropertyListSerialization;
 
 //GLOBAL VARIABLES
+var initialViewControllerID = null;
+var mainStoryBoardFile = null;
 var currentFileName = null;
 var currentFileContent = null;
 var elementsStack = [];
@@ -22,6 +25,9 @@ function parserDidStartDocument(parser){
 
 function parserDidStartElement(parser, element, attributes){
 	
+	if (element == "document"){
+		initialViewControllerID = attributes["initialViewController"];
+	}
 	if (element == "scene"){				
 		let id = attributes["sceneID"];
 		currentFileName = "scene-" + id + ".html";		
@@ -29,6 +35,11 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "viewController"){
 		let id = attributes["id"];
+		
+		// Update app plist file with the main html file
+		if (id == initialViewControllerID) mainStoryBoardFile = currentFileName;
+		updateAppPListFile();
+		
 		let customClass = attributes["customClass"] || "UIViewController";
 					
 		currentFileContent += '<div class="view-controller" id="' + id + '" data-root-view-controller="true"';	
@@ -637,6 +648,19 @@ function classesStringify(classes){
 	if (classes.length == 0) return "";
 
 	return "class='" + classes.join(" ") + "'";
+}
+
+function updateAppPListFile() {		
+	if (mainStoryBoardFile == null) return;
+	console.log(mainStoryBoardFile);				
+
+	let content = fs.readFileSync("./dist/app.plist");	
+	let plist = content ? NSPropertyListSerialization.propertyListWithData(content, null, NSPropertyListFormat.XMLFormat_v1_0, null) : {};
+
+	plist["UIMainStoryboardFile"] = mainStoryBoardFile;
+
+	let newContent = NSPropertyListSerialization.dataWithpropertyList(plist, NSPropertyListFormat.XMLFormat_v1_0, null, null);
+	fs.writeFileSync("./dist/app.plist", newContent);
 }
 
 function generateHtmlFile() {
