@@ -67,11 +67,6 @@ function parseStoryBoard(done) {
 	done();
 }
 
-function generateAppPlist(done) {
-
-	done();
-}
-
 function copyResources(done) {
 	const SRC = "../../Tools/resources/";
 	const FOUNDATION_PATH = "node_modules/mio-foundation-web/";
@@ -106,6 +101,5 @@ module.exports = {
 	transpileTsToJs,
 	uglifyJs,
 	parseStoryBoard,
-	generateAppPlist,
 	copyResources
 }
