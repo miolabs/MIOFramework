@@ -1,7 +1,9 @@
 import { NSObject } from "mio-foundation-web";
 import { UIViewController } from "./UIViewController";
-import { _MUIHideViewController, _MUIShowViewController } from "./core/MUICore";
-import { MUIClassListForAnimationType, MUIAnimationType } from "./core/MUICoreAnimation";
+import { _MUIHideViewController } from "./core/MUICore";
+import { _MUIShowViewController } from "./core/MUICore";
+import { MUIClassListForAnimationType } from "./core/MUICoreAnimation";
+import { MUIAnimationType } from "./core/MUICoreAnimation";
 
 /**
  * Created by godshadow on 9/4/16.

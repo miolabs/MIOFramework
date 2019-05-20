@@ -51,6 +51,11 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "navigationController"){
 		let id = attributes["id"];
+
+		// Update app plist file with the main html file
+		if (id == initialViewControllerID) mainStoryBoardFile = currentFileName;
+		updateAppPListFile();
+		
 		let customClass = attributes["customClass"] || "UINavigationController";
 					
 		currentFileContent += '<div class="nav-controller" id="' + id + '" data-root-view-controller="true"';	
@@ -61,6 +66,9 @@ function parserDidStartElement(parser, element, attributes){
 		outletsStack.push(outlets);
 	}
 	else if (element == "view"){
+		pushNewElement(element, attributes);
+	}
+	else if (element == "navigationBar"){
 		pushNewElement(element, attributes);
 	}
 	else if (element == "label"){
@@ -194,6 +202,9 @@ function parserDidEndElement(parser, element){
 	else if (element == "view"){
 		popElement();
 	}
+	else if (element == "navigationBar"){
+		popElement();
+	}
 	else if (element == "label"){
 		popElement();
 	}
@@ -242,6 +253,7 @@ function pushNewElement(element, attributes){
 	
 	if (attributes["customClass"] != null) item["ExtraAttributes"] = ['data-class="' + attributes["customClass"] + '"'];
 	else if (element == "view") item["ExtraAttributes"] = ['data-class="UIView"'];
+	else if (element == "navigationBar") item["ExtraAttributes"] = ['data-class="UINavigationBar"'];	
 	else if (element == "label") item["ExtraAttributes"] = ['data-class="UILabel"'];
 	else if (element == "button") item["ExtraAttributes"] = ['data-class="UIButton"'];
 	else if (element == "textField") item["ExtraAttributes"] = ['data-class="UITextField"'];	
@@ -372,6 +384,9 @@ function parseClassType(classType){
 
 		case "pageControl":
 		return "page-control";
+
+		case "navigationBar":
+		return "navigation-bar";
 	}
 
 	return classType;

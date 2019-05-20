@@ -1,4 +1,7 @@
-import { UIView, UINavigationItem, MUICoreLayerAddStyle } from ".";
+import { UIView } from "./UIView";
+import { UINavigationItem } from "./UINavigationItem";
+import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
+import "mio-foundation-web/extensions"
 
 export class UINavigationBar extends UIView
 {
