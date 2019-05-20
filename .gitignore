@@ -16,10 +16,10 @@ resources/styles.css
 /_tskeys.json
 
 ITests/dist/*
-/dist/
-/build/
-/.dist/
-/.build/
+dist/
+build/
+.dist/
+.build/
 
 # Xcode
 #
@@ -48,5 +48,3 @@ DerivedData/
 node_modules
 .node_modules
 package-lock.json
-dist
-.vscode/launch.json
