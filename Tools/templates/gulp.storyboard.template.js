@@ -666,7 +666,7 @@ function updateAppPListFile() {
 	}
 	else plist = {};
 
-	plist["UIMainStoryboardFile"] = mainStoryBoardFile;
+	plist["UIMainStoryboardFile"] = "layout/" + mainStoryBoardFile;
 	
 	let newContent = NSPropertyListSerialization.dataWithpropertyList(plist, null, null, null);
 	fs.writeFileSync("./dist/app.plist", newContent);		

@@ -61,6 +61,7 @@ function parseStoryBoard(done) {
 		filesArr.unshift(item);
 	});
 	for(item of filesArr) {
+		if(item == "LaunchScreen.storyboard") continue;
 		var fileString = fs.readFileSync(pathStoryBoard+item, "utf8");		
 		sb.parseDocument(fileString);		
 	}
