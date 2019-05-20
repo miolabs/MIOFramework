@@ -83,6 +83,9 @@ function parserDidStartElement(parser, element, attributes){
 	
 		parseSegmentControlStyle(attributes["segmentControlStyle"], item["Classes"]);		
 	}
+	else if (element == "segment"){		
+		currentElement["Content"] = currentElement["Content"] + '<div class="segment"><span>' + attributes["title"] +'</span></div>';
+	}
 	else if (element == "switch"){
 		let item = pushNewElement(element, attributes);
 	}

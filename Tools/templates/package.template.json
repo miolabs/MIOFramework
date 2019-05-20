@@ -6,7 +6,7 @@
 	  "test": "echo \"Error: no test specified\" && exit 1",
 	  "buildTs": "../../../swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -Xfrontend -disable-access-control -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk -target arm64-apple-ios12.2 -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks .build/app.swift > .build/app.ts",
 	  "transpileTs": "tsc .build/app.ts",
-	  "buildProject": "gulp unifySwiftFiles ; npm run buildTs ; npm run transpileTs ; gulp parseStoryBoard ; gulp generateAppPlist ; gulp copyResources"
+	  "buildProject": "npm install ; gulp unifySwiftFiles ; npm run buildTs ; npm run transpileTs ; gulp parseStoryBoard ; gulp generateAppPlist ; gulp copyResources"
 	},
 	"repository": {
 	  "type": "git",
@@ -27,7 +27,7 @@
 	  "gulp-uglify": "^3.0.2",
 	  "mio-foundation-node": "^1.0.6",
 	  "mio-foundation-web": "^1.0.7",
-	  "mio-uikit-web": "^1.0.0",
+	  "mio-uikit-web": "^1.0.3",
 	  "rimraf": "^2.6.3"
 	},
 	"dependencies": {

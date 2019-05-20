@@ -48,6 +48,9 @@
 	width: 100%;
 	font-size: inherit;
 	height: inherit;
+	border: none;
+	outline: none;
+	padding: 0 10px;
 }
 .text-field input.rounded-rect {
 	border-radius: 5px;
