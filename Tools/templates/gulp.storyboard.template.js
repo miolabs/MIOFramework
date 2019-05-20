@@ -655,20 +655,21 @@ function classesStringify(classes){
 
 function updateAppPListFile() {		
 	const PLIST_PATH = "./dist/app.plist";
-	let content = "";
-
-	if (mainStoryBoardFile == null) return;
-	console.log(mainStoryBoardFile);				
 	
+	if (mainStoryBoardFile == null) return;
+	console.log("MAINURL: " + mainStoryBoardFile);				
+	
+	let plist = null;
 	if (fs.existsSync(PLIST_PATH)) {
-		content = fs.readFileSync(PLIST_PATH);
+		let content = fs.readFileSync(PLIST_PATH, "utf8");
+		plist = NSPropertyListSerialization.propertyListWithData(content, null, null, null);
 	}
+	else plist = {};
 
-	let plist = content ? NSPropertyListSerialization.propertyListWithData(content, null, NSPropertyListFormat.XMLFormat_v1_0, null) : {};
 	plist["UIMainStoryboardFile"] = mainStoryBoardFile;
-
-	let newContent = NSPropertyListSerialization.dataWithpropertyList(plist, NSPropertyListFormat.XMLFormat_v1_0, null, null);
-	fs.writeFileSync("./dist/app.plist", newContent);	
+	
+	let newContent = NSPropertyListSerialization.dataWithpropertyList(plist, null, null, null);
+	fs.writeFileSync("./dist/app.plist", newContent);		
 }
 
 function generateHtmlFile() {
