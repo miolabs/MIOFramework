@@ -1,6 +1,6 @@
 import { UIControl } from "./UIControl";
 import { UIButton, UIButtonType } from "./UIButton";
-import { UIOutletRegister } from "./core/MUICore";
+import { MUIOutletRegister } from "./core/MUICore";
 
 /**
  * Created by godshadow on 29/08/16.
@@ -22,7 +22,7 @@ export class UISegmentedControl extends UIControl
                 si.initWithLayer(itemLayer, owner);
                 si.type = UIButtonType.PushIn;
                 this._addSegmentedItem(si);
-                UIOutletRegister(owner, si.layerID, si);
+                MUIOutletRegister(owner, si.layerID, si);
             }
         }
 

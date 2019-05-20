@@ -21,6 +21,8 @@ export * from './UILabel'
 export * from './UIControl'
 export * from './UIButton'
 export * from './UITextField'
+export * from './UISegmentedControl'
+export * from './UISwitch'
 
 export * from './UIViewController'
 export * from './UIViewController_PresentationController'
