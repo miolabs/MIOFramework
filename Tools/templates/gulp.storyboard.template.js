@@ -250,20 +250,9 @@ function pushNewElement(element, attributes){
 	item["Content"] = "";
 	item["Styles"] = styles;
 	item["Classes"] = classes;	
-	
+
 	if (attributes["customClass"] != null) item["ExtraAttributes"] = ['data-class="' + attributes["customClass"] + '"'];
-	else if (element == "view") item["ExtraAttributes"] = ['data-class="UIView"'];
-	else if (element == "navigationBar") item["ExtraAttributes"] = ['data-class="UINavigationBar"'];	
-	else if (element == "label") item["ExtraAttributes"] = ['data-class="UILabel"'];
-	else if (element == "button") item["ExtraAttributes"] = ['data-class="UIButton"'];
-	else if (element == "textField") item["ExtraAttributes"] = ['data-class="UITextField"'];	
-	else if (element == "segmentedControl") item["ExtraAttributes"] = ['data-class="UISegmentedControl"'];
-	else if (element == "switch") item["ExtraAttributes"] = ['data-class="UISwitch"'];
-	else if (element == "slider") item["ExtraAttributes"] = ['data-class="UISlider"'];
-	else if (element == "progressView") item["ExtraAttributes"] = ['data-class="UIProgressView"'];
-	else if (element == "activityIndicatorView") item["ExtraAttributes"] = ['data-class="UIActivityIndicatorView"'];
-	else if (element == "pageControl") item["ExtraAttributes"] = ['data-class="UIPPageControl"'];
-	else if (element == "stepper") item["ExtraAttributes"] = ['data-class="UIStepper"'];
+	else item["ExtraAttributes"] = ['data-class="UI' + element.charAt(0).toUpperCase() + '"'];
 
 	classes.push(parseClassType(element));
 	if (contenMode != null) classes.push(contenMode);
@@ -369,27 +358,38 @@ function parseViewController(item){
 }
 
 function parseClassType(classType){
+	let formattedString = "";
+	let arrLetters = Array.from(classType);
+
+	for(var i=0; i < arrLetters.length; i++) {
+		if (classType[i] == classType[i].toUpperCase()) {
+			formattedString += "-" + classType[i].toLowerCase();
+		} else {
+			formattedString += classType[i];
+		}
+	} 
+
 	switch (classType){
 		case "textField":
-		return "text-field";
+		return formattedString;
 		
 		case "segmentedControl":
-		return "segmented-control";
+		return formattedString;
 
 		case "progressView":
-		return "progress-view";
+		return formattedString;
 
 		case "activityIndicatorView":
-		return "activity-indicator-view";
+		return formattedString;
 
 		case "pageControl":
-		return "page-control";
+		return formattedString;
 
 		case "navigationBar":
-		return "navigation-bar";
+		return formattedString;
 	}
 
-	return classType;
+	return formattedString;
 }
 
 function parseView(item, classType){
