@@ -55,6 +55,11 @@ export class UIViewController extends NSObject
     protected _preferredContentSize = null;
 
     _outlets = {};
+    _segues = {};
+
+    _checkSegue(relationship:string) {
+
+    }
 
     constructor(layerID?){
         super();

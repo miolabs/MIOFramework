@@ -425,14 +425,23 @@ var MUICoreNibParser = /** @class */ (function (_super) {
                 var subLayer = layer.childNodes[index];
                 if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION")
                     continue;
-                if (subLayer.getAttribute("data-outlets") == "true") {
+                if (subLayer.getAttribute("data-connections") == "true") {
                     for (var index2 = 0; index2 < subLayer.childNodes.length; index2++) {
                         var d = subLayer.childNodes[index2];
                         if (d.tagName != "DIV")
                             continue;
-                        var prop = d.getAttribute("data-property");
-                        var outlet = d.getAttribute("data-outlet");
-                        this.connectOutlet(vc, prop, outlet);
+                        var type = d.getAttribute("data-connection-type");
+                        if (type == "outlet") {
+                            var prop = d.getAttribute("data-property");
+                            var outlet = d.getAttribute("data-outlet");
+                            this.connectOutlet(vc, prop, outlet);
+                        }
+                        else if (type == "segue") {
+                            var destination = d.getAttribute("data-segue-destination");
+                            var destinationClass = d.getAttribute("data-segue-destination-class");
+                            var relationship = d.getAttribute("data-segue-relationship");
+                            this.addSegue(vc, relationship, destination, destinationClass);
+                        }
                     }
                 }
             }
@@ -443,6 +452,10 @@ var MUICoreNibParser = /** @class */ (function (_super) {
         console.log("prop: " + property + " - outluet: " + outletID);
         var obj = owner._outlets[outletID];
         owner[property] = _injectIntoOptional(obj);
+    };
+    MUICoreNibParser.prototype.addSegue = function (owner, relationship, destination, destinationClass) {
+        owner._segues[relationship] = { "Resource": destination, "Class": destinationClass };
+        owner._checkSegue(relationship);
     };
     MUICoreNibParser.prototype.parserDidStartDocument = function (parser) {
         console.log("parser started");
@@ -1626,6 +1639,354 @@ var UIButton = /** @class */ (function (_super) {
 }(UIControl));
  
 /**
+ * Created by godshadow on 12/3/16.
+ */
+var UITextFieldType;
+(function (UITextFieldType) {
+    UITextFieldType[UITextFieldType["NormalType"] = 0] = "NormalType";
+    UITextFieldType[UITextFieldType["PasswordType"] = 1] = "PasswordType";
+    UITextFieldType[UITextFieldType["SearchType"] = 2] = "SearchType";
+})(UITextFieldType || (UITextFieldType = {}));
+var UITextField = /** @class */ (function (_super) {
+    __extends(UITextField, _super);
+    function UITextField() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.placeHolder = null;
+        _this._inputLayer = null;
+        _this.type = UITextFieldType.NormalType;
+        _this.textChangeTarget = null;
+        _this.textChangeAction = null;
+        _this._textChangeFn = null;
+        _this.enterPressTarget = null;
+        _this.enterPressAction = null;
+        _this.keyPressTarget = null;
+        _this.keyPressAction = null;
+        _this.formatter = null;
+        _this._textStopPropagationFn = null;
+        _this.didBeginEditingAction = null;
+        _this.didBeginEditingTarget = null;
+        _this._textDidBeginEditingFn = null;
+        _this.didEndEditingAction = null;
+        _this.didEndEditingTarget = null;
+        _this._textDidEndEditingFn = null;
+        return _this;
+    }
+    UITextField.prototype.init = function () {
+        _super.prototype.init.call(this);
+        this._setupLayer();
+    };
+    UITextField.prototype.initWithLayer = function (layer, owner, options) {
+        _super.prototype.initWithLayer.call(this, layer, owner, options);
+        this._inputLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "INPUT");
+        this._setupLayer();
+    };
+    UITextField.prototype._setupLayer = function () {
+        if (this._inputLayer == null) {
+            this._inputLayer = document.createElement("input");
+            switch (this.type) {
+                case UITextFieldType.SearchType:
+                    this._inputLayer.setAttribute("type", "search");
+                    break;
+                default:
+                    this._inputLayer.setAttribute("type", "text");
+                    break;
+            }
+            this.layer.appendChild(this._inputLayer);
+        }
+        var placeholderKey = this._inputLayer.getAttribute("data-placeholder");
+        if (placeholderKey != null)
+            this._inputLayer.setAttribute("placeholder", NSLocalizeString(placeholderKey, placeholderKey));
+        this._registerInputEvent();
+    };
+    // layoutSubviews(){
+    //     super.layoutSubviews();
+    // var w = this.getWidth();
+    // var h = this.getHeight();
+    // this._inputLayer.style.marginLeft = "4px";
+    // this._inputLayer.style.width = (w - 8) + "px";
+    // this._inputLayer.style.marginTop = "4px";
+    // this._inputLayer.style.height = (h - 8) + "px";
+    //    }
+    UITextField.prototype.setText = function (text) {
+        this.text = text;
+    };
+    Object.defineProperty(UITextField.prototype, "text", {
+        get: function () {
+            return this._inputLayer.value;
+        },
+        set: function (text) {
+            var newValue = text != null ? text : "";
+            this._inputLayer.value = newValue;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    UITextField.prototype.setPlaceholderText = function (text) {
+        this.placeHolder = text;
+        this._inputLayer.setAttribute("placeholder", text);
+    };
+    Object.defineProperty(UITextField.prototype, "placeholderText", {
+        set: function (text) {
+            this.setPlaceholderText(text);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    UITextField.prototype.setOnChangeText = function (target, action) {
+        this.textChangeTarget = target;
+        this.textChangeAction = action;
+    };
+    UITextField.prototype._registerInputEvent = function () {
+        var instance = this;
+        this._textChangeFn = function () {
+            if (instance.enabled)
+                instance._textDidChange.call(instance);
+        };
+        this._textStopPropagationFn = function (e) {
+            //instance._textDidBeginEditing();
+            e.stopPropagation();
+        };
+        this._textDidBeginEditingFn = this._textDidBeginEditing.bind(this);
+        this._textDidEndEditingFn = this._textDidEndEditing.bind(this);
+        this.layer.addEventListener("input", this._textChangeFn);
+        this.layer.addEventListener("click", this._textStopPropagationFn);
+        this._inputLayer.addEventListener("focus", this._textDidBeginEditingFn);
+        this._inputLayer.addEventListener("blur", this._textDidEndEditingFn);
+    };
+    UITextField.prototype._unregisterInputEvent = function () {
+        this.layer.removeEventListener("input", this._textChangeFn);
+        this.layer.removeEventListener("click", this._textStopPropagationFn);
+        this._inputLayer.removeEventListener("focus", this._textDidBeginEditingFn);
+        this._inputLayer.removeEventListener("blur", this._textDidEndEditingFn);
+    };
+    UITextField.prototype._textDidChange = function () {
+        var _a;
+        if (this.enabled == false)
+            return;
+        // Check the formater
+        var value = this._inputLayer.value;
+        if (this.formatter == null) {
+            this._textDidChangeDelegate(value);
+        }
+        else {
+            var result = void 0, newStr = void 0;
+            _a = this.formatter.isPartialStringValid(value), result = _a[0], newStr = _a[1];
+            this._unregisterInputEvent();
+            this._inputLayer.value = newStr;
+            this._registerInputEvent();
+            if (result == true) {
+                this._textDidChangeDelegate(value);
+            }
+        }
+    };
+    UITextField.prototype._textDidChangeDelegate = function (value) {
+        if (this.textChangeAction != null && this.textChangeTarget != null)
+            this.textChangeAction.call(this.textChangeTarget, this, value);
+    };
+    UITextField.prototype.setOnBeginEditing = function (target, action) {
+        this.didBeginEditingTarget = target;
+        this.didBeginEditingAction = action;
+    };
+    UITextField.prototype._textDidBeginEditing = function () {
+        if (this.enabled == false)
+            return;
+        //if (this.formatter != null) this.text = this.formatter.stringForObjectValue(this.text);
+        if (this.didBeginEditingTarget == null || this.didBeginEditingAction == null)
+            return;
+        this.didBeginEditingAction.call(this.didBeginEditingTarget, this, this.text);
+    };
+    UITextField.prototype.setOnDidEndEditing = function (target, action) {
+        this.didEndEditingTarget = target;
+        this.didEndEditingAction = action;
+    };
+    UITextField.prototype._textDidEndEditing = function () {
+        if (this.enabled == false)
+            return;
+        //if (this.formatter != null) this.text = this.formatter.stringForObjectValue(this.text);
+        if (this.didEndEditingTarget == null || this.didEndEditingAction == null)
+            return;
+        this.didEndEditingAction.call(this.didEndEditingTarget, this, this.text);
+    };
+    UITextField.prototype.setOnEnterPress = function (target, action) {
+        this.enterPressTarget = target;
+        this.enterPressAction = action;
+        var instance = this;
+        this.layer.onkeyup = function (e) {
+            if (instance.enabled) {
+                if (e.keyCode == 13)
+                    instance.enterPressAction.call(target, instance, instance._inputLayer.value);
+            }
+        };
+    };
+    UITextField.prototype.setOnKeyPress = function (target, action) {
+        this.keyPressTarget = target;
+        this.keyPressAction = action;
+        var instance = this;
+        this.layer.onkeydown = function (e) {
+            if (instance.enabled) {
+                instance.keyPressAction.call(target, instance, e.keyCode);
+            }
+        };
+    };
+    UITextField.prototype.setTextRGBColor = function (r, g, b) {
+        var value = "rgb(" + r + ", " + g + ", " + b + ")";
+        this._inputLayer.style.color = value;
+    };
+    Object.defineProperty(UITextField.prototype, "textColor", {
+        get: function () {
+            var color = this._getValueFromCSSProperty("color");
+            return color;
+        },
+        set: function (color) {
+            this._inputLayer.style.color = color;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    UITextField.prototype.setEnabled = function (value) {
+        _super.prototype.setEnabled.call(this, value);
+        this._inputLayer.readOnly = !value;
+    };
+    UITextField.prototype.becomeFirstResponder = function () {
+        this._inputLayer.focus();
+    };
+    UITextField.prototype.resignFirstResponder = function () {
+        this._inputLayer.blur();
+    };
+    UITextField.prototype.selectAll = function (control) {
+        this._inputLayer.select();
+    };
+    return UITextField;
+}(UIControl));
+ 
+/**
+ * Created by godshadow on 29/08/16.
+ */
+var UISegmentedControl = /** @class */ (function (_super) {
+    __extends(UISegmentedControl, _super);
+    function UISegmentedControl() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.segmentedItems = [];
+        _this.selectedSegmentedIndex = -1;
+        return _this;
+    }
+    UISegmentedControl.prototype.initWithLayer = function (layer, owner, options) {
+        _super.prototype.initWithLayer.call(this, layer, owner, options);
+        for (var index = 0; index < this.layer.childNodes.length; index++) {
+            var itemLayer = this.layer.childNodes[index];
+            if (itemLayer.tagName == "DIV") {
+                var si = new UIButton();
+                si.initWithLayer(itemLayer, owner);
+                si.type = UIButtonType.PushIn;
+                this._addSegmentedItem(si);
+                MUIOutletRegister(owner, si.layerID, si);
+            }
+        }
+        if (this.segmentedItems.length > 0) {
+            var item = this.segmentedItems[0];
+            item.setSelected(true);
+            this.selectedSegmentedIndex = 0;
+        }
+    };
+    UISegmentedControl.prototype._addSegmentedItem = function (item) {
+        this.segmentedItems.push(item);
+        item.setAction(this, this._didClickSegmentedButton);
+    };
+    UISegmentedControl.prototype._didClickSegmentedButton = function (button) {
+        var index = this.segmentedItems.indexOf(button);
+        this.selectSegmentedAtIndex(index);
+        if (this.mouseOutTarget != null)
+            this.mouseOutAction.call(this.mouseOutTarget, this, index);
+    };
+    UISegmentedControl.prototype.setAction = function (target, action) {
+        this.mouseOutTarget = target;
+        this.mouseOutAction = action;
+    };
+    UISegmentedControl.prototype.selectSegmentedAtIndex = function (index) {
+        if (this.selectedSegmentedIndex == index)
+            return;
+        if (this.selectedSegmentedIndex > -1) {
+            var lastItem = this.segmentedItems[this.selectedSegmentedIndex];
+            lastItem.setSelected(false);
+        }
+        this.selectedSegmentedIndex = index;
+        var item = this.segmentedItems[this.selectedSegmentedIndex];
+        item.setSelected(true);
+    };
+    return UISegmentedControl;
+}(UIControl));
+ 
+/**
+ * Created by godshadow on 12/3/16.
+ */
+var UISwitch = /** @class */ (function (_super) {
+    __extends(UISwitch, _super);
+    function UISwitch() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.target = null;
+        _this.action = null;
+        _this._inputLayer = null;
+        _this._labelLayer = null;
+        _this._on = false;
+        return _this;
+    }
+    UISwitch.prototype.initWithLayer = function (layer, owner, options) {
+        _super.prototype.initWithLayer.call(this, layer, owner, options);
+        this.layer.classList.add("switch_button");
+        this._inputLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "INPUT");
+        if (this._inputLayer == null) {
+            this._inputLayer = document.createElement("input");
+            this._inputLayer.setAttribute("type", "checkbox");
+            this._inputLayer.setAttribute("id", this.layerID + "_input");
+            this._inputLayer.classList.add("switch_button_input");
+            layer.appendChild(this._inputLayer);
+        }
+        // var div1 = document.createElement("div");
+        // this.layer.appendChild(div1);
+        // var div2 = document.createElement("div");
+        // div1.appendChild(div2); 
+        /*
+                this._labelLayer = UILayerGetFirstElementWithTag(this.layer, "LABEL");
+                if (this._labelLayer == null) {
+                    this._labelLayer = document.createElement("label");
+                    this._labelLayer.setAttribute("for", this.layerID + "_input");
+                    //this._labelLayer.classList.add("switch_button_label");
+                    layer.appendChild(this._labelLayer);
+                }
+        
+                */
+        var instance = this;
+        this.layer.onclick = function () {
+            if (instance.enabled) {
+                instance._toggleValue.call(instance);
+            }
+        };
+    };
+    UISwitch.prototype.setOnChangeValue = function (target, action) {
+        this.target = target;
+        this.action = action;
+    };
+    Object.defineProperty(UISwitch.prototype, "on", {
+        get: function () { return this._on; },
+        set: function (value) { this.setOn(value); },
+        enumerable: true,
+        configurable: true
+    });
+    UISwitch.prototype.setOn = function (on) {
+        if (on == this.on)
+            return;
+        this._inputLayer.checked = on;
+        this._on = on;
+    };
+    UISwitch.prototype._toggleValue = function () {
+        this.on = !this.on;
+        if (this.target != null && this.action != null)
+            this.action.call(this.target, this, this.on);
+    };
+    return UISwitch;
+}(UIControl));
+ 
+/**
  * Created by godshadow on 11/3/16.
  */
 var UIViewController = /** @class */ (function (_super) {
@@ -1655,6 +2016,7 @@ var UIViewController = /** @class */ (function (_super) {
         _this._contentSize = new NSSize(320, 200);
         _this._preferredContentSize = null;
         _this._outlets = {};
+        _this._segues = {};
         // removeFromParentViewController()
         // {
         //     this.parent.removeChildViewController(this);
@@ -1667,6 +2029,8 @@ var UIViewController = /** @class */ (function (_super) {
         _this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(_this);
         return _this;
     }
+    UIViewController.prototype._checkSegue = function (relationship) {
+    };
     UIViewController.prototype.init = function () {
         _super.prototype.init.call(this);
         this.loadView();
@@ -2461,6 +2825,62 @@ var MIOPopOverDismissAnimationController = /** @class */ (function (_super) {
     return MIOPopOverDismissAnimationController;
 }(NSObject));
  
+var UINavigationBar = /** @class */ (function (_super) {
+    __extends(UINavigationBar, _super);
+    function UINavigationBar() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._items = [];
+        return _this;
+    }
+    UINavigationBar.prototype.init = function () {
+        _super.prototype.init.call(this);
+        this.setup();
+    };
+    UINavigationBar.prototype.initWithLayer = function (layer, owner, options) {
+        _super.prototype.initWithLayer.call(this, layer, owner, options);
+        this.setup();
+    };
+    UINavigationBar.prototype.setup = function () {
+        MUICoreLayerAddStyle(this.layer, "navbar");
+    };
+    Object.defineProperty(UINavigationBar.prototype, "items", {
+        get: function () { return this._items; },
+        enumerable: true,
+        configurable: true
+    });
+    UINavigationBar.prototype.setItems = function (items, animated) {
+        this._items = items;
+        //TODO: Animate!!!
+    };
+    UINavigationBar.prototype.pushNavigationItem = function (item, animated) {
+        this.items.addObject(item);
+        // TODO: Make the animation and change the items
+    };
+    UINavigationBar.prototype.popNavigationItem = function (item, animated) {
+        this.items.removeObject(item);
+        // TODO: Make the animation and change the items
+    };
+    Object.defineProperty(UINavigationBar.prototype, "topItem", {
+        get: function () {
+            if (this.items.length == 0)
+                return null;
+            return this.items[this.items.length - 1];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(UINavigationBar.prototype, "backItem", {
+        get: function () {
+            if (this.items.length < 2)
+                return null;
+            return this.items[this.items.length - 2];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return UINavigationBar;
+}(UIView));
+ 
 var UINavigationItem = /** @class */ (function (_super) {
     __extends(UINavigationItem, _super);
     function UINavigationItem() {
@@ -2650,6 +3070,17 @@ var UINavigationController = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
+    // Segues
+    UINavigationController.prototype._checkSegue = function (relationship) {
+        _super.prototype._checkSegue.call(this, relationship);
+        if (relationship == "rootViewController") {
+            var className = this._segues[relationship]["Class"];
+            var path = this._segues[relationship]["Path"];
+            var vc = NSClassFromString(className);
+            vc.initWithResource(path);
+            this.setRootViewController(vc);
+        }
+    };
     UINavigationController.prototype.animationControllerForPresentedController = function (presentedViewController, presentingViewController, sourceController) {
         if (this._pushAnimationController == null) {
             this._pushAnimationController = new MUIPushAnimationController();

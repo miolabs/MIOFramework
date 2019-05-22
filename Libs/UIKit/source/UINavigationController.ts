@@ -4,6 +4,8 @@ import { _MUIHideViewController } from "./core/MUICore";
 import { _MUIShowViewController } from "./core/MUICore";
 import { MUIClassListForAnimationType } from "./core/MUICoreAnimation";
 import { MUIAnimationType } from "./core/MUICoreAnimation";
+import { NSClassFromString } from "mio-foundation-web";
+import { UIView } from "./UIView";
 
 /**
  * Created by godshadow on 9/4/16.
@@ -146,6 +148,22 @@ export class UINavigationController extends UIViewController
         if (this.currentViewControllerIndex < 0) return this._preferredContentSize;
         let vc = this.viewControllersStack[this.currentViewControllerIndex];
         return vc.preferredContentSize;
+    }
+
+
+    // Segues
+
+    _checkSegue(relationship:string) {
+        super._checkSegue(relationship);
+
+        if (relationship == "rootViewController") {
+            let className = this._segues[relationship]["Class"];
+            let path = this._segues[relationship]["Path"];
+
+            let vc = NSClassFromString(className) as UIViewController;
+            vc.initWithResource(path);            
+            this.setRootViewController(vc);
+        }
     }
 
     // Transitioning delegate

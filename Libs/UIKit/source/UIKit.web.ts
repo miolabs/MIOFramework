@@ -561,18 +561,28 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 
                 if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
 
-                if (subLayer.getAttribute("data-outlets") == "true") {
+                if (subLayer.getAttribute("data-connections") == "true") {
                     for (let index2 = 0; index2 < subLayer.childNodes.length; index2 ++){
                         let d = subLayer.childNodes[index2] as HTMLElement;
                         if (d.tagName != "DIV") continue;
 
-                        let prop = d.getAttribute("data-property");
-                        let outlet = d.getAttribute("data-outlet");
+                        let type = d.getAttribute("data-connection-type");
+                        
+                        if (type == "outlet") {
+                            let prop = d.getAttribute("data-property");
+                            let outlet = d.getAttribute("data-outlet");
 
-                        this.connectOutlet(vc, prop, outlet);
+                            this.connectOutlet(vc, prop, outlet);
+                        }
+                        else if (type == "segue") {
+                            let destination = d.getAttribute("data-segue-destination");
+                            let destinationClass = d.getAttribute("data-segue-destination-class");
+                            let relationship = d.getAttribute("data-segue-relationship");
+
+                            this.addSegue(vc, relationship, destination, destinationClass);
+                        }
                     }
-                }
-                
+                }                
             }
         }
         
@@ -585,6 +595,11 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 
         let obj = owner._outlets[outletID];
         owner[property] = _injectIntoOptional(obj);
+    }
+
+    private addSegue(owner:any, relationship:string, destination:string, destinationClass:string) {        
+        owner._segues[relationship] = {"Resource": destination, "Class": destinationClass};
+        owner._checkSegue(relationship);
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){
@@ -2380,6 +2395,11 @@ export class UIViewController extends NSObject
     protected _preferredContentSize = null;
 
     _outlets = {};
+    _segues = {};
+
+    _checkSegue(relationship:string) {
+
+    }
 
     constructor(layerID?){
         super();
@@ -3464,6 +3484,8 @@ export function UINavItemSearchInLayer(layer)
 
 
 
+
+
 /**
  * Created by godshadow on 9/4/16.
  */
@@ -3605,6 +3627,22 @@ export class UINavigationController extends UIViewController
         if (this.currentViewControllerIndex < 0) return this._preferredContentSize;
         let vc = this.viewControllersStack[this.currentViewControllerIndex];
         return vc.preferredContentSize;
+    }
+
+
+    // Segues
+
+    _checkSegue(relationship:string) {
+        super._checkSegue(relationship);
+
+        if (relationship == "rootViewController") {
+            let className = this._segues[relationship]["Class"];
+            let path = this._segues[relationship]["Path"];
+
+            let vc = NSClassFromString(className) as UIViewController;
+            vc.initWithResource(path);            
+            this.setRootViewController(vc);
+        }
     }
 
     // Transitioning delegate

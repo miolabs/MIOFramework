@@ -2,6 +2,7 @@ import { NSObject } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
 import "mio-foundation-web/extensions";
+import { NSFormatter } from "mio-foundation-web";
 import { NSSize } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
 export declare var _MUICoreLayerIDCount: number;
@@ -307,6 +308,85 @@ export declare class UIButton extends UIControl {
     setImageURL(urlString: string): void;
 }
 /**
+ * Created by godshadow on 12/3/16.
+ */
+export declare enum UITextFieldType {
+    NormalType = 0,
+    PasswordType = 1,
+    SearchType = 2
+}
+export declare class UITextField extends UIControl {
+    placeHolder: any;
+    private _inputLayer;
+    type: UITextFieldType;
+    textChangeTarget: any;
+    textChangeAction: any;
+    private _textChangeFn;
+    enterPressTarget: any;
+    enterPressAction: any;
+    keyPressTarget: any;
+    keyPressAction: any;
+    formatter: NSFormatter;
+    init(): void;
+    initWithLayer(layer: any, owner: any, options?: any): void;
+    private _setupLayer;
+    setText(text: any): void;
+    text: any;
+    setPlaceholderText(text: any): void;
+    placeholderText: string;
+    setOnChangeText(target: any, action: any): void;
+    private _textStopPropagationFn;
+    private _registerInputEvent;
+    private _unregisterInputEvent;
+    private _textDidChange;
+    private _textDidChangeDelegate;
+    private didBeginEditingAction;
+    private didBeginEditingTarget;
+    setOnBeginEditing(target: any, action: any): void;
+    private _textDidBeginEditingFn;
+    private _textDidBeginEditing;
+    private didEndEditingAction;
+    private didEndEditingTarget;
+    setOnDidEndEditing(target: any, action: any): void;
+    private _textDidEndEditingFn;
+    private _textDidEndEditing;
+    setOnEnterPress(target: any, action: any): void;
+    setOnKeyPress(target: any, action: any): void;
+    setTextRGBColor(r: any, g: any, b: any): void;
+    textColor: any;
+    setEnabled(value: any): void;
+    becomeFirstResponder(): void;
+    resignFirstResponder(): void;
+    selectAll(control: UITextField): void;
+}
+/**
+ * Created by godshadow on 29/08/16.
+ */
+export declare class UISegmentedControl extends UIControl {
+    segmentedItems: any[];
+    selectedSegmentedIndex: number;
+    initWithLayer(layer: any, owner: any, options?: any): void;
+    private _addSegmentedItem;
+    private _didClickSegmentedButton;
+    setAction(target: any, action: any): void;
+    selectSegmentedAtIndex(index: any): void;
+}
+/**
+ * Created by godshadow on 12/3/16.
+ */
+export declare class UISwitch extends UIControl {
+    target: any;
+    action: any;
+    private _inputLayer;
+    private _labelLayer;
+    initWithLayer(layer: any, owner: any, options?: any): void;
+    setOnChangeValue(target: any, action: any): void;
+    private _on;
+    on: boolean;
+    setOn(on: any): void;
+    private _toggleValue;
+}
+/**
  * Created by godshadow on 11/3/16.
  */
 export declare class UIViewController extends NSObject {
@@ -333,6 +413,8 @@ export declare class UIViewController extends NSObject {
     protected _contentSize: NSSize;
     protected _preferredContentSize: any;
     _outlets: {};
+    _segues: {};
+    _checkSegue(relationship: string): void;
     constructor(layerID?: any);
     init(): void;
     initWithCoder(coder: NSCoder): void;
@@ -483,6 +565,18 @@ export declare class MIOPopOverDismissAnimationController extends NSObject {
     animationEnded(transitionCompleted: any): void;
     animations(transitionContext: any): any[];
 }
+export declare class UINavigationBar extends UIView {
+    init(): void;
+    initWithLayer(layer: any, owner: any, options?: any): void;
+    private setup;
+    private _items;
+    readonly items: any[];
+    setItems(items: any, animated: any): void;
+    pushNavigationItem(item: UINavigationItem, animated: any): void;
+    popNavigationItem(item: UINavigationItem, animated: any): void;
+    readonly topItem: any;
+    readonly backItem: any;
+}
 export declare class UINavigationItem extends NSObject {
     backBarButtonItem: UIButton;
     titleView: UIView;
@@ -510,6 +604,7 @@ export declare class UINavigationController extends UIViewController {
     popViewController(animated?: boolean): void;
     popToRootViewController(animated?: boolean): void;
     preferredContentSize: any;
+    _checkSegue(relationship: string): void;
     private _pushAnimationController;
     private _popAnimationController;
     animationControllerForPresentedController(presentedViewController: any, presentingViewController: any, sourceController: any): any;

@@ -28,6 +28,8 @@ function createApp() {
 	fs.copyFileSync(TEMPLATES_PATH + "gulp.utils.template.js", "./gulp.utils.js");
 	fs.copyFileSync(TEMPLATES_PATH + "package.template.json", "./package.json");
 	fs.copyFileSync(TEMPLATES_PATH + "tsconfig.template.json", "./tsconfig.json");
+	fs.copyFileSync(__dirname + "/temp/lib.js", "./dist/libs/swiftlib/lib.js");
+
 }
 
 function parseGulpfile(appName) {
