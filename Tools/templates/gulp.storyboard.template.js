@@ -65,6 +65,22 @@ function parserDidStartElement(parser, element, attributes){
 		let outlets = {};
 		outletsStack.push(outlets);
 	}
+	else if (element == "tableViewController"){
+		let id = attributes["id"];
+
+		// Update app plist file with the main html file
+		if (id == initialViewControllerID) mainStoryBoardFile = currentFileName;
+		updateAppPListFile();
+		
+		let customClass = attributes["customClass"] || "UITableViewController";
+					
+		currentFileContent += '<div class="table-view-controller" id="' + id + '" data-root-view-controller="true"';	
+		currentFileContent += ' data-class="' + customClass + '"';
+		currentFileContent += '>';
+
+		let outlets = {};
+		outletsStack.push(outlets);
+	}
 	else if (element == "view"){
 		pushNewElement(element, attributes);
 	}
@@ -97,6 +113,15 @@ function parserDidStartElement(parser, element, attributes){
 		
 		item["Content"] = item["Content"] + '<input type="text" ' + inputAttrs.join(" ") + '>'
 	}
+	else if(element == "tableView") {
+		pushNewElement(element, attributes);
+	}
+	else if(element == "tableViewCell") {
+		pushNewElement(element, attributes);
+	}
+	else if(element == "tableViewCellContentView") {
+		pushNewElement(element, attributes);
+	}
 	else if (element == "segmentedControl"){
 		let item = pushNewElement(element, attributes);						
 	
@@ -123,8 +148,6 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "stepper"){
 		let item = pushNewElement(element, attributes);
 	}
-
-	
 	else if (element == "rect"){
 		let styles = currentElement["Styles"];
 		styles.push("position:absolute;");
@@ -190,7 +213,7 @@ function parserDidEndElement(parser, element){
 		currentFileName = null;
 		currentFileContent = null;
 	}
-	else if (element == "viewController" || element == "navigationController"){
+	else if (element == "viewController" || element == "navigationController" || element == "tableViewController"){
 		let outlets = outletsStack.pop();
 		currentFileContent += '<div data-outlets="true">';
 		for (let key in outlets){
@@ -214,6 +237,15 @@ function parserDidEndElement(parser, element){
 	else if (element == "textField"){
 		popElement();
 	}
+	else if (element == "tableView") {
+		popElement();
+	}
+	else if(element == "tableViewCell") {
+		popElement();
+	}
+	else if(element == "tableViewCellContentView") {
+		popElement();
+	}
 	else if (element == "segmentedControl"){
 		popElement();
 	}
@@ -235,7 +267,6 @@ function parserDidEndElement(parser, element){
 	else if (element == "stepper"){
 		popElement();
 	}
-
 
 }
 
