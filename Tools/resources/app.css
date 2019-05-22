@@ -138,5 +138,12 @@ input[type="checkbox"]:checked::after {
 
 /* NAVIGATION BAR */
 .navigation-bar {
-	background-color: #EEE;
+	background-color: #fafafa;
+	border-bottom: 1px solid #d6d6d6;
+}
+
+/* TABLE VIEW */
+.table-view .table-view-cell .label {
+	background-color: #fafafa;
+	border-bottom: 1px solid #d6d6d6;
 }
