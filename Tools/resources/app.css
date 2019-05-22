@@ -135,3 +135,8 @@ input[type="checkbox"]:checked::after {
 /* PAGE CONTROL */
 
 /* STEPPER */
+
+/* NAVIGATION BAR */
+.navigation-bar {
+	background-color: #EEE;
+}
