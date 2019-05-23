@@ -575,7 +575,7 @@ function updateAppPListFile() {
 	}
 	else plist = {};
 
-	plist["UIMainResourceFile"] = "layout/" + initialResource;
+	plist["UIMainResourceFile"] = initialResource;
 	plist["UIMainClassname"] = initialClassname;
 	
 	let newContent = NSPropertyListSerialization.dataWithpropertyList(plist, null, null, null);
