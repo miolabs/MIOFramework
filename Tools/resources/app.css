@@ -16,9 +16,6 @@
 
 /* LABEL */
 
-.label {
-	/*color: rgb(0, 0, 0);*/
-}
 .label.align-left {
 	text-align: left;	
 }
@@ -138,6 +135,7 @@ input[type="checkbox"]:checked::after {
 
 /* NAVIGATION BAR */
 .navigation-bar {
+	top: 0 !important;
 	background-color: #fafafa;
 	border-bottom: 1px solid #d6d6d6;
 }
