@@ -28,19 +28,6 @@ function unifySwiftFiles(done) {
 	done();
 }
 
-function transpileTsToJs() { //doesn't work
-	return gulp.src("./.build/app.ts")
-				.pipe(ts({
-					outFile: "app.js",
-					removeComments: true,
-					allowJs: true,
-					suppressImplicitAnyIndexErrors: true,
-					types: ["mio-foundation-web", "mio-uikit-web"],
-					target: "es5"
-				}))
-				.pipe(gulp.dest("./dist/"));
-}
-
 function uglifyJs() { 
 	return pipeline( 
 			//sourcemaps.init({largeFile: true}),
@@ -78,6 +65,9 @@ function copyResources(done) {
 	fs.copyFileSync(SRC + "main.js", DEST + "scripts/main.js");
 	fs.copyFileSync("./.build/app.js", DEST + "scripts/app.js");
 	fs.copyFileSync(SRC + "app.css", DEST + "styles/app.css");
+	//temporary
+	fs.copyFileSync("../../Tools/temp/lib.js", DEST + "libs/lib.js");
+	fs.copyFileSync("../../Tools/temp/app.js", DEST + "libs/app.js");
 
 	//FOUNDATION WEB
 	//fs.copyFileSync(FOUNDATION_PATH + "types/mio-foundation-web.d.ts", DEST + "libs/mio-foundation-web/types/mio-foundation-web.d.ts");
@@ -87,6 +77,7 @@ function copyResources(done) {
 	if (fs.existsSync(FOUNDATION_PATH + "mio-foundation-web.min.js")) fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web.min.js", DEST + "libs/mio-foundation-web/mio-foundation-web.min.js");
 	//fs.copyFileSync(FOUNDATION_PATH + "package.json", DEST + "libs/mio-foundation-web/package.json");
 	//fs.copyFileSync(FOUNDATION_PATH + "README.md", DEST + "libs/mio-foundation-web/README.md");
+
 
 	//UIKIT
 	//fs.copyFileSync(UIKIT_PATH + "types/mio-uikit-web.d.ts", DEST + "libs/mio-uikit-web/types/mio-uikit-web.d.ts");
@@ -101,7 +92,6 @@ function copyResources(done) {
 
 module.exports = {
 	unifySwiftFiles,
-	transpileTsToJs,
 	uglifyJs,
 	parseStoryBoard,
 	copyResources
