@@ -184,7 +184,7 @@ function parserDidEndElement(parser, element){
 	}
 	else if (element == "viewController" || element == "navigationController"){
 		let outlets = outletsStack.pop();
-		currentFileContent += '<div data-outlets="true">';
+		currentFileContent += '<div class="hidden" data-outlets="true">';
 		for (let key in outlets){
 			let id = outlets[key];
 			currentFileContent += '<div data-outlet="' + id + '" data-property="' + key + '"></div>';
