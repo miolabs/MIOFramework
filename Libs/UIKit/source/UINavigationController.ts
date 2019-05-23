@@ -153,17 +153,22 @@ export class UINavigationController extends UIViewController
 
     // Segues
 
-    _checkSegue(relationship:string) {
-        super._checkSegue(relationship);
+    _checkSegues() {
+        super._checkSegues();
 
-        if (relationship == "rootViewController") {
-            let className = this._segues[relationship]["Class"];
-            let path = this._segues[relationship]["Path"];
+        for (let relationship in this._segues) {
 
-            let vc = NSClassFromString(className) as UIViewController;
-            vc.initWithResource(path);            
-            this.setRootViewController(vc);
+            if (relationship == "rootViewController") {
+                let s = this._segues[relationship];
+                let className = s["Class"];
+                let path = s["Resource"];
+    
+                let vc = NSClassFromString(className) as UIViewController;
+                vc.initWithResource(path);            
+                this.setRootViewController(vc);
+            }    
         }
+
     }
 
     // Transitioning delegate

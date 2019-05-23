@@ -6,14 +6,21 @@ import { NSBundle } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
 
 import { UIView } from "./UIView";
-import { UINavigationItem, UINavItemSearchInLayer } from "./UINavigationItem";
+import { UINavigationItem } from "./UINavigationItem";
 import { UINavigationController } from "./UINavigationController";
-import { UIPresentationController, UIModalPresentationStyle, UIModalTransitionStyle } from "./UIViewController_PresentationController";
+import { UIPresentationController } from "./UIViewController_PresentationController";
+import { UIModalPresentationStyle } from "./UIViewController_PresentationController";
+import { UIModalTransitionStyle } from "./UIViewController_PresentationController";
 import { UIPopoverPresentationController } from "./UIViewController_PopoverPresentationController";
-import { MUICoreLayerIDFromObject, MUICoreLayerAddStyle, MUICoreLayerSearchElementByID, MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
-import { _MUIShowViewController, _MUIHideViewController } from "./core/MUICore";
+import { MUICoreLayerIDFromObject } from "./core/MUICoreLayer";
+import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
+import { MUICoreLayerSearchElementByID } from "./core/MUICoreLayer";
+import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
+import { _MUIShowViewController } from "./core/MUICore";
+import { _MUIHideViewController } from "./core/MUICore";
 import { UIWindow } from "./UIWindow";
 import { UISplitViewController } from "./UISplitViewController";
+import { MUICoreBundleLoadNibName } from "./core/MUICoreNibParser";
 
 
 /**
@@ -57,7 +64,7 @@ export class UIViewController extends NSObject
     _outlets = {};
     _segues = {};
 
-    _checkSegue(relationship:string) {
+    _checkSegues() {
 
     }
 
@@ -135,8 +142,14 @@ export class UIViewController extends NSObject
             return;
         }
         
-        let mainBundle = NSBundle.mainBundle();
-        mainBundle.loadNibNamed(this._htmlResourcePath, this, null);
+        MUICoreBundleLoadNibName(this, this._htmlResourcePath, this, function(layer){
+            this.view.initWithLayer(layer, this);
+            this.view.awakeFromHTML();
+            this._didLoadView();
+        });
+
+        // let mainBundle = NSBundle.mainBundle();
+        // mainBundle.loadNibNamed(this._htmlResourcePath, this, null);
 
         // mainBundle.loadHTMLNamed(this._htmlResourcePath, this.layerID, this, function (layer) {            
             
@@ -173,6 +186,7 @@ export class UIViewController extends NSObject
     _didLoadView(){
         this._layerIsReady = true;        
         if (MIOCoreIsPhone() == true) MUICoreLayerAddStyle(this.view.layer, "phone");
+        this._checkSegues();
         
         if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null){
             this._onLoadLayerAction.call(this._onLoadLayerTarget);
