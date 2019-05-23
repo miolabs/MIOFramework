@@ -6,12 +6,21 @@ import { MIOCoreBundleGetContentsFromURLString } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 
 
+var _MIOCoreBundleClassesByDestination = {}
+export function MUICoreBundleSetClassesByDestination(classes){
+    _MIOCoreBundleClassesByDestination = classes;
+}
+
+export function MUICoreBundleGetClassesByDestination(resource:string){    
+    return _MIOCoreBundleClassesByDestination[resource];
+}
+
 export function MUICoreBundleLoadNibName(owner, name:string, target:any, completion:any){
 
     let parser = new MUICoreNibParser();
     parser.target = target;
-    parser.completion = completion;   
-    parser.owner = owner;     
+    parser.completion = completion;               
+    parser.owner = owner;
 
     MIOCoreBundleGetContentsFromURLString(name, this, function(code, data){
         if (code == 200) parser.parseString(data);
@@ -66,11 +75,11 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
                             this.connectOutlet(prop, outlet);
                         }
                         else if (type == "segue") {
-                            let destination = d.getAttribute("data-segue-destination");
-                            let destinationClass = d.getAttribute("data-segue-destination-class");
+                            let destination = d.getAttribute("data-segue-destination");  
+                            let kind = d.getAttribute("data-segue-kind");                          
                             let relationship = d.getAttribute("data-segue-relationship");
 
-                            this.addSegue(relationship, destination, destinationClass);
+                            this.addSegue(destination, kind, relationship);
                         }
                     }
                 }                
@@ -87,8 +96,12 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         this.owner[property] = _injectIntoOptional(obj);
     }
 
-    private addSegue(relationship:string, destination:string, destinationClass:string) {        
-        this.owner._segues[relationship] = {"Resource": destination, "Class": destinationClass};
+    private addSegue(destination:string, kind:string, relationship?:string) {        
+        let s = {};
+        s["Destination"] = destination;
+        s["Kind"] = kind;
+        if (relationship != null) s["Relationship"] = relationship;
+        this.owner._segues.push(s);
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){

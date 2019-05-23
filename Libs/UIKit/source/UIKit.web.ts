@@ -514,12 +514,21 @@ window.addEventListener("resize", function(e) {
 
 
 
+var _MIOCoreBundleClassesByDestination = {}
+export function MUICoreBundleSetClassesByDestination(classes){
+    _MIOCoreBundleClassesByDestination = classes;
+}
+
+export function MUICoreBundleGetClassesByDestination(resource:string){    
+    return _MIOCoreBundleClassesByDestination[resource];
+}
+
 export function MUICoreBundleLoadNibName(owner, name:string, target:any, completion:any){
 
     let parser = new MUICoreNibParser();
     parser.target = target;
-    parser.completion = completion;   
-    parser.owner = owner;     
+    parser.completion = completion;               
+    parser.owner = owner;
 
     MIOCoreBundleGetContentsFromURLString(name, this, function(code, data){
         if (code == 200) parser.parseString(data);
@@ -574,11 +583,11 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
                             this.connectOutlet(prop, outlet);
                         }
                         else if (type == "segue") {
-                            let destination = d.getAttribute("data-segue-destination");
-                            let destinationClass = d.getAttribute("data-segue-destination-class");
+                            let destination = d.getAttribute("data-segue-destination");  
+                            let kind = d.getAttribute("data-segue-kind");                          
                             let relationship = d.getAttribute("data-segue-relationship");
 
-                            this.addSegue(relationship, destination, destinationClass);
+                            this.addSegue(destination, kind, relationship);
                         }
                     }
                 }                
@@ -595,8 +604,12 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         this.owner[property] = _injectIntoOptional(obj);
     }
 
-    private addSegue(relationship:string, destination:string, destinationClass:string) {        
-        this.owner._segues[relationship] = {"Resource": destination, "Class": destinationClass};
+    private addSegue(destination:string, kind:string, relationship?:string) {        
+        let s = {};
+        s["Destination"] = destination;
+        s["Kind"] = kind;
+        if (relationship != null) s["Relationship"] = relationship;
+        this.owner._segues.push(s);
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){
@@ -2399,7 +2412,7 @@ export class UIViewController extends NSObject
     protected _preferredContentSize = null;
 
     _outlets = {};
-    _segues = {};
+    _segues = [];
 
     _checkSegues() {
 
@@ -3646,16 +3659,24 @@ export class UINavigationController extends UIViewController
     _checkSegues() {
         super._checkSegues();
 
-        for (let relationship in this._segues) {
-            let s = this._segues[relationship];
+        for (let index = 0; index < this._segues.length; index++) {
 
-            if (relationship == "rootViewController") {
-                let className = this._segues[relationship]["Class"];
-                let path = this._segues[relationship]["Path"];
-    
-                let vc = NSClassFromString(className) as UIViewController;
-                vc.initWithResource(path);            
-                this.setRootViewController(vc);
+            let s = this._segues[index];
+            let kind = s["Kind"];
+            
+            if (kind == "relationship") {
+                let destination = s["Destination"];
+                let relationship = s["Relationship"];
+
+                if (relationship == "rootViewController") {
+                
+                    let classname = MUICoreBundleGetClassesByDestination(destination);
+                    let path = "layout/" + destination + ".html";    
+
+                    let vc = NSClassFromString(classname) as UIViewController;
+                    vc.initWithResource(path);            
+                    this.setRootViewController(vc);
+                }
             }    
         }
 
@@ -4331,6 +4352,7 @@ export class UIResponder extends NSObject
 
 
 
+
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -4420,8 +4442,9 @@ export class UIApplication {
                         
             // Get Languages from the app.plist
             let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);            
-            this.initialResourceURLString = config["UIMainResourceFile"];
-            this.initialClassname = config["UIMainClassname"]
+            this.initialDestination = config["UIMainResourceFile"];
+            let classes = config["UIMainClasses"];
+            MUICoreBundleSetClassesByDestination(classes);
 
             let langs = config["Languages"];
             if (langs == null) {
@@ -4440,17 +4463,17 @@ export class UIApplication {
         });
     }
 
-    private initialResourceURLString:string = null;
-    private initialClassname:string = null;
-
+    private initialDestination:string = null;    
     private _run() {        
 
         this.delegate.applicationDidFinishLaunchingWithOptions();        
         this._mainWindow = this.delegate.window;
 
         if (this._mainWindow == null) {
-            let vc = NSClassFromString(this.initialClassname) as UIViewController;
-            vc.initWithResource(this.initialResourceURLString);
+            let classname = MUICoreBundleGetClassesByDestination(this.initialDestination);
+
+            let vc = NSClassFromString(classname) as UIViewController;
+            vc.initWithResource("layout/" + this.initialDestination + ".html");
 
             this.delegate.window = new UIWindow();
             this.delegate.window.initWithRootViewController(vc);

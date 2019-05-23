@@ -10,7 +10,8 @@ import { MIOCoreBundleSetAppResource } from "mio-foundation-web";
 import { MIOCoreStringSetLocalizedStrings } from "mio-foundation-web";
 import { UIWindow } from "./UIWindow";
 
-import { MUICoreBundleLoadNibName } from "./core/MUICoreNibParser";
+import { MUICoreBundleSetClassesByDestination } from "./core/MUICoreNibParser";
+import { MUICoreBundleGetClassesByDestination } from "./core/MUICoreNibParser";
 import { UIViewController } from "./UIViewController";
 import { MUICoreEvent } from "./core/MUICoreEvents"
 import { MUICoreEventInput } from "./core/MUICoreEvents"
@@ -104,8 +105,9 @@ export class UIApplication {
                         
             // Get Languages from the app.plist
             let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);            
-            this.initialResourceURLString = config["UIMainResourceFile"];
-            this.initialClassname = config["UIMainClassname"]
+            this.initialDestination = config["UIMainResourceFile"];
+            let classes = config["UIMainClasses"];
+            MUICoreBundleSetClassesByDestination(classes);
 
             let langs = config["Languages"];
             if (langs == null) {
@@ -124,17 +126,17 @@ export class UIApplication {
         });
     }
 
-    private initialResourceURLString:string = null;
-    private initialClassname:string = null;
-
+    private initialDestination:string = null;    
     private _run() {        
 
         this.delegate.applicationDidFinishLaunchingWithOptions();        
         this._mainWindow = this.delegate.window;
 
         if (this._mainWindow == null) {
-            let vc = NSClassFromString(this.initialClassname) as UIViewController;
-            vc.initWithResource(this.initialResourceURLString);
+            let classname = MUICoreBundleGetClassesByDestination(this.initialDestination);
+
+            let vc = NSClassFromString(classname) as UIViewController;
+            vc.initWithResource("layout/" + this.initialDestination + ".html");
 
             this.delegate.window = new UIWindow();
             this.delegate.window.initWithRootViewController(vc);

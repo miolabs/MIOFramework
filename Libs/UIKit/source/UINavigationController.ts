@@ -156,16 +156,24 @@ export class UINavigationController extends UIViewController
     _checkSegues() {
         super._checkSegues();
 
-        for (let relationship in this._segues) {
+        for (let index = 0; index < this._segues.length; index++) {
 
-            if (relationship == "rootViewController") {
-                let s = this._segues[relationship];
-                let className = s["Class"];
-                let path = s["Resource"];
-    
-                let vc = NSClassFromString(className) as UIViewController;
-                vc.initWithResource(path);            
-                this.setRootViewController(vc);
+            let s = this._segues[index];
+            let kind = s["Kind"];
+            
+            if (kind == "relationship") {
+                let destination = s["Destination"];
+                let relationship = s["Relationship"];
+
+                if (relationship == "rootViewController") {
+                
+                    let classname = MUICoreBundleGetClassesByDestination(destination);
+                    let path = "layout/" + destination + ".html";    
+
+                    let vc = NSClassFromString(classname) as UIViewController;
+                    vc.initWithResource(path);            
+                    this.setRootViewController(vc);
+                }
             }    
         }
 
