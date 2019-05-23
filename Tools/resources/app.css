@@ -144,6 +144,5 @@ input[type="checkbox"]:checked::after {
 
 /* TABLE VIEW */
 .table-view .table-view-cell .label {
-	background-color: #fafafa;
 	border-bottom: 1px solid #d6d6d6;
 }

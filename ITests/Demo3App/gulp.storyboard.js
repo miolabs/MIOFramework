@@ -10,10 +10,6 @@ var currentFileContent = null;
 var elementsStack = [];
 var currentElement = null;
 var outletsStack = [];
-var seguesStack = [];
-
-var viewControllersBySceneFile = {};
-var viewControllersByClass = {};
 
 function parseDocument(xmlString) {	
 	console.log('Entering Document');			
@@ -37,27 +33,53 @@ function parserDidStartElement(parser, element, attributes){
 		currentFileName = "scene-" + id + ".html";		
 		currentFileContent = '<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="base.css"></head><body><div class="scene" id="' + id + '">';
 	}
-	else if (element == "viewController" || element == "navigationController" || element == "tableViewController"){
+	else if (element == "viewController"){
 		let id = attributes["id"];
 		
 		// Update app plist file with the main html file
 		if (id == initialViewControllerID) mainStoryBoardFile = currentFileName;
 		updateAppPListFile();
-				
-		let customClass = attributes["customClass"];
-		if (customClass == null) customClass = "UI" + element.charAt(0).toUpperCase();
-
-		viewControllersBySceneFile[id] = currentFileName;
-		viewControllersByClass[id] = customClass;
-
-		currentFileContent += '<div class="' + parseClassType(element) +'" id="' + id + '" data-root-view-controller="true"';	
+		
+		let customClass = attributes["customClass"] || "UIViewController";
+					
+		currentFileContent += '<div class="view-controller" id="' + id + '" data-root-view-controller="true"';	
 		currentFileContent += ' data-class="' + customClass + '"';
 		currentFileContent += '>';
 
 		let outlets = {};
 		outletsStack.push(outlets);
-		let segues = {};
-		seguesStack.push(segues);
+	}
+	else if (element == "navigationController"){
+		let id = attributes["id"];
+
+		// Update app plist file with the main html file
+		if (id == initialViewControllerID) mainStoryBoardFile = currentFileName;
+		updateAppPListFile();
+		
+		let customClass = attributes["customClass"] || "UINavigationController";
+					
+		currentFileContent += '<div class="nav-controller" id="' + id + '" data-root-view-controller="true"';	
+		currentFileContent += ' data-class="' + customClass + '"';
+		currentFileContent += '>';
+
+		let outlets = {};
+		outletsStack.push(outlets);
+	}
+	else if (element == "tableViewController"){
+		let id = attributes["id"];
+
+		// Update app plist file with the main html file
+		if (id == initialViewControllerID) mainStoryBoardFile = currentFileName;
+		updateAppPListFile();
+		
+		let customClass = attributes["customClass"] || "UITableViewController";
+					
+		currentFileContent += '<div class="table-view-controller" id="' + id + '" data-root-view-controller="true"';	
+		currentFileContent += ' data-class="' + customClass + '"';
+		currentFileContent += '>';
+
+		let outlets = {};
+		outletsStack.push(outlets);
 	}
 	else if (element == "view"){
 		pushNewElement(element, attributes);
@@ -180,13 +202,6 @@ function parserDidStartElement(parser, element, attributes){
 		let outlets = outletsStack[outletsStack.length - 1];
 		outlets[outlet] = destination;		
 	}
-	else if (element == "segue"){
-		let destination = attributes["destination"];
-		let relationship = attributes["relationship"];		
-				
-		let segues = seguesStack[seguesStack.length - 1];
-		segues[relationship] = {"Destination": viewControllersBySceneFile[destination], "Class": viewControllersByClass[destination]};
-	}
 }
 
 function parserDidEndElement(parser, element){
@@ -199,19 +214,11 @@ function parserDidEndElement(parser, element){
 		currentFileContent = null;
 	}
 	else if (element == "viewController" || element == "navigationController" || element == "tableViewController"){
-		currentFileContent += '<div class="hidden" data-connections="true">';
-		// Segues
-		let outlets = outletsStack.pop();		
+		let outlets = outletsStack.pop();
+		currentFileContent += '<div data-outlets="true">';
 		for (let key in outlets){
 			let id = outlets[key];
-			currentFileContent += '<div class="hidden" data-connection-type="outlet" data-outlet="' + id + '" data-property="' + key + '"></div>';
-		}
-		// Segues
-		let segues = seguesStack.pop();
-		for (let key in segues){
-			let destination = segues[key]["Destination"];
-			let customClass = segues[key]["Class"];
-			currentFileContent += '<div class="hidden" data-connection-type="segue" data-segue-destination-class="' + customClass + '" data-segue-destination="layout/' + destination + '" data-segue-relationship="' + key + '"></div>';
+			currentFileContent += '<div data-outlet="' + id + '" data-property="' + key + '"></div>';
 		}
 		currentFileContent += '</div></div>';				
 	}
@@ -392,6 +399,26 @@ function parseClassType(classType){
 			formattedString += classType[i];
 		}
 	} 
+
+	switch (classType){
+		case "textField":
+		return formattedString;
+		
+		case "segmentedControl":
+		return formattedString;
+
+		case "progressView":
+		return formattedString;
+
+		case "activityIndicatorView":
+		return formattedString;
+
+		case "pageControl":
+		return formattedString;
+
+		case "navigationBar":
+		return formattedString;
+	}
 
 	return formattedString;
 }
