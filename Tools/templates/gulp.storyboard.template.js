@@ -4,7 +4,9 @@ var NSPropertyListSerialization = require("./node_modules/mio-foundation-node").
 
 //GLOBAL VARIABLES
 var initialViewControllerID = null;
-var mainStoryBoardFile = null;
+var initialResource = null;
+var initialClassname = null;
+
 var currentFileName = null;
 var currentFileContent = null;
 var elementsStack = [];
@@ -39,13 +41,16 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "viewController" || element == "navigationController" || element == "tableViewController"){
 		let id = attributes["id"];
-		
-		// Update app plist file with the main html file
-		if (id == initialViewControllerID) mainStoryBoardFile = currentFileName;
-		updateAppPListFile();
-				
+						
 		let customClass = attributes["customClass"];
-		if (customClass == null) customClass = "UI" + element.charAt(0).toUpperCase();
+		if (customClass == null) customClass = "UI" + element.charAt(0).toUpperCase() + element.substring(1);
+
+		// Update app plist file with the main html file
+		if (id == initialViewControllerID) {
+			initialResource = currentFileName;
+			initialClassname = customClass;
+			updateAppPListFile();
+		}
 
 		viewControllersBySceneFile[id] = currentFileName;
 		viewControllersByClass[id] = customClass;
@@ -276,7 +281,7 @@ function pushNewElement(element, attributes){
 	item["Classes"] = classes;	
 
 	if (attributes["customClass"] != null) item["ExtraAttributes"] = ['data-class="' + attributes["customClass"] + '"'];
-	else item["ExtraAttributes"] = ['data-class="UI' + element.charAt(0).toUpperCase() + '"'];
+	else item["ExtraAttributes"] = ['data-class="UI' + element.charAt(0).toUpperCase() + element.substring(1) + '"'];
 
 	classes.push(parseClassType(element));
 	if (contenMode != null) classes.push(contenMode);
@@ -328,59 +333,6 @@ function parserDidEndDocument(parser){
 
 }
 
-function parseScenes(item){
-	console.log("Entering parseScenes");
-	console.log(item);
-	
-	for (let index = 0; index < item.length; index++){
-		let sc = item[index];
-		parseScene(sc["scene"]);
-	}	
-}
-
-function parseScene(item){
-	console.log("Entering parseScene");
-	console.log(item);
-	let attr = item[0]["$"];
-	console.log(attr);
-	let id = attr["sceneID"];
-	currentFileName = "scene-" + id + ".html";
-	console.log(currentFileName);
-	currentFileContent = "<html><head><link rel='stylesheet' type='text/css' href='base.css'></head><body><div class='scene' id='"+ id +"'>";
-
-	let objs = item[0]["objects"];
-	parseObjects(objs);			
-		
-	currentFileContent += "</div></body></html>";
-	generateHtmlFile();		
-}
-
-function parseObjects(item) {
-	console.log("Entering objects");
-	let objs = item[0];
-	console.log(objs);
-
-	parseViewController(objs["viewController"])
-}
-
-function parseViewController(item){
-	console.log("Entering parseViewController");
-	console.log(item);
-	let attr = item[0]["$"];
-	console.log(attr);
-
-	let id = attr["id"];
-	let customClass = attr["customClass"];	
-		
-	currentFileContent += "<div class='viewController' id='" + id + "'";	
-	if (customClass != null) currentFileContent += " data-class='" + customClass + "'";
-	currentFileContent += ">";	
-	
-	parseView(item[0]["view"][0], "view");
-	
-	currentFileContent += "</div>";	
-}
-
 function parseClassType(classType){
 	let formattedString = "";
 	let arrLetters = Array.from(classType);
@@ -394,69 +346,6 @@ function parseClassType(classType){
 	} 
 
 	return formattedString;
-}
-
-function parseView(item, classType){
-	console.log("Entering parseView");
-	console.log(item);	
-	let attr = item["$"];
-	console.log(attr);
-	
-	let id = attr["id"];
-	let contenMode = parseContentMode(attr["contentMode"]);
-	
-	let classes = []; 
-	classes.push(parseClassType(classType));	
-	if (contenMode != null) classes.push(contenMode);		
-	
-	let content = null;
-
-	switch (classType){
-		case "label":
-		content = parseLabel(item, classes);
-		break;
-
-		case "button":
-		content = parseButton(item, classes);
-		break;
-
-		case "textField":
-		content = parseTextField(item, classes);
-		break;
-	}
-
-	let styles = []; 
-	parseProperties(item, styles);	
-	if (styles.length > 0) {
-		styles = "style='" + styles.join("") + "'"; 
-	}
-	else {
-		styles = "";
-	}
-
-	currentFileContent += "<div class='" + classes.join(" ") + "' id='" + id + "'" + styles + ">";
-	if (content != null) currentFileContent += content;
-
-	let sv = item["subviews"];
-	parseSubViews(sv);
-	
-	currentFileContent += "</div>";	
-}
-
-function parseSubViews(item){
-	if (item == null) return;
-
-	console.log("Entering parseSubViews");
-	let objs = item[0];
-	console.log(objs);
-
-	for (let key in objs){
-		let obj = objs[key];
-		for (let index = 0; index < obj.length; index++){
-			let v = obj[index];
-			parseView(v, key);
-		}		
-	}
 }
 
 function parseContentMode(contentMode){
@@ -675,8 +564,9 @@ function classesStringify(classes){
 function updateAppPListFile() {		
 	const PLIST_PATH = "./dist/app.plist";
 	
-	if (mainStoryBoardFile == null) return;
-	console.log("MAINURL: " + mainStoryBoardFile);				
+	if (initialResource == null) return;
+	console.log("MAIN URL: " + initialResource);				
+	console.log("MAIN CLASSNAME: " + initialClassname);				
 	
 	let plist = null;
 	if (fs.existsSync(PLIST_PATH)) {
@@ -685,7 +575,8 @@ function updateAppPListFile() {
 	}
 	else plist = {};
 
-	plist["UIMainStoryboardFile"] = "layout/" + mainStoryBoardFile;
+	plist["UIMainResourceFile"] = initialResource;
+	plist["UIMainClassname"] = initialClassname;
 	
 	let newContent = NSPropertyListSerialization.dataWithpropertyList(plist, null, null, null);
 	fs.writeFileSync("./dist/app.plist", newContent);		

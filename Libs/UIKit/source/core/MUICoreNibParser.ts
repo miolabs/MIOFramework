@@ -6,11 +6,12 @@ import { MIOCoreBundleGetContentsFromURLString } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 
 
-export function MUICoreBundleLoadNibName(name:string, target:any, completion:any){
+export function MUICoreBundleLoadNibName(owner, name:string, target:any, completion:any){
 
     let parser = new MUICoreNibParser();
     parser.target = target;
-    parser.completion = completion;    
+    parser.completion = completion;   
+    parser.owner = owner;     
 
     MIOCoreBundleGetContentsFromURLString(name, this, function(code, data){
         if (code == 200) parser.parseString(data);
@@ -25,6 +26,7 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 {
     target = null;
     completion = null;    
+    owner = null;  
 
     private result = "";
     private isCapturing = false;    
@@ -42,9 +44,6 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         let domParser = new DOMParser();
         let items = domParser.parseFromString(this.result, "text/html");
         let layer = items.getElementById(this.layerID);
-
-        let vc = NSClassFromString(this.rootClassname);
-        vc.initWithLayer(layer, vc);                
 
         // Check outlets
         if (layer.childNodes.length > 0) {
@@ -64,33 +63,32 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
                             let prop = d.getAttribute("data-property");
                             let outlet = d.getAttribute("data-outlet");
 
-                            this.connectOutlet(vc, prop, outlet);
+                            this.connectOutlet(prop, outlet);
                         }
                         else if (type == "segue") {
                             let destination = d.getAttribute("data-segue-destination");
                             let destinationClass = d.getAttribute("data-segue-destination-class");
                             let relationship = d.getAttribute("data-segue-relationship");
 
-                            this.addSegue(vc, relationship, destination, destinationClass);
+                            this.addSegue(relationship, destination, destinationClass);
                         }
                     }
                 }                
             }
         }
         
-
-        this.completion.call(this.target, vc);
+        this.completion.call(this.target, layer);
     }
 
-    private connectOutlet(owner, property, outletID){
+    private connectOutlet(property, outletID){
         console.log("prop: " + property + " - outluet: " + outletID);
 
-        let obj = owner._outlets[outletID];
-        owner[property] = _injectIntoOptional(obj);
+        let obj = this.owner._outlets[outletID];
+        this.owner[property] = _injectIntoOptional(obj);
     }
 
-    private addSegue(owner:any, relationship:string, destination:string, destinationClass:string) {        
-        owner._segues[relationship] = {"Resource": destination, "Class": destinationClass};
+    private addSegue(relationship:string, destination:string, destinationClass:string) {        
+        this.owner._segues[relationship] = {"Resource": destination, "Class": destinationClass};
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){

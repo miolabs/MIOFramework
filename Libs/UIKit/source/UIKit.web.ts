@@ -514,11 +514,12 @@ window.addEventListener("resize", function(e) {
 
 
 
-export function MUICoreBundleLoadNibName(name:string, target:any, completion:any){
+export function MUICoreBundleLoadNibName(owner, name:string, target:any, completion:any){
 
     let parser = new MUICoreNibParser();
     parser.target = target;
-    parser.completion = completion;    
+    parser.completion = completion;   
+    parser.owner = owner;     
 
     MIOCoreBundleGetContentsFromURLString(name, this, function(code, data){
         if (code == 200) parser.parseString(data);
@@ -533,6 +534,7 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 {
     target = null;
     completion = null;    
+    owner = null;  
 
     private result = "";
     private isCapturing = false;    
@@ -550,9 +552,6 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         let domParser = new DOMParser();
         let items = domParser.parseFromString(this.result, "text/html");
         let layer = items.getElementById(this.layerID);
-
-        let vc = NSClassFromString(this.rootClassname);
-        vc.initWithLayer(layer, vc);                
 
         // Check outlets
         if (layer.childNodes.length > 0) {
@@ -572,34 +571,32 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
                             let prop = d.getAttribute("data-property");
                             let outlet = d.getAttribute("data-outlet");
 
-                            this.connectOutlet(vc, prop, outlet);
+                            this.connectOutlet(prop, outlet);
                         }
                         else if (type == "segue") {
                             let destination = d.getAttribute("data-segue-destination");
                             let destinationClass = d.getAttribute("data-segue-destination-class");
                             let relationship = d.getAttribute("data-segue-relationship");
 
-                            this.addSegue(vc, relationship, destination, destinationClass);
+                            this.addSegue(relationship, destination, destinationClass);
                         }
                     }
                 }                
             }
         }
         
-
-        this.completion.call(this.target, vc);
+        this.completion.call(this.target, layer);
     }
 
-    private connectOutlet(owner, property, outletID){
+    private connectOutlet(property, outletID){
         console.log("prop: " + property + " - outluet: " + outletID);
 
-        let obj = owner._outlets[outletID];
-        owner[property] = _injectIntoOptional(obj);
+        let obj = this.owner._outlets[outletID];
+        this.owner[property] = _injectIntoOptional(obj);
     }
 
-    private addSegue(owner:any, relationship:string, destination:string, destinationClass:string) {        
-        owner._segues[relationship] = {"Resource": destination, "Class": destinationClass};
-        owner._checkSegue(relationship);
+    private addSegue(relationship:string, destination:string, destinationClass:string) {        
+        this.owner._segues[relationship] = {"Resource": destination, "Class": destinationClass};
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){
@@ -2356,6 +2353,13 @@ export class UISwitch extends UIControl
 
 
 
+
+
+
+
+
+
+
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -2397,7 +2401,7 @@ export class UIViewController extends NSObject
     _outlets = {};
     _segues = {};
 
-    _checkSegue(relationship:string) {
+    _checkSegues() {
 
     }
 
@@ -2475,8 +2479,14 @@ export class UIViewController extends NSObject
             return;
         }
         
-        let mainBundle = NSBundle.mainBundle();
-        mainBundle.loadNibNamed(this._htmlResourcePath, this, null);
+        MUICoreBundleLoadNibName(this, this._htmlResourcePath, this, function(layer){
+            this.view.initWithLayer(layer, this);
+            this.view.awakeFromHTML();
+            this._didLoadView();
+        });
+
+        // let mainBundle = NSBundle.mainBundle();
+        // mainBundle.loadNibNamed(this._htmlResourcePath, this, null);
 
         // mainBundle.loadHTMLNamed(this._htmlResourcePath, this.layerID, this, function (layer) {            
             
@@ -2513,6 +2523,7 @@ export class UIViewController extends NSObject
     _didLoadView(){
         this._layerIsReady = true;        
         if (MIOCoreIsPhone() == true) MUICoreLayerAddStyle(this.view.layer, "phone");
+        this._checkSegues();
         
         if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null){
             this._onLoadLayerAction.call(this._onLoadLayerTarget);
@@ -3632,17 +3643,22 @@ export class UINavigationController extends UIViewController
 
     // Segues
 
-    _checkSegue(relationship:string) {
-        super._checkSegue(relationship);
+    _checkSegues() {
+        super._checkSegues();
 
-        if (relationship == "rootViewController") {
-            let className = this._segues[relationship]["Class"];
-            let path = this._segues[relationship]["Path"];
+        for (let relationship in this._segues) {
+            let s = this._segues[relationship];
 
-            let vc = NSClassFromString(className) as UIViewController;
-            vc.initWithResource(path);            
-            this.setRootViewController(vc);
+            if (relationship == "rootViewController") {
+                let className = this._segues[relationship]["Class"];
+                let path = this._segues[relationship]["Path"];
+    
+                let vc = NSClassFromString(className) as UIViewController;
+                vc.initWithResource(path);            
+                this.setRootViewController(vc);
+            }    
         }
+
     }
 
     // Transitioning delegate
@@ -4314,6 +4330,7 @@ export class UIResponder extends NSObject
 
 
 
+
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -4403,7 +4420,8 @@ export class UIApplication {
                         
             // Get Languages from the app.plist
             let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);            
-            this.mainResourceURLString = config["UIMainStoryboardFile"];
+            this.initialResourceURLString = config["UIMainResourceFile"];
+            this.initialClassname = config["UIMainClassname"]
 
             let langs = config["Languages"];
             if (langs == null) {
@@ -4422,18 +4440,27 @@ export class UIApplication {
         });
     }
 
-    private mainResourceURLString:string = null;
+    private initialResourceURLString:string = null;
+    private initialClassname:string = null;
+
     private _run() {        
 
         this.delegate.applicationDidFinishLaunchingWithOptions();        
         this._mainWindow = this.delegate.window;
 
         if (this._mainWindow == null) {
-            MUICoreBundleLoadNibName(this.mainResourceURLString, this, function(vc:UIViewController){
-                this.delegate.window = new UIWindow();
-                this.delegate.window.initWithRootViewController(vc);
-                this._launchApp()
-            });
+            let vc = NSClassFromString(this.initialClassname) as UIViewController;
+            vc.initWithResource(this.initialResourceURLString);
+
+            this.delegate.window = new UIWindow();
+            this.delegate.window.initWithRootViewController(vc);
+
+            this._launchApp()            
+            // MUICoreBundleLoadNibName( this.initialResourceURLString, this, function(vc:UIViewController){
+            //     this.delegate.window = new UIWindow();
+            //     this.delegate.window.initWithRootViewController(vc);
+            //     this._launchApp()
+            // });
         }
         else this._launchApp();         
     }

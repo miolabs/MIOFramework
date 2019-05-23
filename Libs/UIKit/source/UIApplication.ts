@@ -1,4 +1,5 @@
 import { NSURLRequest } from "mio-foundation-web";
+import { NSClassFromString } from "mio-foundation-web";
 import { NSURLConnection } from "mio-foundation-web";
 import { NSPropertyListSerialization } from "mio-foundation-web";
 import { NSURL } from "mio-foundation-web";
@@ -103,7 +104,8 @@ export class UIApplication {
                         
             // Get Languages from the app.plist
             let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);            
-            this.mainResourceURLString = config["UIMainStoryboardFile"];
+            this.initialResourceURLString = config["UIMainResourceFile"];
+            this.initialClassname = config["UIMainClassname"]
 
             let langs = config["Languages"];
             if (langs == null) {
@@ -122,18 +124,27 @@ export class UIApplication {
         });
     }
 
-    private mainResourceURLString:string = null;
+    private initialResourceURLString:string = null;
+    private initialClassname:string = null;
+
     private _run() {        
 
         this.delegate.applicationDidFinishLaunchingWithOptions();        
         this._mainWindow = this.delegate.window;
 
         if (this._mainWindow == null) {
-            MUICoreBundleLoadNibName(this.mainResourceURLString, this, function(vc:UIViewController){
-                this.delegate.window = new UIWindow();
-                this.delegate.window.initWithRootViewController(vc);
-                this._launchApp()
-            });
+            let vc = NSClassFromString(this.initialClassname) as UIViewController;
+            vc.initWithResource(this.initialResourceURLString);
+
+            this.delegate.window = new UIWindow();
+            this.delegate.window.initWithRootViewController(vc);
+
+            this._launchApp()            
+            // MUICoreBundleLoadNibName( this.initialResourceURLString, this, function(vc:UIViewController){
+            //     this.delegate.window = new UIWindow();
+            //     this.delegate.window.initWithRootViewController(vc);
+            //     this._launchApp()
+            // });
         }
         else this._launchApp();         
     }
