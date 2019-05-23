@@ -91,7 +91,6 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 
     private addSegue(owner:any, relationship:string, destination:string, destinationClass:string) {        
         owner._segues[relationship] = {"Resource": destination, "Class": destinationClass};
-        owner._checkSegue(relationship);
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){
