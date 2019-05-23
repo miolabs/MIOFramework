@@ -16,9 +16,6 @@
 
 /* LABEL */
 
-.label {
-	/*color: rgb(0, 0, 0);*/
-}
 .label.align-left {
 	text-align: left;	
 }
