@@ -4,8 +4,8 @@ var NSPropertyListSerialization = require("./node_modules/mio-foundation-node").
 
 //GLOBAL VARIABLES
 var initialViewControllerID = null;
-var initialResource = null;
-var initialClassname = null;
+var initialDestination = null;
+var viewClassByDestination = {};
 
 var currentFileName = null;
 var currentFileContent = null;
@@ -13,9 +13,6 @@ var elementsStack = [];
 var currentElement = null;
 var outletsStack = [];
 var seguesStack = [];
-
-var viewControllersBySceneFile = {};
-var viewControllersByClass = {};
 
 function parseDocument(xmlString) {	
 	console.log('Entering Document');			
@@ -35,25 +32,22 @@ function parserDidStartElement(parser, element, attributes){
 		initialViewControllerID = attributes["initialViewController"];
 	}
 	if (element == "scene"){				
-		let id = attributes["sceneID"];
-		currentFileName = "scene-" + id + ".html";		
-		currentFileContent = '<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="base.css"></head><body><div class="scene" id="' + id + '">';
+		let id = attributes["sceneID"];		
+		currentFileContent = '<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="base.css"></head><body>';
 	}
 	else if (element == "viewController" || element == "navigationController" || element == "tableViewController"){
 		let id = attributes["id"];
-						
+		currentFileName = id + ".html";								
+		
 		let customClass = attributes["customClass"];
 		if (customClass == null) customClass = "UI" + element.charAt(0).toUpperCase() + element.substring(1);
+		viewClassByDestination[id] = customClass;
 
 		// Update app plist file with the main html file
 		if (id == initialViewControllerID) {
-			initialResource = currentFileName;
-			initialClassname = customClass;
+			initialDestination = id;			
 			updateAppPListFile();
-		}
-
-		viewControllersBySceneFile[id] = currentFileName;
-		viewControllersByClass[id] = customClass;
+		}		
 
 		currentFileContent += '<div class="' + parseClassType(element) +'" id="' + id + '" data-root-view-controller="true"';	
 		currentFileContent += ' data-class="' + customClass + '"';
@@ -190,14 +184,14 @@ function parserDidStartElement(parser, element, attributes){
 		let relationship = attributes["relationship"];		
 				
 		let segues = seguesStack[seguesStack.length - 1];
-		segues[relationship] = {"Destination": viewControllersBySceneFile[destination], "Class": viewControllersByClass[destination]};
+		segues[relationship] = destination;
 	}
 }
 
 function parserDidEndElement(parser, element){
 
 	if (element == "scene"){				
-		currentFileContent += '</div></body></html>';
+		currentFileContent += '</body></html>';
 		generateHtmlFile();			
 		console.log(currentFileContent);
 		currentFileName = null;
@@ -214,9 +208,8 @@ function parserDidEndElement(parser, element){
 		// Segues
 		let segues = seguesStack.pop();
 		for (let key in segues){
-			let destination = segues[key]["Destination"];
-			let customClass = segues[key]["Class"];
-			currentFileContent += '<div class="hidden" data-connection-type="segue" data-segue-destination-class="' + customClass + '" data-segue-destination="layout/' + destination + '" data-segue-relationship="' + key + '"></div>';
+			let destination = segues[key];			
+			currentFileContent += '<div class="hidden" data-connection-type="segue" data-segue-destination="'+ destination + '" data-segue-relationship="' + key + '"></div>';
 		}
 		currentFileContent += '</div></div>';				
 	}
@@ -564,9 +557,8 @@ function classesStringify(classes){
 function updateAppPListFile() {		
 	const PLIST_PATH = "./dist/app.plist";
 	
-	if (initialResource == null) return;
-	console.log("MAIN URL: " + initialResource);				
-	console.log("MAIN CLASSNAME: " + initialClassname);				
+	if (initialDestination == null) return;
+	console.log("MAIN URL: " + initialDestination);
 	
 	let plist = null;
 	if (fs.existsSync(PLIST_PATH)) {
@@ -575,8 +567,8 @@ function updateAppPListFile() {
 	}
 	else plist = {};
 
-	plist["UIMainResourceFile"] = initialResource;
-	plist["UIMainClassname"] = initialClassname;
+	plist["UIMainResourceFile"] = initialDestination;
+	plist["UIMainClasses"] = viewClassByDestination;
 	
 	let newContent = NSPropertyListSerialization.dataWithpropertyList(plist, null, null, null);
 	fs.writeFileSync("./dist/app.plist", newContent);		

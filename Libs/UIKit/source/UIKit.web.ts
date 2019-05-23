@@ -514,12 +514,21 @@ window.addEventListener("resize", function(e) {
 
 
 
+var _MIOCoreBundleClassesByDestination = {}
+export function MUICoreBundleSetClassesByDestination(classes){
+    _MIOCoreBundleClassesByDestination = classes;
+}
+
+export function MUICoreBundleGetClassesByDestination(resource:string){    
+    return _MIOCoreBundleClassesByDestination[resource];
+}
+
 export function MUICoreBundleLoadNibName(owner, name:string, target:any, completion:any){
 
     let parser = new MUICoreNibParser();
     parser.target = target;
-    parser.completion = completion;   
-    parser.owner = owner;     
+    parser.completion = completion;               
+    parser.owner = owner;
 
     MIOCoreBundleGetContentsFromURLString(name, this, function(code, data){
         if (code == 200) parser.parseString(data);
@@ -3647,11 +3656,11 @@ export class UINavigationController extends UIViewController
         super._checkSegues();
 
         for (let relationship in this._segues) {
-            let s = this._segues[relationship];
 
             if (relationship == "rootViewController") {
-                let className = this._segues[relationship]["Class"];
-                let path = this._segues[relationship]["Path"];
+                let s = this._segues[relationship];
+                let className = s["Class"];
+                let path = s["Resource"];
     
                 let vc = NSClassFromString(className) as UIViewController;
                 vc.initWithResource(path);            
@@ -4331,6 +4340,7 @@ export class UIResponder extends NSObject
 
 
 
+
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -4420,8 +4430,9 @@ export class UIApplication {
                         
             // Get Languages from the app.plist
             let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);            
-            this.initialResourceURLString = config["UIMainResourceFile"];
-            this.initialClassname = config["UIMainClassname"]
+            this.initialDestination = config["UIMainResourceFile"];
+            let classes = config["UIMainClasses"];
+            MUICoreBundleSetClassesByDestination(classes);
 
             let langs = config["Languages"];
             if (langs == null) {
@@ -4440,17 +4451,17 @@ export class UIApplication {
         });
     }
 
-    private initialResourceURLString:string = null;
-    private initialClassname:string = null;
-
+    private initialDestination:string = null;    
     private _run() {        
 
         this.delegate.applicationDidFinishLaunchingWithOptions();        
         this._mainWindow = this.delegate.window;
 
         if (this._mainWindow == null) {
-            let vc = NSClassFromString(this.initialClassname) as UIViewController;
-            vc.initWithResource(this.initialResourceURLString);
+            let classname = MUICoreBundleGetClassesByDestination(this.initialDestination);
+
+            let vc = NSClassFromString(classname) as UIViewController;
+            vc.initWithResource("layout/" + this.initialDestination + ".html");
 
             this.delegate.window = new UIWindow();
             this.delegate.window.initWithRootViewController(vc);

@@ -6,12 +6,21 @@ import { MIOCoreBundleGetContentsFromURLString } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 
 
+var _MIOCoreBundleClassesByDestination = {}
+export function MUICoreBundleSetClassesByDestination(classes){
+    _MIOCoreBundleClassesByDestination = classes;
+}
+
+export function MUICoreBundleGetClassesByDestination(resource:string){    
+    return _MIOCoreBundleClassesByDestination[resource];
+}
+
 export function MUICoreBundleLoadNibName(owner, name:string, target:any, completion:any){
 
     let parser = new MUICoreNibParser();
     parser.target = target;
-    parser.completion = completion;   
-    parser.owner = owner;     
+    parser.completion = completion;               
+    parser.owner = owner;
 
     MIOCoreBundleGetContentsFromURLString(name, this, function(code, data){
         if (code == 200) parser.parseString(data);
