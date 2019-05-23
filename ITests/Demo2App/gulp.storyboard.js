@@ -11,8 +11,6 @@ var currentFileName = null;
 var currentFileContent = null;
 var elementsStack = [];
 var currentElement = null;
-var outletsStack = [];
-var seguesStack = [];
 
 function parseDocument(xmlString) {	
 	console.log('Entering Document');			
@@ -36,27 +34,20 @@ function parserDidStartElement(parser, element, attributes){
 		currentFileContent = '<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="base.css"></head><body>';
 	}
 	else if (element == "viewController" || element == "navigationController" || element == "tableViewController"){
+		let item = pushNewElement(element, attributes);
+		
 		let id = attributes["id"];
 		currentFileName = id + ".html";								
 		
-		let customClass = attributes["customClass"];
-		if (customClass == null) customClass = "UI" + element.charAt(0).toUpperCase() + element.substring(1);
-		viewClassByDestination[id] = customClass;
+		viewClassByDestination[id] = item["CustomClass"];
 
 		// Update app plist file with the main html file
 		if (id == initialViewControllerID) {
-			initialDestination = id;			
+			initialDestination = id;
 			updateAppPListFile();
 		}		
-
-		currentFileContent += '<div class="' + parseClassType(element) +'" id="' + id + '" data-root-view-controller="true"';	
-		currentFileContent += ' data-class="' + customClass + '"';
-		currentFileContent += '>';
-
-		let outlets = {};
-		outletsStack.push(outlets);
-		let segues = {};
-		seguesStack.push(segues);
+		
+		item["ExtraAttributes"].push('data-root-view-controller="true"');
 	}
 	else if (element == "view"){
 		pushNewElement(element, attributes);
@@ -173,18 +164,26 @@ function parserDidStartElement(parser, element, attributes){
 		currentElement["Content"] = currentElement["Content"] + '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "") +'"></div>';
 	}
 	else if (element == "outlet") {
-		let outlet = attributes["property"];
+		let outlets = currentElement["Outlets"];
+		
+		let property = attributes["property"];
 		let destination = attributes["destination"];
-						
-		let outlets = outletsStack[outletsStack.length - 1];
-		outlets[outlet] = destination;		
+								
+		let o = {"Property" : property, "Destination": destination};
+		outlet.push(o);
 	}
 	else if (element == "segue"){
+		let segues = currentElement["Segues"];
+		
+		let id = attributes["id"];
 		let destination = attributes["destination"];
+		let kind = attributes["kind"];
 		let relationship = attributes["relationship"];		
-				
-		let segues = seguesStack[seguesStack.length - 1];
-		segues[relationship] = destination;
+						
+		let segue = {"Destination" : destination, "Kind" : kind };
+		if (relationship != null) segue["Relationship"] = relationship;
+
+		segues.push(segue);
 	}
 }
 
@@ -198,20 +197,7 @@ function parserDidEndElement(parser, element){
 		currentFileContent = null;
 	}
 	else if (element == "viewController" || element == "navigationController" || element == "tableViewController"){
-		currentFileContent += '<div class="hidden" data-connections="true">';
-		// Segues
-		let outlets = outletsStack.pop();		
-		for (let key in outlets){
-			let id = outlets[key];
-			currentFileContent += '<div class="hidden" data-connection-type="outlet" data-outlet="' + id + '" data-property="' + key + '"></div>';
-		}
-		// Segues
-		let segues = seguesStack.pop();
-		for (let key in segues){
-			let destination = segues[key];			
-			currentFileContent += '<div class="hidden" data-connection-type="segue" data-segue-destination="'+ destination + '" data-segue-relationship="' + key + '"></div>';
-		}
-		currentFileContent += '</div></div>';				
+		popElement();
 	}
 	else if (element == "view"){
 		popElement();
@@ -268,13 +254,17 @@ function pushNewElement(element, attributes){
 	let item = {};		
 	let styles = [];
 	let classes = [];
-	item["ID"] = id;
+	item["ID"] = id;	
 	item["Content"] = "";
 	item["Styles"] = styles;
-	item["Classes"] = classes;	
+	item["Classes"] = classes;
+	item["Segues"]	= [];	
+	item["Outlets"] = [];
 
-	if (attributes["customClass"] != null) item["ExtraAttributes"] = ['data-class="' + attributes["customClass"] + '"'];
-	else item["ExtraAttributes"] = ['data-class="UI' + element.charAt(0).toUpperCase() + element.substring(1) + '"'];
+	let customClass = attributes["customClass"];
+	if (customClass == null) customClass = "UI" + element.charAt(0).toUpperCase() + element.substring(1);
+	item["ExtraAttributes"] = ['data-class="' + customClass + '"'];	
+	item["CustomClass"] = customClass;
 
 	classes.push(parseClassType(element));
 	if (contenMode != null) classes.push(contenMode);
@@ -301,10 +291,35 @@ function popElement(){
 	let extraAttributes = item["ExtraAttributes"];
 	classes = classes.length > 0 ? 'class="' + classes.join(" ") + '"': '';		
 	styles = styles.length > 0 ? 'style="' + styles.join("") + '"': '';		
-	let content = item["Content"];
+	let content = item["Content"] || "";
+
+	let outlets = item["Outlets"];
+	let segues = item["Segues"];	
+	
+	if (outlets.length + segues.length > 0) content += '<div class="hidden" data-connections="true">';
+
+	// Outlets	
+	for (let index = 0; index < outlets.length; index++){
+		let o = outlets[index];
+		let prop = o["Property"];
+		let dst = o["Destination"];
+		content += '<div class="hidden" data-connection-type="outlet" data-outlet="' + dst + '" data-property="' + prop + '"></div>';
+	}
+	// Segues		
+	for (let index = 0; index < segues.length; index++){
+		let item = segues[index];
+		
+		content += '<div class="hidden" data-connection-type="segue"';
+		content += ' data-segue-destination="' + item["Destination"] + '"';
+		content += ' data-segue-kind="' + item["Kind"] + '"';
+		if (item["Relationship"] != null) content += ' data-segue-relationship="' + item["Relationship"] + '"';
+		content += '></div>';
+	}
+	
+	if (outlets.length + segues.length > 0) content += '</div>';
 
 	addContentToParentItem('<div ' + classes + 'id="' + id + '"' + extraAttributes.join(" ") + styles + '>', parentItem);
-	if (content != null) addContentToParentItem(content, parentItem);			
+	if (content.length > 0) addContentToParentItem(content, parentItem);	
 	addContentToParentItem('</div>', parentItem);		
 
 }
@@ -558,7 +573,7 @@ function updateAppPListFile() {
 	const PLIST_PATH = "./dist/app.plist";
 	
 	if (initialDestination == null) return;
-	console.log("MAIN URL: " + initialDestination);					
+	console.log("MAIN URL: " + initialDestination);
 	
 	let plist = null;
 	if (fs.existsSync(PLIST_PATH)) {

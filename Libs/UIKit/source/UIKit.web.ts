@@ -583,11 +583,11 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
                             this.connectOutlet(prop, outlet);
                         }
                         else if (type == "segue") {
-                            let destination = d.getAttribute("data-segue-destination");
-                            let destinationClass = d.getAttribute("data-segue-destination-class");
+                            let destination = d.getAttribute("data-segue-destination");  
+                            let kind = d.getAttribute("data-segue-kind");                          
                             let relationship = d.getAttribute("data-segue-relationship");
 
-                            this.addSegue(relationship, destination, destinationClass);
+                            this.addSegue(destination, kind, relationship);
                         }
                     }
                 }                
@@ -604,8 +604,12 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         this.owner[property] = _injectIntoOptional(obj);
     }
 
-    private addSegue(relationship:string, destination:string, destinationClass:string) {        
-        this.owner._segues[relationship] = {"Resource": destination, "Class": destinationClass};
+    private addSegue(destination:string, kind:string, relationship?:string) {        
+        let s = {};
+        s["Destination"] = destination;
+        s["Kind"] = kind;
+        if (relationship != null) s["Relationship"] = relationship;
+        this.owner._segues.push(s);
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){
@@ -2408,7 +2412,7 @@ export class UIViewController extends NSObject
     protected _preferredContentSize = null;
 
     _outlets = {};
-    _segues = {};
+    _segues = [];
 
     _checkSegues() {
 
@@ -3655,16 +3659,24 @@ export class UINavigationController extends UIViewController
     _checkSegues() {
         super._checkSegues();
 
-        for (let relationship in this._segues) {
+        for (let index = 0; index < this._segues.length; index++) {
 
-            if (relationship == "rootViewController") {
-                let s = this._segues[relationship];
-                let className = s["Class"];
-                let path = s["Resource"];
-    
-                let vc = NSClassFromString(className) as UIViewController;
-                vc.initWithResource(path);            
-                this.setRootViewController(vc);
+            let s = this._segues[index];
+            let kind = s["Kind"];
+            
+            if (kind == "relationship") {
+                let destination = s["Destination"];
+                let relationship = s["Relationship"];
+
+                if (relationship == "rootViewController") {
+                
+                    let classname = MUICoreBundleGetClassesByDestination(destination);
+                    let path = "layout/" + destination + ".html";    
+
+                    let vc = NSClassFromString(classname) as UIViewController;
+                    vc.initWithResource(path);            
+                    this.setRootViewController(vc);
+                }
             }    
         }
 
