@@ -45,9 +45,7 @@ function parserDidStartElement(parser, element, attributes){
 		updateAppPListFile();
 				
 		let customClass = attributes["customClass"];
-		if (customClass == null && element == "viewController") customClass = "UIViewController";
-		if (customClass == null && element == "navigationController") customClass = "UINavigationController";
-		if (customClass == null && element == "tableViewController") customClass = "UITableViewController";
+		if (customClass == null) customClass = "UI" + element.charAt(0).toUpperCase();
 
 		viewControllersBySceneFile[id] = currentFileName;
 		viewControllersByClass[id] = customClass;
