@@ -1,6 +1,9 @@
 import { NSLocalizeString } from "mio-foundation-web";
 import { UIControl } from "./UIControl";
 import { MUICoreLayerAddStyle, MUICoreLayerRemoveStyle, MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
+import { NSClassFromString } from "mio-foundation-web";
+import { UIViewController } from "./UIViewController";
+import { getTypeParameterOwner } from "typescript";
 
 /**
  * Created by godshadow on 12/3/16.
@@ -125,6 +128,36 @@ export class UIButton extends UIControl
             
         }.bind(this));
     }
+
+    _checkSegues() {
+        super._checkSegues();
+
+        for (let index = 0; index < this._segues.length; index++) {
+
+            let s = this._segues[index];
+            let kind = s["Kind"];
+            
+            if (kind == "show") {
+                let destination = s["Destination"];                
+                let classname = MUICoreBundleGetClassesByDestination(destination);
+                let path = "layout/" + destination + ".html";    
+
+                if (this.owner != null && this.owner instanceof UIViewController) {
+                    this.setAction(this, function(){
+                        let vc = NSClassFromString(classname) as UIViewController;
+                        vc.initWithResource(path);   
+        
+                        this.owner.navigationController.pushViewController(vc);
+                    });
+                }
+
+                
+                
+                
+            }    
+        }
+    }
+
 
     initWithAction(target, action){
         this.init();

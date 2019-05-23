@@ -27,11 +27,10 @@ import { MUICoreBundleLoadNibName } from "./core/MUICoreNibParser";
  * Created by godshadow on 11/3/16.
  */
 
-export class UIViewController extends NSObject
-{
-    layerID:string = null;
+export class UIViewController extends NSObject {
+    layerID: string = null;
 
-    view:UIView = null;
+    view: UIView = null;
 
     private _htmlResourcePath = null;
 
@@ -45,13 +44,13 @@ export class UIViewController extends NSObject
     private _layerIsReady = false;
 
     private _childViewControllers = [];
-    parentViewController:UIViewController = null;
+    parentViewController: UIViewController = null;
 
-    presentingViewController:UIViewController = null;
-    presentedViewController:UIView = null;
-    navigationController:UINavigationController = null;
-    navigationItem:UINavigationItem = null;
-    splitViewController:UISplitViewController = null;
+    presentingViewController: UIViewController = null;
+    presentedViewController: UIView = null;
+    navigationController: UINavigationController = null;
+    navigationItem: UINavigationItem = null;
+    splitViewController: UISplitViewController = null;
     tabBarController = null;
 
     modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
@@ -68,48 +67,99 @@ export class UIViewController extends NSObject
 
     }
 
-    constructor(layerID?){
+    constructor(layerID?) {
         super();
         this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(this);
     }
 
-    init(){
-        super.init();        
-        this.loadView();        
+    init() {
+        super.init();
+        this.loadView();
     }
 
-    initWithCoder(coder:NSCoder){
+    initWithCoder(coder: NSCoder) {
 
     }
 
-    initWithLayer(layer, owner, options?){
+    initWithLayer(layer, owner, options?) {
         super.init();
 
         let viewLayer = MUICoreLayerGetFirstElementWithTag(layer, "DIV");
 
         this.view = new UIView();
         this.view.initWithLayer(viewLayer, owner, options);
-        
+        this.view._checkSegues();
+
         // Search for navigation item
-        //this.navigationItem = UINavItemSearchInLayer(layer);
-        
-        this.loadView();        
+        //this.navigationItem = UINavItemSearchInLayer(layer);        
+
+        this.loadView();
     }
 
-    initWithResource(path){
+    private _parseConnections(layer){
+        // Check outlets and segues
+        if (layer.childNodes.length > 0) {
+            for (let index = 0; index < layer.childNodes.length; index++) {
+                let subLayer = layer.childNodes[index] as HTMLElement;
+
+                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+
+                if (subLayer.getAttribute("data-connections") == "true") {
+                    for (let index2 = 0; index2 < subLayer.childNodes.length; index2++) {
+                        let d = subLayer.childNodes[index2] as HTMLElement;
+                        if (d.tagName != "DIV") continue;
+
+                        let type = d.getAttribute("data-connection-type");
+
+                        if (type == "outlet") {
+                            let prop = d.getAttribute("data-property");
+                            let outlet = d.getAttribute("data-outlet");
+
+                            this.connectOutlet(prop, outlet);
+                        }
+                        else if (type == "segue") {
+                            let destination = d.getAttribute("data-segue-destination");
+                            let kind = d.getAttribute("data-segue-kind");
+                            let relationship = d.getAttribute("data-segue-relationship");
+
+                            this.addSegue(destination, kind, relationship);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private connectOutlet(property, outletID) {
+        console.log("prop: " + property + " - outluet: " + outletID);
+
+        let obj = this._outlets[outletID];
+        this[property] = _injectIntoOptional(obj);
+    }
+
+
+    private addSegue(destination: string, kind: string, relationship?: string) {
+        let s = {};
+        s["Destination"] = destination;
+        s["Kind"] = kind;
+        if (relationship != null) s["Relationship"] = relationship;
+        this._segues.push(s);
+    }
+
+    initWithResource(path) {
         if (path == null) throw new Error("UIViewController:initWithResource can't be null");
 
-        super.init();        
+        super.init();
 
         this._htmlResourcePath = path;
         this.loadView();
     }
 
-    localizeSubLayers(layers){
+    localizeSubLayers(layers) {
         if (layers.length == 0)
             return;
 
-        for (let index = 0; index < layers.length; index++){
+        for (let index = 0; index < layers.length; index++) {
             let layer = layers[index];
 
             if (layer.tagName != "DIV") continue;
@@ -122,29 +172,30 @@ export class UIViewController extends NSObject
         }
     }
 
-    localizeLayerIDWithKey(layerID, key){
+    localizeLayerIDWithKey(layerID, key) {
         let layer = MUICoreLayerSearchElementByID(this.view.layer, layerID);
         layer.innerHTML = NSLocalizeString(key, key);
     }
 
-    loadView(){
+    loadView() {
         if (this.view != null) {
             this._didLoadView();
             return;
         }
 
         this.view = new UIView(this.layerID);
-        
+
         if (this._htmlResourcePath == null) {
-            this.view.init();            
+            this.view.init();
             MUICoreLayerAddStyle(this.view.layer, "page");
             this._didLoadView();
             return;
         }
-        
-        MUICoreBundleLoadNibName(this, this._htmlResourcePath, this, function(layer){
+
+        MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (layer) {
             this.view.initWithLayer(layer, this);
             this.view.awakeFromHTML();
+            this.view._checkSegues();
             this._didLoadView();
         });
 
@@ -152,7 +203,7 @@ export class UIViewController extends NSObject
         // mainBundle.loadNibNamed(this._htmlResourcePath, this, null);
 
         // mainBundle.loadHTMLNamed(this._htmlResourcePath, this.layerID, this, function (layer) {            
-            
+
         //     let domParser = new DOMParser();
         //     let items = domParser.parseFromString(layerData, "text/html");
         //     let layer = items.getElementById(layerID);
@@ -170,7 +221,7 @@ export class UIViewController extends NSObject
         // });        
     }
 
-    _didLoadNibWithLayer(layerData){
+    _didLoadNibWithLayer(layerData) {
         let domParser = new DOMParser();
         let items = domParser.parseFromString(layerData, "text/html");
         let layer = items.getElementById("kk");
@@ -178,29 +229,30 @@ export class UIViewController extends NSObject
         //this.navigationItem = UINavItemSearchInLayer(layer);
 
         this.view.initWithLayer(layer, this);
-        this.view.awakeFromHTML();        
+        this.view.awakeFromHTML();
 
         this._didLoadView();
     }
 
-    _didLoadView(){
-        this._layerIsReady = true;        
+    _didLoadView() {
+        this._layerIsReady = true;
         if (MIOCoreIsPhone() == true) MUICoreLayerAddStyle(this.view.layer, "phone");
+        this._parseConnections(this.view.layer);        
         this._checkSegues();
-        
-        if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null){
+
+        if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null) {
             this._onLoadLayerAction.call(this._onLoadLayerTarget);
             this._onLoadLayerTarget = null;
             this._onLoadLayerAction = null;
         }
 
-        if (this._onViewLoadedAction != null && this._onViewLoadedTarget != null){
+        if (this._onViewLoadedAction != null && this._onViewLoadedTarget != null) {
             this.viewDidLoad();
             this._loadChildControllers();
         }
     }
 
-    protected _loadChildControllers(){
+    protected _loadChildControllers() {
         let count = this._childViewControllers.length;
 
         if (count > 0)
@@ -209,7 +261,7 @@ export class UIViewController extends NSObject
             this._setViewLoaded(true);
     }
 
-    protected _loadChildViewController(index, max){
+    protected _loadChildViewController(index, max) {
         if (index < max) {
             let vc = this._childViewControllers[index];
             vc.onLoadView(this, function () {
@@ -218,13 +270,12 @@ export class UIViewController extends NSObject
                 this._loadChildViewController(newIndex, max);
             });
         }
-        else
-        {
+        else {
             this._setViewLoaded(true);
         }
     }
 
-    protected _setViewLoaded(value){
+    protected _setViewLoaded(value) {
         this.willChangeValue("viewLoaded");
         this._viewIsLoaded = value;
         this.didChangeValue("viewLoaded");
@@ -238,7 +289,7 @@ export class UIViewController extends NSObject
         this.view.setNeedsDisplay();
     }
 
-    onLoadView(target, action){
+    onLoadView(target, action) {
         this._onViewLoadedTarget = target;
         this._onViewLoadedAction = action;
 
@@ -246,45 +297,38 @@ export class UIViewController extends NSObject
             action.call(target);
             //this.view.setNeedsDisplay();
         }
-        else if (this._layerIsReady == true)
-        {
-            this.viewDidLoad();            
+        else if (this._layerIsReady == true) {
+            this.viewDidLoad();
             this._loadChildControllers();
             //this.view.setNeedsDisplay();
         }
     }
 
-    onLoadLayer(target, action){
-        if (this._layerIsReady == true)
-        {
+    onLoadLayer(target, action) {
+        if (this._layerIsReady == true) {
             action.call(target);
         }
-        else
-        {
+        else {
             this._onLoadLayerTarget = action;
-            this._onLoadLayerAction= target;
+            this._onLoadLayerAction = target;
         }
     }
 
-    get viewIsLoaded()
-    {
+    get viewIsLoaded() {
         return this._viewIsLoaded;
     }
 
-    get childViewControllers()
-    {
+    get childViewControllers() {
         return this._childViewControllers;
     }
 
-    addChildViewController(vc)
-    {
+    addChildViewController(vc) {
         vc.parentViewController = this;
         this._childViewControllers.push(vc);
         //vc.willMoveToParentViewController(this);
     }
 
-    removeChildViewController(vc)
-    {
+    removeChildViewController(vc) {
         var index = this._childViewControllers.indexOf(vc);
         if (index != -1) {
             this._childViewControllers.splice(index, 1);
@@ -300,32 +344,32 @@ export class UIViewController extends NSObject
     //     //this.didMoveToParentViewController(null);
     // }
 
-    private _presentationController:UIPresentationController = null;
-    get isPresented(){
+    private _presentationController: UIPresentationController = null;
+    get isPresented() {
         if (this._presentationController != null)
             return this._presentationController._isPresented;
     }
 
-    get presentationController():UIPresentationController {
+    get presentationController(): UIPresentationController {
         // if (this._presentationController == null && this.parentViewController != null)
         //     return this.parentViewController.presentationController;
 
         return this._presentationController;
-    }       
-    
-    private _popoverPresentationController:UIPopoverPresentationController = null;
-    get popoverPresentationController():UIPopoverPresentationController {
-        if (this._popoverPresentationController == null){
+    }
+
+    private _popoverPresentationController: UIPopoverPresentationController = null;
+    get popoverPresentationController(): UIPopoverPresentationController {
+        if (this._popoverPresentationController == null) {
             this._popoverPresentationController = new UIPopoverPresentationController();
             this._popoverPresentationController.init();
             this._popoverPresentationController.presentedViewController = this;
             this._presentationController = this._popoverPresentationController;
-        }        
-        
+        }
+
         return this._popoverPresentationController;
     }
 
-    showViewController(vc, animated){
+    showViewController(vc, animated) {
         vc.onLoadView(this, function () {
 
             this.view.addSubview(vc.view);
@@ -335,8 +379,8 @@ export class UIViewController extends NSObject
         });
     }
 
-    presentViewController(vc:UIViewController, animated:boolean){           
-        
+    presentViewController(vc: UIViewController, animated: boolean) {
+
         let pc = vc.presentationController as UIPresentationController;
         if (pc == null) {
             pc = new UIPresentationController();
@@ -345,19 +389,19 @@ export class UIViewController extends NSObject
             pc.presentingViewController = this;
             vc._presentationController = pc;
         }
-        
+
         if (pc.presentingViewController == null) {
             pc.presentingViewController = this;
         }
-        
-        if (pc._isPresented == true){
-            throw new Error("You try to present a view controller that is already presented"); 
+
+        if (pc._isPresented == true) {
+            throw new Error("You try to present a view controller that is already presented");
         }
-        
+
         // if (vc.modalPresentationStyle == UIModalPresentationStyle.CurrentContext){            
         //     vc.modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
         // }
-        
+
         // if (vc.modalPresentationStyle != UIModalPresentationStyle.FullScreen 
         //     && vc.modalPresentationStyle != UIModalPresentationStyle.FormSheet
         //     && vc.modalPresentationStyle != UIModalPresentationStyle.PageSheet
@@ -367,37 +411,36 @@ export class UIViewController extends NSObject
 
         vc.onLoadView(this, function () {
 
-            if (vc.modalPresentationStyle == UIModalPresentationStyle.CurrentContext){
+            if (vc.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
                 this.view.addSubview(vc.presentationController.presentedView);
                 this.addChildViewController(vc);
                 _MUIShowViewController(this, vc, null, animated, this, function () {
-                });    
+                });
             }
-            else{
+            else {
                 // It's a window instead of a view
-                let w:UIWindow = pc.window;
-                if (w == null)
-                {
+                let w: UIWindow = pc.window;
+                if (w == null) {
                     w = new UIWindow();
                     w.init();
                     w.layer.style.background = "";
                     w.rootViewController = vc;
                     w.addSubview(pc.presentedView);
-                    pc.window = w;                                        
+                    pc.window = w;
                 }
                 w.setHidden(false);
 
                 _MUIShowViewController(this, vc, null, animated, this, function () {
                     w.makeKey();
-                });    
+                });
             }
         });
     }
 
-    dismissViewController(animate){
+    dismissViewController(animate) {
         let pc = this._presentationController;
         let vc = this as UIViewController;
-        while(pc == null) {
+        while (pc == null) {
             vc = vc.parentViewController;
             pc = vc._presentationController;
         }
@@ -407,13 +450,13 @@ export class UIViewController extends NSObject
 
         _MUIHideViewController(fromVC, toVC, null, this, function () {
 
-            if (fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext){
+            if (fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
                 toVC.removeChildViewController(fromVC);
                 let pc1 = fromVC.presentationController;
                 let view = pc1.presentedView;
                 view.removeFromSuperview();
             }
-            else{
+            else {
                 // It's a window instead of a view
                 let pc1 = fromVC.presentationController;
                 let w = pc1.window as UIWindow;
@@ -421,87 +464,74 @@ export class UIViewController extends NSObject
             }
         });
     }
- 
-    transitionFromViewControllerToViewController(fromVC, toVC, duration, animationType, target?, completion?)
-    {
+
+    transitionFromViewControllerToViewController(fromVC, toVC, duration, animationType, target?, completion?) {
         //TODO
     }
 
-    viewDidLoad(){}
+    viewDidLoad() { }
 
-    viewWillAppear(animated?)
-    {
-        for (var index = 0; index < this._childViewControllers.length; index++)
-        {
+    viewWillAppear(animated?) {
+        for (var index = 0; index < this._childViewControllers.length; index++) {
             var vc = this._childViewControllers[index];
             vc.viewWillAppear(animated);
         }
-        
+
         this.view.setViewIsVisible(true);
     }
 
-    viewDidAppear(animated?)
-    {
+    viewDidAppear(animated?) {
         //this.view.setNeedsDisplay();
-        
-        for (var index = 0; index < this._childViewControllers.length; index++)
-        {
+
+        for (var index = 0; index < this._childViewControllers.length; index++) {
             var vc = this._childViewControllers[index];
             vc.viewDidAppear(animated);
         }
     }
 
-    viewWillDisappear(animated?)
-    {
-        for (var index = 0; index < this._childViewControllers.length; index++)
-        {
+    viewWillDisappear(animated?) {
+        for (var index = 0; index < this._childViewControllers.length; index++) {
             var vc = this._childViewControllers[index];
             vc.viewWillDisappear(animated);
         }
-        
+
         this.view.setViewIsVisible(false);
     }
 
-    viewDidDisappear(animated?)
-    {
-        for (var index = 0; index < this._childViewControllers.length; index++)
-        {
+    viewDidDisappear(animated?) {
+        for (var index = 0; index < this._childViewControllers.length; index++) {
             var vc = this._childViewControllers[index];
             vc.viewDidDisappear(animated);
         }
     }
 
-    contentHeight()
-    {
+    contentHeight() {
         return this.view.getHeight();
     }
 
-    setContentSize(size)
-    {
+    setContentSize(size) {
         this.willChangeValue("contentSize");
         this._contentSize = size;
         this.didChangeValue("contentSize");
     }
 
-    public set contentSize(size)
-    {
+    public set contentSize(size) {
         this.setContentSize(size);
     }
 
-    public get contentSize()
-    {
+    public get contentSize() {
         return this._contentSize;
     }
 
-    public set preferredContentSize(size){
+    public set preferredContentSize(size) {
         this.setPreferredContentSize(size);
     }
 
-    public get preferredContentSize(){
+    public get preferredContentSize() {
         return this._preferredContentSize;
     }
 
-    setPreferredContentSize(size){
+    setPreferredContentSize(size) {
         this.willChangeValue("preferredContentSize");
         this._preferredContentSize = size;
         this.didChangeValue("preferredContentSize");

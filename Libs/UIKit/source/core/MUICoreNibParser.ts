@@ -15,21 +15,17 @@ export function MUICoreBundleGetClassesByDestination(resource:string){
     return _MIOCoreBundleClassesByDestination[resource];
 }
 
-export function MUICoreBundleLoadNibName(owner, name:string, target:any, completion:any){
+export function MUICoreBundleLoadNibName(name:string, target:any, completion:any){
 
     let parser = new MUICoreNibParser();
     parser.target = target;
-    parser.completion = completion;               
-    parser.owner = owner;
+    parser.completion = completion;                   
 
     MIOCoreBundleGetContentsFromURLString(name, this, function(code, data){
         if (code == 200) parser.parseString(data);
         else throw new Error("MUICoreBundleLoadNibName: Couldn't download resource " + name);
     });    
 }
-
-
-declare function _injectIntoOptional(param:any);
 
 class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 {
@@ -54,54 +50,7 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         let items = domParser.parseFromString(this.result, "text/html");
         let layer = items.getElementById(this.layerID);
 
-        // Check outlets
-        if (layer.childNodes.length > 0) {
-            for (let index = 0; index < layer.childNodes.length; index++) {
-                let subLayer = layer.childNodes[index] as HTMLElement;
-
-                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
-
-                if (subLayer.getAttribute("data-connections") == "true") {
-                    for (let index2 = 0; index2 < subLayer.childNodes.length; index2 ++){
-                        let d = subLayer.childNodes[index2] as HTMLElement;
-                        if (d.tagName != "DIV") continue;
-
-                        let type = d.getAttribute("data-connection-type");
-                        
-                        if (type == "outlet") {
-                            let prop = d.getAttribute("data-property");
-                            let outlet = d.getAttribute("data-outlet");
-
-                            this.connectOutlet(prop, outlet);
-                        }
-                        else if (type == "segue") {
-                            let destination = d.getAttribute("data-segue-destination");  
-                            let kind = d.getAttribute("data-segue-kind");                          
-                            let relationship = d.getAttribute("data-segue-relationship");
-
-                            this.addSegue(destination, kind, relationship);
-                        }
-                    }
-                }                
-            }
-        }
-        
         this.completion.call(this.target, layer);
-    }
-
-    private connectOutlet(property, outletID){
-        console.log("prop: " + property + " - outluet: " + outletID);
-
-        let obj = this.owner._outlets[outletID];
-        this.owner[property] = _injectIntoOptional(obj);
-    }
-
-    private addSegue(destination:string, kind:string, relationship?:string) {        
-        let s = {};
-        s["Destination"] = destination;
-        s["Kind"] = kind;
-        if (relationship != null) s["Relationship"] = relationship;
-        this.owner._segues.push(s);
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){
