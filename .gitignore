@@ -48,3 +48,5 @@ DerivedData/
 node_modules
 .node_modules
 package-lock.json
+.vscode/launch.json
+packages/
