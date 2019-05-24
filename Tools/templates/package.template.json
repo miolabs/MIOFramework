@@ -20,6 +20,7 @@
 	},
 	"homepage": "https://github.com/miolabs/MIOFramework#readme",
 	"devDependencies": {
+	  "animate.css": "^3.7.0",
 	  "decimal.js": "^10.2.0",
 	  "file-system": "^2.2.2",
 	  "gulp": "^4.0.2",
