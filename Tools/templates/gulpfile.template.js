@@ -67,7 +67,7 @@ function copyResources(done) {
 	fs.copyFileSync("./.build/app.js", DEST + "scripts/app.js");
 	fs.copyFileSync(SRC + "app.css", DEST + "styles/app.css");
 	//temporary
-	fs.copyFileSync("../../Tools/temp/lib.js", DEST + "libs/lib.js");
+	fs.copyFileSync("../../Tools/temp/lib.js", DEST + "libs/swiftlib/lib.js");
 	fs.copyFileSync("../../Tools/temp/app.js", DEST + "scripts/app.js");
 
 	//FOUNDATION WEB
