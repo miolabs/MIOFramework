@@ -8,7 +8,6 @@ import { MIOCoreAddLanguage } from "mio-foundation-web";
 import { MIOCoreGetPlatformLanguage } from "mio-foundation-web";
 import { MIOCoreStringSetLocalizedStrings } from "mio-foundation-web";
 import { UIWindow } from "./UIWindow";
-import { UIViewController } from "./UIViewController";
 import { MUICoreEvent } from "./core/MUICoreEvents"
 import { MUICoreEventInput } from "./core/MUICoreEvents"
 import { UIStoryboard } from "./UIStoryboard"

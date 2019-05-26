@@ -1,4 +1,5 @@
-import { UILayerGetFirstElementWithTag, UIView } from "./UIView";
+import { UIView } from "./UIView";
+import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
 
 /**
  * Created by godshadow on 12/3/16.
@@ -15,7 +16,7 @@ export class UIImageView extends UIView
 
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
-        this._imageLayer = UILayerGetFirstElementWithTag(this.layer, "IMG");
+        this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "IMG");
         this.setupLayers();
     }
 

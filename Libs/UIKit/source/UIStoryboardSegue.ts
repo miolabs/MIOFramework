@@ -21,7 +21,12 @@ export class UIStoryboardSegue extends NSObject
         this.performHandler = performHandler;
     }
 
+    _sender = null;
     perform(){
-        
+        let canPerfom = this.source.shouldPerformSegueWithIdentifier(this.identifier, this._sender);
+        if (canPerfom == false) return;
+
+        this.source.prepareForSegue(this, this._sender);
+        if (this.performHandler != null) this.performHandler.call(this.source);
     }
 }

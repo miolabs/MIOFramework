@@ -38,7 +38,7 @@ export * from './UINavigationItem'
 export * from './UINavigationController'
 
 
-export * from './UISplitViewController'
+//export * from './UISplitViewController'
 
 export * from './core/MUICore'
 

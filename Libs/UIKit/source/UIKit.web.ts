@@ -944,6 +944,8 @@ export class UIPanGestureRecognizer extends UIGestureRecognizer
 
 
 
+
+
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -960,8 +962,6 @@ function MUICoreViewSearchViewTag(view, tag) {
 
     return null;
 }
-
-declare function _injectIntoOptional(param:any);
 
 export class UIView extends NSObject {
     layerID = null;
@@ -1052,54 +1052,7 @@ export class UIView extends NSObject {
             }
         }
 
-        // Check outlets and segues
-        if (layer.childNodes.length > 0) {
-            for (let index = 0; index < layer.childNodes.length; index++) {
-                let subLayer = layer.childNodes[index] as HTMLElement;
-
-                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
-
-                if (subLayer.getAttribute("data-connections") == "true") {
-                    for (let index2 = 0; index2 < subLayer.childNodes.length; index2++) {
-                        let d = subLayer.childNodes[index2] as HTMLElement;
-                        if (d.tagName != "DIV") continue;
-
-                        let type = d.getAttribute("data-connection-type");
-
-                        if (type == "outlet") {
-                            let prop = d.getAttribute("data-property");
-                            let outlet = d.getAttribute("data-outlet");
-
-                            this.connectOutlet(prop, outlet);
-                        }
-                        else if (type == "segue") {
-                            let destination = d.getAttribute("data-segue-destination");
-                            let kind = d.getAttribute("data-segue-kind");
-                            let relationship = d.getAttribute("data-segue-relationship");
-
-                            this.addSegue(destination, kind, relationship);
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-    private connectOutlet(property, outletID){
-        console.log("prop: " + property + " - outluet: " + outletID);
-
-        let obj = this._outlets[outletID];
-        this[property] = _injectIntoOptional(obj);
-    }
-
-    
-    private addSegue(destination:string, kind:string, relationship?:string) {        
-        let s = {};
-        s["Destination"] = destination;
-        s["Kind"] = kind;
-        if (relationship != null) s["Relationship"] = relationship;
-        this._segues.push(s);
+        MUICoreStoryboardParseLayer(layer, this);
     }
 
     copy() {
@@ -1694,17 +1647,106 @@ export class UILabel extends UIView
 
 
 
+
+
+
 /**
  * Created by godshadow on 12/3/16.
  */
 
+ export enum UIControlEvents
+ {
+     TouchDown = 1 <<  0,
+     TouchDownRepeat = 1 <<  1,
+     TouchDragInside = 1 <<  2,
+     TouchDragOutside = 1 <<  3,
+     TouchDragEnter = 1 <<  4,
+     TouchDragExit = 1 <<  5,
+     TouchUpInside = 1 <<  6,
+     TouchUpOutside = 1 <<  7,
+     TouchCancel = 1 <<  8,
+     ValueChanged = 1 << 12,
+     PrimaryActionTriggered = 1 << 13,
+     EditingDidBegin = 1 << 16,
+     EditingChanged = 1 << 17,
+     EditingDidEnd = 1 << 18,
+     EditingDidEndOnExit = 1 << 19,
+     AllTouchEvents = 0x00000FFF,
+     EditingEvents = 0x000F0000,
+     ApplicationReserved = 0x0F000000,
+     SystemReserved = 0xF0000000,
+     AllEvents = 0xFFFFFFFF
+ }
+
 export class UIControl extends UIView
 {
-    // TODO: Make delegation of the methods above
-    mouseOverTarget = null;
-    mouseOverAction = null;
-    mouseOutTarget = null;
-    mouseOutAction = null;
+
+    initWithLayer(layer, owner, options?){
+        super.initWithLayer(layer, owner, options);
+    
+        // Check for actions
+        if (this.layer.childNodes.length > 0) {
+            for (let index = 0; index < this.layer.childNodes.length; index++) {
+                let subLayer = this.layer.childNodes[index];
+
+                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+
+                let actionSelector = subLayer.getAttribute("data-action-selector");
+                if (actionSelector != null) {                    
+                    this.addTarget(this, function(){
+                        owner[actionSelector](this);
+                    }, UIControlEvents.AllEvents);
+                    break;                    
+                }
+            }
+        }
+    }
+
+    private actionSegue = null;
+    _checkSegues() {
+        super._checkSegues();
+
+        for (let index = 0; index < this._segues.length; index++) {
+
+            let s = this._segues[index];
+            let kind = s["Kind"];
+            
+            if (kind == "show") {
+                if ((this.owner instanceof UIViewController) == false) continue;
+                
+                this.actionSegue = {};
+                this.actionSegue["VC"] = this.owner;
+                this.actionSegue["Destination"] = s["Destination"];
+                let identifier = s["Identifier"];
+                if (identifier != null) this.actionSegue["Identifier"] = identifier;
+                
+                this.addTarget(this, function(){
+
+                    let fromVC = this.actionSegue["VC"] as UIViewController;
+                    let destination = this.actionSegue["Destination"];                    
+                    let identifier = this.actionSegue["Identifier"];
+
+                    let toVC = fromVC.storyboard._instantiateViewControllerWithDestination(destination);
+
+                    let segue = new UIStoryboardSegue();                
+                    segue.initWithIdentifierAndPerformHandler(identifier, fromVC, toVC, function(){
+                        fromVC.navigationController.pushViewController(toVC);
+                    });           
+                    
+                    segue._sender = this;
+                    segue.perform();
+
+                }, UIControlEvents.AllEvents);                
+            }    
+        }        
+    }
+
+    target = null;
+    action = null;
+    addTarget(target, action, controlEvents:UIControlEvents){
+        this.target = target;
+        this.action = action;
+    }
 
     private _enabled = true;
     get enabled(){return this._enabled;}
@@ -1712,15 +1754,43 @@ export class UIControl extends UIView
 
     setEnabled(enabled:boolean){
         this._enabled = enabled;
-
         if (enabled == true)
             this.layer.style.opacity = "1.0";
         else
             this.layer.style.opacity = "0.10";
     }
 
-    setOnMouseOverAction(target, action)
-    {
+    private _selected = false;
+    set selected(value){
+        this.setSelected(value);
+    }
+
+    get selected(){
+        return this._selected;
+    }
+    
+    setSelected(value){
+        if (this._selected == value)
+            return;
+
+        this.willChangeValue("selected");
+        if (value == true) {
+            MUICoreLayerAddStyle(this.layer, "selected");
+        }
+        else {            
+            MUICoreLayerRemoveStyle(this.layer, "selected");
+        }
+        this._selected = value;
+        this.didChangeValue("selected");
+    }
+
+     // TODO: Make delegation of the methods above
+     mouseOverTarget = null;
+     mouseOverAction = null;
+     mouseOutTarget = null;
+     mouseOutAction = null;
+ 
+    setOnMouseOverAction(target, action){
          this.mouseOverTarget = target;
          this.mouseOverAction = action;
          var instance = this;
@@ -1732,8 +1802,7 @@ export class UIControl extends UIView
          }
     }
 
-    setOnMouseOutAction(target, action)
-    {
+    setOnMouseOutAction(target, action){
          this.mouseOutTarget = target;
          this.mouseOutAction = action;
          var instance = this;
@@ -1776,11 +1845,7 @@ export class UIButton extends UIControl
 
     private _imageStatusStyle = null;
     private _imageLayer = null;
-
-    target = null;
-    action = null;
-
-    private _selected = false;
+    
     type = UIButtonType.MomentaryPushIn;
 
     init(){
@@ -1812,25 +1877,6 @@ export class UIButton extends UIControl
         let status = this.layer.getAttribute("data-status");
         if (status == "selected")
             this.setSelected(true);
-
-        // Check for actions
-        if (this.layer.childNodes.length > 0) {
-            for (let index = 0; index < this.layer.childNodes.length; index++) {
-                let subLayer = this.layer.childNodes[index];
-
-                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
-
-                let actionSelector = subLayer.getAttribute("data-action-selector");
-                if (actionSelector != null) {                    
-                    this.setAction(this, function(){
-                        owner[actionSelector](this);
-                        // let action = owner[actionSelector];
-                        // action.call(owner);
-                    });
-                    break;                    
-                }
-            }
-        }
 
         this.setupLayers();
     }
@@ -1880,46 +1926,6 @@ export class UIButton extends UIControl
         }.bind(this));
     }
 
-    _checkSegues() {
-        super._checkSegues();
-
-        for (let index = 0; index < this._segues.length; index++) {
-
-            let s = this._segues[index];
-            let kind = s["Kind"];
-            
-            if (kind == "show") {
-                let destination = s["Destination"];                
-                let classname = MUICoreBundleGetClassesByDestination(destination);
-                let path = "layout/" + destination + ".html";    
-
-                if (this.owner != null && this.owner instanceof UIViewController) {
-                    this.setAction(this, function(){
-                        let vc = NSClassFromString(classname) as UIViewController;
-                        vc.initWithResource(path);   
-        
-                        this.owner.navigationController.pushViewController(vc);
-                    });
-                }
-
-                
-                
-                
-            }    
-        }
-    }
-
-
-    initWithAction(target, action){
-        this.init();
-        this.setAction(target, action);
-    }
-
-    setAction(target, action){
-        this.target = target;
-        this.action = action;
-    }
-
     setTitle(title){
         this._titleLayer.innerHTML = title;
     }
@@ -1930,30 +1936,6 @@ export class UIButton extends UIControl
 
     get title(){
         return this._titleLayer.innerHTML;
-    }
-
-    set selected(value){
-        this.setSelected(value);
-    }
-
-    get selected(){
-        return this._selected;
-    }
-    
-    setSelected(value){
-        if (this._selected == value)
-            return;
-
-        if (value == true) {
-            MUICoreLayerAddStyle(this.layer, "selected");
-            //UICoreLayerRemoveStyle(this.layer, "deselected");
-        }
-        else {
-            //UICoreLayerAddStyle(this.layer, "deselected");
-            MUICoreLayerRemoveStyle(this.layer, "selected");
-        }
-
-        this._selected = value;
     }
 
     setImageURL(urlString:string){
@@ -2308,9 +2290,6 @@ export class UISegmentedControl extends UIControl
 
 export class UISwitch extends UIControl
 {
-    target = null;
-    action = null;    
-
     private _inputLayer = null;
     private _labelLayer = null;
 
@@ -2328,23 +2307,6 @@ export class UISwitch extends UIControl
             layer.appendChild(this._inputLayer);
         }       
 
-        // var div1 = document.createElement("div");
-        // this.layer.appendChild(div1);
-
-        // var div2 = document.createElement("div");
-        // div1.appendChild(div2); 
-
-/*
-        this._labelLayer = UILayerGetFirstElementWithTag(this.layer, "LABEL");
-        if (this._labelLayer == null) {
-            this._labelLayer = document.createElement("label");
-            this._labelLayer.setAttribute("for", this.layerID + "_input");
-            //this._labelLayer.classList.add("switch_button_label");
-            layer.appendChild(this._labelLayer);
-        }
-
-        */
-
         var instance = this;
         this.layer.onclick = function() {
 
@@ -2361,21 +2323,22 @@ export class UISwitch extends UIControl
 
 
     private _on = false;
-    get on() {return this._on;}
-    set on(value){this.setOn(value);}
-    setOn(on){
-        if (on == this.on) return;
-        this._inputLayer.checked = on;
-        this._on = on;
+    get isOn() {return this._on;}
+    set isOn(value){this.setOn(value);}
+    setOn(value){
+        if (value == this._on) return;
+        this._inputLayer.checked = value;
+        this._on = value;
     }
 
     private _toggleValue(){
-        this.on = !this.on;
+        this.isOn = !this.isOn;
 
         if (this.target != null && this.action != null)
-            this.action.call(this.target, this, this.on);
+            this.action.call(this.target, this, this.isOn);
     }
 }
+
 
 
 
@@ -2442,14 +2405,6 @@ export class UIViewController extends NSObject {
     protected _contentSize = new NSSize(320, 200);
     protected _preferredContentSize = null;
 
-    storyboard:UIStoryboard = null;
-    _outlets = {};
-    _segues = [];
-
-    _checkSegues() {
-
-    }
-
     constructor(layerID?) {
         super();
         this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(this);
@@ -2477,56 +2432,6 @@ export class UIViewController extends NSObject {
         //this.navigationItem = UINavItemSearchInLayer(layer);        
 
         this.loadView();
-    }
-
-    private _parseConnections(layer){
-        // Check outlets and segues
-        if (layer.childNodes.length > 0) {
-            for (let index = 0; index < layer.childNodes.length; index++) {
-                let subLayer = layer.childNodes[index] as HTMLElement;
-
-                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
-
-                if (subLayer.getAttribute("data-connections") == "true") {
-                    for (let index2 = 0; index2 < subLayer.childNodes.length; index2++) {
-                        let d = subLayer.childNodes[index2] as HTMLElement;
-                        if (d.tagName != "DIV") continue;
-
-                        let type = d.getAttribute("data-connection-type");
-
-                        if (type == "outlet") {
-                            let prop = d.getAttribute("data-property");
-                            let outlet = d.getAttribute("data-outlet");
-
-                            this.connectOutlet(prop, outlet);
-                        }
-                        else if (type == "segue") {
-                            let destination = d.getAttribute("data-segue-destination");
-                            let kind = d.getAttribute("data-segue-kind");
-                            let relationship = d.getAttribute("data-segue-relationship");
-
-                            this.addSegue(destination, kind, relationship);
-                        }
-                    }
-                }
-            }
-        }
-    }    
-
-    private connectOutlet(property, outletID) {
-        console.log("prop: " + property + " - outluet: " + outletID);
-
-        let obj = this._outlets[outletID];
-        this[property] = _injectIntoOptional(obj);
-    }
-
-
-    private addSegue(destination: string, kind: string, relationship?: string) {
-        let s = {};
-        s["Destination"] = destination;
-        s["Kind"] = kind;
-        if (relationship != null) s["Relationship"] = relationship;
-        this._segues.push(s);
     }
 
     initWithResource(path) {
@@ -2575,7 +2480,7 @@ export class UIViewController extends NSObject {
             return;
         }
 
-        MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (layer) {
+        MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (this: UIViewController, layer) {
             this.view.initWithLayer(layer, this);
             this.view.awakeFromHTML();
             this.view._checkSegues();
@@ -2620,7 +2525,7 @@ export class UIViewController extends NSObject {
     _didLoadView() {
         this._layerIsReady = true;
         if (MIOCoreIsPhone() == true) MUICoreLayerAddStyle(this.view.layer, "phone");
-        this._parseConnections(this.view.layer);        
+        MUICoreStoryboardParseLayer(this.view.layer, this);
         this._checkSegues();
 
         if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null) {
@@ -2918,6 +2823,27 @@ export class UIViewController extends NSObject {
         this.willChangeValue("preferredContentSize");
         this._preferredContentSize = size;
         this.didChangeValue("preferredContentSize");
+    }
+
+    // Storyboard
+    storyboard:UIStoryboard = null;
+    _outlets = {};
+    _segues = [];
+
+    _checkSegues() {
+
+    }
+
+    shouldPerformSegueWithIdentifier(identifier:string, sender:any):Boolean{
+        return true;
+    }
+
+    prepareForSegue(segue:UIStoryboardSegue, sender:any){
+
+    }
+
+    performSegueWithIdentifier(identifier:string, sender:any){
+
     }
 }
 
@@ -3574,6 +3500,7 @@ export function UINavItemSearchInLayer(layer)
 
 
 
+
 /**
  * Created by godshadow on 9/4/16.
  */
@@ -3647,9 +3574,9 @@ export class UINavigationController extends UIViewController
         vc.onLoadView(this, function () {
 
             if (vc.navigationItem != null && vc.navigationItem.backBarButtonItem != null) {
-                vc.navigationItem.backBarButtonItem.setAction(this, function(){
+                vc.navigationItem.backBarButtonItem.addTarget(this, function(){
                     vc.navigationController.popViewController();
-                });
+                }, UIControlEvents.AllTouchEvents);
             }
 
             this.view.addSubview(vc.view);
@@ -3867,8 +3794,8 @@ export class UISplitViewController extends UIViewController
     get displayModeButtonItem():UIButton {
         if (this._displayModeButtonItem != null) return this._displayModeButtonItem;
 
-        this._displayModeButtonItem = new UIButton();
-        this._displayModeButtonItem.initWithAction(this, this.displayModeButtonItemAction);        
+        // this._displayModeButtonItem = new UIButton();
+        // this._displayModeButtonItem.initWithAction(this, this.displayModeButtonItemAction);        
 
         return this._displayModeButtonItem;
     }
@@ -4432,6 +4359,61 @@ export class UIStoryboard extends NSObject
     }
 }
 
+export function MUICoreStoryboardParseLayer(layer, owner){
+    
+    // Check outlets and segues
+    if (layer.childNodes.length > 0) {
+        for (let index = 0; index < layer.childNodes.length; index++) {
+            let subLayer = layer.childNodes[index] as HTMLElement;
+
+            if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+
+            if (subLayer.getAttribute("data-connections") == "true") {
+                for (let index2 = 0; index2 < subLayer.childNodes.length; index2++) {
+                    let d = subLayer.childNodes[index2] as HTMLElement;
+                    if (d.tagName != "DIV") continue;
+
+                    let type = d.getAttribute("data-connection-type");
+
+                    if (type == "outlet") {
+                        let prop = d.getAttribute("data-property");
+                        let outlet = d.getAttribute("data-outlet");
+
+                        MUICoreStoryboardConnectOutlet(owner, prop, outlet);
+                    }
+                    else if (type == "segue") {
+                        let destination = d.getAttribute("data-segue-destination");
+                        let kind = d.getAttribute("data-segue-kind");
+                        let relationship = d.getAttribute("data-segue-relationship");
+                        let identifier = d.getAttribute("data-segue-identifier");
+
+                        MUICoreStoryboardAddSegue(owner, destination, kind, relationship, identifier);
+                    }
+                }
+            }
+        }
+    }
+}
+
+declare function _injectIntoOptional(value:any);
+
+export function MUICoreStoryboardConnectOutlet(owner, property, outletID){
+    console.log("prop: " + property + " - outluet: " + outletID);
+
+    let obj = this._outlets[outletID];
+    owner[property] = _injectIntoOptional(obj);
+}
+
+
+export function MUICoreStoryboardAddSegue(owner, destination:string, kind:string, relationship:string, identifier:string) {        
+    let s = {};
+    s["Destination"] = destination;
+    s["Kind"] = kind;
+    if (identifier != null) s["Identifier"] = identifier;
+    if (relationship != null) s["Relationship"] = relationship;
+    owner._segues.push(s);
+}
+
 
 
 export class UIStoryboardSegue extends NSObject
@@ -4454,28 +4436,31 @@ export class UIStoryboardSegue extends NSObject
         this.performHandler = performHandler;
     }
 
+    _sender = null;
     perform(){
-        
+        let canPerfom = this.source.shouldPerformSegueWithIdentifier(this.identifier, this._sender);
+        if (canPerfom == false) return;
+
+        this.source.prepareForSegue(this, this._sender);
+        if (this.performHandler != null) this.performHandler.call(this.source);
     }
 }
 
 
 
-<<<<<<< HEAD
 export class UIResponder extends NSObject
 {
 
 }
-=======
+
+
+
 export class UIApplicationDelegate {
 
-  window: UIWindow
+  window: UIWindow;
+  applicationDidFinishLaunchingWithOptions(){};
 }
 
-
-
-
->>>>>>> 54873833ef39bec43082b7d21e411b996fadf252
 
 
 

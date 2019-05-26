@@ -51,8 +51,8 @@ export class UISplitViewController extends UIViewController
     get displayModeButtonItem():UIButton {
         if (this._displayModeButtonItem != null) return this._displayModeButtonItem;
 
-        this._displayModeButtonItem = new UIButton();
-        this._displayModeButtonItem.initWithAction(this, this.displayModeButtonItemAction);        
+        // this._displayModeButtonItem = new UIButton();
+        // this._displayModeButtonItem.initWithAction(this, this.displayModeButtonItemAction);        
 
         return this._displayModeButtonItem;
     }

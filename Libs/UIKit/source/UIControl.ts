@@ -1,16 +1,105 @@
 import { UIView } from "./UIView";
+import { UIViewController } from "./UIViewController";
+import { UIStoryboardSegue } from "./UIStoryboardSegue";
+import { UIStoryboard } from "./UIStoryboard";
 
 /**
  * Created by godshadow on 12/3/16.
  */
 
+ export enum UIControlEvents
+ {
+     TouchDown = 1 <<  0,
+     TouchDownRepeat = 1 <<  1,
+     TouchDragInside = 1 <<  2,
+     TouchDragOutside = 1 <<  3,
+     TouchDragEnter = 1 <<  4,
+     TouchDragExit = 1 <<  5,
+     TouchUpInside = 1 <<  6,
+     TouchUpOutside = 1 <<  7,
+     TouchCancel = 1 <<  8,
+     ValueChanged = 1 << 12,
+     PrimaryActionTriggered = 1 << 13,
+     EditingDidBegin = 1 << 16,
+     EditingChanged = 1 << 17,
+     EditingDidEnd = 1 << 18,
+     EditingDidEndOnExit = 1 << 19,
+     AllTouchEvents = 0x00000FFF,
+     EditingEvents = 0x000F0000,
+     ApplicationReserved = 0x0F000000,
+     SystemReserved = 0xF0000000,
+     AllEvents = 0xFFFFFFFF
+ }
+
 export class UIControl extends UIView
 {
-    // TODO: Make delegation of the methods above
-    mouseOverTarget = null;
-    mouseOverAction = null;
-    mouseOutTarget = null;
-    mouseOutAction = null;
+
+    initWithLayer(layer, owner, options?){
+        super.initWithLayer(layer, owner, options);
+    
+        // Check for actions
+        if (this.layer.childNodes.length > 0) {
+            for (let index = 0; index < this.layer.childNodes.length; index++) {
+                let subLayer = this.layer.childNodes[index];
+
+                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+
+                let actionSelector = subLayer.getAttribute("data-action-selector");
+                if (actionSelector != null) {                    
+                    this.addTarget(this, function(){
+                        owner[actionSelector](this);
+                    }, UIControlEvents.AllEvents);
+                    break;                    
+                }
+            }
+        }
+    }
+
+    private actionSegue = null;
+    _checkSegues() {
+        super._checkSegues();
+
+        for (let index = 0; index < this._segues.length; index++) {
+
+            let s = this._segues[index];
+            let kind = s["Kind"];
+            
+            if (kind == "show") {
+                if ((this.owner instanceof UIViewController) == false) continue;
+                
+                this.actionSegue = {};
+                this.actionSegue["VC"] = this.owner;
+                this.actionSegue["Destination"] = s["Destination"];
+                let identifier = s["Identifier"];
+                if (identifier != null) this.actionSegue["Identifier"] = identifier;
+                
+                this.addTarget(this, function(){
+
+                    let fromVC = this.actionSegue["VC"] as UIViewController;
+                    let destination = this.actionSegue["Destination"];                    
+                    let identifier = this.actionSegue["Identifier"];
+
+                    let toVC = fromVC.storyboard._instantiateViewControllerWithDestination(destination);
+
+                    let segue = new UIStoryboardSegue();                
+                    segue.initWithIdentifierAndPerformHandler(identifier, fromVC, toVC, function(){
+                        fromVC.navigationController.pushViewController(toVC);
+                    });           
+                    
+                    segue._sender = this;
+                    segue.perform();
+
+                }, UIControlEvents.AllEvents);                
+            }    
+        }        
+    }
+
+    target = null;
+    action = null;
+    addTarget(target, action, controlEvents:UIControlEvents){
+        this.target = target;
+        this.action = action;
+    }
 
     private _enabled = true;
     get enabled(){return this._enabled;}
@@ -18,15 +107,43 @@ export class UIControl extends UIView
 
     setEnabled(enabled:boolean){
         this._enabled = enabled;
-
         if (enabled == true)
             this.layer.style.opacity = "1.0";
         else
             this.layer.style.opacity = "0.10";
     }
 
-    setOnMouseOverAction(target, action)
-    {
+    private _selected = false;
+    set selected(value){
+        this.setSelected(value);
+    }
+
+    get selected(){
+        return this._selected;
+    }
+    
+    setSelected(value){
+        if (this._selected == value)
+            return;
+
+        this.willChangeValue("selected");
+        if (value == true) {
+            MUICoreLayerAddStyle(this.layer, "selected");
+        }
+        else {            
+            MUICoreLayerRemoveStyle(this.layer, "selected");
+        }
+        this._selected = value;
+        this.didChangeValue("selected");
+    }
+
+     // TODO: Make delegation of the methods above
+     mouseOverTarget = null;
+     mouseOverAction = null;
+     mouseOutTarget = null;
+     mouseOutAction = null;
+ 
+    setOnMouseOverAction(target, action){
          this.mouseOverTarget = target;
          this.mouseOverAction = action;
          var instance = this;
@@ -38,8 +155,7 @@ export class UIControl extends UIView
          }
     }
 
-    setOnMouseOutAction(target, action)
-    {
+    setOnMouseOutAction(target, action){
          this.mouseOutTarget = target;
          this.mouseOutAction = action;
          var instance = this;

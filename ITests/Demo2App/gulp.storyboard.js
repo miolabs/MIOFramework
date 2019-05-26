@@ -169,13 +169,14 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "segue"){
 		let segues = currentElement["Segues"];
-		
-		let id = attributes["id"];
+				
 		let destination = attributes["destination"];
 		let kind = attributes["kind"];
 		let relationship = attributes["relationship"];		
+		let identifier = attributes["identifier"];
 						
 		let segue = {"Destination" : destination, "Kind" : kind };
+		if (identifier != null) segue["Identifier"] = identifier;
 		if (relationship != null) segue["Relationship"] = relationship;
 
 		segues.push(segue);
@@ -307,6 +308,7 @@ function popElement(){
 		content += '<div class="hidden" data-connection-type="segue"';
 		content += ' data-segue-destination="' + item["Destination"] + '"';
 		content += ' data-segue-kind="' + item["Kind"] + '"';
+		if (item["Identifier"] != null) content += ' data-segue-identifier="' + item["Identifier"] + '"';
 		if (item["Relationship"] != null) content += ' data-segue-relationship="' + item["Relationship"] + '"';
 		content += '></div>';
 	}

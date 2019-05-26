@@ -7,6 +7,7 @@ import { MUIAnimationType } from "./core/MUICoreAnimation";
 import { NSClassFromString } from "mio-foundation-web";
 import { UIView } from "./UIView";
 import { MUICoreBundleGetClassesByDestination } from "./core/MUICoreNibParser";
+import { UIControlEvents } from "./UIControl";
 
 /**
  * Created by godshadow on 9/4/16.
@@ -81,9 +82,9 @@ export class UINavigationController extends UIViewController
         vc.onLoadView(this, function () {
 
             if (vc.navigationItem != null && vc.navigationItem.backBarButtonItem != null) {
-                vc.navigationItem.backBarButtonItem.setAction(this, function(){
+                vc.navigationItem.backBarButtonItem.addTarget(this, function(){
                     vc.navigationController.popViewController();
-                });
+                }, UIControlEvents.AllTouchEvents);
             }
 
             this.view.addSubview(vc.view);

@@ -7,9 +7,6 @@ import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
 
 export class UISwitch extends UIControl
 {
-    target = null;
-    action = null;    
-
     private _inputLayer = null;
     private _labelLayer = null;
 
@@ -26,23 +23,6 @@ export class UISwitch extends UIControl
             this._inputLayer.classList.add("switch_button_input");
             layer.appendChild(this._inputLayer);
         }       
-
-        // var div1 = document.createElement("div");
-        // this.layer.appendChild(div1);
-
-        // var div2 = document.createElement("div");
-        // div1.appendChild(div2); 
-
-/*
-        this._labelLayer = UILayerGetFirstElementWithTag(this.layer, "LABEL");
-        if (this._labelLayer == null) {
-            this._labelLayer = document.createElement("label");
-            this._labelLayer.setAttribute("for", this.layerID + "_input");
-            //this._labelLayer.classList.add("switch_button_label");
-            layer.appendChild(this._labelLayer);
-        }
-
-        */
 
         var instance = this;
         this.layer.onclick = function() {
