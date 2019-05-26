@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-web-prod": "gulp UIBuildWeb ; tsc ; gulp UICleanWebJsFile ; gulp UIMinifyWebProd ; gulp UIBuildWebPackage ; gulp UIRemoveTempFolders",
-    "build-web-dev": "gulp UIBuildWeb ; tsc ; gulp UICleanWebJsFile ; gulp UIBuildWebPackage ; gulp UIRemoveTempFolders"
+    "build-web-dev": "gulp UIBuildWeb ; tsc ; gulp UICleanWebJsFile ; gulp UIBuildWebPackage ; gulp UIRemoveTempFolders",
+    "build-web-dev-transpiler": "gulp UIBuildWeb --transpiler ; ts-node  --disableWarnings ../../MIOSwiftTranspiler/include/build-bodies/refactor-miojslibs.ts ; gulp UICleanWebJsFile --transpiler ; gulp UIBuildWebPackage --transpiler ; gulp UIRemoveTempFolders --transpiler"
   },
   "author": "MIOLabs Team",
   "license": "Apache-2.0",
@@ -16,6 +17,7 @@
     "gulp-concat": "^2.6.1",
     "gulp-uglify": "^3.0.2",
     "readable-stream": "^3.3.0",
-    "rimraf": "^2.6.3"
+    "rimraf": "^2.6.3",
+    "yargs": "^13.2.4"
   }
 }

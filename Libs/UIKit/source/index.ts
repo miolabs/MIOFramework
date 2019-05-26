@@ -48,4 +48,5 @@ export * from './UIStoryboard'
 export * from './UIStoryboardSegue'
 
 export * from './UIResponder'
+export * from './UIApplicationDelegate'
 export * from './UIApplication'

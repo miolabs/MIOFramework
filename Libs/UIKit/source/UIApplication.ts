@@ -12,6 +12,8 @@ import { UIViewController } from "./UIViewController";
 import { MUICoreEvent } from "./core/MUICoreEvents"
 import { MUICoreEventInput } from "./core/MUICoreEvents"
 import { UIStoryboard } from "./UIStoryboard"
+import { UIApplicationDelegate } from "./UIApplicationDelegate";
+
 
 /**
  * Created by godshadow on 11/3/16.
@@ -37,7 +39,7 @@ export class UIApplication {
         }
     }
 
-    delegate = null;
+    delegate: UIApplicationDelegate = null;
 
     isMobile = false;
     defaultLanguage = null;
@@ -149,7 +151,7 @@ export class UIApplication {
     private _launchApp(){
         this.delegate.window.makeKeyAndVisible();
 
-        this.delegate.window.rootViewController.onLoadView(this, function () {
+        this.delegate.window.rootViewController.onLoadView(this, function (this: UIApplication) {
             
             this.delegate.window.rootViewController.viewWillAppear(false);
             this.delegate.window.rootViewController.viewDidAppear(false);

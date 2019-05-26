@@ -4304,7 +4304,7 @@ export class UIWindow extends UIView
         MUICoreLayerAddStyle(this.layer, "view");
     }
 
-    initWithRootViewController(vc){
+    initWithRootViewController(vc: UIViewController){
         this.init();        
 
         this.rootViewController = vc;
@@ -4461,10 +4461,21 @@ export class UIStoryboardSegue extends NSObject
 
 
 
+<<<<<<< HEAD
 export class UIResponder extends NSObject
 {
 
 }
+=======
+export class UIApplicationDelegate {
+
+  window: UIWindow
+}
+
+
+
+
+>>>>>>> 54873833ef39bec43082b7d21e411b996fadf252
 
 
 
@@ -4504,7 +4515,7 @@ export class UIApplication {
         }
     }
 
-    delegate = null;
+    delegate: UIApplicationDelegate = null;
 
     isMobile = false;
     defaultLanguage = null;
@@ -4616,7 +4627,7 @@ export class UIApplication {
     private _launchApp(){
         this.delegate.window.makeKeyAndVisible();
 
-        this.delegate.window.rootViewController.onLoadView(this, function () {
+        this.delegate.window.rootViewController.onLoadView(this, function (this: UIApplication) {
             
             this.delegate.window.rootViewController.viewWillAppear(false);
             this.delegate.window.rootViewController.viewDidAppear(false);

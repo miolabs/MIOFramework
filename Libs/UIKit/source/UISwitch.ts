@@ -60,18 +60,18 @@ export class UISwitch extends UIControl
 
 
     private _on = false;
-    get on() {return this._on;}
-    set on(value){this.setOn(value);}
-    setOn(on){
-        if (on == this.on) return;
-        this._inputLayer.checked = on;
-        this._on = on;
+    get isOn() {return this._on;}
+    set isOn(value){this.setOn(value);}
+    setOn(value){
+        if (value == this._on) return;
+        this._inputLayer.checked = value;
+        this._on = value;
     }
 
     private _toggleValue(){
-        this.on = !this.on;
+        this.isOn = !this.isOn;
 
         if (this.target != null && this.action != null)
-            this.action.call(this.target, this, this.on);
+            this.action.call(this.target, this, this.isOn);
     }
 }
