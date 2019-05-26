@@ -5055,34 +5055,56 @@ function _NSSortDescriptorSortObjects2(a, b, sortDescriptors, index)
 
 
 
+export enum NSPropertyListFormat
+{
+    OpenStepFormat,
+    XMLFormat_v1_0,
+    BinaryFormat_v1_0,    
+}
+
 export enum NSPropertyListReadOptions
 {
     None
 }
 
-export enum NSPropertyListFormatformat
+export enum NSPropertyListWriteOptions
 {
     None
 }
 
 export class NSPropertyListSerialization extends NSObject
 {            
-    static propertyListWithData(data:string, options:NSPropertyListReadOptions, format:NSPropertyListFormatformat, error:NSError){
+    static propertyListWithData(data:string, options:NSPropertyListReadOptions, format:NSPropertyListFormat, error:NSError){
         let pl = new NSPropertyListSerialization();
         pl.initWithData(data, options, format);
 
-        let item = pl._parse(error);
+        let item = pl.parseData(error);
         return item;
     }
 
+    static dataWithpropertyList(plist:any, format:NSPropertyListFormat, options:NSPropertyListReadOptions, error:NSError){
+        let pl = new NSPropertyListSerialization();
+        pl.initWithObject(plist, options, format);
+
+        let data = pl.parsePList(error);
+        return data;
+    }
+
+
     private data:string = null;
-    initWithData(data:string, options:NSPropertyListReadOptions, format:NSPropertyListFormatformat){
+    private initWithData(data:string, options:NSPropertyListReadOptions, format:NSPropertyListFormat){
         super.init();
         this.data = data;
     }
 
+    private plist:any = null;
+    private initWithObject(plist:any, options:NSPropertyListReadOptions, format:NSPropertyListFormat){
+        super.init();
+        this.plist = plist;
+    }
+
     private rootItem = null;        
-    private _parse(error:NSError){
+    private parseData(error:NSError){
         this.currentElement = null;
         let parser = new NSXMLParser();
         parser.initWithString(this.data, this);
@@ -5146,9 +5168,10 @@ export class NSPropertyListSerialization extends NSObject
         if (element == "key") {
             this.currentKey = this.currentString;            
         }
-        else if (element == "string" || element == "integer" || element == "data") {
+        else if (element == "string" || element == "integer" || element == "real" || element == "data") {
             this.currentValue = this.currentString;
             if (element == "integer") this.currentValue = parseInt(this.currentString);
+            if (element == "real") this.currentValue = parseFloat(this.currentString);
             if (this.currentElementType == 1) this.currentElement.push(this.currentValue);
             else if (this.currentElementType == 0 && this.currentKey != null){
                 let key = this.currentKey;
@@ -5174,5 +5197,71 @@ export class NSPropertyListSerialization extends NSObject
 
     }
 
-    // #endregion
+    private contentString:string = null;
+    private parsePList(error:NSError){
+        this.contentString = '<?xml version="1.0" encoding="UTF-8"?>';
+        this.contentString += '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">';
+        this.contentString += '<plist version="1.0">';
+        
+        this.parseObject(this.plist);
+
+        this.contentString += '</plist>';
+
+        return this.contentString;
+    }
+
+    private parseObject(object:any){
+        
+        if (typeof object === "string") this.parseString(object);
+        else if (typeof object === "number") this.parseNumber(object);
+        //else if (typeof object === "Date") this.parseDate(object);
+        else if (object instanceof Array) this.parseArray(object);
+        else this.parseDictionary(object);
+    }
+
+    private parseString(object:string){
+        this.contentString += "<string>";
+        this.contentString += object;
+        this.contentString += "</string>";
+    }
+
+    private parseNumber(object:number){
+        if (object % 1 === 0) {
+            this.contentString += "<integer>";
+            this.contentString += object;
+            this.contentString += "</integer>";    
+        }
+        else {
+            this.contentString += "<real>";
+            this.contentString += object;
+            this.contentString += "</real>";    
+        }        
+    }
+
+    private parseArray(objects:any){
+        this.contentString += "<array>";
+
+        for (let index = 0; index < objects.length; index++){
+            let obj = objects[index];
+            this.parseObject(obj);
+        }
+
+        this.contentString += "</array>";
+    }
+
+    private parseDictionary(objects:any){
+        this.contentString += "<dict>";
+
+        for (let key in objects){            
+            this.contentString += "<key>";
+            this.contentString += key;
+            this.contentString += "</key>";
+
+            let obj = objects[key];
+            this.parseObject(obj);
+        }
+
+        this.contentString += "</dict>";
+    }
+
 }

@@ -4,20 +4,19 @@
   "description": "Apple UIKit libraries for Javascript/typescript developers",
   "main": "index.js",
   "scripts": {
-	"test": "echo \"Error: no test specified\" && exit 1",
-	"build-web-prod": "gulp UIBuildWeb && tsc && gulp UICleanWebJsFile && gulp UIMinifyWebProd && gulp UIBuildWebPackage && gulp UIRemoveTempFolders",
-	"build-web-dev": "gulp UIBuildWeb; tsc; gulp UICleanWebJsFile; gulp UIBuildWebPackage; gulp UIRemoveTempFolders",
-    "build-web-dev-transpiler": "gulp UICleanWebJsFile; gulp UIBuildWebPackage; gulp UIRemoveTempFolders"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-web-prod": "gulp UIBuildWeb ; tsc ; gulp UICleanWebJsFile ; gulp UIMinifyWebProd ; gulp UIBuildWebPackage ; gulp UIRemoveTempFolders",
+    "build-web-dev": "gulp UIBuildWeb ; tsc ; gulp UICleanWebJsFile ; gulp UIBuildWebPackage ; gulp UIRemoveTempFolders",
+    "build-web-dev-transpiler": "gulp UICleanWebJsFile ; gulp UIBuildWebPackage ; gulp UIRemoveTempFolders"
   },
   "author": "MIOLabs Team",
   "license": "Apache-2.0",
-  "devDependencies": {    
+  "devDependencies": {
     "decimal.js": "^10.1.1",
-    "mio-foundation-web": "^1.0.6",
     "gulp": "^4.0.0",
     "gulp-concat": "^2.6.1",
     "gulp-uglify": "^3.0.2",
     "readable-stream": "^3.3.0",
-    "rimraf": "^2.6.3"    
+    "rimraf": "^2.6.3"
   }
 }

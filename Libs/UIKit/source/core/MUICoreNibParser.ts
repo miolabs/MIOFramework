@@ -6,11 +6,20 @@ import { MIOCoreBundleGetContentsFromURLString } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 
 
+var _MIOCoreBundleClassesByDestination = {}
+export function MUICoreBundleSetClassesByDestination(classes){
+    _MIOCoreBundleClassesByDestination = classes;
+}
+
+export function MUICoreBundleGetClassesByDestination(resource:string){    
+    return _MIOCoreBundleClassesByDestination[resource];
+}
+
 export function MUICoreBundleLoadNibName(name:string, target:any, completion:any){
 
     let parser = new MUICoreNibParser();
     parser.target = target;
-    parser.completion = completion;    
+    parser.completion = completion;                   
 
     MIOCoreBundleGetContentsFromURLString(name, this, function(code, data){
         if (code == 200) parser.parseString(data);
@@ -18,13 +27,11 @@ export function MUICoreBundleLoadNibName(name:string, target:any, completion:any
     });    
 }
 
-
-declare function _injectIntoOptional(param:any);
-
 class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 {
     target = null;
     completion = null;    
+    owner = null;  
 
     private result = "";
     private isCapturing = false;    
@@ -43,40 +50,7 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         let items = domParser.parseFromString(this.result, "text/html");
         let layer = items.getElementById(this.layerID);
 
-        let vc = NSClassFromString(this.rootClassname);
-        vc.initWithLayer(layer, vc);                
-
-        // Check outlets
-        if (layer.childNodes.length > 0) {
-            for (let index = 0; index < layer.childNodes.length; index++) {
-                let subLayer = layer.childNodes[index] as HTMLElement;
-
-                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
-
-                if (subLayer.getAttribute("data-outlets") == "true") {
-                    for (let index2 = 0; index2 < subLayer.childNodes.length; index2 ++){
-                        let d = subLayer.childNodes[index2] as HTMLElement;
-                        if (d.tagName != "DIV") continue;
-
-                        let prop = d.getAttribute("data-property");
-                        let outlet = d.getAttribute("data-outlet");
-
-                        this.connectOutlet(vc, prop, outlet);
-                    }
-                }
-                
-            }
-        }
-        
-
-        this.completion.call(this.target, vc);
-    }
-
-    private connectOutlet(owner, property, outletID){
-        console.log("prop: " + property + " - outluet: " + outletID);
-
-        let obj = owner._outlets[outletID];
-        owner[property] = _injectIntoOptional(obj);
+        this.completion.call(this.target, layer);
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){

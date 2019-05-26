@@ -6,7 +6,8 @@
 	  "test": "echo \"Error: no test specified\" && exit 1",
 	  "buildTs": "../../../swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -Xfrontend -disable-access-control -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk -target arm64-apple-ios12.2 -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks .build/app.swift > .build/app.ts",
 	  "transpileTs": "tsc .build/app.ts",
-	  "buildProject": "npm install ; gulp unifySwiftFiles ; npm run buildTs ; npm run transpileTs ; gulp parseStoryBoard ; gulp copyResources"
+	  "build": "npm install ; gulp unifySwiftFiles ; npm run buildTs ; npm run transpileTs ; gulp parseStoryBoard ; gulp copyResources",
+	  "build-dev": "gulp unifySwiftFiles ; npm run buildTs ; npm run transpileTs ; gulp parseStoryBoard ; gulp copyResources"
 	},
 	"repository": {
 	  "type": "git",
@@ -19,6 +20,7 @@
 	},
 	"homepage": "https://github.com/miolabs/MIOFramework#readme",
 	"devDependencies": {
+	  "animate.css": "^3.7.0",
 	  "decimal.js": "^10.2.0",
 	  "file-system": "^2.2.2",
 	  "gulp": "^4.0.2",

@@ -1,0 +1,16 @@
+{
+  "name": "miotool",
+  "version": "1.0.0",
+  "description": "",
+  "author": "MIO Framework Team",
+  "license": "Apache-2.0",
+  "bin": {
+    "miotool": "bin/miotool"
+  },
+  "dependencies": {
+    "commander": "^2.20.0"
+  },
+  "devDependencies": {
+    "file-system": "^2.2.2"
+  }
+}

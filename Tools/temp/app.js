@@ -16,25 +16,9 @@ var ViewController = /** @class */ (function (_super) {
     function ViewController() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    ViewController.prototype.textLabel$get = function () { return this.textLabel$internal; };
-    Object.defineProperty(ViewController.prototype, "textLabel", {
-        get: function () { return this.textLabel$get(); },
-        set: function ($newValue) { this.textLabel$set($newValue); },
-        enumerable: true,
-        configurable: true
-    });
-    ViewController.prototype.textLabel$set = function ($newValue) {
-        var $oldValue = this.textLabel$internal;
-        this.textLabel$internal = $newValue;
-    };
-    ;
     ViewController.prototype.viewDidLoad = function ($info) {
         var _this = this;
         _super.prototype.viewDidLoad.call(this, {});
-    };
-    ViewController.prototype.buttonClickedWithSender = function (sender, $info) {
-        var _this = this;
-        this.textLabel[0]._text = _injectIntoOptional("Bye");
     };
     ViewController.prototype.initNibNameOptionalBundleOptional = function (nibNameOrNil, nibBundleOrNil, $info) {
         var _this = this;
@@ -49,11 +33,10 @@ var ViewController = /** @class */ (function (_super) {
     ViewController.prototype.init$vars = function () {
         if (_super.prototype.init$vars)
             _super.prototype.init$vars.call(this);
-        this.textLabel$internal = Optional.none;
     };
     ViewController.initCoderNSCoder$failable = true;
     return ViewController;
-}(MUIViewController));
+}(UIViewController));
 var AppDelegate = /** @class */ (function (_super) {
     __extends(AppDelegate, _super);
     function AppDelegate() {
@@ -101,6 +84,6 @@ var AppDelegate = /** @class */ (function (_super) {
         this._window$internal = Optional.none;
     };
     return AppDelegate;
-}(MUIResponder));
-if (typeof MUIApplicationDelegate$implementation != 'undefined')
-    _mixin(AppDelegate, MUIApplicationDelegate$implementation, false);
+}(UIResponder));
+if (typeof UIApplicationDelegate$implementation != 'undefined')
+    _mixin(AppDelegate, UIApplicationDelegate$implementation, false);

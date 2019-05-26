@@ -1,7 +1,10 @@
-var fs = require("file-system");
-var NSXMLParser = require("mio-foundation-node").NSXMLParser;
+var fs = require("./node_modules/file-system");
+var NSXMLParser = require("./node_modules/mio-foundation-node").NSXMLParser;
+var NSPropertyListSerialization = require("./node_modules/mio-foundation-node").NSPropertyListSerialization;
 
 //GLOBAL VARIABLES
+var initialViewControllerID = null;
+var mainStoryBoardFile = null;
 var currentFileName = null;
 var currentFileContent = null;
 var elementsStack = [];
@@ -22,6 +25,9 @@ function parserDidStartDocument(parser){
 
 function parserDidStartElement(parser, element, attributes){
 	
+	if (element == "document"){
+		initialViewControllerID = attributes["initialViewController"];
+	}
 	if (element == "scene"){				
 		let id = attributes["sceneID"];
 		currentFileName = "scene-" + id + ".html";		
@@ -29,6 +35,11 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "viewController"){
 		let id = attributes["id"];
+		
+		// Update app plist file with the main html file
+		if (id == initialViewControllerID) mainStoryBoardFile = currentFileName;
+		updateAppPListFile();
+		
 		let customClass = attributes["customClass"] || "UIViewController";
 					
 		currentFileContent += '<div class="view-controller" id="' + id + '" data-root-view-controller="true"';	
@@ -78,6 +89,34 @@ function parserDidStartElement(parser, element, attributes){
 		
 		item["Content"] = item["Content"] + '<input type="text" ' + inputAttrs.join(" ") + '>'
 	}
+	else if (element == "segmentedControl"){
+		let item = pushNewElement(element, attributes);						
+	
+		parseSegmentControlStyle(attributes["segmentControlStyle"], item["Classes"]);		
+	}
+	else if (element == "segment"){		
+		currentElement["Content"] = currentElement["Content"] + '<div class="segment"><span>' + attributes["title"] +'</span></div>';
+	}
+	else if (element == "switch"){
+		let item = pushNewElement(element, attributes);
+	}
+	else if (element == "slider"){
+		let item = pushNewElement(element, attributes);
+	}
+	else if (element == "progressView"){
+		let item = pushNewElement(element, attributes);
+	}
+	else if (element == "activityIndicatorView"){
+		let item = pushNewElement(element, attributes);
+	}
+	else if (element == "pageControl"){
+		let item = pushNewElement(element, attributes);
+	}
+	else if (element == "stepper"){
+		let item = pushNewElement(element, attributes);
+	}
+
+	
 	else if (element == "rect"){
 		let styles = currentElement["Styles"];
 		styles.push("position:absolute;");
@@ -101,9 +140,9 @@ function parserDidStartElement(parser, element, attributes){
 			b = 255;	
 		}
 		else {
-			let r = parseFloat(attributes["red"]) * 255;
-			let g = parseFloat(attributes["green"]) * 255;
-			let b = parseFloat(attributes["blue"]) * 255;		
+			r = parseFloat(attributes["red"]) * 255;
+			g = parseFloat(attributes["green"]) * 255;
+			b = parseFloat(attributes["blue"]) * 255;		
 		}
 		
 		let a = parseFloat(attributes["alpha"]);
@@ -145,7 +184,7 @@ function parserDidEndElement(parser, element){
 	}
 	else if (element == "viewController" || element == "navigationController"){
 		let outlets = outletsStack.pop();
-		currentFileContent += '<div data-outlets="true">';
+		currentFileContent += '<div class="hidden" data-outlets="true">';
 		for (let key in outlets){
 			let id = outlets[key];
 			currentFileContent += '<div data-outlet="' + id + '" data-property="' + key + '"></div>';
@@ -164,6 +203,29 @@ function parserDidEndElement(parser, element){
 	else if (element == "textField"){
 		popElement();
 	}
+	else if (element == "segmentedControl"){
+		popElement();
+	}
+	else if (element == "switch"){
+		popElement();
+	}
+	else if (element == "slider"){
+		popElement();
+	}
+	else if (element == "progressView"){
+		popElement();
+	}
+	else if (element == "activityIndicatorView"){
+		popElement();
+	}
+	else if (element == "pageControl"){
+		popElement();
+	}
+	else if (element == "stepper"){
+		popElement();
+	}
+
+
 }
 
 function pushNewElement(element, attributes){
@@ -182,6 +244,14 @@ function pushNewElement(element, attributes){
 	else if (element == "view") item["ExtraAttributes"] = ['data-class="UIView"'];
 	else if (element == "label") item["ExtraAttributes"] = ['data-class="UILabel"'];
 	else if (element == "button") item["ExtraAttributes"] = ['data-class="UIButton"'];
+	else if (element == "textField") item["ExtraAttributes"] = ['data-class="UITextField"'];	
+	else if (element == "segmentedControl") item["ExtraAttributes"] = ['data-class="UISegmentedControl"'];
+	else if (element == "switch") item["ExtraAttributes"] = ['data-class="UISwitch"'];
+	else if (element == "slider") item["ExtraAttributes"] = ['data-class="UISlider"'];
+	else if (element == "progressView") item["ExtraAttributes"] = ['data-class="UIProgressView"'];
+	else if (element == "activityIndicatorView") item["ExtraAttributes"] = ['data-class="UIActivityIndicatorView"'];
+	else if (element == "pageControl") item["ExtraAttributes"] = ['data-class="UIPPageControl"'];
+	else if (element == "stepper") item["ExtraAttributes"] = ['data-class="UIStepper"'];
 
 	classes.push(parseClassType(element));
 	if (contenMode != null) classes.push(contenMode);
@@ -232,9 +302,6 @@ function parserFoundCharacters(parser, characters){
 function parserDidEndDocument(parser){
 
 }
-
-
-
 
 function parseScenes(item){
 	console.log("Entering parseScenes");
@@ -293,6 +360,18 @@ function parseClassType(classType){
 	switch (classType){
 		case "textField":
 		return "text-field";
+		
+		case "segmentedControl":
+		return "segmented-control";
+
+		case "progressView":
+		return "progress-view";
+
+		case "activityIndicatorView":
+		return "activity-indicator-view";
+
+		case "pageControl":
+		return "page-control";
 	}
 
 	return classType;
@@ -369,7 +448,6 @@ function parseContentMode(contentMode){
 
 	return null;
 }
-
 
 function parseProperties(item, styles){
 	console.log("Entering parse Properties");
@@ -519,7 +597,6 @@ function parseButtonType(type, classes){
 	classes.push(value);
 }
 
-
 function parseButtonState(buttonState, key){
 	if (buttonState == null) return null;
 	let state = buttonState[0];
@@ -557,6 +634,18 @@ function parseBorderStyle(borderStyle, classes){
 	if (value != null) classes.push(value);
 }
 
+function parseSegmentControlStyle(style, classes){
+	let value = null
+
+	switch(style){
+		case "plain":
+		value = "plain";
+		break;
+	}
+
+	if (value != null) classes.push(value);
+}
+
 function classesStringify(classes){
 	if (classes == null) return "";
 	if (classes.length == 0) return "";
@@ -564,8 +653,27 @@ function classesStringify(classes){
 	return "class='" + classes.join(" ") + "'";
 }
 
+function updateAppPListFile() {		
+	const PLIST_PATH = "./dist/app.plist";
+	
+	if (mainStoryBoardFile == null) return;
+	console.log("MAINURL: " + mainStoryBoardFile);				
+	
+	let plist = null;
+	if (fs.existsSync(PLIST_PATH)) {
+		let content = fs.readFileSync(PLIST_PATH, "utf8");
+		plist = NSPropertyListSerialization.propertyListWithData(content, null, null, null);
+	}
+	else plist = {};
+
+	plist["UIMainStoryboardFile"] = "layout/" + mainStoryBoardFile;
+	
+	let newContent = NSPropertyListSerialization.dataWithpropertyList(plist, null, null, null);
+	fs.writeFileSync("./dist/app.plist", newContent);		
+}
+
 function generateHtmlFile() {
-	fs.writeFileSync("./ITests/Demo1App/Demo1App/dist/" + currentFileName, currentFileContent);
+	fs.writeFileSync("./dist/layout/" + currentFileName, currentFileContent);
 }
 
 module.exports = {

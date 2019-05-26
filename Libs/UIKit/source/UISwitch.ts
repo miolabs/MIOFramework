@@ -1,11 +1,11 @@
 import { UIControl } from "./UIControl";
-import { UILayerGetFirstElementWithTag } from "./UIView";
+import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
 
 /**
  * Created by godshadow on 12/3/16.
  */
 
-export class UISwitchButton extends UIControl
+export class UISwitch extends UIControl
 {
     target = null;
     action = null;    
@@ -18,7 +18,7 @@ export class UISwitchButton extends UIControl
 
         this.layer.classList.add("switch_button");
 
-        this._inputLayer = UILayerGetFirstElementWithTag(this.layer, "INPUT");
+        this._inputLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "INPUT");
         if (this._inputLayer == null) {
             this._inputLayer = document.createElement("input");
             this._inputLayer.setAttribute("type", "checkbox");

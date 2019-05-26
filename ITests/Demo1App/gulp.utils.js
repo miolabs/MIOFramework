@@ -1,5 +1,3 @@
-var fs = require("file-system");
-
 //Gets rid off @UIApplicationMain @NSApplicationMain
 function filterSwiftFile(file) {
 	var filteredString;
