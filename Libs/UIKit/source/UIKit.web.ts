@@ -8,6 +8,8 @@ import { NSClassFromString } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
 import "mio-foundation-web/extensions"
+import { getTypeParameterOwner } from "typescript";
+import { NSFormatter } from "mio-foundation-web";
 import { NSSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
 import { NSBundle } from "mio-foundation-web";
@@ -513,11 +515,20 @@ window.addEventListener("resize", function(e) {
 
 
 
+var _MIOCoreBundleClassesByDestination = {}
+export function MUICoreBundleSetClassesByDestination(classes){
+    _MIOCoreBundleClassesByDestination = classes;
+}
+
+export function MUICoreBundleGetClassesByDestination(resource:string){    
+    return _MIOCoreBundleClassesByDestination[resource];
+}
+
 export function MUICoreBundleLoadNibName(name:string, target:any, completion:any){
 
     let parser = new MUICoreNibParser();
     parser.target = target;
-    parser.completion = completion;    
+    parser.completion = completion;                   
 
     MIOCoreBundleGetContentsFromURLString(name, this, function(code, data){
         if (code == 200) parser.parseString(data);
@@ -525,13 +536,11 @@ export function MUICoreBundleLoadNibName(name:string, target:any, completion:any
     });    
 }
 
-
-declare function _injectIntoOptional(param:any);
-
 class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 {
     target = null;
     completion = null;    
+    owner = null;  
 
     private result = "";
     private isCapturing = false;    
@@ -550,40 +559,7 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         let items = domParser.parseFromString(this.result, "text/html");
         let layer = items.getElementById(this.layerID);
 
-        let vc = NSClassFromString(this.rootClassname);
-        vc.initWithLayer(layer, vc);                
-
-        // Check outlets
-        if (layer.childNodes.length > 0) {
-            for (let index = 0; index < layer.childNodes.length; index++) {
-                let subLayer = layer.childNodes[index] as HTMLElement;
-
-                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
-
-                if (subLayer.getAttribute("data-outlets") == "true") {
-                    for (let index2 = 0; index2 < subLayer.childNodes.length; index2 ++){
-                        let d = subLayer.childNodes[index2] as HTMLElement;
-                        if (d.tagName != "DIV") continue;
-
-                        let prop = d.getAttribute("data-property");
-                        let outlet = d.getAttribute("data-outlet");
-
-                        this.connectOutlet(vc, prop, outlet);
-                    }
-                }
-                
-            }
-        }
-        
-
-        this.completion.call(this.target, vc);
-    }
-
-    private connectOutlet(owner, property, outletID){
-        console.log("prop: " + property + " - outluet: " + outletID);
-
-        let obj = owner._outlets[outletID];
-        owner[property] = _injectIntoOptional(obj);
+        this.completion.call(this.target, layer);
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){
@@ -973,30 +949,31 @@ export class UIPanGestureRecognizer extends UIGestureRecognizer
  */
 
 
-function MUICoreViewSearchViewTag(view, tag){
+function MUICoreViewSearchViewTag(view, tag) {
     if (view.tag == tag) return view;
 
-    for (let index = 0; index < view.subviews.length; index++){
-        let v:UIView = view.subviews[index];
+    for (let index = 0; index < view.subviews.length; index++) {
+        let v: UIView = view.subviews[index];
         v = MUICoreViewSearchViewTag(v, tag);
-        if (v != null) return v;        
+        if (v != null) return v;
     }
 
     return null;
 }
 
+declare function _injectIntoOptional(param:any);
 
-export class UIView extends NSObject
-{
+export class UIView extends NSObject {
     layerID = null;
     layer = null;
-    layerOptions = null;    
+    layerOptions = null;
     alpha = 1;
-    tag:number = 0;
+    tag: number = 0;
+    owner = null;
 
-    private _parent:UIView = null;
-    set parent(view){this.setParent(view);}
-    get parent():UIView {return this._parent;}
+    private _parent: UIView = null;
+    set parent(view) { this.setParent(view); }
+    get parent(): UIView { return this._parent; }
 
 
     protected _viewIsVisible = false;
@@ -1004,21 +981,25 @@ export class UIView extends NSObject
     _isLayerInDOM = false;
 
     protected _subviews = [];
-    get subviews(){
+    get subviews() {
         return this._subviews;
     }
 
-    _window:UIWindow = null;
+    _window: UIWindow = null;
 
     _outlets = {};
+    _segues = [];
 
-    constructor(layerID?){
+    _checkSegues() {
+    }
+
+    constructor(layerID?) {
         super();
         this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(this);
     }
 
-    init(){
-        this.layer = MUICoreLayerCreate(this.layerID);        
+    init() {
+        this.layer = MUICoreLayerCreate(this.layerID);
         //UICoreLayerAddStyle(this.layer, "view");
         //UICoreLayerAddStyle(this.layer, "view");
         //this.layer.style.position = "absolute";
@@ -1029,7 +1010,7 @@ export class UIView extends NSObject
         //this.layer.style.background = "rgb(255, 255, 255)";                
     }
 
-    initWithFrame(frame:NSRect){
+    initWithFrame(frame: NSRect) {
         this.layer = MUICoreLayerCreate(this.layerID);
         this.layer.style.position = "absolute";
         this.setX(frame.origin.x);
@@ -1038,10 +1019,11 @@ export class UIView extends NSObject
         this.setHeight(frame.size.height);
     }
 
-    initWithLayer(layer, owner, options?){
+    initWithLayer(layer, owner, options?) {
         this.layer = layer;
         this.layerOptions = options;
-        
+        this.owner = owner;
+
         let layerID = this.layer.getAttribute("id");
         if (layerID != null) this.layerID = layerID;
 
@@ -1059,80 +1041,127 @@ export class UIView extends NSObject
 
                 let className = subLayer.getAttribute("data-class");
                 if (className == null || className.length == 0) className = "UIView";
-                
+
                 let sv = NSClassFromString(className);
-                sv.initWithLayer(subLayer, owner); 
+                sv.initWithLayer(subLayer, owner);
+                sv._checkSegues();
                 this._linkViewToSubview(sv);
-                
+
                 let id = subLayer.getAttribute("id");
-                if (id != null ) owner._outlets[id] = sv;
+                if (id != null) owner._outlets[id] = sv;
+            }
+        }
+
+        // Check outlets and segues
+        if (layer.childNodes.length > 0) {
+            for (let index = 0; index < layer.childNodes.length; index++) {
+                let subLayer = layer.childNodes[index] as HTMLElement;
+
+                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+
+                if (subLayer.getAttribute("data-connections") == "true") {
+                    for (let index2 = 0; index2 < subLayer.childNodes.length; index2++) {
+                        let d = subLayer.childNodes[index2] as HTMLElement;
+                        if (d.tagName != "DIV") continue;
+
+                        let type = d.getAttribute("data-connection-type");
+
+                        if (type == "outlet") {
+                            let prop = d.getAttribute("data-property");
+                            let outlet = d.getAttribute("data-outlet");
+
+                            this.connectOutlet(prop, outlet);
+                        }
+                        else if (type == "segue") {
+                            let destination = d.getAttribute("data-segue-destination");
+                            let kind = d.getAttribute("data-segue-kind");
+                            let relationship = d.getAttribute("data-segue-relationship");
+
+                            this.addSegue(destination, kind, relationship);
+                        }
+                    }
+                }
             }
         }
 
     }
 
+    private connectOutlet(property, outletID){
+        console.log("prop: " + property + " - outluet: " + outletID);
+
+        let obj = this._outlets[outletID];
+        this[property] = _injectIntoOptional(obj);
+    }
+
+    
+    private addSegue(destination:string, kind:string, relationship?:string) {        
+        let s = {};
+        s["Destination"] = destination;
+        s["Kind"] = kind;
+        if (relationship != null) s["Relationship"] = relationship;
+        this._segues.push(s);
+    }
+
     copy() {
         let objLayer = this.layer.cloneNode(true);
-        
-        let className = this.getClassName();        
+
+        let className = this.getClassName();
         if (className == null) throw Error("UIView:copy: Error classname is null");
-        
+
         let view = NSClassFromString(className);
-        view.initWithLayer(objLayer, null);   
+        view.initWithLayer(objLayer, null);
 
         return view;
     }
 
-    awakeFromHTML(){}
+    awakeFromHTML() { }
 
-    setParent(view:UIView){
+    setParent(view: UIView) {
         this.willChangeValue("parent");
         this._parent = view;
         this.didChangeValue("parent");
     }
 
-    addSubLayer(layer){
+    addSubLayer(layer) {
         this.layer.innerHTML = layer.innerHTML;
     }
 
-    _linkViewToSubview(view)
-    {
+    _linkViewToSubview(view) {
         if ((view instanceof UIView) == false) throw new Error("_linkViewToSubview: Trying to add an object that is not a view");
-        
+
         this.subviews.push(view);
     }
 
-    addSubview(view, index?)
-    {
+    addSubview(view, index?) {
         if ((view instanceof UIView) == false) throw new Error("addSubview: Trying to add an object that is not a view");
 
         view.setParent(this);
 
         if (index == null)
             this.subviews.push(view);
-        else 
+        else
             this.subviews.splice(index, 0, view);
 
         view._addLayerToDOM(index);
         view.setNeedsDisplay();
     }
 
-    insertSubviewAboveSubview(view:UIView, siblingSubview:UIView){
+    insertSubviewAboveSubview(view: UIView, siblingSubview: UIView) {
         view.setParent(this);
-        let index = this.subviews.indexOf(siblingSubview);        
+        let index = this.subviews.indexOf(siblingSubview);
         this.subviews.splice(index, 0, view);
         this.addLayerBeforeLayer(view.layer, siblingSubview.layer);
         view.setNeedsDisplay();
     }
 
-    private addLayerBeforeLayer(newLayer, layer){
+    private addLayerBeforeLayer(newLayer, layer) {
         if (newLayer._isLayerInDOM == true) return;
         if (layer == null || newLayer == null) return;
         this.layer.insertBefore(newLayer, layer);
         newLayer._isLayerInDOM = true;
     }
 
-    protected _addLayerToDOM(index?){
+    protected _addLayerToDOM(index?) {
         if (this._isLayerInDOM == true)
             return;
 
@@ -1147,7 +1176,7 @@ export class UIView extends NSObject
         this._isLayerInDOM = true;
     }
 
-    removeFromSuperview(){
+    removeFromSuperview() {
         if (this.parent == null) return;
 
         let subviews = this.parent._subviews;
@@ -1160,7 +1189,7 @@ export class UIView extends NSObject
         this._isLayerInDOM = false;
     }
 
-    protected _removeLayerFromDOM(){
+    protected _removeLayerFromDOM() {
         if (this._isLayerInDOM == false)
             return;
 
@@ -1184,56 +1213,55 @@ export class UIView extends NSObject
         }
     }
 
-    setViewIsVisible(value:boolean){
+    setViewIsVisible(value: boolean) {
 
         this._viewIsVisible = true;
-        for(var index = 0; index < this.subviews.length; index++){
+        for (var index = 0; index < this.subviews.length; index++) {
             var v = this.subviews[index];
             v.setViewIsVisible(value);
         }
     }
 
-    viewWithTag(tag):UIView{
+    viewWithTag(tag): UIView {
         // TODO: Use also the view tag component
         let view = MUICoreViewSearchViewTag(this, tag);
         return view;
     }
 
-    layoutSubviews(){
-                
-        for(var index = 0; index < this.subviews.length; index++)
-        {
+    layoutSubviews() {
+
+        for (var index = 0; index < this.subviews.length; index++) {
             var v = this.subviews[index];
             if ((v instanceof UIView) == false) throw new Error("layout: Trying to layout an object that is not a view");
             v.setNeedsDisplay();
         }
     }
 
-    setNeedsDisplay(){
+    setNeedsDisplay() {
         this._needDisplay = true;
 
         if (this._viewIsVisible == false) return;
         if (this.hidden == true) return;
-        
+
         this._needDisplay = false;
         this.layoutSubviews();
 
-        for(var index = 0; index < this.subviews.length; index++){
+        for (var index = 0; index < this.subviews.length; index++) {
             let v = this.subviews[index];
-            if (!(v instanceof UIView)){
+            if (!(v instanceof UIView)) {
                 console.log("ERROR: trying to call setNeedsDisplay: in object that it's not a view");
             }
             else
                 v.setNeedsDisplay();
-        }        
+        }
     }
 
-    layerWithItemID(itemID){
+    layerWithItemID(itemID) {
         return MUICoreLayerSearchElementByID(this.layer, itemID);
     }
 
-    private _hidden:boolean = false;
-    setHidden(hidden:boolean){
+    private _hidden: boolean = false;
+    setHidden(hidden: boolean) {
         this._hidden = hidden;
 
         if (this.layer == null)
@@ -1245,161 +1273,156 @@ export class UIView extends NSObject
             this.layer.style.display = "";
     }
 
-    get hidden():boolean{
+    get hidden(): boolean {
         return this._hidden;
     }
 
-    set hidden(value:boolean){
+    set hidden(value: boolean) {
         this.setHidden(value);
     }
 
-    setBackgroundColor(color){
+    setBackgroundColor(color) {
         this.layer.style.backgroundColor = "#" + color;
     }
 
-    setBackgroundRGBColor(r, g, b, a?){
-        if (a == null)
-        {
+    setBackgroundRGBColor(r, g, b, a?) {
+        if (a == null) {
             let value = "rgb(" + r + ", " + g + ", " + b + ")";
             this.layer.style.backgroundColor = value;
         }
-        else
-        {
-            let value = "rgba(" + r + ", " + g + ", " + b + ", " + a +")";
+        else {
+            let value = "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
             this.layer.style.backgroundColor = value;
         }
     }
 
-    getBackgroundColor()
-    {
+    getBackgroundColor() {
         var cs = document.defaultView.getComputedStyle(this.layer, null);
         var bg = cs.getPropertyValue('background-color');
 
         return bg;
     }
 
-    setAlpha(alpha){
+    setAlpha(alpha) {
         this.willChangeValue("alpha");
         this.alpha = alpha;
         this.didChangeValue("alpha");
-        
+
         if (UIView.animationsChanges != null) {
-            let animation = {"View" : this, "Key" : "opacity", "EndValue": alpha};
+            let animation = { "View": this, "Key": "opacity", "EndValue": alpha };
             UIView.animationsChanges.addObject(animation);
-        }        
-        else {            
+        }
+        else {
             this.layer.style.opacity = alpha;
-        }        
+        }
     }
 
     private x = 0;
-    setX(x){
+    setX(x) {
         this.willChangeValue("frame");
         this.x = x;
         this.didChangeValue("frame");
 
         if (UIView.animationsChanges != null) {
-            let animation = {"View" : this, "Key" : "left", "EndValue": x + "px"};
+            let animation = { "View": this, "Key": "left", "EndValue": x + "px" };
             UIView.animationsChanges.addObject(animation);
-        }        
-        else {            
+        }
+        else {
             this.layer.style.left = x + "px";
-        }        
+        }
     }
 
-    getX(){        
+    getX() {
         let x = this._getIntValueFromCSSProperty("left");
         return x;
     }
 
     private y = 0;
-    setY(y){
+    setY(y) {
         this.willChangeValue("frame");
         this.y = y;
         this.didChangeValue("frame");
 
         if (UIView.animationsChanges != null) {
-            let animation = {"View" : this, "Key" : "top", "EndValue": y + "px"};
+            let animation = { "View": this, "Key": "top", "EndValue": y + "px" };
             UIView.animationsChanges.addObject(animation);
-        }        
-        else {            
+        }
+        else {
             this.layer.style.top = y + "px";
-        }                
+        }
     }
 
-    getY(){        
+    getY() {
         let y = this._getIntValueFromCSSProperty("top");
         return y;
     }
 
     private width = 0;
-    setWidth(w){
+    setWidth(w) {
         this.willChangeValue("frame");
         this.width = w;
         this.didChangeValue("frame");
 
         if (UIView.animationsChanges != null) {
-            let animation = {"View" : this, "Key" : "width", "EndValue": w + "px"};
+            let animation = { "View": this, "Key": "width", "EndValue": w + "px" };
             UIView.animationsChanges.addObject(animation);
-        }        
-        else {            
+        }
+        else {
             this.layer.style.width = w + "px";
-        }                        
+        }
     }
 
-    getWidth(){        
+    getWidth() {
         let w1 = this.layer.clientWidth;
         let w2 = this._getIntValueFromCSSProperty("width");
         let w = Math.max(w1, w2);
         if (isNaN(w)) w = 0;
         return w;
     }
-    
+
     private height = 0;
-    setHeight(height){
-        this.willChangeValue("height");        
+    setHeight(height) {
+        this.willChangeValue("height");
         this.height = height;
         this.didChangeValue("height");
 
         if (UIView.animationsChanges != null) {
-            let animation = {"View" : this, "Key" : "height", "EndValue": height + "px"};
+            let animation = { "View": this, "Key": "height", "EndValue": height + "px" };
             UIView.animationsChanges.addObject(animation);
-        }        
-        else {            
+        }
+        else {
             this.layer.style.height = height + "px";
-        }        
+        }
     }
-    
-    getHeight(){
+
+    getHeight() {
         let h = this.height;
         if (h == 0) h = this.layer.clientHeight;
         else {
             if (h == 0) h = this.layer.height;
-            else if (h == 0) h = this._getIntValueFromCSSProperty("height");        
+            else if (h == 0) h = this._getIntValueFromCSSProperty("height");
         }
         return h;
     }
 
-    setFrameComponents(x, y, w, h)
-    {
+    setFrameComponents(x, y, w, h) {
         this.setX(x);
         this.setY(y);
         this.setWidth(w);
         this.setHeight(h);
     }
 
-    setFrame(frame)
-    {
+    setFrame(frame) {
         this.willChangeValue("frame");
         this.setFrameComponents(frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
         this.didChangeValue("frame");
     }
-    
-    get frame() {        
+
+    get frame() {
         return NSRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
     }
 
-    public get bounds(){
+    public get bounds() {
         return NSRect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
     }
 
@@ -1407,19 +1430,16 @@ export class UIView extends NSObject
     // CSS Subsystem
     //
 
-    protected _getValueFromCSSProperty(property)
-    {
+    protected _getValueFromCSSProperty(property) {
         var v = window.getComputedStyle(this.layer, null).getPropertyValue(property);
         return v;
     }
 
-    protected _getIntValueFromCSSProperty(property)
-    {
+    protected _getIntValueFromCSSProperty(property) {
         var v = this._getValueFromCSSProperty(property);
         var r = v.hasSuffix("px");
         if (r == true) v = v.substring(0, v.length - 2);
-        else
-        {
+        else {
             var r2 = v.hasSuffix("%");
             if (r2 == true) v = v.substring(0, v.length - 1);
         }
@@ -1428,79 +1448,79 @@ export class UIView extends NSObject
     }
 
     private _userInteraction = false;
-    set userInteraction(value){
+    set userInteraction(value) {
         if (value == this._userInteraction) return;
 
-        if (value == true){
+        if (value == true) {
             this.layer.addEventListener("mousedown", this.mouseDownEvent.bind(this));
             this.layer.addEventListener("mouseup", this.mouseUpEvent.bind(this));
         }
         else {
             this.layer.removeEventListener("mousedown", this.mouseDownEvent);
-            this.layer.removeEventListener("mouseup", this.mouseUpEvent);             
+            this.layer.removeEventListener("mouseup", this.mouseUpEvent);
         }
     }
 
     private isMouseDown = false;
-    private mouseDownEvent(ev){   
-        let e = UIEvent.eventWithSysEvent(ev);                 
+    private mouseDownEvent(ev) {
+        let e = UIEvent.eventWithSysEvent(ev);
         this.touchesBeganWithEvent(null, e);
         this.isMouseDown = true;
         window.addEventListener("mousemove", this.mouseMoveEvent.bind(this));
         ev.preventDefault(); // Prevent selection
     }
 
-    private mouseUpEvent(ev){   
-        this.isMouseDown = false; 
-        let e = UIEvent.eventWithSysEvent(ev);                
+    private mouseUpEvent(ev) {
+        this.isMouseDown = false;
+        let e = UIEvent.eventWithSysEvent(ev);
         this.touchesEndedWithEvent(null, e);
     }
 
-    private mouseMoveEvent(ev){   
+    private mouseMoveEvent(ev) {
         if (this.isMouseDown == false) return;
         if (ev.buttons == 0) {
             window.removeEventListener("mousemove", this.mouseMoveEvent);
             this.isMouseDown = false;
-            let e = UIEvent.eventWithSysEvent(ev);                
-            this.touchesEndedWithEvent(null, e);    
+            let e = UIEvent.eventWithSysEvent(ev);
+            this.touchesEndedWithEvent(null, e);
         }
         else {
-            let e = UIEvent.eventWithSysEvent(ev);                    
+            let e = UIEvent.eventWithSysEvent(ev);
             this.touchesMovedWithEvent(null, e);
         }
     }
 
-    touchesBeganWithEvent(touches, ev:UIEvent){
-        for (let index = 0; index < this.gestureRecognizers.length; index++){
-            let gr:UIGestureRecognizer = this.gestureRecognizers[index];
+    touchesBeganWithEvent(touches, ev: UIEvent) {
+        for (let index = 0; index < this.gestureRecognizers.length; index++) {
+            let gr: UIGestureRecognizer = this.gestureRecognizers[index];
             gr._viewTouchesBeganWithEvent(touches, ev);
         }
     }
 
-    touchesMovedWithEvent(touches, ev:UIEvent){        
-        for (let index = 0; index < this.gestureRecognizers.length; index++){
-            let gr:UIGestureRecognizer = this.gestureRecognizers[index];
+    touchesMovedWithEvent(touches, ev: UIEvent) {
+        for (let index = 0; index < this.gestureRecognizers.length; index++) {
+            let gr: UIGestureRecognizer = this.gestureRecognizers[index];
             gr._viewTouchesMovedWithEvent(touches, ev);
         }
     }
 
-    touchesEndedWithEvent(touches, ev:UIEvent){
-        for (let index = 0; index < this.gestureRecognizers.length; index++){
-            let gr:UIGestureRecognizer = this.gestureRecognizers[index];
+    touchesEndedWithEvent(touches, ev: UIEvent) {
+        for (let index = 0; index < this.gestureRecognizers.length; index++) {
+            let gr: UIGestureRecognizer = this.gestureRecognizers[index];
             gr._viewTouchesEndedWithEvent(touches, ev);
         }
     }
 
     private gestureRecognizers = [];
-    addGestureRecognizer(gesture:UIGestureRecognizer){
+    addGestureRecognizer(gesture: UIGestureRecognizer) {
         if (this.gestureRecognizers.containsObject(gesture)) return;
-        
+
         gesture.view = this;
         this.gestureRecognizers.addObject(gesture);
         this.userInteraction = true;
     }
 
-    removeGestureRecognizer(gesture:UIGestureRecognizer){        
+    removeGestureRecognizer(gesture: UIGestureRecognizer) {
         gesture.view = null;
         this.gestureRecognizers.removeObject(gesture);
     }
@@ -1509,71 +1529,71 @@ export class UIView extends NSObject
     // Animations
     //
 
-    private static animationsChanges = null;    
+    private static animationsChanges = null;
     private static animationsViews = null;
     private static animationTarget = null;
     private static animationCompletion = null;
-    static animateWithDuration(duration:number, target, animations, completion?){
+    static animateWithDuration(duration: number, target, animations, completion?) {
         UIView.animationsChanges = [];
         UIView.animationsViews = [];
         UIView.animationTarget = target;
         UIView.animationCompletion = completion;
-        animations.call(target);                
+        animations.call(target);
 
-        for (let index = 0; index < UIView.animationsChanges.length; index++){
+        for (let index = 0; index < UIView.animationsChanges.length; index++) {
             let anim = UIView.animationsChanges[index];
             let view = anim["View"];
             let key = anim["Key"];
-            let value = anim["EndValue"];            
-            
+            let value = anim["EndValue"];
+
             view.layer.style.transition = key + " " + duration + "s";
-            switch(key){
+            switch (key) {
                 case "opacity":
-                view.layer.style.opacity = value;                
-                break;
+                    view.layer.style.opacity = value;
+                    break;
 
                 case "x":
-                view.layer.style.left = value;
-                break;
+                    view.layer.style.left = value;
+                    break;
 
                 case "y":
-                view.layer.style.top = value;
-                break;
+                    view.layer.style.top = value;
+                    break;
 
                 case "width":
-                view.layer.style.width = value;
-                break;
+                    view.layer.style.width = value;
+                    break;
 
                 case "height":
-                view.layer.style.height = value;
-                break;
+                    view.layer.style.height = value;
+                    break;
             }
 
             UIView.addTrackingAnimationView(view);
-        }   
-        UIView.animationsChanges = null;                             
+        }
+        UIView.animationsChanges = null;
     }
 
-    private static addTrackingAnimationView(view:UIView){
+    private static addTrackingAnimationView(view: UIView) {
         let index = UIView.animationsViews.indexOf(view);
         if (index > -1) return;
         UIView.animationsViews.addObject(view);
-        view.layer.animationParams = {"View" : view};
+        view.layer.animationParams = { "View": view };
         view.layer.addEventListener("webkitTransitionEnd", UIView.animationDidFinish);
     }
 
-    private static removeTrackingAnimationView(view:UIView){
+    private static removeTrackingAnimationView(view: UIView) {
         let index = UIView.animationsViews.indexOf(view);
         if (index == -1) return;
-        UIView.animationsViews.removeObject(view);                
-        view.layer.removeEventListener("webkitTransitionEnd", UIView.animationDidFinish);            
+        UIView.animationsViews.removeObject(view);
+        view.layer.removeEventListener("webkitTransitionEnd", UIView.animationDidFinish);
         view.layer.style.transition = "none";
         view.setNeedsDisplay();
     }
 
-    private static animationDidFinish(event){
+    private static animationDidFinish(event) {
         let view = event.target.animationParams["View"];
-        UIView.removeTrackingAnimationView(view);        
+        UIView.removeTrackingAnimationView(view);
         if (UIView.animationsViews.length > 0) return;
         UIView.animationsChanges = null;
         UIView.animationsViews = null;
@@ -1731,6 +1751,9 @@ export class UIControl extends UIView
 
 
 
+
+
+
 /**
  * Created by godshadow on 12/3/16.
  */
@@ -1855,6 +1878,36 @@ export class UIButton extends UIControl
         }.bind(this));
     }
 
+    _checkSegues() {
+        super._checkSegues();
+
+        for (let index = 0; index < this._segues.length; index++) {
+
+            let s = this._segues[index];
+            let kind = s["Kind"];
+            
+            if (kind == "show") {
+                let destination = s["Destination"];                
+                let classname = MUICoreBundleGetClassesByDestination(destination);
+                let path = "layout/" + destination + ".html";    
+
+                if (this.owner != null && this.owner instanceof UIViewController) {
+                    this.setAction(this, function(){
+                        let vc = NSClassFromString(classname) as UIViewController;
+                        vc.initWithResource(path);   
+        
+                        this.owner.navigationController.pushViewController(vc);
+                    });
+                }
+
+                
+                
+                
+            }    
+        }
+    }
+
+
     initWithAction(target, action){
         this.init();
         this.setAction(target, action);
@@ -1923,6 +1976,420 @@ export class UIButton extends UIControl
 
 
 
+/**
+ * Created by godshadow on 12/3/16.
+ */
+
+
+
+export enum UITextFieldType {
+    NormalType,
+    PasswordType,
+    SearchType,    
+}
+
+export class UITextField extends UIControl
+{
+    placeHolder = null;
+    private _inputLayer = null;
+    type = UITextFieldType.NormalType;
+
+    textChangeTarget = null;
+    textChangeAction = null;
+    private _textChangeFn = null;
+
+    enterPressTarget = null;
+    enterPressAction = null;
+
+    keyPressTarget   = null;
+    keyPressAction   = null;
+
+    formatter:NSFormatter = null;
+
+    init(){
+        super.init();
+        this._setupLayer();
+    }
+
+    initWithLayer(layer, owner, options?){
+        super.initWithLayer(layer, owner, options);
+        this._inputLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "INPUT");
+        this._setupLayer();
+    }
+
+    private _setupLayer(){
+        if (this._inputLayer == null){
+            this._inputLayer = document.createElement("input");
+
+            switch(this.type){
+                case UITextFieldType.SearchType:
+                this._inputLayer.setAttribute("type", "search");
+                break;
+
+                default:
+                this._inputLayer.setAttribute("type", "text");
+                break;
+            }
+
+            this.layer.appendChild(this._inputLayer);
+        }
+
+        const placeholderKey = this._inputLayer.getAttribute("data-placeholder");
+        if (placeholderKey != null)
+            this._inputLayer.setAttribute("placeholder", NSLocalizeString(placeholderKey, placeholderKey));
+
+        this._registerInputEvent();            
+    }
+    // layoutSubviews(){
+    //     super.layoutSubviews();
+
+        // var w = this.getWidth();
+        // var h = this.getHeight();
+
+        // this._inputLayer.style.marginLeft = "4px";
+        // this._inputLayer.style.width = (w - 8) + "px";
+        // this._inputLayer.style.marginTop = "4px";
+        // this._inputLayer.style.height = (h - 8) + "px";
+//    }
+
+    setText(text){
+        this.text = text;
+    }
+
+    set text(text){        
+        let newValue = text != null ? text : "";        
+        this._inputLayer.value = newValue;
+    }
+
+    get text(){
+        return this._inputLayer.value;
+    }
+
+    setPlaceholderText(text){
+        this.placeHolder = text;
+        this._inputLayer.setAttribute("placeholder", text);
+    }
+
+    set placeholderText(text:string){
+        this.setPlaceholderText(text);
+    }
+
+    setOnChangeText(target, action){
+        this.textChangeTarget = target;
+        this.textChangeAction = action;
+    }    
+
+    private _textStopPropagationFn = null;
+    private _registerInputEvent(){
+        let instance = this;
+        this._textChangeFn = function() {
+            if (instance.enabled)
+                instance._textDidChange.call(instance);
+        }
+
+        this._textStopPropagationFn = function(e){
+            //instance._textDidBeginEditing();
+            e.stopPropagation();
+        };
+
+        this._textDidBeginEditingFn = this._textDidBeginEditing.bind(this);
+        this._textDidEndEditingFn = this._textDidEndEditing.bind(this);
+        
+        this.layer.addEventListener("input", this._textChangeFn);        
+        this.layer.addEventListener("click", this._textStopPropagationFn);
+        this._inputLayer.addEventListener("focus", this._textDidBeginEditingFn);
+        this._inputLayer.addEventListener("blur", this._textDidEndEditingFn);
+    }
+
+    private _unregisterInputEvent(){
+        this.layer.removeEventListener("input", this._textChangeFn);
+        this.layer.removeEventListener("click", this._textStopPropagationFn);
+        this._inputLayer.removeEventListener("focus", this._textDidBeginEditingFn);
+        this._inputLayer.removeEventListener("blur", this._textDidEndEditingFn);
+
+    }
+
+    private _textDidChange(){
+        if (this.enabled == false) return;
+
+        // Check the formater
+        let value = this._inputLayer.value;
+        if (this.formatter == null) {
+            this._textDidChangeDelegate(value);
+        }
+        else {
+            let result, newStr;
+            [result, newStr] = this.formatter.isPartialStringValid(value);
+
+            this._unregisterInputEvent();
+            this._inputLayer.value = newStr;
+            this._registerInputEvent();
+
+            if (result == true) {
+                this._textDidChangeDelegate(value);
+            }
+        }
+    }
+
+    private _textDidChangeDelegate(value){
+        if (this.textChangeAction != null && this.textChangeTarget != null)
+            this.textChangeAction.call(this.textChangeTarget, this, value);
+    }    
+
+    private didBeginEditingAction = null;
+    private didBeginEditingTarget = null;    
+    setOnBeginEditing(target, action) {
+        this.didBeginEditingTarget = target;
+        this.didBeginEditingAction = action;        
+    }    
+
+    private _textDidBeginEditingFn = null;
+    private _textDidBeginEditing(){
+        if (this.enabled == false)  return;
+
+        //if (this.formatter != null) this.text = this.formatter.stringForObjectValue(this.text);
+
+        if (this.didBeginEditingTarget == null || this.didBeginEditingAction == null) return;
+        this.didBeginEditingAction.call(this.didBeginEditingTarget, this, this.text);
+    }
+
+    private didEndEditingAction = null;
+    private didEndEditingTarget = null;    
+    setOnDidEndEditing(target, action) {
+        this.didEndEditingTarget = target;
+        this.didEndEditingAction = action;        
+    }    
+
+    private _textDidEndEditingFn = null;
+    private _textDidEndEditing(){
+        if (this.enabled == false)  return;
+
+        //if (this.formatter != null) this.text = this.formatter.stringForObjectValue(this.text);
+
+        if (this.didEndEditingTarget == null || this.didEndEditingAction == null) return;
+        this.didEndEditingAction.call(this.didEndEditingTarget, this, this.text);
+    }
+
+    setOnEnterPress(target, action){
+        this.enterPressTarget = target;
+        this.enterPressAction = action;
+        var instance = this;
+
+        this.layer.onkeyup = function(e){
+            if (instance.enabled) {
+                if (e.keyCode == 13)
+                    instance.enterPressAction.call(target, instance, instance._inputLayer.value);
+            }
+        }
+    }
+
+    setOnKeyPress(target, action){
+        this.keyPressTarget = target;
+        this.keyPressAction = action;
+        var instance = this;
+
+        this.layer.onkeydown = function(e){
+            if (instance.enabled) {
+                instance.keyPressAction.call(target, instance, e.keyCode);
+            }
+        }
+    }
+
+    setTextRGBColor(r, g, b){
+        let value = "rgb(" + r + ", " + g + ", " + b + ")";
+        this._inputLayer.style.color = value;
+    }
+
+    set textColor(color){
+        this._inputLayer.style.color = color;
+    }
+
+    get textColor(){
+        let color = this._getValueFromCSSProperty("color");
+        return color;        
+    }
+
+    setEnabled(value){
+        super.setEnabled(value);
+        this._inputLayer.readOnly = !value;
+    }
+
+    becomeFirstResponder(){
+        this._inputLayer.focus();
+    }
+
+    resignFirstResponder(){
+        this._inputLayer.blur();
+    }
+
+    selectAll(control:UITextField){
+        this._inputLayer.select();
+    }
+
+}
+
+
+
+
+
+
+/**
+ * Created by godshadow on 29/08/16.
+ */
+
+export class UISegmentedControl extends UIControl
+{
+    segmentedItems = [];
+    selectedSegmentedIndex = -1;
+
+    initWithLayer(layer, owner, options?)
+    {
+        super.initWithLayer(layer, owner, options);
+
+        for (let index = 0; index < this.layer.childNodes.length; index++){
+            let itemLayer = this.layer.childNodes[index];
+            if (itemLayer.tagName == "DIV"){
+                let si = new UIButton();
+                si.initWithLayer(itemLayer, owner);
+                si.type = UIButtonType.PushIn;
+                this._addSegmentedItem(si);
+                MUIOutletRegister(owner, si.layerID, si);
+            }
+        }
+
+        if (this.segmentedItems.length > 0){
+            let item = this.segmentedItems[0];
+            item.setSelected(true);
+            this.selectedSegmentedIndex = 0;
+        }
+    }
+
+    private _addSegmentedItem(item){
+        this.segmentedItems.push(item);
+        item.setAction(this, this._didClickSegmentedButton);
+    }
+
+    private _didClickSegmentedButton(button){
+        let index = this.segmentedItems.indexOf(button);
+        this.selectSegmentedAtIndex(index);
+
+        if (this.mouseOutTarget != null)
+            this.mouseOutAction.call(this.mouseOutTarget, this, index);
+    }
+
+    setAction(target, action){
+        this.mouseOutTarget = target;
+        this.mouseOutAction = action;
+    }
+
+    selectSegmentedAtIndex(index){
+        if (this.selectedSegmentedIndex == index)
+            return;
+
+        if (this.selectedSegmentedIndex > -1){
+            let lastItem = this.segmentedItems[this.selectedSegmentedIndex];
+            lastItem.setSelected(false);
+        }
+
+        this.selectedSegmentedIndex = index;
+        
+        let item = this.segmentedItems[this.selectedSegmentedIndex];
+        item.setSelected(true);
+    }
+}
+
+
+
+/**
+ * Created by godshadow on 12/3/16.
+ */
+
+export class UISwitch extends UIControl
+{
+    target = null;
+    action = null;    
+
+    private _inputLayer = null;
+    private _labelLayer = null;
+
+    initWithLayer(layer, owner, options?){
+        super.initWithLayer(layer, owner, options);
+
+        this.layer.classList.add("switch_button");
+
+        this._inputLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "INPUT");
+        if (this._inputLayer == null) {
+            this._inputLayer = document.createElement("input");
+            this._inputLayer.setAttribute("type", "checkbox");
+            this._inputLayer.setAttribute("id", this.layerID + "_input");
+            this._inputLayer.classList.add("switch_button_input");
+            layer.appendChild(this._inputLayer);
+        }       
+
+        // var div1 = document.createElement("div");
+        // this.layer.appendChild(div1);
+
+        // var div2 = document.createElement("div");
+        // div1.appendChild(div2); 
+
+/*
+        this._labelLayer = UILayerGetFirstElementWithTag(this.layer, "LABEL");
+        if (this._labelLayer == null) {
+            this._labelLayer = document.createElement("label");
+            this._labelLayer.setAttribute("for", this.layerID + "_input");
+            //this._labelLayer.classList.add("switch_button_label");
+            layer.appendChild(this._labelLayer);
+        }
+
+        */
+
+        var instance = this;
+        this.layer.onclick = function() {
+
+            if (instance.enabled) {
+                instance._toggleValue.call(instance);
+            }
+        }
+    }
+
+    setOnChangeValue(target, action){
+        this.target = target;
+        this.action = action;
+    }
+
+
+    private _on = false;
+    get on() {return this._on;}
+    set on(value){this.setOn(value);}
+    setOn(on){
+        if (on == this.on) return;
+        this._inputLayer.checked = on;
+        this._on = on;
+    }
+
+    private _toggleValue(){
+        this.on = !this.on;
+
+        if (this.target != null && this.action != null)
+            this.action.call(this.target, this, this.on);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1937,11 +2404,10 @@ export class UIButton extends UIControl
  * Created by godshadow on 11/3/16.
  */
 
-export class UIViewController extends NSObject
-{
-    layerID:string = null;
+export class UIViewController extends NSObject {
+    layerID: string = null;
 
-    view:UIView = null;
+    view: UIView = null;
 
     private _htmlResourcePath = null;
 
@@ -1955,13 +2421,13 @@ export class UIViewController extends NSObject
     private _layerIsReady = false;
 
     private _childViewControllers = [];
-    parentViewController:UIViewController = null;
+    parentViewController: UIViewController = null;
 
-    presentingViewController:UIViewController = null;
-    presentedViewController:UIView = null;
-    navigationController:UINavigationController = null;
-    navigationItem:UINavigationItem = null;
-    splitViewController:UISplitViewController = null;
+    presentingViewController: UIViewController = null;
+    presentedViewController: UIView = null;
+    navigationController: UINavigationController = null;
+    navigationItem: UINavigationItem = null;
+    splitViewController: UISplitViewController = null;
     tabBarController = null;
 
     modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
@@ -1972,49 +2438,105 @@ export class UIViewController extends NSObject
     protected _preferredContentSize = null;
 
     _outlets = {};
+    _segues = [];
 
-    constructor(layerID?){
+    _checkSegues() {
+
+    }
+
+    constructor(layerID?) {
         super();
         this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(this);
     }
 
-    init(){
-        super.init();        
-        this.loadView();        
+    init() {
+        super.init();
+        this.loadView();
     }
 
-    initWithCoder(coder:NSCoder){
+    initWithCoder(coder: NSCoder) {
 
     }
 
-    initWithLayer(layer, owner, options?){
+    initWithLayer(layer, owner, options?) {
         super.init();
 
         let viewLayer = MUICoreLayerGetFirstElementWithTag(layer, "DIV");
 
         this.view = new UIView();
         this.view.initWithLayer(viewLayer, owner, options);
-        
+        this.view._checkSegues();
+
         // Search for navigation item
-        //this.navigationItem = UINavItemSearchInLayer(layer);
-        
-        this.loadView();        
+        //this.navigationItem = UINavItemSearchInLayer(layer);        
+
+        this.loadView();
     }
 
-    initWithResource(path){
+    private _parseConnections(layer){
+        // Check outlets and segues
+        if (layer.childNodes.length > 0) {
+            for (let index = 0; index < layer.childNodes.length; index++) {
+                let subLayer = layer.childNodes[index] as HTMLElement;
+
+                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+
+                if (subLayer.getAttribute("data-connections") == "true") {
+                    for (let index2 = 0; index2 < subLayer.childNodes.length; index2++) {
+                        let d = subLayer.childNodes[index2] as HTMLElement;
+                        if (d.tagName != "DIV") continue;
+
+                        let type = d.getAttribute("data-connection-type");
+
+                        if (type == "outlet") {
+                            let prop = d.getAttribute("data-property");
+                            let outlet = d.getAttribute("data-outlet");
+
+                            this.connectOutlet(prop, outlet);
+                        }
+                        else if (type == "segue") {
+                            let destination = d.getAttribute("data-segue-destination");
+                            let kind = d.getAttribute("data-segue-kind");
+                            let relationship = d.getAttribute("data-segue-relationship");
+
+                            this.addSegue(destination, kind, relationship);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private connectOutlet(property, outletID) {
+        console.log("prop: " + property + " - outluet: " + outletID);
+
+        let obj = this._outlets[outletID];
+        this[property] = _injectIntoOptional(obj);
+    }
+
+
+    private addSegue(destination: string, kind: string, relationship?: string) {
+        let s = {};
+        s["Destination"] = destination;
+        s["Kind"] = kind;
+        if (relationship != null) s["Relationship"] = relationship;
+        this._segues.push(s);
+    }
+
+    initWithResource(path) {
         if (path == null) throw new Error("UIViewController:initWithResource can't be null");
 
-        super.init();        
+        super.init();
 
         this._htmlResourcePath = path;
         this.loadView();
     }
 
-    localizeSubLayers(layers){
+    localizeSubLayers(layers) {
         if (layers.length == 0)
             return;
 
-        for (let index = 0; index < layers.length; index++){
+        for (let index = 0; index < layers.length; index++) {
             let layer = layers[index];
 
             if (layer.tagName != "DIV") continue;
@@ -2027,31 +2549,38 @@ export class UIViewController extends NSObject
         }
     }
 
-    localizeLayerIDWithKey(layerID, key){
+    localizeLayerIDWithKey(layerID, key) {
         let layer = MUICoreLayerSearchElementByID(this.view.layer, layerID);
         layer.innerHTML = NSLocalizeString(key, key);
     }
 
-    loadView(){
+    loadView() {
         if (this.view != null) {
             this._didLoadView();
             return;
         }
 
         this.view = new UIView(this.layerID);
-        
+
         if (this._htmlResourcePath == null) {
-            this.view.init();            
+            this.view.init();
             MUICoreLayerAddStyle(this.view.layer, "page");
             this._didLoadView();
             return;
         }
-        
-        let mainBundle = NSBundle.mainBundle();
-        mainBundle.loadNibNamed(this._htmlResourcePath, this, null);
+
+        MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (layer) {
+            this.view.initWithLayer(layer, this);
+            this.view.awakeFromHTML();
+            this.view._checkSegues();
+            this._didLoadView();
+        });
+
+        // let mainBundle = NSBundle.mainBundle();
+        // mainBundle.loadNibNamed(this._htmlResourcePath, this, null);
 
         // mainBundle.loadHTMLNamed(this._htmlResourcePath, this.layerID, this, function (layer) {            
-            
+
         //     let domParser = new DOMParser();
         //     let items = domParser.parseFromString(layerData, "text/html");
         //     let layer = items.getElementById(layerID);
@@ -2069,7 +2598,7 @@ export class UIViewController extends NSObject
         // });        
     }
 
-    _didLoadNibWithLayer(layerData){
+    _didLoadNibWithLayer(layerData) {
         let domParser = new DOMParser();
         let items = domParser.parseFromString(layerData, "text/html");
         let layer = items.getElementById("kk");
@@ -2077,28 +2606,30 @@ export class UIViewController extends NSObject
         //this.navigationItem = UINavItemSearchInLayer(layer);
 
         this.view.initWithLayer(layer, this);
-        this.view.awakeFromHTML();        
+        this.view.awakeFromHTML();
 
         this._didLoadView();
     }
 
-    _didLoadView(){
-        this._layerIsReady = true;        
+    _didLoadView() {
+        this._layerIsReady = true;
         if (MIOCoreIsPhone() == true) MUICoreLayerAddStyle(this.view.layer, "phone");
-        
-        if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null){
+        this._parseConnections(this.view.layer);        
+        this._checkSegues();
+
+        if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null) {
             this._onLoadLayerAction.call(this._onLoadLayerTarget);
             this._onLoadLayerTarget = null;
             this._onLoadLayerAction = null;
         }
 
-        if (this._onViewLoadedAction != null && this._onViewLoadedTarget != null){
+        if (this._onViewLoadedAction != null && this._onViewLoadedTarget != null) {
             this.viewDidLoad();
             this._loadChildControllers();
         }
     }
 
-    protected _loadChildControllers(){
+    protected _loadChildControllers() {
         let count = this._childViewControllers.length;
 
         if (count > 0)
@@ -2107,7 +2638,7 @@ export class UIViewController extends NSObject
             this._setViewLoaded(true);
     }
 
-    protected _loadChildViewController(index, max){
+    protected _loadChildViewController(index, max) {
         if (index < max) {
             let vc = this._childViewControllers[index];
             vc.onLoadView(this, function () {
@@ -2116,13 +2647,12 @@ export class UIViewController extends NSObject
                 this._loadChildViewController(newIndex, max);
             });
         }
-        else
-        {
+        else {
             this._setViewLoaded(true);
         }
     }
 
-    protected _setViewLoaded(value){
+    protected _setViewLoaded(value) {
         this.willChangeValue("viewLoaded");
         this._viewIsLoaded = value;
         this.didChangeValue("viewLoaded");
@@ -2136,7 +2666,7 @@ export class UIViewController extends NSObject
         this.view.setNeedsDisplay();
     }
 
-    onLoadView(target, action){
+    onLoadView(target, action) {
         this._onViewLoadedTarget = target;
         this._onViewLoadedAction = action;
 
@@ -2144,45 +2674,38 @@ export class UIViewController extends NSObject
             action.call(target);
             //this.view.setNeedsDisplay();
         }
-        else if (this._layerIsReady == true)
-        {
-            this.viewDidLoad();            
+        else if (this._layerIsReady == true) {
+            this.viewDidLoad();
             this._loadChildControllers();
             //this.view.setNeedsDisplay();
         }
     }
 
-    onLoadLayer(target, action){
-        if (this._layerIsReady == true)
-        {
+    onLoadLayer(target, action) {
+        if (this._layerIsReady == true) {
             action.call(target);
         }
-        else
-        {
+        else {
             this._onLoadLayerTarget = action;
-            this._onLoadLayerAction= target;
+            this._onLoadLayerAction = target;
         }
     }
 
-    get viewIsLoaded()
-    {
+    get viewIsLoaded() {
         return this._viewIsLoaded;
     }
 
-    get childViewControllers()
-    {
+    get childViewControllers() {
         return this._childViewControllers;
     }
 
-    addChildViewController(vc)
-    {
+    addChildViewController(vc) {
         vc.parentViewController = this;
         this._childViewControllers.push(vc);
         //vc.willMoveToParentViewController(this);
     }
 
-    removeChildViewController(vc)
-    {
+    removeChildViewController(vc) {
         var index = this._childViewControllers.indexOf(vc);
         if (index != -1) {
             this._childViewControllers.splice(index, 1);
@@ -2198,32 +2721,32 @@ export class UIViewController extends NSObject
     //     //this.didMoveToParentViewController(null);
     // }
 
-    private _presentationController:UIPresentationController = null;
-    get isPresented(){
+    private _presentationController: UIPresentationController = null;
+    get isPresented() {
         if (this._presentationController != null)
             return this._presentationController._isPresented;
     }
 
-    get presentationController():UIPresentationController {
+    get presentationController(): UIPresentationController {
         // if (this._presentationController == null && this.parentViewController != null)
         //     return this.parentViewController.presentationController;
 
         return this._presentationController;
-    }       
-    
-    private _popoverPresentationController:UIPopoverPresentationController = null;
-    get popoverPresentationController():UIPopoverPresentationController {
-        if (this._popoverPresentationController == null){
+    }
+
+    private _popoverPresentationController: UIPopoverPresentationController = null;
+    get popoverPresentationController(): UIPopoverPresentationController {
+        if (this._popoverPresentationController == null) {
             this._popoverPresentationController = new UIPopoverPresentationController();
             this._popoverPresentationController.init();
             this._popoverPresentationController.presentedViewController = this;
             this._presentationController = this._popoverPresentationController;
-        }        
-        
+        }
+
         return this._popoverPresentationController;
     }
 
-    showViewController(vc, animated){
+    showViewController(vc, animated) {
         vc.onLoadView(this, function () {
 
             this.view.addSubview(vc.view);
@@ -2233,8 +2756,8 @@ export class UIViewController extends NSObject
         });
     }
 
-    presentViewController(vc:UIViewController, animated:boolean){           
-        
+    presentViewController(vc: UIViewController, animated: boolean) {
+
         let pc = vc.presentationController as UIPresentationController;
         if (pc == null) {
             pc = new UIPresentationController();
@@ -2243,19 +2766,19 @@ export class UIViewController extends NSObject
             pc.presentingViewController = this;
             vc._presentationController = pc;
         }
-        
+
         if (pc.presentingViewController == null) {
             pc.presentingViewController = this;
         }
-        
-        if (pc._isPresented == true){
-            throw new Error("You try to present a view controller that is already presented"); 
+
+        if (pc._isPresented == true) {
+            throw new Error("You try to present a view controller that is already presented");
         }
-        
+
         // if (vc.modalPresentationStyle == UIModalPresentationStyle.CurrentContext){            
         //     vc.modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
         // }
-        
+
         // if (vc.modalPresentationStyle != UIModalPresentationStyle.FullScreen 
         //     && vc.modalPresentationStyle != UIModalPresentationStyle.FormSheet
         //     && vc.modalPresentationStyle != UIModalPresentationStyle.PageSheet
@@ -2265,37 +2788,36 @@ export class UIViewController extends NSObject
 
         vc.onLoadView(this, function () {
 
-            if (vc.modalPresentationStyle == UIModalPresentationStyle.CurrentContext){
+            if (vc.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
                 this.view.addSubview(vc.presentationController.presentedView);
                 this.addChildViewController(vc);
                 _MUIShowViewController(this, vc, null, animated, this, function () {
-                });    
+                });
             }
-            else{
+            else {
                 // It's a window instead of a view
-                let w:UIWindow = pc.window;
-                if (w == null)
-                {
+                let w: UIWindow = pc.window;
+                if (w == null) {
                     w = new UIWindow();
                     w.init();
                     w.layer.style.background = "";
                     w.rootViewController = vc;
                     w.addSubview(pc.presentedView);
-                    pc.window = w;                                        
+                    pc.window = w;
                 }
                 w.setHidden(false);
 
                 _MUIShowViewController(this, vc, null, animated, this, function () {
                     w.makeKey();
-                });    
+                });
             }
         });
     }
 
-    dismissViewController(animate){
+    dismissViewController(animate) {
         let pc = this._presentationController;
         let vc = this as UIViewController;
-        while(pc == null) {
+        while (pc == null) {
             vc = vc.parentViewController;
             pc = vc._presentationController;
         }
@@ -2305,13 +2827,13 @@ export class UIViewController extends NSObject
 
         _MUIHideViewController(fromVC, toVC, null, this, function () {
 
-            if (fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext){
+            if (fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
                 toVC.removeChildViewController(fromVC);
                 let pc1 = fromVC.presentationController;
                 let view = pc1.presentedView;
                 view.removeFromSuperview();
             }
-            else{
+            else {
                 // It's a window instead of a view
                 let pc1 = fromVC.presentationController;
                 let w = pc1.window as UIWindow;
@@ -2319,87 +2841,74 @@ export class UIViewController extends NSObject
             }
         });
     }
- 
-    transitionFromViewControllerToViewController(fromVC, toVC, duration, animationType, target?, completion?)
-    {
+
+    transitionFromViewControllerToViewController(fromVC, toVC, duration, animationType, target?, completion?) {
         //TODO
     }
 
-    viewDidLoad(){}
+    viewDidLoad() { }
 
-    viewWillAppear(animated?)
-    {
-        for (var index = 0; index < this._childViewControllers.length; index++)
-        {
+    viewWillAppear(animated?) {
+        for (var index = 0; index < this._childViewControllers.length; index++) {
             var vc = this._childViewControllers[index];
             vc.viewWillAppear(animated);
         }
-        
+
         this.view.setViewIsVisible(true);
     }
 
-    viewDidAppear(animated?)
-    {
+    viewDidAppear(animated?) {
         //this.view.setNeedsDisplay();
-        
-        for (var index = 0; index < this._childViewControllers.length; index++)
-        {
+
+        for (var index = 0; index < this._childViewControllers.length; index++) {
             var vc = this._childViewControllers[index];
             vc.viewDidAppear(animated);
         }
     }
 
-    viewWillDisappear(animated?)
-    {
-        for (var index = 0; index < this._childViewControllers.length; index++)
-        {
+    viewWillDisappear(animated?) {
+        for (var index = 0; index < this._childViewControllers.length; index++) {
             var vc = this._childViewControllers[index];
             vc.viewWillDisappear(animated);
         }
-        
+
         this.view.setViewIsVisible(false);
     }
 
-    viewDidDisappear(animated?)
-    {
-        for (var index = 0; index < this._childViewControllers.length; index++)
-        {
+    viewDidDisappear(animated?) {
+        for (var index = 0; index < this._childViewControllers.length; index++) {
             var vc = this._childViewControllers[index];
             vc.viewDidDisappear(animated);
         }
     }
 
-    contentHeight()
-    {
+    contentHeight() {
         return this.view.getHeight();
     }
 
-    setContentSize(size)
-    {
+    setContentSize(size) {
         this.willChangeValue("contentSize");
         this._contentSize = size;
         this.didChangeValue("contentSize");
     }
 
-    public set contentSize(size)
-    {
+    public set contentSize(size) {
         this.setContentSize(size);
     }
 
-    public get contentSize()
-    {
+    public get contentSize() {
         return this._contentSize;
     }
 
-    public set preferredContentSize(size){
+    public set preferredContentSize(size) {
         this.setPreferredContentSize(size);
     }
 
-    public get preferredContentSize(){
+    public get preferredContentSize() {
         return this._preferredContentSize;
     }
 
-    setPreferredContentSize(size){
+    setPreferredContentSize(size) {
         this.willChangeValue("preferredContentSize");
         this._preferredContentSize = size;
         this.didChangeValue("preferredContentSize");
@@ -2932,6 +3441,55 @@ export class MIOPopOverDismissAnimationController extends NSObject
 
 
 
+export class UINavigationBar extends UIView
+{
+    init(){
+        super.init();
+        this.setup();
+    }
+
+    initWithLayer(layer, owner, options?){
+        super.initWithLayer(layer, owner, options);
+        this.setup();
+    }
+
+    private setup(){
+        MUICoreLayerAddStyle(this.layer, "navbar");
+    }
+
+    private _items = [];
+    get items(){return this._items;}
+    setItems(items, animated){        
+        this._items = items;
+
+        //TODO: Animate!!!
+    }    
+    
+    pushNavigationItem(item:UINavigationItem, animated){
+        this.items.addObject(item);
+        // TODO: Make the animation and change the items
+    }
+
+    popNavigationItem(item:UINavigationItem, animated) {
+        this.items.removeObject(item);
+        // TODO: Make the animation and change the items
+    }
+
+    get topItem(){
+        if (this.items.length == 0) return null;
+        return this.items[this.items.length - 1];
+    }
+
+    get backItem(){
+        if (this.items.length < 2) return null;
+        return this.items[this.items.length - 2];
+    }
+}
+
+
+
+
+
 export class UINavigationItem extends NSObject
 {    
     backBarButtonItem:UIButton = null;
@@ -2999,6 +3557,10 @@ export function UINavItemSearchInLayer(layer)
 
     return null;
  }
+
+
+
+
 
 
 
@@ -3146,6 +3708,35 @@ export class UINavigationController extends UIViewController
         if (this.currentViewControllerIndex < 0) return this._preferredContentSize;
         let vc = this.viewControllersStack[this.currentViewControllerIndex];
         return vc.preferredContentSize;
+    }
+
+
+    // Segues
+
+    _checkSegues() {
+        super._checkSegues();
+
+        for (let index = 0; index < this._segues.length; index++) {
+
+            let s = this._segues[index];
+            let kind = s["Kind"];
+            
+            if (kind == "relationship") {
+                let destination = s["Destination"];
+                let relationship = s["Relationship"];
+
+                if (relationship == "rootViewController") {
+                
+                    let classname = MUICoreBundleGetClassesByDestination(destination);
+                    let path = "layout/" + destination + ".html";    
+
+                    let vc = NSClassFromString(classname) as UIViewController;
+                    vc.initWithResource(path);            
+                    this.setRootViewController(vc);
+                }
+            }    
+        }
+
     }
 
     // Transitioning delegate
@@ -3825,6 +4416,8 @@ export class UIApplicationDelegate {
 
 
 
+
+
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -3914,7 +4507,9 @@ export class UIApplication {
                         
             // Get Languages from the app.plist
             let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);            
-            this.mainResourceURLString = config["UIMainStoryboardFile"];
+            this.initialDestination = config["UIMainResourceFile"];
+            let classes = config["UIMainClasses"];
+            MUICoreBundleSetClassesByDestination(classes);
 
             let langs = config["Languages"];
             if (langs == null) {
@@ -3933,18 +4528,27 @@ export class UIApplication {
         });
     }
 
-    private mainResourceURLString:string = null;
+    private initialDestination:string = null;    
     private _run() {        
 
         this.delegate.applicationDidFinishLaunchingWithOptions();        
         this._mainWindow = this.delegate.window;
 
         if (this._mainWindow == null) {
-            MUICoreBundleLoadNibName(this.mainResourceURLString, this, function(vc:UIViewController){
-                this.delegate.window = new UIWindow();
-                this.delegate.window.initWithRootViewController(vc);
-                this._launchApp()
-            });
+            let classname = MUICoreBundleGetClassesByDestination(this.initialDestination);
+
+            let vc = NSClassFromString(classname) as UIViewController;
+            vc.initWithResource("layout/" + this.initialDestination + ".html");
+
+            this.delegate.window = new UIWindow();
+            this.delegate.window.initWithRootViewController(vc);
+
+            this._launchApp()            
+            // MUICoreBundleLoadNibName( this.initialResourceURLString, this, function(vc:UIViewController){
+            //     this.delegate.window = new UIWindow();
+            //     this.delegate.window.initWithRootViewController(vc);
+            //     this._launchApp()
+            // });
         }
         else this._launchApp();         
     }

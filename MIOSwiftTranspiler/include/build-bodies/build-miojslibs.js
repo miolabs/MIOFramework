@@ -60,7 +60,6 @@ for(let className in UIKit) {
         let propName = swift[i]
         let isOptional = swift[i + 1]
         let optionalParams = swift[i + 2]
-        console.log(propName, isOptional)
 
         if(classMapping && classMapping[propName]) {
             renames.push({chain: ["getSourceFile", sourceFile, "getClass", className, "getInstanceMethod", classMapping[propName]], rename: propName})
