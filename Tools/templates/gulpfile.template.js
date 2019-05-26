@@ -50,7 +50,7 @@ function parseStoryBoard(done) {
 	for(item of filesArr) {
 		if(item == "LaunchScreen.storyboard") continue;
 		var fileString = fs.readFileSync(pathStoryBoard+item, "utf8");		
-		sb.parseDocument(fileString);		
+		sb.parseDocument(fileString, item);		
 	}
 	done();
 }
@@ -61,6 +61,7 @@ function copyResources(done) {
 	const UIKIT_PATH = "node_modules/mio-uikit-web/";
 	const ANIMATECSS_PATH = "node_modules/animate.css/animate.min.css";
 	const DEST = __dirname + "/dist/";
+	const APP_PLIST_PATH = "./{AppName}/Info.plist/";
 
 	fs.copyFileSync(SRC + "index.html", DEST + "index.html");
 	fs.copyFileSync(SRC + "main.js", DEST + "scripts/main.js");
@@ -90,6 +91,8 @@ function copyResources(done) {
 
 	//fs.copyFileSync(UIKIT_PATH + "package.json", DEST + "libs/mio-uikit-web/package.json");
 	//fs.copyFileSync(UIKIT_PATH + "README.md", DEST + "libs/mio-uikit-web/README.md");
+
+	fs.copyFileSync(APP_PLIST_PATH, DEST + "app.plist");
 
 	done();
 }
