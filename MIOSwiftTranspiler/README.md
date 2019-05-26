@@ -17,9 +17,11 @@ That ensures that it's cloned together with the submodule MIOJSLibs.
 We've decided not to include the swift submodule, because it was failing when running the
 `./swift/utils/update-checkout --clone` for some reason. For now, you need to clone it *separately*.
 
-Go to the *parent directory* of MIOSwiftTranspiler and run `mkdir swift-source && cd swift-source`. Then
+First of all, you need to install cmake and ninja that the swift repo uses to build `brew install cmake ninja`.
+
+Go to the *parent directory* of your repos (repo root) and run `mkdir swift-source && cd swift-source`. Then
 clone our fork of the apple swift repo `git clone https://github.com/miolabs/swift.git`. Then run another command
-that swift needs to work `cd .. && ./swift/utils/update-checkout --clone`.
+that swift needs to work `./swift/utils/update-checkout --clone`.
 
 Then you need to build the C++ executable. We need to additionally include the `--ios` flag, so that we can target UIKit.
 Run `./swift/utils/build-script --release-debuginfo --ios`.
@@ -52,13 +54,13 @@ mocha
 **Transpiling a given file**
 
 ```
-../swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks example.swift
+./swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks example.swift
 ```
 
 For UIKit:
 
 ```
-../swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk -target arm64-apple-ios12.2 -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks example.swift
+./swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk -target arm64-apple-ios12.2 -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks example.swift
 ```
 
 **Outputting the AST tree (untouched ASTDumper)**
@@ -89,3 +91,23 @@ The project needs to include two sets of libraries: MIOJSLibs and the one genera
 The first time and then any time transpiler gets updated, run `npm run build-swift-libs`
 
 The first time and then any time MIOJSLibs get updated, run `npm run build-miojs-libs`
+
+## **Refactoring MIOLibs to work with transpiled projects:**
+
+**build miojslibs-optionals.json & miojslibs-renames.json**
+
+```
+node ./MIOSwiftTranspiler/include/build-bodies/build-miojslibs.js
+```
+
+**generate Libs/UIKit/dist-swift-transpiler folder (with UIKit.web.js)**
+
+```
+ts-node  --disableWarnings ./MIOSwiftTranspiler/include/build-bodies/refactor-miojslibs.ts
+```
+
+**generate mio-uikit-web.js**
+
+```
+cd Libs/UIKit && npm run build-web-dev-transpiler
+```
