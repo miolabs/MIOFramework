@@ -23,3 +23,5 @@ export function MIOCoreBundleGetAppResource(resource:string, type:string){
     let content = files[resource];
     return content;
 }
+
+

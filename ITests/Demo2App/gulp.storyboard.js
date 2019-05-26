@@ -165,7 +165,7 @@ function parserDidStartElement(parser, element, attributes){
 		let destination = attributes["destination"];
 								
 		let o = {"Property" : property, "Destination": destination};
-		outlet.push(o);
+		outlets.push(o);
 	}
 	else if (element == "segue"){
 		let segues = currentElement["Segues"];
@@ -569,11 +569,11 @@ function generateStoryboardFile(name){
 	let filename = name.replace("storyboard", "json");
 
 	let item = {};
-	item["InitialViewController"] = initialViewControllerID;
-	item["ClassesByDestination"] = storyBoardItems;
+	item["InitialViewControllerID"] = initialViewControllerID;
+	item["ClassByID"] = storyBoardItems;
 
 	let content = JSON.stringify(item);
-	fs.writeFileSync("./dist/storyboards/" + filename, content);		
+	fs.writeFileSync("./dist/layout/" + filename, content);		
 }
 
 function generateHtmlFile() {

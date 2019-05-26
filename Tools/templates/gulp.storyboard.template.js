@@ -569,11 +569,11 @@ function generateStoryboardFile(name){
 	let filename = name.replace("storyboard", "json");
 
 	let item = {};
-	item["InitialViewController"] = initialViewControllerID;
-	item["ClassesByDestination"] = storyBoardItems;
+	item["InitialViewControllerID"] = initialViewControllerID;
+	item["ClassByID"] = storyBoardItems;
 
 	let content = JSON.stringify(item);
-	fs.writeFileSync("./dist/storyboards/" + filename, content);		
+	fs.writeFileSync("./dist/layout/" + filename, content);		
 }
 
 function generateHtmlFile() {

@@ -6,6 +6,7 @@ import { MUIClassListForAnimationType } from "./core/MUICoreAnimation";
 import { MUIAnimationType } from "./core/MUICoreAnimation";
 import { NSClassFromString } from "mio-foundation-web";
 import { UIView } from "./UIView";
+import { MUICoreBundleGetClassesByDestination } from "./core/MUICoreNibParser";
 
 /**
  * Created by godshadow on 9/4/16.
@@ -165,13 +166,8 @@ export class UINavigationController extends UIViewController
                 let destination = s["Destination"];
                 let relationship = s["Relationship"];
 
-                if (relationship == "rootViewController") {
-                
-                    let classname = MUICoreBundleGetClassesByDestination(destination);
-                    let path = "layout/" + destination + ".html";    
-
-                    let vc = NSClassFromString(classname) as UIViewController;
-                    vc.initWithResource(path);            
+                if (relationship == "rootViewController") {                                    
+                    let vc = this.storyboard._instantiateViewControllerWithDestination(destination);
                     this.setRootViewController(vc);
                 }
             }    

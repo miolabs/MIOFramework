@@ -62,7 +62,7 @@ function copyResources(done) {
 	const UIKIT_PATH = "node_modules/mio-uikit-web/";
 	const ANIMATECSS_PATH = "node_modules/animate.css/animate.min.css";
 	const DEST = __dirname + "/dist/";
-	const APP_PLIST_PATH = "./{AppName}/Info.plist/";
+	const APP_PLIST_PATH = "./{AppName}/Info.plist";
 
 	fs.copyFileSync(SRC + "index.html", DEST + "index.html");
 	fs.copyFileSync(SRC + "main.js", DEST + "scripts/main.js");

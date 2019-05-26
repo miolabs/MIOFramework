@@ -1,7 +1,7 @@
 import { NSObject } from "mio-foundation-web";
 import { UIViewController } from "./UIViewController";
 
-class UIStoryboardSegue extends NSObject
+export class UIStoryboardSegue extends NSObject
 {
     identifier:string = null;
     source:UIViewController = null;

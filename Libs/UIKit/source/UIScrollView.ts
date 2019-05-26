@@ -1,7 +1,9 @@
+import { NSTimer } from "mio-foundation-web";
+import { NSPoint } from "mio-foundation-web";
+import { NSRect } from "mio-foundation-web";
+import { NSSize } from "mio-foundation-web";
+import { NSLog } from "mio-foundation-web";
 import { UIView } from "./UIView";
-import { MIOTimer, MIOPoint, MIORect, MIOSize, MIOLog } from "../MIOFoundation";
-import { UICoreLayerCreate, UICoreLayerRemoveSublayer, UICoreLayerAddSublayer, UICoreLayerAddStyle } from "./MIOUI_CoreLayer";
-import { MIOCoreDeviceOSString } from "../MIOCore/platform";
 
 /**
  * Created by godshadow on 01/09/16.
@@ -39,8 +41,8 @@ export class UIScrollView extends UIView {
     private setupLayer() {        
         if (MIOCoreDeviceOSString() == "ios") this.layer.style["-webkit-overflow-scrolling"] = "touch"; 
 
-        let contentLayer = UICoreLayerCreate();
-        UICoreLayerAddStyle(contentLayer, "content-view");
+        let contentLayer = MUICoreLayerCreate();
+        MUICoreLayerAddStyle(contentLayer, "content-view");
         // contentLayer.style.position = "absolute";
         // contentLayer.style.width = "100%";
         // contentLayer.style.height = "100%";

@@ -8,21 +8,21 @@ import { NSClassFromString } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
 import "mio-foundation-web/extensions"
-import { getTypeParameterOwner } from "typescript";
 import { NSFormatter } from "mio-foundation-web";
 import { NSSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
 import { NSBundle } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
 import { MIOCoreIsMobile } from "mio-foundation-web";
+import { MIOCoreBundleGetAppResource } from "mio-foundation-web";
 import { NSURLRequest } from "mio-foundation-web";
+import { MIOCoreBundleDownloadResource } from "mio-foundation-web";
 import { NSURLConnection } from "mio-foundation-web";
 import { NSPropertyListSerialization } from "mio-foundation-web";
 import { NSURL } from "mio-foundation-web";
 import { MIOCoreGetLanguages } from "mio-foundation-web";
 import { MIOCoreAddLanguage } from "mio-foundation-web";
 import { MIOCoreGetPlatformLanguage } from "mio-foundation-web";
-import { MIOCoreBundleSetAppResource } from "mio-foundation-web";
 import { MIOCoreStringSetLocalizedStrings } from "mio-foundation-web";
 
 export var _MUICoreLayerIDCount = 0;
@@ -1754,6 +1754,8 @@ export class UIControl extends UIView
 
 
 
+
+
 /**
  * Created by godshadow on 12/3/16.
  */
@@ -2400,9 +2402,12 @@ export class UISwitch extends UIControl
 
 
 
+
 /**
  * Created by godshadow on 11/3/16.
  */
+
+declare function _injectIntoOptional(obj:any);
 
 export class UIViewController extends NSObject {
     layerID: string = null;
@@ -2437,6 +2442,7 @@ export class UIViewController extends NSObject {
     protected _contentSize = new NSSize(320, 200);
     protected _preferredContentSize = null;
 
+    storyboard:UIStoryboard = null;
     _outlets = {};
     _segues = [];
 
@@ -2505,7 +2511,7 @@ export class UIViewController extends NSObject {
                 }
             }
         }
-    }
+    }    
 
     private connectOutlet(property, outletID) {
         console.log("prop: " + property + " - outluet: " + outletID);
@@ -3567,6 +3573,7 @@ export function UINavItemSearchInLayer(layer)
 
 
 
+
 /**
  * Created by godshadow on 9/4/16.
  */
@@ -3725,13 +3732,8 @@ export class UINavigationController extends UIViewController
                 let destination = s["Destination"];
                 let relationship = s["Relationship"];
 
-                if (relationship == "rootViewController") {
-                
-                    let classname = MUICoreBundleGetClassesByDestination(destination);
-                    let path = "layout/" + destination + ".html";    
-
-                    let vc = NSClassFromString(classname) as UIViewController;
-                    vc.initWithResource(path);            
+                if (relationship == "rootViewController") {                                    
+                    let vc = this.storyboard._instantiateViewControllerWithDestination(destination);
                     this.setRootViewController(vc);
                 }
             }    
@@ -4388,13 +4390,81 @@ export class UIWindow extends UIView
 
 
 
-export class UIResponder extends NSObject
-{
 
+
+
+export class UIStoryboard extends NSObject
+{
+    private name:string = null;
+    private bundle:NSBundle = null;
+
+    private items = null;
+    initWithName(name:string, bundle:NSBundle) {
+        super.init();
+        this.name = name;
+        this.bundle = bundle;
+
+        let content = MIOCoreBundleGetAppResource(this.name, "json");
+        this.items = JSON.parse(content);
+    }
+
+    instantiateInitialViewController():UIViewController {
+        let resource = this.items["InitialViewControllerID"];
+        if (resource == null) return;
+
+        return this._instantiateViewControllerWithDestination(resource);        
+    }
+
+    instantiateViewControllerWithIdentifier(identifier:string):UIViewController {        
+        let resource = null; //TODO: Get from main.json
+        return this._instantiateViewControllerWithDestination(resource);
+    }
+
+    _instantiateViewControllerWithDestination(resource:string):UIViewController {
+        let classname = this.items["ClassByID"][resource];
+        if (classname == null) return null;
+
+        let vc = NSClassFromString(classname) as UIViewController;        
+        vc.initWithResource("layout/" + resource + ".html");
+        vc.storyboard = this;
+
+        return vc;
+    }
 }
 
 
 
+export class UIStoryboardSegue extends NSObject
+{
+    identifier:string = null;
+    source:UIViewController = null;
+    destination:UIViewController = null;
+
+    initWithIdentifier(identifier:string, source:UIViewController, destination:UIViewController){
+        super.init();
+
+        this.identifier = identifier;
+        this.source = source = source;
+        this.destination = destination;        
+    }
+
+    private performHandler = null;
+    initWithIdentifierAndPerformHandler(identifier:string, source:UIViewController, destination:UIViewController, performHandler:any){
+        this.initWithIdentifier(identifier, source, destination);
+        this.performHandler = performHandler;
+    }
+
+    perform(){
+        
+    }
+}
+
+
+
+export class UIResponder extends NSObject
+{
+
+}
 
 
 
@@ -4481,57 +4551,55 @@ export class UIApplication {
         });        
     }
 
-    private downloadAppPlist(target, completion){        
-        let request = NSURLRequest.requestWithURL(NSURL.urlWithString("app.plist"));
-        let con = new NSURLConnection();
-        con.initWithRequestBlock(request, this, function(code, data){
-            if (code == 200) {                
-                MIOCoreBundleSetAppResource("app", "plist", data);
+    // Get Languages from the app.plist
+    private downloadLanguages(config){
+        let langs = config["Languages"];
+        if (langs == null) {
+            this._run();
+        }
+        else {
+            for (let key in langs) {
+                let url = langs[key];
+                MIOCoreAddLanguage(key, url);
             }
-            completion.call(target, data);
-        });        
-
+            let lang = MIOCoreGetPlatformLanguage();
+            this.setLanguage(lang, this, function(){
+                this._run();
+            });                
+        }
     }
 
     run(){
-        this.downloadAppPlist(this, function(data){
+        // Get App.plist
+        MIOCoreBundleDownloadResource("app", "plist", this, function(data){
             if (data == null) throw new Error("We couldn't download the app.plist");
-                        
-            // Get Languages from the app.plist
-            let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);            
-            this.initialDestination = config["UIMainResourceFile"];
-            let classes = config["UIMainClasses"];
-            MUICoreBundleSetClassesByDestination(classes);
+                                    
+            let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);
+            let mainStoryBoardFile = "layout/" + config["UIMainStoryboardFile"];
 
-            let langs = config["Languages"];
-            if (langs == null) {
-                this._run();
+            // Get Main story board
+            if (mainStoryBoardFile != null) {
+                MIOCoreBundleDownloadResource(mainStoryBoardFile, "json", this, function(data){
+                    this.mainStoryboard = new UIStoryboard();
+                    this.mainStoryboard.initWithName(mainStoryBoardFile, null);
+
+                    this.downloadLanguages(config);
+                });
             }
             else {
-                for (let key in langs) {
-                    let url = langs[key];
-                    MIOCoreAddLanguage(key, url);
-                }
-                let lang = MIOCoreGetPlatformLanguage();
-                this.setLanguage(lang, this, function(){
-                    this._run();
-                });                
+                this.downloadLanguages(config);
             }
         });
     }
-
-    private initialDestination:string = null;    
+    
+    private mainStoryboard:UIStoryboard = null;
     private _run() {        
 
         this.delegate.applicationDidFinishLaunchingWithOptions();        
         this._mainWindow = this.delegate.window;
 
         if (this._mainWindow == null) {
-            let classname = MUICoreBundleGetClassesByDestination(this.initialDestination);
-
-            let vc = NSClassFromString(classname) as UIViewController;
-            vc.initWithResource("layout/" + this.initialDestination + ".html");
-
+            let vc = this.mainStoryboard.instantiateInitialViewController();
             this.delegate.window = new UIWindow();
             this.delegate.window.initWithRootViewController(vc);
 
