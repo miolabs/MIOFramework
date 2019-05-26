@@ -96,17 +96,17 @@ The first time and then any time MIOJSLibs get updated, run `npm run build-miojs
 
 **build miojslibs-optionals.json & miojslibs-renames.json**
 
+miojslibs-optionals.json is a list of types that are optionals in native UIKit; we're looking for occurrences of these
+in Javi's libs and compiling a list of these, so that we know what to refactor in the next step.
+
 ```
 node ./MIOSwiftTranspiler/include/build-bodies/build-miojslibs.js
 ```
 
-**generate Libs/UIKit/dist-swift-transpiler folder (with UIKit.web.js)**
-
-```
-ts-node  --disableWarnings ./MIOSwiftTranspiler/include/build-bodies/refactor-miojslibs.ts
-```
-
 **generate mio-uikit-web.js**
+
+This actually goes through the ts code and refactors it, by adding `_injectIntoOptional(...)` and `...[0]`.
+At the end it produces a mio-uikit-web.js, just like `npm run build-web-dev` would
 
 ```
 cd Libs/UIKit && npm run build-web-dev-transpiler

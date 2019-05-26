@@ -192,7 +192,7 @@ export class UIViewController extends NSObject {
             return;
         }
 
-        MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (layer) {
+        MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (this: UIViewController, layer) {
             this.view.initWithLayer(layer, this);
             this.view.awakeFromHTML();
             this.view._checkSegues();

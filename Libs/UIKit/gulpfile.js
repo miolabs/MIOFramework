@@ -6,8 +6,8 @@ const uglify = require("gulp-uglify");
 const execSync = require('child_process').execSync;
 const argv = require('yargs').argv;
 
-function DIST_FOLDER() {
-	return (argv.transpiler !== undefined) ? 'dist-swift-transpiler' : 'dist';
+function DIST_FOLDER(outer) {
+	return (argv.transpiler !== undefined) ? 'dist-swift-transpiler' + (outer ? '' : '/source') : 'dist';
 }
 
 let arrIndexFiles = [];
@@ -131,7 +131,7 @@ function UIBuildWebPackageFile(done) {
 
 function UIRemoveTempFolders(done) {
 	const buildDir = __dirname + "/.build";
-	const distDir =  __dirname + `/${DIST_FOLDER()}`;
+	const distDir =  __dirname + `/${DIST_FOLDER(true)}`;
 
 	if(fs.existsSync(buildDir)) {
 		rimraf(buildDir, function(err) {
@@ -145,10 +145,10 @@ function UIRemoveTempFolders(done) {
 	if(fs.existsSync(distDir)) {
 		rimraf(distDir, function(err) {
 			if(err) throw err;
-			console.log(`/${DIST_FOLDER()} folder deleted successfully`);
+			console.log(`/${DIST_FOLDER(true)} folder deleted successfully`);
 		});
 	} else {
-		console.log(`/${DIST_FOLDER()} directory does not exist`);
+		console.log(`/${DIST_FOLDER(true)} directory does not exist`);
 	}
 	done();
 }
