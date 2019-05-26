@@ -21,11 +21,14 @@ import { _MUIHideViewController } from "./core/MUICore";
 import { UIWindow } from "./UIWindow";
 import { UISplitViewController } from "./UISplitViewController";
 import { MUICoreBundleLoadNibName } from "./core/MUICoreNibParser";
+import { UIStoryboard } from "./UIStoryboard";
 
 
 /**
  * Created by godshadow on 11/3/16.
  */
+
+declare function _injectIntoOptional(obj:any);
 
 export class UIViewController extends NSObject {
     layerID: string = null;
@@ -60,6 +63,7 @@ export class UIViewController extends NSObject {
     protected _contentSize = new NSSize(320, 200);
     protected _preferredContentSize = null;
 
+    storyboard:UIStoryboard = null;
     _outlets = {};
     _segues = [];
 
@@ -128,7 +132,7 @@ export class UIViewController extends NSObject {
                 }
             }
         }
-    }
+    }    
 
     private connectOutlet(property, outletID) {
         console.log("prop: " + property + " - outluet: " + outletID);

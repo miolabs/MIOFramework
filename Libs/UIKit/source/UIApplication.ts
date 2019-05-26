@@ -1,21 +1,19 @@
 import { NSURLRequest } from "mio-foundation-web";
-import { NSClassFromString } from "mio-foundation-web";
+import { MIOCoreBundleDownloadResource } from "mio-foundation-web";
 import { NSURLConnection } from "mio-foundation-web";
 import { NSPropertyListSerialization } from "mio-foundation-web";
 import { NSURL } from "mio-foundation-web";
 import { MIOCoreGetLanguages } from "mio-foundation-web";
 import { MIOCoreAddLanguage } from "mio-foundation-web";
 import { MIOCoreGetPlatformLanguage } from "mio-foundation-web";
-import { MIOCoreBundleSetAppResource } from "mio-foundation-web";
 import { MIOCoreStringSetLocalizedStrings } from "mio-foundation-web";
 import { UIWindow } from "./UIWindow";
-
-import { MUICoreBundleSetClassesByDestination } from "./core/MUICoreNibParser";
-import { MUICoreBundleGetClassesByDestination } from "./core/MUICoreNibParser";
 import { UIViewController } from "./UIViewController";
 import { MUICoreEvent } from "./core/MUICoreEvents"
 import { MUICoreEventInput } from "./core/MUICoreEvents"
+import { UIStoryboard } from "./UIStoryboard"
 import { UIApplicationDelegate } from "./UIApplicationDelegate";
+
 
 /**
  * Created by godshadow on 11/3/16.
@@ -88,57 +86,55 @@ export class UIApplication {
         });        
     }
 
-    private downloadAppPlist(target, completion){        
-        let request = NSURLRequest.requestWithURL(NSURL.urlWithString("app.plist"));
-        let con = new NSURLConnection();
-        con.initWithRequestBlock(request, this, function(code, data){
-            if (code == 200) {                
-                MIOCoreBundleSetAppResource("app", "plist", data);
+    // Get Languages from the app.plist
+    private downloadLanguages(config){
+        let langs = config["Languages"];
+        if (langs == null) {
+            this._run();
+        }
+        else {
+            for (let key in langs) {
+                let url = langs[key];
+                MIOCoreAddLanguage(key, url);
             }
-            completion.call(target, data);
-        });        
-
+            let lang = MIOCoreGetPlatformLanguage();
+            this.setLanguage(lang, this, function(){
+                this._run();
+            });                
+        }
     }
 
     run(){
-        this.downloadAppPlist(this, function(data){
+        // Get App.plist
+        MIOCoreBundleDownloadResource("app", "plist", this, function(data){
             if (data == null) throw new Error("We couldn't download the app.plist");
-                        
-            // Get Languages from the app.plist
-            let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);            
-            this.initialDestination = config["UIMainResourceFile"];
-            let classes = config["UIMainClasses"];
-            MUICoreBundleSetClassesByDestination(classes);
+                                    
+            let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);
+            let mainStoryBoardFile = "layout/" + config["UIMainStoryboardFile"];
 
-            let langs = config["Languages"];
-            if (langs == null) {
-                this._run();
+            // Get Main story board
+            if (mainStoryBoardFile != null) {
+                MIOCoreBundleDownloadResource(mainStoryBoardFile, "json", this, function(data){
+                    this.mainStoryboard = new UIStoryboard();
+                    this.mainStoryboard.initWithName(mainStoryBoardFile, null);
+
+                    this.downloadLanguages(config);
+                });
             }
             else {
-                for (let key in langs) {
-                    let url = langs[key];
-                    MIOCoreAddLanguage(key, url);
-                }
-                let lang = MIOCoreGetPlatformLanguage();
-                this.setLanguage(lang, this, function(){
-                    this._run();
-                });                
+                this.downloadLanguages(config);
             }
         });
     }
-
-    private initialDestination:string = null;    
+    
+    private mainStoryboard:UIStoryboard = null;
     private _run() {        
 
         this.delegate.applicationDidFinishLaunchingWithOptions();        
         this._mainWindow = this.delegate.window;
 
         if (this._mainWindow == null) {
-            let classname = MUICoreBundleGetClassesByDestination(this.initialDestination);
-
-            let vc = NSClassFromString(classname) as UIViewController;
-            vc.initWithResource("layout/" + this.initialDestination + ".html");
-
+            let vc = this.mainStoryboard.instantiateInitialViewController();
             this.delegate.window = new UIWindow();
             this.delegate.window.initWithRootViewController(vc);
 

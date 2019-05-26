@@ -4,7 +4,7 @@ export function NSClassFromString(className:string){
     let classObject = window[className];
     //if (classObject == null) classObject = MIOCoreClassByName(className);
 
-    if (classObject == null) throw new Error("MIOClassFromString: class '" + className + "' didn't register.");
+    if (classObject == null) throw new Error("NSClassFromString: class '" + className + "' didn't register.");
 
     let newClass = new classObject();
     return newClass;
