@@ -8,14 +8,14 @@ var utils = require("./gulp.utils");
 function unifySwiftFiles(done) {
 	var fileArr = [];
 	var dir = "./.build";
+	var content = "";
 
-	if (!fs.existsSync(dir)){
-		fs.mkdirSync(dir);
-	}
+	fs.mkdirSync(dir);
 	fs.recurseSync("./{AppName}/", ["*.swift"], function(filepath, relative, filename) {
-		if(filename === "app.swift") {
-			//remove app.swift if exists
+		if(filename === "app.swift" || filename === "app.ts" || filename === "app.js") {
 			fs.unlinkSync("./.build/app.swift");
+			fs.unlinkSync("./.build/app.ts");
+			fs.unlinkSync("./.build/app.js");
 		} else {
 			fileArr.push(filepath);
 		}
@@ -23,7 +23,8 @@ function unifySwiftFiles(done) {
 	fileArr.reverse().forEach((item) => {
 		var currentItem = fs.readFileSync(item, "utf8");
 		var filteredItem = utils.filterSwiftFile(currentItem);
-		fs.appendFileSync("./.build/app.swift", filteredItem, "utf8");
+		content += filteredItem;
+		fs.writeFileSync("./.build/app.swift", content, "utf8");
 	});
 	done();
 }
@@ -68,7 +69,7 @@ function copyResources(done) {
 	fs.copyFileSync("./.build/app.js", DEST + "scripts/app.js");
 	fs.copyFileSync(SRC + "app.css", DEST + "styles/app.css");
 	//temporary
-	fs.copyFileSync("../../Tools/temp/lib.js", DEST + "libs/lib.js");
+	fs.copyFileSync("../../Tools/temp/lib.js", DEST + "libs/swiftlib/lib.js");
 	fs.copyFileSync("../../Tools/temp/app.js", DEST + "scripts/app.js");
 
 	//FOUNDATION WEB

@@ -165,7 +165,7 @@ function parserDidStartElement(parser, element, attributes){
 		let destination = attributes["destination"];
 								
 		let o = {"Property" : property, "Destination": destination};
-		outlet.push(o);
+		outlets.push(o);
 	}
 	else if (element == "segue"){
 		let segues = currentElement["Segues"];
