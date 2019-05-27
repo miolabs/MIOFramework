@@ -77,13 +77,12 @@ function UIMinifyWebProd() {
 	.pipe(gulp.dest('./.build/web-prod/'));
 }
 
-function UICreateWebPackage(done) {
+function UICreateWebProdPackage(done) {
 	const SRC = __dirname + `/${DIST_FOLDER()}/`;
 	const DEST = __dirname + "/packages/mio-uikit-web/";
 
 	if(fs.existsSync(SRC)) {
 		//Create package and types folder				
-		//fs.mkdirSync(DEST + "types", {recursive: true});	 ??? WHY this functions doesn't work? who knows... 	
 		execSync('mkdir -p ' + DEST + "types"); // Always you can relay on bash :)
 		
 		//Copy UIKit.d.ts to types folder
@@ -91,14 +90,35 @@ function UICreateWebPackage(done) {
 
 		//Copy UIKit js minified
 		if(fs.existsSync("./.build/web-prod/UIKit.web.js")) {
-			fs.copyFileSync("./.build/web-prod/UIKit.web.js", DEST + "mio-uikit-web.min.js");
+			fs.copyFileSync("./.build/web-prod/UIKit.web.js", DEST + "mio-uikit-web.js");
 		}
+
+		//Copy package.json, LICENSE AND README
+		fs.copyFileSync(__dirname + "/../../LICENSE", DEST + "LICENSE");
+		fs.copyFileSync(__dirname + "/../../README.md", DEST + "README.md");
+
+		console.log("Package created succesfully");
+	} else {
+		console.log("SOMETHING WENT WRONT");
+	}
+	done();
+}
+
+function UICreateWebDevPackage(done) {
+	const SRC = __dirname + `/${DIST_FOLDER()}/`;
+	const DEST = __dirname + "/packages/mio-uikit-web-dev/";
+
+	if(fs.existsSync(SRC)) {
+		//Create package and types folder				
+		execSync('mkdir -p ' + DEST + "types"); // Always you can relay on bash :)
+		
+		//Copy UIKit.d.ts to types folder
+		fs.copyFileSync(`./${DIST_FOLDER()}/UIKit.web.d.ts`, DEST + "types/mio-uikit-web.d.ts");
 
 		//Copy UIKit js for DEV not minified
 		if(fs.existsSync(`./${DIST_FOLDER()}/UIKit.web.js`)) {
 			fs.copyFileSync(`./${DIST_FOLDER()}/UIKit.web.js`, DEST + "mio-uikit-web.js");
 		}
-
 		//Copy UIKit js map if exists
 		if(fs.existsSync(`./${DIST_FOLDER()}/UIKit.web.js.map`)) {
 			fs.copyFileSync(`./${DIST_FOLDER()}/UIKit.web.js.map`, DEST + "mio-uikit-web.js.map");
@@ -110,7 +130,7 @@ function UICreateWebPackage(done) {
 
 		console.log("Package created succesfully");
 	} else {
-		console.log("/.build directory does not exist - Execute first gulp UIminifyWebProd");
+		console.log("SOMETHING WENT WRONG!");
 	}
 	done();
 }
@@ -157,6 +177,7 @@ module.exports = {
 	UIBuildWeb: gulp.series(UIParseIndexWebTs, UIConcatWebTsFiles, UICleanWebUIkit),
 	UICleanWebJsFile,
 	UIMinifyWebProd,
-	UIBuildWebPackage: gulp.series(UICreateWebPackage, UIBuildWebPackageFile),
+	UIBuildWebProdPackage: gulp.series(UICreateWebProdPackage, UIBuildWebPackageFile),
+	UIBuildWebDevPackage: gulp.series(UICreateWebDevPackage, UIBuildWebPackageFile),
 	UIRemoveTempFolders
 }
