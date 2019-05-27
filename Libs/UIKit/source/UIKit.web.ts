@@ -4393,7 +4393,7 @@ declare function _injectIntoOptional(value:any);
 export function MUICoreStoryboardConnectOutlet(owner, property, outletID){
     console.log("prop: " + property + " - outluet: " + outletID);
 
-    let obj = this._outlets[outletID];
+    let obj = owner._outlets[outletID];
     owner[property] = _injectIntoOptional(obj);
 }
 
