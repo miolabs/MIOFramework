@@ -67,10 +67,11 @@ function copyResources(done) {
 	fs.copyFileSync(SRC + "main.js", DEST + "scripts/main.js");
 	fs.copyFileSync("./.build/app.js", DEST + "scripts/app.js");
 	fs.copyFileSync(SRC + "app.css", DEST + "styles/app.css");
+	
 	//temporary
-	fs.copyFileSync("../../Tools/temp/lib.js", DEST + "libs/swiftlib/lib.js");
-	fs.copyFileSync("../../Tools/temp/app.js", DEST + "scripts/app.js");
-
+	// fs.copyFileSync("../../Tools/temp/lib.js", DEST + "libs/swiftlib/lib.js");
+	// fs.copyFileSync("../../Tools/temp/app.js", DEST + "scripts/app.js");
+w
 	//FOUNDATION WEB
 	//fs.copyFileSync(FOUNDATION_PATH + "types/mio-foundation-web.d.ts", DEST + "libs/mio-foundation-web/types/mio-foundation-web.d.ts");
 	//fs.copyFileSync(FOUNDATION_PATH + "extensions.ts", DEST + "libs/mio-foundation-web/extensions.ts");
