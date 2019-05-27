@@ -23,7 +23,6 @@ import { UISplitViewController } from "./UISplitViewController";
 import { MUICoreBundleLoadNibName } from "./core/MUICoreNibParser";
 import { UIStoryboard, MUICoreStoryboardParseLayer } from "./UIStoryboard";
 import { UIStoryboardSegue } from "./UIStoryboardSegue";
-import { UITabBarController } from "./UITabBarController";
 
 
 /**
@@ -54,11 +53,11 @@ export class UIViewController extends NSObject {
     navigationController: UINavigationController = null;
     navigationItem: UINavigationItem = null;
     splitViewController: UISplitViewController = null;
-    tabBarController: UITabBarController = null;
+    tabBarController/*TODO: UITabBarController*/ = null;
 
     modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
     modalTransitionStyle = UIModalTransitionStyle.CoverVertical;
-    transitioningDelegate: UIViewControllerTransitioningDelegate = null;
+    transitioningDelegate/*TODO: UIViewControllerTransitioningDelegate*/ = null;
 
     protected _contentSize = new NSSize(320, 200);
     protected _preferredContentSize = null;
