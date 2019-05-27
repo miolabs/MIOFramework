@@ -2366,11 +2366,10 @@ export class UISwitch extends UIControl
 
 
 
+
 /**
  * Created by godshadow on 11/3/16.
  */
-
-declare function _injectIntoOptional(obj:any);
 
 export class UIViewController extends NSObject {
     layerID: string = null;
@@ -2388,7 +2387,7 @@ export class UIViewController extends NSObject {
     private _viewIsLoaded = false;
     private _layerIsReady = false;
 
-    private _childViewControllers = [];
+    private _childViewControllers: UIViewController[] = [];
     parentViewController: UIViewController = null;
 
     presentingViewController: UIViewController = null;
@@ -2396,11 +2395,11 @@ export class UIViewController extends NSObject {
     navigationController: UINavigationController = null;
     navigationItem: UINavigationItem = null;
     splitViewController: UISplitViewController = null;
-    tabBarController = null;
+    tabBarController: UITabBarController = null;
 
     modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
     modalTransitionStyle = UIModalTransitionStyle.CoverVertical;
-    transitioningDelegate = null;
+    transitioningDelegate: UIViewControllerTransitioningDelegate = null;
 
     protected _contentSize = new NSSize(320, 200);
     protected _preferredContentSize = null;
@@ -2610,13 +2609,13 @@ export class UIViewController extends NSObject {
         return this._childViewControllers;
     }
 
-    addChildViewController(vc) {
+    addChildViewController(vc: UIViewController) {
         vc.parentViewController = this;
         this._childViewControllers.push(vc);
         //vc.willMoveToParentViewController(this);
     }
 
-    removeChildViewController(vc) {
+    removeChildViewController(vc: UIViewController) {
         var index = this._childViewControllers.indexOf(vc);
         if (index != -1) {
             this._childViewControllers.splice(index, 1);
@@ -4455,10 +4454,10 @@ export class UIResponder extends NSObject
 
 
 
-export class UIApplicationDelegate {
+export interface UIApplicationDelegate {
 
-  window: UIWindow;
-  applicationDidFinishLaunchingWithOptions(){};
+  window: UIWindow
+  applicationDidFinishLaunchingWithOptions(): void
 }
 
 

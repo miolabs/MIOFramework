@@ -4,6 +4,6 @@ function main(args)
 {    
     var app = UIApplication.sharedInstance();
 
-    app.delegate = new AppDelegate();
+    app.delegate = _create(AppDelegate, "init");
     app.run();
 }

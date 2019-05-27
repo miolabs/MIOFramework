@@ -1,8 +1,8 @@
 import { UIWindow } from "./UIWindow";
 
 
-export class UIApplicationDelegate {
+export interface UIApplicationDelegate {
 
-  window: UIWindow;
-  applicationDidFinishLaunchingWithOptions(){};
+  window: UIWindow
+  applicationDidFinishLaunchingWithOptions(): void
 }

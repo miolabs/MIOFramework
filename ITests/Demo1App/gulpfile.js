@@ -20,7 +20,20 @@ function unifySwiftFiles(done) {
 			fileArr.push(filepath);
 		}
 	});
-	fileArr.reverse().forEach((item) => {
+	//if there's a file '/Demo1App/order.json', we expect it in the format ["file1.swift", "subfolder/file2.swift"]
+	//it's a way to provide a custom order for the swift files (with proper dependency order)
+	if(fs.existsSync("./Demo1App/order.json")) {
+		let order = JSON.parse(fs.readFileSync("./Demo1App/order.json", "utf8"))
+		fileArr.sort((a, b) => {
+			let aIndex = order.indexOf(a.slice(a.indexOf('/') + 1))
+			let bIndex = order.indexOf(b.slice(b.indexOf('/') + 1))
+			return aIndex < bIndex ? -1 : 1
+		})
+	}
+	else {
+		fileArr.reverse()//I think that's a just bodge to get files in reverse alphabetical order
+	}
+	fileArr.forEach((item) => {
 		var currentItem = fs.readFileSync(item, "utf8");
 		var filteredItem = utils.filterSwiftFile(currentItem);
 		content += filteredItem;
@@ -51,7 +64,7 @@ function parseStoryBoard(done) {
 	for(item of filesArr) {
 		if(item == "LaunchScreen.storyboard") continue;
 		var fileString = fs.readFileSync(pathStoryBoard+item, "utf8");		
-		sb.parseDocument(fileString);		
+		sb.parseDocument(fileString, item);		
 	}
 	done();
 }
@@ -62,14 +75,16 @@ function copyResources(done) {
 	const UIKIT_PATH = "node_modules/mio-uikit-web/";
 	const ANIMATECSS_PATH = "node_modules/animate.css/animate.min.css";
 	const DEST = __dirname + "/dist/";
+	const APP_PLIST_PATH = "./Demo1App/Info.plist";
 
 	fs.copyFileSync(SRC + "index.html", DEST + "index.html");
 	fs.copyFileSync(SRC + "main.js", DEST + "scripts/main.js");
 	fs.copyFileSync("./.build/app.js", DEST + "scripts/app.js");
 	fs.copyFileSync(SRC + "app.css", DEST + "styles/app.css");
+	
 	//temporary
-	fs.copyFileSync("../../Tools/temp/lib.js", DEST + "libs/swiftlib/lib.js");
-	fs.copyFileSync("../../Tools/temp/app.js", DEST + "scripts/app.js");
+	// fs.copyFileSync("../../Tools/temp/lib.js", DEST + "libs/swiftlib/lib.js");
+	// fs.copyFileSync("../../Tools/temp/app.js", DEST + "scripts/app.js");
 
 	//FOUNDATION WEB
 	//fs.copyFileSync(FOUNDATION_PATH + "types/mio-foundation-web.d.ts", DEST + "libs/mio-foundation-web/types/mio-foundation-web.d.ts");
@@ -91,6 +106,8 @@ function copyResources(done) {
 
 	//fs.copyFileSync(UIKIT_PATH + "package.json", DEST + "libs/mio-uikit-web/package.json");
 	//fs.copyFileSync(UIKIT_PATH + "README.md", DEST + "libs/mio-uikit-web/README.md");
+
+	fs.copyFileSync(APP_PLIST_PATH, DEST + "app.plist");
 
 	done();
 }

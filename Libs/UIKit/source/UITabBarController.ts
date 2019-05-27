@@ -5,7 +5,7 @@ import { UIViewController } from "./UIViewController";
  * Created by godshadow on 24/08/16.
  */
 
-export class MIOTabBarController extends UIViewController
+export class UITabBarController extends UIViewController
 {
     tabBar = null;
     private pageController = null;
