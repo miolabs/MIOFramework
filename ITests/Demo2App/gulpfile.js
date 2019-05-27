@@ -8,14 +8,14 @@ var utils = require("./gulp.utils");
 function unifySwiftFiles(done) {
 	var fileArr = [];
 	var dir = "./.build";
+	var content = "";
 
-	if (!fs.existsSync(dir)){
-		fs.mkdirSync(dir);
-	}
+	fs.mkdirSync(dir);
 	fs.recurseSync("./Demo2App/", ["*.swift"], function(filepath, relative, filename) {
-		if(filename === "app.swift") {
-			//remove app.swift if exists
+		if(filename === "app.swift" || filename === "app.ts" || filename === "app.js") {
 			fs.unlinkSync("./.build/app.swift");
+			fs.unlinkSync("./.build/app.ts");
+			fs.unlinkSync("./.build/app.js");
 		} else {
 			fileArr.push(filepath);
 		}
@@ -23,7 +23,8 @@ function unifySwiftFiles(done) {
 	fileArr.reverse().forEach((item) => {
 		var currentItem = fs.readFileSync(item, "utf8");
 		var filteredItem = utils.filterSwiftFile(currentItem);
-		fs.appendFileSync("./.build/app.swift", filteredItem, "utf8");
+		content += filteredItem;
+		fs.writeFileSync("./.build/app.swift", content, "utf8");
 	});
 	done();
 }
@@ -50,7 +51,7 @@ function parseStoryBoard(done) {
 	for(item of filesArr) {
 		if(item == "LaunchScreen.storyboard") continue;
 		var fileString = fs.readFileSync(pathStoryBoard+item, "utf8");		
-		sb.parseDocument(fileString);		
+		sb.parseDocument(fileString, item);		
 	}
 	done();
 }
@@ -59,14 +60,16 @@ function copyResources(done) {
 	const SRC = "../../Tools/resources/";
 	const FOUNDATION_PATH = "node_modules/mio-foundation-web/";
 	const UIKIT_PATH = "node_modules/mio-uikit-web/";
+	const ANIMATECSS_PATH = "node_modules/animate.css/animate.min.css";
 	const DEST = __dirname + "/dist/";
+	const APP_PLIST_PATH = "./Demo2App/Info.plist";
 
 	fs.copyFileSync(SRC + "index.html", DEST + "index.html");
 	fs.copyFileSync(SRC + "main.js", DEST + "scripts/main.js");
 	fs.copyFileSync("./.build/app.js", DEST + "scripts/app.js");
 	fs.copyFileSync(SRC + "app.css", DEST + "styles/app.css");
 	//temporary
-	fs.copyFileSync("../../Tools/temp/lib.js", DEST + "libs/lib.js");
+	fs.copyFileSync("../../Tools/temp/lib.js", DEST + "libs/swiftlib/lib.js");
 	fs.copyFileSync("../../Tools/temp/app.js", DEST + "scripts/app.js");
 
 	//FOUNDATION WEB
@@ -84,8 +87,13 @@ function copyResources(done) {
 	//fs.copyFileSync(UIKIT_PATH + "LICENSE", DEST + "libs/mio-uikit-web/LICENSE");
 	if (fs.existsSync(UIKIT_PATH + "mio-uikit-web.js")) fs.copyFileSync(UIKIT_PATH + "mio-uikit-web.js", DEST + "libs/mio-uikit-web/mio-uikit-web.js");
 	if (fs.existsSync(UIKIT_PATH + "mio-uikit-web.min.js")) fs.copyFileSync(UIKIT_PATH + "mio-uikit-web.min.js", DEST + "libs/mio-uikit-web/mio-uikit-web.min.js");
+	
+	fs.copyFileSync(ANIMATECSS_PATH, DEST + "styles/animate.min.css");
+
 	//fs.copyFileSync(UIKIT_PATH + "package.json", DEST + "libs/mio-uikit-web/package.json");
 	//fs.copyFileSync(UIKIT_PATH + "README.md", DEST + "libs/mio-uikit-web/README.md");
+
+	fs.copyFileSync(APP_PLIST_PATH, DEST + "app.plist");
 
 	done();
 }

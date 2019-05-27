@@ -12,7 +12,7 @@ export function NSClassFromString(className:string){
     let classObject = window[className];
     //if (classObject == null) classObject = MIOCoreClassByName(className);
 
-    if (classObject == null) throw new Error("MIOClassFromString: class '" + className + "' didn't register.");
+    if (classObject == null) throw new Error("NSClassFromString: class '" + className + "' didn't register.");
 
     let newClass = new classObject();
     return newClass;
@@ -798,6 +798,8 @@ export function MIOCoreBundleGetAppResource(resource:string, type:string){
 
 
 
+
+
 export class MIOCoreBundleHTMLParser implements MIOCoreHTMLParserDelegate 
 {
     private text = null;    
@@ -1395,6 +1397,7 @@ export class NSError extends NSObject
 
 
 
+
 /**
  * Created by godshadow on 9/4/16.
  */
@@ -1432,6 +1435,21 @@ export class NSBundle extends NSObject
     }
 
 }
+
+export function MIOCoreBundleDownloadResource(name:string, extension:string, target, completion){        
+    let resource = name + "." + extension;
+    let request = NSURLRequest.requestWithURL(NSURL.urlWithString(resource));
+    let con = new NSURLConnection();
+    con.initWithRequestBlock(request, target, function(code, data){
+        if (code == 200) {                
+            MIOCoreBundleSetAppResource(name, extension, data);
+        }
+        completion.call(target, data);
+    });        
+
+}
+
+
 
 
 

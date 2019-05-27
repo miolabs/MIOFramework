@@ -4,12 +4,13 @@ var NSPropertyListSerialization = require("./node_modules/mio-foundation-node").
 
 //GLOBAL VARIABLES
 var initialViewControllerID = null;
-var mainStoryBoardFile = null;
+var initialDestination = null;
+var viewClassByDestination = {};
+
 var currentFileName = null;
 var currentFileContent = null;
 var elementsStack = [];
 var currentElement = null;
-var outletsStack = [];
 
 function parseDocument(xmlString) {	
 	console.log('Entering Document');			
@@ -29,38 +30,29 @@ function parserDidStartElement(parser, element, attributes){
 		initialViewControllerID = attributes["initialViewController"];
 	}
 	if (element == "scene"){				
-		let id = attributes["sceneID"];
-		currentFileName = "scene-" + id + ".html";		
-		currentFileContent = '<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="base.css"></head><body><div class="scene" id="' + id + '">';
+		let id = attributes["sceneID"];		
+		currentFileContent = '<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="base.css"></head><body>';
 	}
-	else if (element == "viewController"){
-		let id = attributes["id"];
+	else if (element == "viewController" || element == "navigationController" || element == "tableViewController"){
+		let item = pushNewElement(element, attributes);
 		
+		let id = attributes["id"];
+		currentFileName = id + ".html";								
+		
+		viewClassByDestination[id] = item["CustomClass"];
+
 		// Update app plist file with the main html file
-		if (id == initialViewControllerID) mainStoryBoardFile = currentFileName;
-		updateAppPListFile();
+		if (id == initialViewControllerID) {
+			initialDestination = id;
+			updateAppPListFile();
+		}		
 		
-		let customClass = attributes["customClass"] || "UIViewController";
-					
-		currentFileContent += '<div class="view-controller" id="' + id + '" data-root-view-controller="true"';	
-		currentFileContent += ' data-class="' + customClass + '"';
-		currentFileContent += '>';
-
-		let outlets = {};
-		outletsStack.push(outlets);
-	}
-	else if (element == "navigationController"){
-		let id = attributes["id"];
-		let customClass = attributes["customClass"] || "UINavigationController";
-					
-		currentFileContent += '<div class="nav-controller" id="' + id + '" data-root-view-controller="true"';	
-		currentFileContent += ' data-class="' + customClass + '"';
-		currentFileContent += '>';
-
-		let outlets = {};
-		outletsStack.push(outlets);
+		item["ExtraAttributes"].push('data-root-view-controller="true"');
 	}
 	else if (element == "view"){
+		pushNewElement(element, attributes);
+	}
+	else if (element == "navigationBar"){
 		pushNewElement(element, attributes);
 	}
 	else if (element == "label"){
@@ -89,6 +81,15 @@ function parserDidStartElement(parser, element, attributes){
 		
 		item["Content"] = item["Content"] + '<input type="text" ' + inputAttrs.join(" ") + '>'
 	}
+	else if(element == "tableView") {
+		pushNewElement(element, attributes);
+	}
+	else if(element == "tableViewCell") {
+		pushNewElement(element, attributes);
+	}
+	else if(element == "tableViewCellContentView") {
+		pushNewElement(element, attributes);
+	}
 	else if (element == "segmentedControl"){
 		let item = pushNewElement(element, attributes);						
 	
@@ -115,8 +116,6 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "stepper"){
 		let item = pushNewElement(element, attributes);
 	}
-
-	
 	else if (element == "rect"){
 		let styles = currentElement["Styles"];
 		styles.push("position:absolute;");
@@ -165,33 +164,45 @@ function parserDidStartElement(parser, element, attributes){
 		currentElement["Content"] = currentElement["Content"] + '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "") +'"></div>';
 	}
 	else if (element == "outlet") {
-		let outlet = attributes["property"];
+		let outlets = currentElement["Outlets"];
+		
+		let property = attributes["property"];
 		let destination = attributes["destination"];
+								
+		let o = {"Property" : property, "Destination": destination};
+		outlets.push(o);
+	}
+	else if (element == "segue"){
+		let segues = currentElement["Segues"];
+		
+		let id = attributes["id"];
+		let destination = attributes["destination"];
+		let kind = attributes["kind"];
+		let relationship = attributes["relationship"];		
 						
-		let outlets = outletsStack[outletsStack.length - 1];
-		outlets[outlet] = destination;		
+		let segue = {"Destination" : destination, "Kind" : kind };
+		if (relationship != null) segue["Relationship"] = relationship;
+
+		segues.push(segue);
 	}
 }
 
 function parserDidEndElement(parser, element){
 
 	if (element == "scene"){				
-		currentFileContent += '</div></body></html>';
+		currentFileContent += '</body></html>';
 		generateHtmlFile();			
 		console.log(currentFileContent);
 		currentFileName = null;
 		currentFileContent = null;
 	}
-	else if (element == "viewController" || element == "navigationController"){
-		let outlets = outletsStack.pop();
-		currentFileContent += '<div class="hidden" data-outlets="true">';
-		for (let key in outlets){
-			let id = outlets[key];
-			currentFileContent += '<div data-outlet="' + id + '" data-property="' + key + '"></div>';
-		}
-		currentFileContent += '</div></div>';				
+	else if (element == "viewController" || element == "navigationController" || element == "tableViewController"){
+		popElement();
 	}
 	else if (element == "view"){
+		popElement();
+	}
+	else if (element == "navigationBar"){
 		popElement();
 	}
 	else if (element == "label"){
@@ -201,6 +212,15 @@ function parserDidEndElement(parser, element){
 		popElement();
 	}
 	else if (element == "textField"){
+		popElement();
+	}
+	else if (element == "tableView") {
+		popElement();
+	}
+	else if(element == "tableViewCell") {
+		popElement();
+	}
+	else if(element == "tableViewCellContentView") {
 		popElement();
 	}
 	else if (element == "segmentedControl"){
@@ -225,7 +245,6 @@ function parserDidEndElement(parser, element){
 		popElement();
 	}
 
-
 }
 
 function pushNewElement(element, attributes){
@@ -235,23 +254,17 @@ function pushNewElement(element, attributes){
 	let item = {};		
 	let styles = [];
 	let classes = [];
-	item["ID"] = id;
+	item["ID"] = id;	
 	item["Content"] = "";
 	item["Styles"] = styles;
-	item["Classes"] = classes;	
-	
-	if (attributes["customClass"] != null) item["ExtraAttributes"] = ['data-class="' + attributes["customClass"] + '"'];
-	else if (element == "view") item["ExtraAttributes"] = ['data-class="UIView"'];
-	else if (element == "label") item["ExtraAttributes"] = ['data-class="UILabel"'];
-	else if (element == "button") item["ExtraAttributes"] = ['data-class="UIButton"'];
-	else if (element == "textField") item["ExtraAttributes"] = ['data-class="UITextField"'];	
-	else if (element == "segmentedControl") item["ExtraAttributes"] = ['data-class="UISegmentedControl"'];
-	else if (element == "switch") item["ExtraAttributes"] = ['data-class="UISwitch"'];
-	else if (element == "slider") item["ExtraAttributes"] = ['data-class="UISlider"'];
-	else if (element == "progressView") item["ExtraAttributes"] = ['data-class="UIProgressView"'];
-	else if (element == "activityIndicatorView") item["ExtraAttributes"] = ['data-class="UIActivityIndicatorView"'];
-	else if (element == "pageControl") item["ExtraAttributes"] = ['data-class="UIPPageControl"'];
-	else if (element == "stepper") item["ExtraAttributes"] = ['data-class="UIStepper"'];
+	item["Classes"] = classes;
+	item["Segues"]	= [];	
+	item["Outlets"] = [];
+
+	let customClass = attributes["customClass"];
+	if (customClass == null) customClass = "UI" + element.charAt(0).toUpperCase() + element.substring(1);
+	item["ExtraAttributes"] = ['data-class="' + customClass + '"'];	
+	item["CustomClass"] = customClass;
 
 	classes.push(parseClassType(element));
 	if (contenMode != null) classes.push(contenMode);
@@ -278,10 +291,35 @@ function popElement(){
 	let extraAttributes = item["ExtraAttributes"];
 	classes = classes.length > 0 ? 'class="' + classes.join(" ") + '"': '';		
 	styles = styles.length > 0 ? 'style="' + styles.join("") + '"': '';		
-	let content = item["Content"];
+	let content = item["Content"] || "";
+
+	let outlets = item["Outlets"];
+	let segues = item["Segues"];	
+	
+	if (outlets.length + segues.length > 0) content += '<div class="hidden" data-connections="true">';
+
+	// Outlets	
+	for (let index = 0; index < outlets.length; index++){
+		let o = outlets[index];
+		let prop = o["Property"];
+		let dst = o["Destination"];
+		content += '<div class="hidden" data-connection-type="outlet" data-outlet="' + dst + '" data-property="' + prop + '"></div>';
+	}
+	// Segues		
+	for (let index = 0; index < segues.length; index++){
+		let item = segues[index];
+		
+		content += '<div class="hidden" data-connection-type="segue"';
+		content += ' data-segue-destination="' + item["Destination"] + '"';
+		content += ' data-segue-kind="' + item["Kind"] + '"';
+		if (item["Relationship"] != null) content += ' data-segue-relationship="' + item["Relationship"] + '"';
+		content += '></div>';
+	}
+	
+	if (outlets.length + segues.length > 0) content += '</div>';
 
 	addContentToParentItem('<div ' + classes + 'id="' + id + '"' + extraAttributes.join(" ") + styles + '>', parentItem);
-	if (content != null) addContentToParentItem(content, parentItem);			
+	if (content.length > 0) addContentToParentItem(content, parentItem);	
 	addContentToParentItem('</div>', parentItem);		
 
 }
@@ -303,141 +341,19 @@ function parserDidEndDocument(parser){
 
 }
 
-function parseScenes(item){
-	console.log("Entering parseScenes");
-	console.log(item);
-	
-	for (let index = 0; index < item.length; index++){
-		let sc = item[index];
-		parseScene(sc["scene"]);
-	}	
-}
-
-function parseScene(item){
-	console.log("Entering parseScene");
-	console.log(item);
-	let attr = item[0]["$"];
-	console.log(attr);
-	let id = attr["sceneID"];
-	currentFileName = "scene-" + id + ".html";
-	console.log(currentFileName);
-	currentFileContent = "<html><head><link rel='stylesheet' type='text/css' href='base.css'></head><body><div class='scene' id='"+ id +"'>";
-
-	let objs = item[0]["objects"];
-	parseObjects(objs);			
-		
-	currentFileContent += "</div></body></html>";
-	generateHtmlFile();		
-}
-
-function parseObjects(item) {
-	console.log("Entering objects");
-	let objs = item[0];
-	console.log(objs);
-
-	parseViewController(objs["viewController"])
-}
-
-function parseViewController(item){
-	console.log("Entering parseViewController");
-	console.log(item);
-	let attr = item[0]["$"];
-	console.log(attr);
-
-	let id = attr["id"];
-	let customClass = attr["customClass"];	
-		
-	currentFileContent += "<div class='viewController' id='" + id + "'";	
-	if (customClass != null) currentFileContent += " data-class='" + customClass + "'";
-	currentFileContent += ">";	
-	
-	parseView(item[0]["view"][0], "view");
-	
-	currentFileContent += "</div>";	
-}
-
 function parseClassType(classType){
-	switch (classType){
-		case "textField":
-		return "text-field";
-		
-		case "segmentedControl":
-		return "segmented-control";
+	let formattedString = "";
+	let arrLetters = Array.from(classType);
 
-		case "progressView":
-		return "progress-view";
+	for(var i=0; i < arrLetters.length; i++) {
+		if (classType[i] == classType[i].toUpperCase()) {
+			formattedString += "-" + classType[i].toLowerCase();
+		} else {
+			formattedString += classType[i];
+		}
+	} 
 
-		case "activityIndicatorView":
-		return "activity-indicator-view";
-
-		case "pageControl":
-		return "page-control";
-	}
-
-	return classType;
-}
-
-function parseView(item, classType){
-	console.log("Entering parseView");
-	console.log(item);	
-	let attr = item["$"];
-	console.log(attr);
-	
-	let id = attr["id"];
-	let contenMode = parseContentMode(attr["contentMode"]);
-	
-	let classes = []; 
-	classes.push(parseClassType(classType));	
-	if (contenMode != null) classes.push(contenMode);		
-	
-	let content = null;
-
-	switch (classType){
-		case "label":
-		content = parseLabel(item, classes);
-		break;
-
-		case "button":
-		content = parseButton(item, classes);
-		break;
-
-		case "textField":
-		content = parseTextField(item, classes);
-		break;
-	}
-
-	let styles = []; 
-	parseProperties(item, styles);	
-	if (styles.length > 0) {
-		styles = "style='" + styles.join("") + "'"; 
-	}
-	else {
-		styles = "";
-	}
-
-	currentFileContent += "<div class='" + classes.join(" ") + "' id='" + id + "'" + styles + ">";
-	if (content != null) currentFileContent += content;
-
-	let sv = item["subviews"];
-	parseSubViews(sv);
-	
-	currentFileContent += "</div>";	
-}
-
-function parseSubViews(item){
-	if (item == null) return;
-
-	console.log("Entering parseSubViews");
-	let objs = item[0];
-	console.log(objs);
-
-	for (let key in objs){
-		let obj = objs[key];
-		for (let index = 0; index < obj.length; index++){
-			let v = obj[index];
-			parseView(v, key);
-		}		
-	}
+	return formattedString;
 }
 
 function parseContentMode(contentMode){
@@ -656,8 +572,8 @@ function classesStringify(classes){
 function updateAppPListFile() {		
 	const PLIST_PATH = "./dist/app.plist";
 	
-	if (mainStoryBoardFile == null) return;
-	console.log("MAINURL: " + mainStoryBoardFile);				
+	if (initialDestination == null) return;
+	console.log("MAIN URL: " + initialDestination);
 	
 	let plist = null;
 	if (fs.existsSync(PLIST_PATH)) {
@@ -666,7 +582,8 @@ function updateAppPListFile() {
 	}
 	else plist = {};
 
-	plist["UIMainStoryboardFile"] = "layout/" + mainStoryBoardFile;
+	plist["UIMainResourceFile"] = initialDestination;
+	plist["UIMainClasses"] = viewClassByDestination;
 	
 	let newContent = NSPropertyListSerialization.dataWithpropertyList(plist, null, null, null);
 	fs.writeFileSync("./dist/app.plist", newContent);		

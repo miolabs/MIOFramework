@@ -4,6 +4,11 @@ const concat = require("gulp-concat");
 const rimraf = require("rimraf");
 const uglify = require("gulp-uglify");
 const execSync = require('child_process').execSync;
+const argv = require('yargs').argv;
+
+function DIST_FOLDER(outer) {
+	return (argv.transpiler !== undefined) ? 'dist-swift-transpiler' + (outer ? '' : '/source') : 'dist';
+}
 
 let arrIndexFiles = [];
 
@@ -49,7 +54,7 @@ function UICleanWebUIkit(done) {
 }
 
 function UICleanWebJsFile(done) {
-	const path = "./dist/UIKit.web.js";
+	const path = `./${DIST_FOLDER()}/UIKit.web.js`;
 	const regExObject = /\}\)\((.*) = exports.*\{\}\)\);/g;
 	const ObjectReplace = "})($1 || ($1 = {}));";
 	const regExExport = /exports\..*;/g;
@@ -67,13 +72,13 @@ function UICleanWebJsFile(done) {
 }
 
 function UIMinifyWebProd() {
-	return gulp.src('./dist/UIKit.web.js')
+	return gulp.src(`./${DIST_FOLDER()}/UIKit.web.js`)
 	.pipe(uglify())
 	.pipe(gulp.dest('./.build/web-prod/'));
 }
 
 function UICreateWebPackage(done) {
-	const SRC = __dirname + "/dist/";
+	const SRC = __dirname + `/${DIST_FOLDER()}/`;
 	const DEST = __dirname + "/packages/mio-uikit-web/";
 
 	if(fs.existsSync(SRC)) {
@@ -82,7 +87,7 @@ function UICreateWebPackage(done) {
 		execSync('mkdir -p ' + DEST + "types"); // Always you can relay on bash :)
 		
 		//Copy UIKit.d.ts to types folder
-		fs.copyFileSync("./dist/UIKit.web.d.ts", DEST + "types/mio-uikit-web.d.ts");
+		fs.copyFileSync(`./${DIST_FOLDER()}/UIKit.web.d.ts`, DEST + "types/mio-uikit-web.d.ts");
 
 		//Copy UIKit js minified
 		if(fs.existsSync("./.build/web-prod/UIKit.web.js")) {
@@ -90,13 +95,13 @@ function UICreateWebPackage(done) {
 		}
 
 		//Copy UIKit js for DEV not minified
-		if(fs.existsSync("./dist/UIKit.web.js")) {
-			fs.copyFileSync("./dist/UIKit.web.js", DEST + "mio-uikit-web.js");
+		if(fs.existsSync(`./${DIST_FOLDER()}/UIKit.web.js`)) {
+			fs.copyFileSync(`./${DIST_FOLDER()}/UIKit.web.js`, DEST + "mio-uikit-web.js");
 		}
 
 		//Copy UIKit js map if exists
-		if(fs.existsSync("./dist/UIKit.web.js.map")) {
-			fs.copyFileSync("./dist/UIKit.web.js.map", DEST + "mio-uikit-web.js.map");
+		if(fs.existsSync(`./${DIST_FOLDER()}/UIKit.web.js.map`)) {
+			fs.copyFileSync(`./${DIST_FOLDER()}/UIKit.web.js.map`, DEST + "mio-uikit-web.js.map");
 		}
 
 		//Copy package.json, LICENSE AND README
@@ -126,7 +131,7 @@ function UIBuildWebPackageFile(done) {
 
 function UIRemoveTempFolders(done) {
 	const buildDir = __dirname + "/.build";
-	const distDir =  __dirname + "/dist";
+	const distDir =  __dirname + `/${DIST_FOLDER(true)}`;
 
 	if(fs.existsSync(buildDir)) {
 		rimraf(buildDir, function(err) {
@@ -140,10 +145,10 @@ function UIRemoveTempFolders(done) {
 	if(fs.existsSync(distDir)) {
 		rimraf(distDir, function(err) {
 			if(err) throw err;
-			console.log("/dist folder deleted successfully");
+			console.log(`/${DIST_FOLDER(true)} folder deleted successfully`);
 		});
 	} else {
-		console.log("/dist directory does not exist");
+		console.log(`/${DIST_FOLDER(true)} directory does not exist`);
 	}
 	done();
 }

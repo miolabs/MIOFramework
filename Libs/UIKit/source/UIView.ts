@@ -5,10 +5,12 @@ import { NSClassFromString } from "mio-foundation-web";
 import "mio-foundation-web/extensions"
 
 import { UIWindow } from "./UIWindow";
-import { MUICoreLayerIDFromObject, MUICoreLayerCreate, MUICoreLayerAddStyle } from "./core/MUICoreLayer";
-import { UIGestureRecognizer, UIGestureRecognizerState } from "./UIGestureRecognizer";
+import { MUICoreLayerIDFromObject } from "./core/MUICoreLayer";
+import { MUICoreLayerCreate } from "./core/MUICoreLayer";
+import { UIGestureRecognizer } from "./UIGestureRecognizer";
 import { UIEvent } from "./UIEvent";
 import { MUICoreLayerSearchElementByID } from "./core/MUICoreLayer";
+import { MUICoreStoryboardParseLayer } from "./UIStoryboard";
 
 
 /**
@@ -27,8 +29,6 @@ function MUICoreViewSearchViewTag(view, tag) {
 
     return null;
 }
-
-declare function _injectIntoOptional(param:any);
 
 export class UIView extends NSObject {
     layerID = null;
@@ -119,54 +119,7 @@ export class UIView extends NSObject {
             }
         }
 
-        // Check outlets and segues
-        if (layer.childNodes.length > 0) {
-            for (let index = 0; index < layer.childNodes.length; index++) {
-                let subLayer = layer.childNodes[index] as HTMLElement;
-
-                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
-
-                if (subLayer.getAttribute("data-connections") == "true") {
-                    for (let index2 = 0; index2 < subLayer.childNodes.length; index2++) {
-                        let d = subLayer.childNodes[index2] as HTMLElement;
-                        if (d.tagName != "DIV") continue;
-
-                        let type = d.getAttribute("data-connection-type");
-
-                        if (type == "outlet") {
-                            let prop = d.getAttribute("data-property");
-                            let outlet = d.getAttribute("data-outlet");
-
-                            this.connectOutlet(prop, outlet);
-                        }
-                        else if (type == "segue") {
-                            let destination = d.getAttribute("data-segue-destination");
-                            let kind = d.getAttribute("data-segue-kind");
-                            let relationship = d.getAttribute("data-segue-relationship");
-
-                            this.addSegue(destination, kind, relationship);
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-    private connectOutlet(property, outletID){
-        console.log("prop: " + property + " - outluet: " + outletID);
-
-        let obj = this._outlets[outletID];
-        this[property] = _injectIntoOptional(obj);
-    }
-
-    
-    private addSegue(destination:string, kind:string, relationship?:string) {        
-        let s = {};
-        s["Destination"] = destination;
-        s["Kind"] = kind;
-        if (relationship != null) s["Relationship"] = relationship;
-        this._segues.push(s);
+        MUICoreStoryboardParseLayer(layer, this);
     }
 
     copy() {

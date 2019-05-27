@@ -51,6 +51,9 @@
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ih6-Sc-lcq">
                                 <rect key="frame" x="184" y="463" width="49" height="31"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <connections>
+                                    <action selector="switchClickedWithSender:" destination="BYZ-38-t0r" eventType="valueChanged" id="GWy-AT-lNy"/>
+                                </connections>
                             </switch>
                         </subviews>
                         <color key="backgroundColor" red="1" green="0.61172291300000003" blue="0.30352848799999999" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
@@ -58,7 +61,9 @@
                     </view>
                     <navigationItem key="navigationItem" title="1fst View" id="fq8-3N-ZFL"/>
                     <connections>
-                        <outlet property="textLabel" destination="cSH-1m-eQg" id="Phc-Hw-Prn"/>
+                        <outlet property="label" destination="cSH-1m-eQg" id="Epj-zk-RbT"/>
+                        <outlet property="switchButton" destination="ih6-Sc-lcq" id="jvG-Ob-dur"/>
+                        <outlet property="textField" destination="fhq-14-exn" id="EYC-OP-7tn"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

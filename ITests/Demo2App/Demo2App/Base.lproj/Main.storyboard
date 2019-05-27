@@ -23,7 +23,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Push"/>
                                 <connections>
-                                    <segue destination="86r-yL-ksG" kind="show" id="DsL-8H-CeO"/>
+                                    <segue destination="86r-yL-ksG" kind="show" identifier="SecondView" id="DsL-8H-CeO"/>
                                 </connections>
                             </button>
                         </subviews>

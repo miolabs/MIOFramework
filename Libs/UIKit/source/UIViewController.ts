@@ -21,11 +21,15 @@ import { _MUIHideViewController } from "./core/MUICore";
 import { UIWindow } from "./UIWindow";
 import { UISplitViewController } from "./UISplitViewController";
 import { MUICoreBundleLoadNibName } from "./core/MUICoreNibParser";
+import { UIStoryboard, MUICoreStoryboardParseLayer } from "./UIStoryboard";
+import { UIStoryboardSegue } from "./UIStoryboardSegue";
 
 
 /**
  * Created by godshadow on 11/3/16.
  */
+
+declare function _injectIntoOptional(obj:any);
 
 export class UIViewController extends NSObject {
     layerID: string = null;
@@ -60,13 +64,6 @@ export class UIViewController extends NSObject {
     protected _contentSize = new NSSize(320, 200);
     protected _preferredContentSize = null;
 
-    _outlets = {};
-    _segues = [];
-
-    _checkSegues() {
-
-    }
-
     constructor(layerID?) {
         super();
         this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(this);
@@ -94,56 +91,6 @@ export class UIViewController extends NSObject {
         //this.navigationItem = UINavItemSearchInLayer(layer);        
 
         this.loadView();
-    }
-
-    private _parseConnections(layer){
-        // Check outlets and segues
-        if (layer.childNodes.length > 0) {
-            for (let index = 0; index < layer.childNodes.length; index++) {
-                let subLayer = layer.childNodes[index] as HTMLElement;
-
-                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
-
-                if (subLayer.getAttribute("data-connections") == "true") {
-                    for (let index2 = 0; index2 < subLayer.childNodes.length; index2++) {
-                        let d = subLayer.childNodes[index2] as HTMLElement;
-                        if (d.tagName != "DIV") continue;
-
-                        let type = d.getAttribute("data-connection-type");
-
-                        if (type == "outlet") {
-                            let prop = d.getAttribute("data-property");
-                            let outlet = d.getAttribute("data-outlet");
-
-                            this.connectOutlet(prop, outlet);
-                        }
-                        else if (type == "segue") {
-                            let destination = d.getAttribute("data-segue-destination");
-                            let kind = d.getAttribute("data-segue-kind");
-                            let relationship = d.getAttribute("data-segue-relationship");
-
-                            this.addSegue(destination, kind, relationship);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private connectOutlet(property, outletID) {
-        console.log("prop: " + property + " - outluet: " + outletID);
-
-        let obj = this._outlets[outletID];
-        this[property] = _injectIntoOptional(obj);
-    }
-
-
-    private addSegue(destination: string, kind: string, relationship?: string) {
-        let s = {};
-        s["Destination"] = destination;
-        s["Kind"] = kind;
-        if (relationship != null) s["Relationship"] = relationship;
-        this._segues.push(s);
     }
 
     initWithResource(path) {
@@ -192,7 +139,7 @@ export class UIViewController extends NSObject {
             return;
         }
 
-        MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (layer) {
+        MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (this: UIViewController, layer) {
             this.view.initWithLayer(layer, this);
             this.view.awakeFromHTML();
             this.view._checkSegues();
@@ -237,7 +184,7 @@ export class UIViewController extends NSObject {
     _didLoadView() {
         this._layerIsReady = true;
         if (MIOCoreIsPhone() == true) MUICoreLayerAddStyle(this.view.layer, "phone");
-        this._parseConnections(this.view.layer);        
+        MUICoreStoryboardParseLayer(this.view.layer, this);
         this._checkSegues();
 
         if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null) {
@@ -535,6 +482,27 @@ export class UIViewController extends NSObject {
         this.willChangeValue("preferredContentSize");
         this._preferredContentSize = size;
         this.didChangeValue("preferredContentSize");
+    }
+
+    // Storyboard
+    storyboard:UIStoryboard = null;
+    _outlets = {};
+    _segues = [];
+
+    _checkSegues() {
+
+    }
+
+    shouldPerformSegueWithIdentifier(identifier:string, sender:any):Boolean{
+        return true;
+    }
+
+    prepareForSegue(segue:UIStoryboardSegue, sender:any){
+
+    }
+
+    performSegueWithIdentifier(identifier:string, sender:any){
+
     }
 }
 

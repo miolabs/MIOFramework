@@ -20,16 +20,17 @@
 	},
 	"homepage": "https://github.com/miolabs/MIOFramework#readme",
 	"devDependencies": {
-		"decimal.js": "^10.2.0",
-		"file-system": "^2.2.2",
-		"gulp": "^4.0.2",
-		"gulp-sourcemaps": "^2.6.5",
-		"gulp-typescript": "^5.0.1",
-		"gulp-uglify": "^3.0.2",
-		"mio-foundation-node": "^1.0.6",
-		"mio-foundation-web": "^1.0.7",
-		"mio-uikit-web": "^1.0.3",
-		"rimraf": "^2.6.3"
+	  "animate.css": "^3.7.0",
+	  "decimal.js": "^10.2.0",
+	  "file-system": "^2.2.2",
+	  "gulp": "^4.0.2",
+	  "gulp-sourcemaps": "^2.6.5",
+	  "gulp-typescript": "^5.0.1",
+	  "gulp-uglify": "^3.0.2",
+	  "mio-foundation-node": "^1.0.6",
+	  "mio-foundation-web": "^1.0.7",
+	  "mio-uikit-web": "^1.0.3",
+	  "rimraf": "^2.6.3"
 	},
 	"dependencies": {
 		"animate.css": "^3.7.0",

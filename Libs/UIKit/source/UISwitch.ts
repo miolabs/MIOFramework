@@ -7,9 +7,6 @@ import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
 
 export class UISwitch extends UIControl
 {
-    target = null;
-    action = null;    
-
     private _inputLayer = null;
     private _labelLayer = null;
 
@@ -27,23 +24,6 @@ export class UISwitch extends UIControl
             layer.appendChild(this._inputLayer);
         }       
 
-        // var div1 = document.createElement("div");
-        // this.layer.appendChild(div1);
-
-        // var div2 = document.createElement("div");
-        // div1.appendChild(div2); 
-
-/*
-        this._labelLayer = UILayerGetFirstElementWithTag(this.layer, "LABEL");
-        if (this._labelLayer == null) {
-            this._labelLayer = document.createElement("label");
-            this._labelLayer.setAttribute("for", this.layerID + "_input");
-            //this._labelLayer.classList.add("switch_button_label");
-            layer.appendChild(this._labelLayer);
-        }
-
-        */
-
         var instance = this;
         this.layer.onclick = function() {
 
@@ -60,18 +40,18 @@ export class UISwitch extends UIControl
 
 
     private _on = false;
-    get on() {return this._on;}
-    set on(value){this.setOn(value);}
-    setOn(on){
-        if (on == this.on) return;
-        this._inputLayer.checked = on;
-        this._on = on;
+    get isOn() {return this._on;}
+    set isOn(value){this.setOn(value);}
+    setOn(value){
+        if (value == this._on) return;
+        this._inputLayer.checked = value;
+        this._on = value;
     }
 
     private _toggleValue(){
-        this.on = !this.on;
+        this.isOn = !this.isOn;
 
         if (this.target != null && this.action != null)
-            this.action.call(this.target, this, this.on);
+            this.action.call(this.target, this, this.isOn);
     }
 }

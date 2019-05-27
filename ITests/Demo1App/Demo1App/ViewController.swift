@@ -10,7 +10,9 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    @IBOutlet weak var textLabel: UILabel!
+    @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var textField: UITextField!
+  @IBOutlet weak var switchButton: UISwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,8 +21,14 @@ class ViewController: UIViewController {
     
     @IBAction func buttonClicked(sender: UIButton){
         NSLog("Button clicked!!")
-        //textLabel.text = "Bye"
+        label.text = textField.text
+        switchButton.isOn = !switchButton.isOn
+      
     }
+  
+  @IBAction func switchClicked(sender: UISwitch){
+    label.text = "Hello from switch button " + (sender.isOn ? "on" : "not on");
+  }
 
 }
 

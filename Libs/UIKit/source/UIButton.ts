@@ -1,9 +1,11 @@
 import { NSLocalizeString } from "mio-foundation-web";
 import { UIControl } from "./UIControl";
-import { MUICoreLayerAddStyle, MUICoreLayerRemoveStyle, MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
+import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
+import { MUICoreLayerRemoveStyle } from "./core/MUICoreLayer";
+import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
 import { NSClassFromString } from "mio-foundation-web";
 import { UIViewController } from "./UIViewController";
-import { getTypeParameterOwner } from "typescript";
+import { MUICoreBundleGetClassesByDestination } from "./core/MUICoreNibParser";
 
 /**
  * Created by godshadow on 12/3/16.
@@ -25,11 +27,7 @@ export class UIButton extends UIControl
 
     private _imageStatusStyle = null;
     private _imageLayer = null;
-
-    target = null;
-    action = null;
-
-    private _selected = false;
+    
     type = UIButtonType.MomentaryPushIn;
 
     init(){
@@ -61,25 +59,6 @@ export class UIButton extends UIControl
         let status = this.layer.getAttribute("data-status");
         if (status == "selected")
             this.setSelected(true);
-
-        // Check for actions
-        if (this.layer.childNodes.length > 0) {
-            for (let index = 0; index < this.layer.childNodes.length; index++) {
-                let subLayer = this.layer.childNodes[index];
-
-                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
-
-                let actionSelector = subLayer.getAttribute("data-action-selector");
-                if (actionSelector != null) {                    
-                    this.setAction(this, function(){
-                        owner[actionSelector](this);
-                        // let action = owner[actionSelector];
-                        // action.call(owner);
-                    });
-                    break;                    
-                }
-            }
-        }
 
         this.setupLayers();
     }
@@ -129,46 +108,6 @@ export class UIButton extends UIControl
         }.bind(this));
     }
 
-    _checkSegues() {
-        super._checkSegues();
-
-        for (let index = 0; index < this._segues.length; index++) {
-
-            let s = this._segues[index];
-            let kind = s["Kind"];
-            
-            if (kind == "show") {
-                let destination = s["Destination"];                
-                let classname = MUICoreBundleGetClassesByDestination(destination);
-                let path = "layout/" + destination + ".html";    
-
-                if (this.owner != null && this.owner instanceof UIViewController) {
-                    this.setAction(this, function(){
-                        let vc = NSClassFromString(classname) as UIViewController;
-                        vc.initWithResource(path);   
-        
-                        this.owner.navigationController.pushViewController(vc);
-                    });
-                }
-
-                
-                
-                
-            }    
-        }
-    }
-
-
-    initWithAction(target, action){
-        this.init();
-        this.setAction(target, action);
-    }
-
-    setAction(target, action){
-        this.target = target;
-        this.action = action;
-    }
-
     setTitle(title){
         this._titleLayer.innerHTML = title;
     }
@@ -179,30 +118,6 @@ export class UIButton extends UIControl
 
     get title(){
         return this._titleLayer.innerHTML;
-    }
-
-    set selected(value){
-        this.setSelected(value);
-    }
-
-    get selected(){
-        return this._selected;
-    }
-    
-    setSelected(value){
-        if (this._selected == value)
-            return;
-
-        if (value == true) {
-            MUICoreLayerAddStyle(this.layer, "selected");
-            //UICoreLayerRemoveStyle(this.layer, "deselected");
-        }
-        else {
-            //UICoreLayerAddStyle(this.layer, "deselected");
-            MUICoreLayerRemoveStyle(this.layer, "selected");
-        }
-
-        this._selected = value;
     }
 
     setImageURL(urlString:string){

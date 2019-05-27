@@ -6,6 +6,8 @@ import { MUIClassListForAnimationType } from "./core/MUICoreAnimation";
 import { MUIAnimationType } from "./core/MUICoreAnimation";
 import { NSClassFromString } from "mio-foundation-web";
 import { UIView } from "./UIView";
+import { MUICoreBundleGetClassesByDestination } from "./core/MUICoreNibParser";
+import { UIControlEvents } from "./UIControl";
 
 /**
  * Created by godshadow on 9/4/16.
@@ -80,9 +82,9 @@ export class UINavigationController extends UIViewController
         vc.onLoadView(this, function () {
 
             if (vc.navigationItem != null && vc.navigationItem.backBarButtonItem != null) {
-                vc.navigationItem.backBarButtonItem.setAction(this, function(){
+                vc.navigationItem.backBarButtonItem.addTarget(this, function(){
                     vc.navigationController.popViewController();
-                });
+                }, UIControlEvents.AllTouchEvents);
             }
 
             this.view.addSubview(vc.view);
@@ -165,13 +167,8 @@ export class UINavigationController extends UIViewController
                 let destination = s["Destination"];
                 let relationship = s["Relationship"];
 
-                if (relationship == "rootViewController") {
-                
-                    let classname = MUICoreBundleGetClassesByDestination(destination);
-                    let path = "layout/" + destination + ".html";    
-
-                    let vc = NSClassFromString(classname) as UIViewController;
-                    vc.initWithResource(path);            
+                if (relationship == "rootViewController") {                                    
+                    let vc = this.storyboard._instantiateViewControllerWithDestination(destination);
                     this.setRootViewController(vc);
                 }
             }    

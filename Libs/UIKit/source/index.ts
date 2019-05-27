@@ -28,16 +28,25 @@ export * from './UIViewController'
 export * from './UIViewController_PresentationController'
 export * from './UIViewController_PopoverPresentationController'
 
+export * from "./UIScrollView"
+export * from "./UITableView"
+export * from "./UITableViewCell"
+export * from "./UITableViewController"
+
 export * from './UINavigationBar'
 export * from './UINavigationItem'
 export * from './UINavigationController'
 
 
-export * from './UISplitViewController'
+//export * from './UISplitViewController'
 
 export * from './core/MUICore'
 
 export * from './UIWindow'
 
+export * from './UIStoryboard'
+export * from './UIStoryboardSegue'
+
 export * from './UIResponder'
+export * from './UIApplicationDelegate'
 export * from './UIApplication'
