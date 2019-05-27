@@ -21,7 +21,8 @@ import { _MUIHideViewController } from "./core/MUICore";
 import { UIWindow } from "./UIWindow";
 import { UISplitViewController } from "./UISplitViewController";
 import { MUICoreBundleLoadNibName } from "./core/MUICoreNibParser";
-import { UIStoryboard, MUICoreStoryboardParseLayer } from "./UIStoryboard";
+import { UIStoryboard } from "./UIStoryboard";
+import { MUICoreStoryboardParseLayer } from "./UIStoryboard";
 import { UIStoryboardSegue } from "./UIStoryboardSegue";
 import { UITabBarController } from "./UITabBarController";
 
@@ -58,7 +59,7 @@ export class UIViewController extends NSObject {
 
     modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
     modalTransitionStyle = UIModalTransitionStyle.CoverVertical;
-    transitioningDelegate: UIViewControllerTransitioningDelegate = null;
+    transitioningDelegate = null;
 
     protected _contentSize = new NSSize(320, 200);
     protected _preferredContentSize = null;
@@ -183,7 +184,7 @@ export class UIViewController extends NSObject {
     _didLoadView() {
         this._layerIsReady = true;
         if (MIOCoreIsPhone() == true) MUICoreLayerAddStyle(this.view.layer, "phone");
-        MUICoreStoryboardParseLayer(this.view.layer, this);
+        MUICoreStoryboardParseLayer(this.view.layer, this, this);
         this._checkSegues();
 
         if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null) {

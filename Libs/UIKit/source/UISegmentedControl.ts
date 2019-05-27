@@ -11,8 +11,7 @@ export class UISegmentedControl extends UIControl
     segmentedItems = [];
     selectedSegmentedIndex = -1;
 
-    initWithLayer(layer, owner, options?)
-    {
+    initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
 
         for (let index = 0; index < this.layer.childNodes.length; index++){
@@ -33,9 +32,9 @@ export class UISegmentedControl extends UIControl
         }
     }
 
-    private _addSegmentedItem(item){
+    private _addSegmentedItem(item:UIButton){
         this.segmentedItems.push(item);
-        item.setAction(this, this._didClickSegmentedButton);
+        item.addTarget(this, this._didClickSegmentedButton, UIControlEvents.AllTouchEvents);
     }
 
     private _didClickSegmentedButton(button){
@@ -44,11 +43,6 @@ export class UISegmentedControl extends UIControl
 
         if (this.mouseOutTarget != null)
             this.mouseOutAction.call(this.mouseOutTarget, this, index);
-    }
-
-    setAction(target, action){
-        this.mouseOutTarget = target;
-        this.mouseOutAction = action;
     }
 
     selectSegmentedAtIndex(index){

@@ -43,7 +43,7 @@ export class UIStoryboard extends NSObject
     }
 }
 
-export function MUICoreStoryboardParseLayer(layer, owner){
+export function MUICoreStoryboardParseLayer(layer, object, owner){
     
     // Check outlets and segues
     if (layer.childNodes.length > 0) {
@@ -71,7 +71,7 @@ export function MUICoreStoryboardParseLayer(layer, owner){
                         let relationship = d.getAttribute("data-segue-relationship");
                         let identifier = d.getAttribute("data-segue-identifier");
 
-                        MUICoreStoryboardAddSegue(owner, destination, kind, relationship, identifier);
+                        MUICoreStoryboardAddSegue(object, destination, kind, relationship, identifier);
                     }
                 }
             }

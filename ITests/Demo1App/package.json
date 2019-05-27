@@ -33,6 +33,7 @@
 		"rimraf": "^2.6.3"
 	},
 	"dependencies": {
+		"swiftlib": "1.0.0",
 		"miojslibs": "^0.9.135",
 		"readable-stream": "^3.3.0",
 		"typescript": "^3.4.5"
