@@ -67,7 +67,7 @@ function createNodePackage(done) {
 
 		console.log("Package created succesfully");
 	} else {
-		console.log("/.build directory does not exist - Execute first gulp minifyNodeProd");
+		console.log("SOMETHING WENT WRONG!");
 	}
 	done();
 }
@@ -148,7 +148,7 @@ function createWebPackage(done) {
 		fs.copyFileSync("./dist/foundation.web.d.ts", DEST + "types/mio-foundation-web.d.ts");
 
 		//Copy foundation.min.js
-		fs.copyFileSync("./.build/web-prod/foundation.web.js", DEST + "mio-foundation-web.min.js");
+		fs.copyFileSync("./.build/web-prod/foundation.web.js", DEST + "mio-foundation-web.js");
 
 		//Copy extensions.ts file
 		fs.copyFileSync("source/extensions/extensions.ts", DEST + "extensions.ts");
@@ -159,7 +159,7 @@ function createWebPackage(done) {
 
 		console.log("Package created succesfully");
 	} else {
-		console.log("/.build directory does not exist - Execute first gulp minifyWebProd");
+		console.log("SOMETHING WENT WRONG!");
 	}
 	done();
 }
@@ -207,7 +207,7 @@ function buildWebDevPackage(done) {
 
 		console.log("Package created succesfully");
 	} else {
-		console.log("/.build directory does not exist - Execute first gulp minifyWebProd");
+		console.log("SOMETHING WENT WRONG!");
 	}
 	done();
 }
