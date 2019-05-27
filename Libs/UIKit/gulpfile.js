@@ -7,7 +7,8 @@ const execSync = require('child_process').execSync;
 const argv = require('yargs').argv;
 
 function DIST_FOLDER(outer) {
-	return (argv.transpiler !== undefined) ? 'dist-swift-transpiler' + (outer ? '' : '/source') : 'dist';
+	return 'dist'
+	//return (argv.transpiler !== undefined) ? 'dist-swift-transpiler' + (outer ? '' : '/source') : 'dist';
 }
 
 let arrIndexFiles = [];
@@ -136,6 +137,7 @@ function UICreateWebDevPackage(done) {
 }
 
 function UIBuildWebPackageFile(done) {
+	//TODO Edgar should mio-uikit-web => mio-uikit-web-dev 3 times here
 	var platform = "web";
 	var regEx = /{%platform%}/gm;
 	const DEST = "packages/mio-uikit-web/";

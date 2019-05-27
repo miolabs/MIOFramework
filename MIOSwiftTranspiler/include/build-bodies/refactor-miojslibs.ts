@@ -4,10 +4,7 @@ const optionals = require("./miojslibs-optionals.json")
 const renames = require("./miojslibs-renames.json")
 
 const project = new Project({
-  tsConfigFilePath: `${__dirname}/../../../Libs/UIKit/tsconfig.json`,
-  compilerOptions: {
-    outDir: `${__dirname}/../../../Libs/UIKit/dist-swift-transpiler`
-  }
+  tsConfigFilePath: `${__dirname}/../../../Libs/UIKit/tsconfig.json`
 })
 
 function getReferences(chain: string[]): ReferencedSymbol[] {
