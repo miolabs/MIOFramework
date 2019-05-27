@@ -135,7 +135,7 @@ function UICreateWebDevPackage(done) {
 	done();
 }
 
-function UIBuildWebPackageFile(done) {
+function UIBuildWebProdPackageFile(done) {
 	var platform = "web";
 	var regEx = /{%platform%}/gm;
 	const DEST = "packages/mio-uikit-web/";
@@ -146,6 +146,20 @@ function UIBuildWebPackageFile(done) {
 	var content = fs.readFileSync("packages/mio-uikit-" + platform + "/package.json", "utf8");
 	content = content.replace(regEx, platform);
 	fs.writeFileSync("packages/mio-uikit-" + platform + "/package.json", content);
+	done();
+}
+
+function UIBuildWebDevPackageFile(done) {
+	var platform = "web";
+	var regEx = /{%platform%}/gm;
+	const DEST = "packages/mio-uikit-web-dev/";
+
+	//Create package.platform.json
+	fs.copyFileSync("package.platform.json", DEST + "package.json");
+	
+	var content = fs.readFileSync("packages/mio-uikit-" + platform + "-dev/package.json", "utf8");
+	content = content.replace(regEx, platform);
+	fs.writeFileSync("packages/mio-uikit-" + platform + "-dev/package.json", content);
 	done();
 }
 
@@ -177,7 +191,7 @@ module.exports = {
 	UIBuildWeb: gulp.series(UIParseIndexWebTs, UIConcatWebTsFiles, UICleanWebUIkit),
 	UICleanWebJsFile,
 	UIMinifyWebProd,
-	UIBuildWebProdPackage: gulp.series(UICreateWebProdPackage, UIBuildWebPackageFile),
-	UIBuildWebDevPackage: gulp.series(UICreateWebDevPackage, UIBuildWebPackageFile),
+	UIBuildWebProdPackage: gulp.series(UICreateWebProdPackage, UIBuildWebProdPackageFile),
+	UIBuildWebDevPackage: gulp.series(UICreateWebDevPackage, UIBuildWebDevPackageFile),
 	UIRemoveTempFolders
 }
