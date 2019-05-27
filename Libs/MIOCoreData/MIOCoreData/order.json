@@ -1,0 +1,12 @@
+[
+  "MIOManagedObjectContext.swift",
+  "MIOPredicate.swift",
+  "MIOSortDescriptor.swift",
+  "MIOEntityDescription.swift",
+  "MIOPropertyDescription.swift",
+  "MIOAttributeDescription.swift",
+  "MIORelationshipDescription.swift",
+  "MIOPersistentStoreRequest.swift",
+  "MIOManagedObjectModel.swift",
+  "MIOFetchRequest.swift"
+]

@@ -20,7 +20,20 @@ function unifySwiftFiles(done) {
 			fileArr.push(filepath);
 		}
 	});
-	fileArr.reverse().forEach((item) => {
+	//if there's a file '/{AppName}/order.json', we expect it in the format ["file1.swift", "subfolder/file2.swift"]
+	//it's a way to provide a custom order for the swift files (with proper dependency order)
+	if(fs.existsSync("./{AppName}/order.json")) {
+		let order = JSON.parse(fs.readFileSync("./{AppName}/order.json", "utf8"))
+		fileArr.sort((a, b) => {
+			let aIndex = order.indexOf(a.slice(a.indexOf('/') + 1))
+			let bIndex = order.indexOf(b.slice(b.indexOf('/') + 1))
+			return aIndex < bIndex ? -1 : 1
+		})
+	}
+	else {
+		fileArr.reverse()//I think that's a just bodge to get files in reverse alphabetical order
+	}
+	fileArr.forEach((item) => {
 		var currentItem = fs.readFileSync(item, "utf8");
 		var filteredItem = utils.filterSwiftFile(currentItem);
 		content += filteredItem;
@@ -72,7 +85,7 @@ function copyResources(done) {
 	//temporary
 	// fs.copyFileSync("../../Tools/temp/lib.js", DEST + "libs/swiftlib/lib.js");
 	// fs.copyFileSync("../../Tools/temp/app.js", DEST + "scripts/app.js");
-w
+
 	//FOUNDATION WEB
 	//fs.copyFileSync(FOUNDATION_PATH + "types/mio-foundation-web.d.ts", DEST + "libs/mio-foundation-web/types/mio-foundation-web.d.ts");
 	//fs.copyFileSync(FOUNDATION_PATH + "extensions.ts", DEST + "libs/mio-foundation-web/extensions.ts");
