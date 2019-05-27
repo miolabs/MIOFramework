@@ -99,7 +99,7 @@ function UICreateWebProdPackage(done) {
 
 		console.log("Package created succesfully");
 	} else {
-		console.log("SOMETHING WENT WRONT");
+		console.log("SOMETHING WENT WRONG!");
 	}
 	done();
 }
