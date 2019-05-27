@@ -13,10 +13,12 @@ const project = new Project({
 function getReferences(chain: string[]): ReferencedSymbol[] {
   let chained: any = project
   for(let i = 0; i < chain.length; i += 2) {
+    if(!chained) break
     if(!i) chain[i + 1] = 'UIKit.web.ts'
     if(typeof chain[i + 1] === 'string') chained = chained[chain[i]](chain[i + 1])
     else chained = chained[chain[i]]
   }
+  if(!chained) return []
 
   let property = chained as ParameterDeclaration | ClassInstancePropertyTypes
   //console.log(chain)

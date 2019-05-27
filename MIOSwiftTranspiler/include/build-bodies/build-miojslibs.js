@@ -25,7 +25,7 @@ for(let className in UIKitMembers) {
 
 fs.writeFileSync(
     `${__dirname}/miojslibs.js`,
-    fs.readFileSync(`${__dirname}/../../../Libs/Foundation/packages/mio-foundation-web/mio-foundation-web.js`, 'utf8') +
+    fs.readFileSync(`${__dirname}/../../../Libs/Foundation/packages/mio-foundation-web-dev/mio-foundation-web.js`, 'utf8') +
     fs.readFileSync(`${__dirname}/../../../Libs/UIKit/packages/mio-uikit-web/mio-uikit-web.js`, 'utf8') +
     exportCode
 )

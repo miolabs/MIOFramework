@@ -100,7 +100,7 @@ miojslibs-optionals.json is a list of types that are optionals in native UIKit; 
 in Javi's libs and compiling a list of these, so that we know what to refactor in the next step.
 
 ```
-node ./MIOSwiftTranspiler/include/build-bodies/build-miojslibs.js
+ts-node --disableWarnings ./MIOSwiftTranspiler/include/build-bodies/build-miojslibs.ts
 ```
 
 **generate mio-uikit-web.js**
