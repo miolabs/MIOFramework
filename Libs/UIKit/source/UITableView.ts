@@ -317,3 +317,8 @@ class UITableViewRow extends UIView
     section = null;
     cell = null;
 }
+
+export class UITableViewCellContentView extends UIView
+{
+
+}

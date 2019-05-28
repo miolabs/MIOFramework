@@ -71,36 +71,33 @@ function parseStoryBoard(done) {
 
 function copyResources(done) {
 	const SRC = "../../Tools/resources/";
-	const FOUNDATION_PATH = "node_modules/mio-foundation-web/";
-	const UIKIT_PATH = "node_modules/mio-uikit-web/";
-	const ANIMATECSS_PATH = "node_modules/animate.css/animate.min.css";
 	const DEST = __dirname + "/dist/";
 	const APP_PLIST_PATH = "./Demo3App/Info.plist";
+	const FOUNDATION_PATH = "node_modules/mio-foundation-web/";
+	const UIKIT_PATH = "node_modules/mio-uikit-web/";
+	const SWIFT_PATH = "node_modules/mio-swiftlib/";
+	const ANIMATECSS_PATH = "node_modules/animate.css/animate.min.css";
 
 	fs.copyFileSync(SRC + "index.html", DEST + "index.html");
 	fs.copyFileSync(SRC + "main.js", DEST + "scripts/main.js");
 	fs.copyFileSync("./.build/app.js", DEST + "scripts/app.js");
 	fs.copyFileSync(SRC + "app.css", DEST + "styles/app.css");
-	
-	//temporary
-	// fs.copyFileSync("../../Tools/temp/lib.js", DEST + "libs/swiftlib/lib.js");
-	// fs.copyFileSync("../../Tools/temp/app.js", DEST + "scripts/app.js");
+	fs.copyFileSync(SWIFT_PATH + "lib.js", DEST + "libs/mio-swiftlib/lib.js");
 
 	//FOUNDATION WEB
 	//fs.copyFileSync(FOUNDATION_PATH + "types/mio-foundation-web.d.ts", DEST + "libs/mio-foundation-web/types/mio-foundation-web.d.ts");
 	//fs.copyFileSync(FOUNDATION_PATH + "extensions.ts", DEST + "libs/mio-foundation-web/extensions.ts");
 	//fs.copyFileSync(FOUNDATION_PATH + "LICENSE", DEST + "libs/mio-foundation-web/LICENSE");
 	if (fs.existsSync(FOUNDATION_PATH + "mio-foundation-web.js")) fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web.js", DEST + "libs/mio-foundation-web/mio-foundation-web.js");
-	if (fs.existsSync(FOUNDATION_PATH + "mio-foundation-web.min.js")) fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web.min.js", DEST + "libs/mio-foundation-web/mio-foundation-web.min.js");
+	// if (fs.existsSync(FOUNDATION_PATH + "mio-foundation-web.min.js")) fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web.min.js", DEST + "libs/mio-foundation-web/mio-foundation-web.min.js");
 	//fs.copyFileSync(FOUNDATION_PATH + "package.json", DEST + "libs/mio-foundation-web/package.json");
 	//fs.copyFileSync(FOUNDATION_PATH + "README.md", DEST + "libs/mio-foundation-web/README.md");
-
 
 	//UIKIT
 	//fs.copyFileSync(UIKIT_PATH + "types/mio-uikit-web.d.ts", DEST + "libs/mio-uikit-web/types/mio-uikit-web.d.ts");
 	//fs.copyFileSync(UIKIT_PATH + "LICENSE", DEST + "libs/mio-uikit-web/LICENSE");
 	if (fs.existsSync(UIKIT_PATH + "mio-uikit-web.js")) fs.copyFileSync(UIKIT_PATH + "mio-uikit-web.js", DEST + "libs/mio-uikit-web/mio-uikit-web.js");
-	if (fs.existsSync(UIKIT_PATH + "mio-uikit-web.min.js")) fs.copyFileSync(UIKIT_PATH + "mio-uikit-web.min.js", DEST + "libs/mio-uikit-web/mio-uikit-web.min.js");
+	// if (fs.existsSync(UIKIT_PATH + "mio-uikit-web.min.js")) fs.copyFileSync(UIKIT_PATH + "mio-uikit-web.min.js", DEST + "libs/mio-uikit-web/mio-uikit-web.min.js");
 	
 	fs.copyFileSync(ANIMATECSS_PATH, DEST + "styles/animate.min.css");
 

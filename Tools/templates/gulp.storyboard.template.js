@@ -80,7 +80,10 @@ function parserDidStartElement(parser, element, attributes){
 		pushNewElement(element, attributes);
 	}
 	else if(element == "tableViewCell") {
-		pushNewElement(element, attributes);
+		let item = pushNewElement(element, attributes);
+
+		let reuseIdentifier = attributes["reuseIdentifier"];
+		item["ExtraAttributes"].push('data-cell-identifier="' + reuseIdentifier + '"');
 	}
 	else if(element == "tableViewCellContentView") {
 		pushNewElement(element, attributes);

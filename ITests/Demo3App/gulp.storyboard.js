@@ -80,7 +80,10 @@ function parserDidStartElement(parser, element, attributes){
 		pushNewElement(element, attributes);
 	}
 	else if(element == "tableViewCell") {
-		pushNewElement(element, attributes);
+		let item = pushNewElement(element, attributes);
+
+		let reuseIdentifier = attributes["reuseIdentifier"];
+		item["ExtraAttributes"].push('data-cell-identifier="' + reuseIdentifier + '"');
 	}
 	else if(element == "tableViewCellContentView") {
 		pushNewElement(element, attributes);
@@ -155,8 +158,9 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "action") {
 		let selector =  attributes["selector"];
-		//TODO: let eventType = attributes["eventType"];		
-		currentElement["Content"] = currentElement["Content"] + '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "") +'"></div>';
+		let eventType = attributes["eventType"];		
+		let actionDiv = '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "") + '" data-event-type="' + eventType + '"></div>';
+		currentElement["Content"] = currentElement["Content"] + actionDiv;
 	}
 	else if (element == "outlet") {
 		let outlets = currentElement["Outlets"];

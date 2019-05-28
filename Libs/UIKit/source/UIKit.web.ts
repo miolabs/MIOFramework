@@ -3903,6 +3903,11 @@ class UITableViewRow extends UIView
     cell = null;
 }
 
+export class UITableViewCellContentView extends UIView
+{
+
+}
+
 
 export class UITableViewController extends UIViewController
 {
