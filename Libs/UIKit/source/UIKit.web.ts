@@ -14,6 +14,8 @@ import { MIOCoreIsPhone } from "mio-foundation-web";
 import { NSBundle } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
 import { MIOCoreIsMobile } from "mio-foundation-web";
+import { NSTimer } from "mio-foundation-web";
+import { NSLog } from "mio-foundation-web";
 import { MIOCoreBundleGetAppResource } from "mio-foundation-web";
 import { NSURLRequest } from "mio-foundation-web";
 import { MIOCoreBundleDownloadResource } from "mio-foundation-web";
@@ -3359,6 +3361,1688 @@ export class MIOPopOverDismissAnimationController extends NSObject
         let animations = MUIClassListForAnimationType(MUIAnimationType.FadeOut);
         return animations;
     }
+
+}
+
+
+
+
+
+
+
+/**
+ * Created by godshadow on 01/09/16.
+ */
+
+
+export class UIScrollView extends UIView {
+    pagingEnabled = false;
+    delegate = null;
+    scrolling = false;
+
+    private _showsVerticalScrollIndicator: boolean = true;
+    set showsVerticalScrollIndicator(value: boolean) { this.setShowsVerticalScrollIndicator(value); }
+    get showsVerticalScrollIndicator(): boolean { return this._showsVerticalScrollIndicator; }
+
+    private _scrollEnable = true;
+    set scrollEnable(value: boolean) { this.setScrollEnable(value); }
+    get scrollEnable(): boolean { return this._scrollEnable; }
+
+    private scrollTimer = null;
+    private lastOffsetY = 0;
+
+    protected contentView:UIView = null;
+
+    init() {
+        super.init();
+        this.setupLayer();
+    }
+
+    initWithLayer(layer, owner, options?) {
+        super.initWithLayer(layer, owner, options);
+        this.setupLayer();
+    }
+
+    private setupLayer() {        
+        if (MIOCoreDeviceOSString() == "ios") this.layer.style["-webkit-overflow-scrolling"] = "touch"; 
+
+        let contentLayer = MUICoreLayerCreate();
+        MUICoreLayerAddStyle(contentLayer, "content-view");
+        // contentLayer.style.position = "absolute";
+        // contentLayer.style.width = "100%";
+        // contentLayer.style.height = "100%";
+        // contentLayer.style.overflow = "hidden";
+
+        this.contentView = new UIView();
+        this.contentView.initWithLayer(contentLayer, this);
+        super.addSubview(this.contentView);
+        
+        this.contentView.layer.addEventListener("wheel", this.scrollEventCallback.bind(this), true);
+        this.layer.addEventListener("scroll", this.scrollEventCallback.bind(this), true);
+
+        // if (MIOCoreDeviceOSString() == 'ios'){
+        //     this.contentView.layer.addEventListener("touchstart", function(e){
+
+        //     }, false);
+        // }
+
+        // FIX: Scroll event don't get fire when you scroll with a scrollbar because the system thinks that
+        //      has to take care by himself to scroll a "prerender" page so if you have a dynamic page that 
+        //      has to be notify when the user scrolls to load more content, you're out of luck. You code doesn't get call.
+        //      The onwheel event, instead, fire an event becuase it's a hardware thing, not like the scrollbar...
+        //
+        // NOTE: Really, who the hell make this kind of crap implementation in the html???
+
+    }
+
+    private scrollEventCallback() {
+
+        let offsetY = this.contentOffset.y;
+        let deltaY = 0;
+        if (offsetY < this.lastOffsetY)
+            deltaY = offsetY - this.lastOffsetY;
+        else if (offsetY > this.lastOffsetY)
+            deltaY = this.lastOffsetY + offsetY;
+        else 
+            return;
+
+        console.log("Content Offset y: " + offsetY + " - delta y: " + deltaY);
+
+        this.setNeedsDisplay();
+
+        if (this.scrolling == false) {
+            this.scrolling = true;
+            this.didStartScroll();
+        }
+
+        if (this.scrollTimer != null) this.scrollTimer.invalidate();
+        this.scrollTimer = MIOTimer.scheduledTimerWithTimeInterval(150, false, this, this.scrollEventStopCallback);        
+
+        this.didScroll(0, deltaY);
+        this.lastOffsetY = this.contentOffset.y;
+
+        if (this.delegate != null && typeof this.delegate.scrollViewDidScroll === "function")
+            this.delegate.scrollViewDidScroll.call(this.delegate, this);
+    }
+
+    private scrollEventStopCallback(timer) {
+        this.scrolling = false;
+
+        this.didStopScroll();
+    }
+
+    protected didStartScroll() {
+        //console.log("START SCROLL");
+    }
+
+    protected didScroll(deltaX, deltaY) {
+        //console.log("DID SCROLL");
+    }
+
+    protected didStopScroll() {
+        //console.log("STOP SCROLL");
+    }
+
+    public setScrollEnable(value: boolean) {
+
+        if (this._scrollEnable == value) return;
+        this._scrollEnable = value;
+
+
+        if (value == true) {
+            this.contentView.layer.style.overflow = "scroll";
+        }
+        else {
+            this.contentView.layer.style.overflow = "hidden";
+        }
+    }
+
+    public setShowsVerticalScrollIndicator(value: boolean) {
+        if (value == this._showsVerticalScrollIndicator) return;
+
+        this._showsVerticalScrollIndicator = value;
+
+        if (value == false) {
+            this.layer.style.paddingRight = "20px";
+        }
+        else {
+            this.layer.style.paddingRight = "";
+        }
+    }
+
+    set contentOffset(point: MIOPoint) {
+        if (point.x > 0) this.layer.scrollLeft = point.x;
+        if (point.y > 0) this.layer.scrollTop = point.y;
+    }
+
+    get contentOffset(): MIOPoint {
+        let p = new MIOPoint(this.layer.scrollLeft, this.layer.scrollTop);
+        return p;
+    }
+
+    get bounds():MIORect{
+        let p = this.contentOffset;
+        return MIORect.rectWithValues(p.x, p.y, this.getWidth(), this.getHeight());
+    }
+
+    addSubview(view:UIView, index?) {
+        this.contentView.addSubview(view, index);
+    }
+
+    set contentSize(size: MIOSize) {
+        if (size.width > 0) {
+            this.contentView.setWidth(size.width);
+        }
+        if (size.height > 0) {
+            this.contentView.setHeight(size.height);
+            // create markers for intersection observer (see fix note below)
+            //this.createIntersectionObserverMarkers(size.height);
+        }
+    }
+
+    layoutSubviews() {
+        this.contentView.layoutSubviews();
+    }
+
+    scrollToTop(animate?) {
+        // if (true)
+        //     this.layer.style.transition = "scrollTop 0.25s";
+
+        this.layer.scrollTop = 0;
+    }
+
+    scrollToBottom(animate?) {
+        // if (true)
+        //     this.layer.style.transition = "scrollTop 0.25s";
+
+        this.layer.scrollTop = this.layer.scrollHeight;
+    }
+
+    scrollToPoint(x, y, animate?) {
+        this.layer.scrollTop = y;
+        this.lastOffsetY = y;
+    }
+
+    scrollRectToVisible(rect, animate?) {
+        //TODO: Implement this
+    }
+}
+
+
+
+
+
+
+
+
+
+/**
+ * Created by godshadow on 22/3/16.
+ */
+
+export interface UITableViewDataSource {
+    
+    viewForHeaderInSection?(tableView:UITableView, section):UIView;
+    titleForHeaderInSection?(tableView:UITableView, section):string;
+}
+
+export enum UITableViewRowAnimation
+{
+    None,
+    Automatic,
+    Fade,
+    Right,
+    Left,
+    Top,
+    Bottom,
+    Middle
+}
+
+export class UITableViewSection extends MIOObject {
+    header: UIView = null;
+    title: string = null;
+    footer: UIView = null;
+
+    rowCount = 0;
+    cells = [];
+    rows = [];
+
+    static headerWithTitle(title, height) {
+
+        let header = new UIView();
+        header.init();
+        header.setHeight(height);
+        //header.layer.style.background = "";
+        //header.layer.style.margin = "4px 8px";
+        UICoreLayerRemoveStyle(header.layer, "view");
+        UICoreLayerAddStyle(header.layer, "header");
+
+        let titleLabel = new UILabel();
+        titleLabel.init();
+        // titleLabel.layer.style.background = "";
+        UICoreLayerRemoveStyle(titleLabel.layer, "lbl");
+        UICoreLayerAddStyle(titleLabel.layer, "title");
+        titleLabel.text = title;
+        header.addSubview(titleLabel);
+
+        return header;
+    }
+}
+
+export enum UITableViewRowType {
+    Header,
+    SectionHeader,
+    Cell,
+    SectionFooter,
+    Footer
+}
+
+export class UITableViewRow extends MIOObject {
+    type: UITableViewRowType;
+    view: UIView = null;
+    height = 0;
+
+    prevRow:UITableViewRow = null;
+    nextRow:UITableViewRow = null;
+
+    initWithType(type: UITableViewRowType) {
+        this.type = type;
+    }
+}
+
+export class UITableViewCellNode extends MIOObject {
+
+    identifier: string = null;
+    section: UITableViewSection = null;
+}
+
+export class UITableView extends UIScrollView {
+    dataSource = null;
+    delegate = null;
+
+    headerView: UIView = null;
+    footerView: UIView = null;
+
+    headerHeight = 0;
+    footerHeight = 0;
+
+    sectionHeaderHeight = 23;
+    sectionFooterHeight = 23;
+
+    rowHeight = 0;
+    private defaultRowHeight = 44;
+
+    allowsMultipleSelection = false;
+    
+    private selectedIndexPath: MIOIndexPath = null;
+
+    private _indexPathsForSelectedRows = [];
+
+    private _cellPrototypesCount = 0;
+    private _cellPrototypesDownloadedCount = 0;
+    private _isDownloadingCells = false;
+    private _needReloadData = false;
+    private _cellPrototypes = {};
+
+    visibleCells = [];
+    private reusableCellsByID = {};    
+    private cellNodesByID = {};
+
+    private visibleRange: MIORange = new MIORange(-1, -1);
+
+    private sections = [];
+    private rows = [];
+    private cellRows = [];
+    private rowsCount = 0;
+
+    private contentHeight = 0;
+    private lastContentOffsetY = -this.defaultRowHeight;
+
+    private firstVisibleHeader:UIView = null;
+    private reloadingData = false;
+    private selectedCellWhileReloadingData:UITableViewCell = null;
+
+    initWithLayer(layer, owner, options?) {
+        super.initWithLayer(layer, owner, options);
+
+        // Check if we have prototypes
+        if (this.layer.childNodes.length > 0) {
+            for (let index = 0; index < this.layer.childNodes.length; index++) {
+                let subLayer = this.layer.childNodes[index];
+
+                if (subLayer.tagName != "DIV")
+                    continue;
+
+                if (subLayer.getAttribute("data-cell-identifier") != null) {
+                    this._addCellPrototypeWithLayer(subLayer, owner);
+                    subLayer.style.display = "none";
+                }
+                else if (subLayer.getAttribute("data-tableview-header") != null) {
+                    this._addHeaderWithLayer(subLayer, owner);
+                }
+                else if (subLayer.getAttribute("data-tableview-footer") != null) {
+                    this._addFooterWithLayer(subLayer, owner);
+                }
+            }
+        }
+    }
+
+    private _addHeaderWithLayer(subLayer, owner) {
+        this.headerView = new UIView();
+        this.headerView.initWithLayer(subLayer, owner);
+        // var h = this.headerView.getHeight();
+        // var size = new MIOSize(subLayer.clientWidth, subLayer.clientHeight);
+        // this.headerView.setFrame(MIOFrame.frameWithRect(0, 0, size.width, size.height));
+    }
+
+    private _addFooterWithLayer(subLayer, owner) {
+        this.footerView = new UIView();
+        this.footerView.initWithLayer(subLayer, owner);
+        // var size = new MIOSize(subLayer.clientWidth, subLayer.clientHeight);
+        // this.footerView.setFrame(MIOFrame.frameWithRect(0, 0, size.width, size.height));
+    }
+
+    private _addCellPrototypeWithLayer(subLayer, owner) {
+        let cellIdentifier = subLayer.getAttribute("data-cell-identifier");
+        let cellClassname = subLayer.getAttribute("data-class");
+        if (cellClassname == null) cellClassname = "UITableViewCell";
+
+        let item = {};
+        item["class"] = cellClassname;
+        item["layer"] = subLayer;
+        let size = new MIOSize(subLayer.clientWidth, subLayer.clientHeight);
+        if (size != null) item["size"] = size;
+        // var bg = window.getComputedStyle( subLayer ,null).getPropertyValue('background-color');
+        // if (bg != null) item["bg"] = bg;
+
+        this._cellPrototypes[cellIdentifier] = item;
+    }
+
+    addCellPrototypeWithIdentifier(identifier, elementID, url, classname?) {
+
+        let item = {};
+
+        this._isDownloadingCells = true;
+        this._cellPrototypesCount++;
+
+        item["url"] = url;
+        item["id"] = elementID;
+        if (classname != null)
+            item["class"] = classname;
+
+        this._cellPrototypes[identifier] = item;
+        let mainBundle = MIOBundle.mainBundle();
+        mainBundle.loadHTMLNamed(url, elementID, this, function (layer) {
+
+            item["layer"] = layer;
+            this._cellPrototypes[identifier] = item;
+
+            this._cellPrototypesDownloadedCount++;
+            if (this._cellPrototypesDownloadedCount == this._cellPrototypesCount) {
+                this._isDownloadingCells = false;
+                if (this._needReloadData)
+                    this.reloadData();
+            }
+        });
+    }
+
+    dequeueReusableCellWithIdentifier(identifier:string): UITableViewCell {
+
+        let cell: UITableViewCell = null;
+
+        let array = this.reusableCellsByID[identifier];
+        if (array != null) {
+            if (array.length > 0) {
+                cell = array[0];
+                array.splice(0, 1);
+                cell.addObserver(this, "selected");
+                return cell;
+            }
+        }
+
+        let item = this._cellPrototypes[identifier];
+
+        //instance creation here
+        let className = item["class"];
+        cell = MIOClassFromString(className);
+        cell.nodeID = MIOUUID.UUID().UUIDString;
+        cell.reuseIdentifier = identifier;
+
+        let layer = item["layer"];
+        if (layer != null) {
+            let newLayer = layer.cloneNode(true);
+            newLayer.style.display = "";            
+            cell.initWithLayer(newLayer, this);
+            cell.awakeFromHTML();
+        }
+        // else {
+        //     let cells = item["cells"];
+        //     if (cells == null) {
+        //         cells = [];
+        //         item["cells"] = cells;
+        //     }
+        //     cells.push(cell);
+        // }        
+
+        cell.addObserver(this, "selected");
+        return cell;
+    }
+
+    setHeaderView(view) {
+        this.headerView = view;
+        this.addSubview(this.headerView);
+    }
+
+    reloadData() {
+
+        this.reloadingData = true;
+        // Remove all subviews
+        for (let index = 0; index < this.rows.length; index++) {
+            let row = this.rows[index];
+            if (row.view != null) {
+                switch (row.type) {
+
+                    case UITableViewRowType.Header:
+                    case UITableViewRowType.Footer:                    
+                        break;
+
+                    case UITableViewRowType.Cell:
+                        this.recycleCell(row.view);
+                        row.view.removeFromSuperview();                        
+                        break;
+
+                    default:
+                        row.view.removeFromSuperview();
+                }                
+            }
+        }
+
+        this.rows = [];
+        this.sections = [];
+        this.rowsCount = 0;
+        this.selectedIndexPath = null;
+        this.visibleRange = new MIORange(-1, -1);
+        //this.lastContentOffsetY = -this.defaultRowHeight;
+        this.lastContentOffsetY = 0;
+        this.contentHeight = 0;
+
+        // Is ready to reaload or the are still donwloading
+        if (this._isDownloadingCells == true) {
+            this._needReloadData = true;
+            return;
+        }
+
+        if (this.dataSource == null) return;
+
+        let sections = 1;
+        if (typeof this.dataSource.numberOfSections === "function") sections = this.dataSource.numberOfSections(this);
+        for (let sectionIndex = 0; sectionIndex < sections; sectionIndex++) {
+            let section = new UITableViewSection();
+            section.init();
+            this.sections.push(section);
+
+            let rows = this.dataSource.numberOfRowsInSection(this, sectionIndex);
+            section.rowCount = rows;
+            this.rowsCount += rows;
+            this.contentHeight += rows * this.defaultRowHeight;
+        }
+
+        let size = new MIOSize(0, this.contentHeight);
+        this.contentSize = size;        
+        this.scrollToTop();
+
+        this.reloadLayoutSubviews = true;
+
+        if (this.rowsCount > 0) this.setNeedsDisplay();
+
+        this.reloadingData = false;
+        if (this.selectedCellWhileReloadingData != null) {
+            let ip = this.indexPathForCell(this.selectedCellWhileReloadingData);
+            this.selectedIndexPath = ip;
+            this.selectedCellWhileReloadingData = null;
+        }
+        
+    }
+
+    private reloadLayoutSubviews = false;
+
+    layoutSubviews() {
+
+        if (this.reloadLayoutSubviews == true) {
+            this.reloadLayoutSubviews = false;
+            this.initialLayoutSubviews();
+        }
+        else {
+            this.scrollLayoutSubviews();
+        }
+    }
+
+    private lastIndexPath: MIOIndexPath = null;
+
+    private initialLayoutSubviews() {
+        
+        // Add Header
+        let posY = this.addHeader();
+        
+        let maxY = this.getHeight() + (this.defaultRowHeight * 4);
+        let exit = false;
+
+        let lastRow = null;
+        for (let sectionIndex = 0; sectionIndex < this.sections.length; sectionIndex++) {
+
+            if (exit == true) break;            
+
+            let section = this.sections[sectionIndex] as UITableViewSection;
+            if (section.rowCount > 0) posY += this.addSectionHeader(section, posY, null);           
+
+            for (let cellIndex = 0; cellIndex < section.rowCount; cellIndex++) {
+                let ip = MIOIndexPath.indexForRowInSection(cellIndex, sectionIndex);
+                posY += this.addCell(ip, posY, null, lastRow);
+
+                lastRow = this.rows[this.rows.length - 1];
+                this.lastIndexPath = ip;
+
+                if (cellIndex == section.rowCount - 1) posY += this.addSectionFooter(section, posY, null);
+
+                if (posY >= maxY) {
+                    exit = true;
+                    break;
+                }
+            }            
+        }
+
+        // Add Footer
+        if (posY < maxY) posY += this.addFooter();        
+
+        this.visibleRange = new MIORange(0, this.rows.length);
+        
+        let size = new MIOSize(0, this.contentHeight);
+        this.contentSize = size;
+        this.lastContentOffsetY = 0;
+    }
+
+    private scrollLayoutSubviews() {
+
+        if (this.rowsCount == 0) return;
+
+        let scrollDown = false;
+        let offsetY = 0;
+        if (this.contentOffset.y == this.lastContentOffsetY) return;
+        if (this.contentOffset.y > this.lastContentOffsetY) {
+            offsetY = this.contentOffset.y - this.lastContentOffsetY;
+            scrollDown = true;
+        }
+        else if (this.contentOffset.y < this.lastContentOffsetY) {
+            offsetY = this.lastContentOffsetY - this.contentOffset.y;
+            scrollDown = false;
+        }
+
+        if (offsetY < (this.defaultRowHeight / 2)) return;
+        this.lastContentOffsetY = this.contentOffset.y;
+
+        if (scrollDown == true) {
+
+            let start = this.visibleRange.location;
+            let end = this.visibleRange.location + this.visibleRange.length - 1;
+            let row = this.rows[end];
+            let posY = row.view.getY() + row.height;
+            let maxY = this.contentOffset.y + this.getHeight() + (this.defaultRowHeight * 4);
+            let startSectionIndex = this.lastIndexPath.section;
+            let startRowIndex = this.lastIndexPath.row + 1;
+
+            let lastRow = row;
+            let nextRow = end + 1;
+            let h = 0;
+            let exit = false;
+
+            for (let sectionIndex = startSectionIndex; sectionIndex < this.sections.length; sectionIndex++) {
+
+                if (exit == true) break;
+
+                let section: UITableViewSection = this.sections[sectionIndex];
+                
+                for (let cellIndex = startRowIndex; cellIndex < section.rowCount; cellIndex++) {
+
+                    if (cellIndex == 0) {
+                        h = this.addSectionHeader(section, posY, this.rows[nextRow]);
+                        posY += h;
+                        if (h > 0) {
+                            nextRow++;
+                            start++;
+                        }
+                    }
+
+                    let ip = MIOIndexPath.indexForRowInSection(cellIndex, sectionIndex);
+                    posY += this.addCell(ip, posY, this.rows[nextRow], lastRow);
+                    lastRow = this.rows[nextRow];
+                    nextRow++;
+                    start++;                    
+
+                    // let recycleRow:UITableViewRow = this.rows[start];
+                    // if (recycleRow.type == UITableViewRowType.Cell) {
+                    //     this.recycleCell(recycleRow.view as UITableViewCell);                            
+                    // }                        
+
+                    this.lastIndexPath = ip;
+
+                    if (section.rowCount - 1 == cellIndex) {
+                        h = this.addSectionFooter(section, posY, this.rows[nextRow]);
+                        posY += h;
+                        if (h > 0) {
+                            nextRow++;
+                            start++;
+                        } 
+                    }
+
+                    if (posY >= maxY) {
+                        exit = true;
+                        break;
+                    }
+                    
+                }
+                startRowIndex = 0;
+                
+            }
+
+            // Add Footer
+            // if (posY < maxY) {
+            //     posY += this.addFooter();
+            // }
+
+            this.visibleRange = new MIORange(start, nextRow - start);
+        }
+
+        let size = new MIOSize(0, this.contentHeight);
+        this.contentSize = size;
+    }
+
+    private recycleCell(cell: UITableViewCell) {
+
+        if (cell == null) return;
+
+        let ip = this.indexPathForCell(cell);
+
+        if (ip.row == -1) return;
+
+        let section = this.sections[ip.section];
+        section.cells[ip.row] = null;
+
+        //cell.selected = false;
+        cell.removeObserver(this, "selected");        
+
+        let array = this.reusableCellsByID[cell.reuseIdentifier];
+        if (array == null) {
+            array = [];
+            this.reusableCellsByID[cell.reuseIdentifier] = array;
+        }
+        array.push(cell);
+
+        if (this.delegate != null) {
+            if (typeof this.delegate.didEndDisplayingCellAtIndexPath === "function")
+                this.delegate.didEndDisplayingCellAtIndexPath(this, cell, ip);
+        }
+    }
+
+    private indexPathForRowIndex(index, sectionIndex) {
+
+        let section = this.sections[sectionIndex];
+
+        if (index < section.rows) {
+            return MIOIndexPath.indexForRowInSection(index, sectionIndex);
+        }
+        else {
+            let nextIndex = index - section.rows;
+            return this.indexPathForRowIndex(nextIndex, sectionIndex + 1);
+        }
+    }
+
+    private addRowsForNewVisibleRange(range: MIORange, scrollDown: boolean) {
+
+        let row: UITableViewRow;
+        let start;
+        let end;
+        let posY = 0;
+
+        if (this.visibleRange.location == -1) {
+            start = range.location;
+            end = range.length;
+            posY = 0;
+        }
+        else if (scrollDown == true) {
+            start = this.visibleRange.location + this.visibleRange.length - 1;
+            end = range.location + range.length;
+        }
+        else {
+            start = range.location;
+            end = this.visibleRange.location;
+            row = this.rows[end];
+            posY = row.view.getY();
+        }
+
+        if (scrollDown == true) {
+
+            row = this.rows[start];
+            posY = row.view.getY();
+
+            for (let index = start; index < end; index++) {
+
+                row = this.rows[index];
+                if (MIOLocationInRange(index, this.visibleRange) == true) {
+                    posY += row.height;
+                }
+                else {
+                    // if (ip.row == 0) {
+                    //     let section = this.sections[ip.section];
+                    //     posY += this.addSectionHeader(section, posY, index);
+                    // }
+
+                    let ip = this.indexPathForRowIndex(index, 0);
+                    posY += this.addCell(ip, posY, index, null);
+                }
+            }
+        }
+        else {
+
+            for (let index = end; index >= start; index--) {
+
+                if (MIOLocationInRange(index, this.visibleRange) == false) {
+
+                    // if (rowIndex == section.rows - 1) {
+                    //     section.header = this.addSectionHeader(sectionIndex);
+                    // }
+                    row = this.rows[index];
+                    let h = row.height;
+                    row = this.rows[index + 1];
+                    posY = row.view.getY() - h;
+                    let ip = this.indexPathForRowIndex(index, 0);
+                    this.addCell(ip, posY, index, null, row);
+                }
+            }
+        }
+    }
+
+    private addRowWithType(type: UITableViewRowType, view: UIView): UITableViewRow {
+
+        let row = new UITableViewRow();
+        row.initWithType(type);
+        this.rows.push(row);
+        this.cellRows.addObject(row);
+        row.view = view;
+
+        return row;
+    }
+
+    private addHeader() {
+
+        let header:UIView = null;
+        if (this.headerView != null) header = this.headerView;
+        if (header == null) return 0;
+
+        header.setX(0);
+        header.setY(0);
+        header.setWidth(this.getWidth());
+
+        this.addSubview(header);
+        let row = this.addRowWithType(UITableViewRowType.Header, header);
+
+        if (row.height == 0) {
+            row.height = header.getHeight() + 1;
+            this.contentHeight += row.height;
+        }
+
+        return row.height;
+    }
+
+    private addSectionHeader(section: UITableViewSection, posY, row: UITableViewRow) {
+
+        if (row != null && row.view != null) return row.height;
+
+        let sectionIndex = this.sections.indexOf(section);
+
+        if (typeof this.dataSource.viewForHeaderInSection === "function") {
+            let view: UIView = this.dataSource.viewForHeaderInSection(this, sectionIndex);
+            if (view == null) return 0;
+
+            view.setX(0);
+            view.setY(posY);
+
+            section.header = view;
+            this.addSubview(view);
+            if (row == null) {
+                row = this.addRowWithType(UITableViewRowType.SectionHeader, section.header);
+            }
+            row.view = view;
+
+            if (row.height == 0) {
+                row.height = view.getHeight();;
+                this.contentHeight += row.height;
+            }
+
+            return row.height;
+        }
+        else if (typeof this.dataSource.titleForHeaderInSection === "function") {
+            let title = this.dataSource.titleForHeaderInSection(this, sectionIndex);
+            if (title == null) return null;
+
+            let header = UITableViewSection.headerWithTitle(title, this.sectionHeaderHeight);
+
+            header.setX(0);
+            header.setY(posY);
+
+            section.header = header;
+            this.addSubview(header);
+
+            if (row == null) {
+                row = this.addRowWithType(UITableViewRowType.SectionHeader, section.header);
+            }
+            row.view = header;
+
+            if (row.height == 0) {
+                row.height = header.getHeight();;
+                this.contentHeight += row.height;
+            }
+
+            return row.height;
+        }
+
+        return 0;
+    }
+
+    private addCell(indexPath: MIOIndexPath, posY, row: UITableViewRow, prevRow:UITableViewRow, currentRow?:UITableViewRow) {
+
+        let cell: UITableViewCell = this.dataSource.cellAtIndexPath(this, indexPath);
+
+        if (row != null && row.view != null) return row.height;
+        let r = row;
+        if (r == null) {
+            r = this.addRowWithType(UITableViewRowType.Cell, cell);
+        }
+
+        if (currentRow != null && prevRow != null){
+            prevRow.nextRow = r;
+            currentRow.prevRow = r;
+            r.prevRow = prevRow;
+            r.nextRow = currentRow;
+        }
+        else if (currentRow != null){
+            r.nextRow = currentRow;
+            r.prevRow = currentRow.prevRow;
+            currentRow.prevRow = r;
+        }
+        else if (prevRow != null) {
+            r.prevRow = prevRow;
+            prevRow.nextRow = r;
+        }
+
+        let nodeID = cell.nodeID;
+        let node: UITableViewCellNode = this.cellNodesByID[nodeID];
+        if (node == null) {
+            node = new UITableViewCellNode();
+            node.identifier = nodeID;
+            this.cellNodesByID[nodeID] = node;
+        }
+
+        let section = this.sections[indexPath.section];
+        node.section = section;
+        section.cells[indexPath.row] = cell;
+        section.rows[indexPath.row] = r;
+
+        cell.setX(0);
+        cell.setY(posY);
+        // TODO: Here we don't have to use the css. Encapsulate that in a Core Layer funciton
+        //cell.layer.style.width = "100%";
+
+        if (this.delegate != null && typeof this.delegate.willDisplayCellAtIndexPath === "function") {
+            this.delegate.willDisplayCellAtIndexPath(this, cell, indexPath);
+        }
+        
+        if (prevRow == null) {
+            this.addSubview(cell);
+        }
+        else {
+            let index = this.contentView.subviews.indexOf(prevRow.view);
+            this.addSubview(cell, index)
+        }
+
+        r.view = cell;
+
+        cell.setNeedsDisplay();
+
+        //TODO: these are private properties, can not be used from outside
+        cell._target = this;
+        cell._onClickFn = this.cellOnClickFn;
+        cell._onDblClickFn = this.cellOnDblClickFn;
+        cell._onAccessoryClickFn = this.cellOnAccessoryClickFn;
+        cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
+
+        let h = this.rowHeight;
+        if (this.delegate != null && typeof this.delegate.heightForRowAtIndexPath === "function") {
+            h = this.delegate.heightForRowAtIndexPath(this, indexPath);
+            if (r.height != h) {
+                if (r.height == 0) {
+                    this.contentHeight -= this.defaultRowHeight;
+                    this.contentHeight += h; 
+                }
+                else {
+                    this.contentHeight -= r.height;
+                    this.contentHeight += h;                     
+                }
+                r.height = h;
+            }
+        }
+        
+        if (h > 0) {
+            cell.setHeight(h);
+        }
+        else {
+            h = cell.getHeight();
+            if (r.height == 0) {
+                r.height = h;
+                this.contentHeight -= this.defaultRowHeight;
+                this.contentHeight += h;
+            }
+        }
+
+        if (this.delegate != null && typeof this.delegate.editingStyleForRowAtIndexPath === "function") {
+            let editingStyle = this.delegate.editingStyleForRowAtIndexPath(this, indexPath);
+            cell.setEditingAccessoryType(editingStyle);
+        }
+
+        return r.height;
+    }
+
+    private addSectionFooter(section: UITableViewSection, posY, row:UITableViewRow) {
+        
+        if (row != null && row.type != UITableViewRowType.SectionFooter) return 0;
+        if (row != null && row.view != null) return row.height;
+
+        let sectionIndex = this.sections.indexOf(section);
+
+        if (typeof this.dataSource.viewForFooterInSection === "function") {
+            let view: UIView = this.dataSource.viewForFooterInSection(this, sectionIndex);
+            if (view == null) return 0;
+
+            view.setX(0);
+            view.setY(posY);
+
+            section.footer = view;
+            this.addSubview(view);
+            if (row == null) {
+                row = this.addRowWithType(UITableViewRowType.SectionFooter, section.footer);
+            }
+            row.view = view;
+
+            if (row.height == 0) {
+                row.height = view.getHeight();
+                this.contentHeight += row.height;
+            }
+
+            return row.height;
+        }
+
+        return 0;
+    }
+
+    private addFooter() {
+        return 0;
+    }
+
+    cellOnClickFn(cell: UITableViewCell) {
+
+        let indexPath: MIOIndexPath = this.indexPathForCell(cell);
+
+        let canSelectCell = true;
+
+        if (this.delegate != null) {
+            if (typeof this.delegate.canSelectCellAtIndexPath === "function")
+                canSelectCell = this.delegate.canSelectCellAtIndexPath(this, indexPath);
+        }
+
+        if (canSelectCell == false)
+            return;
+
+        if (this.allowsMultipleSelection == false) {                        
+            cell.selected = true;
+            if (this.delegate != null && typeof this.delegate.didSelectCellAtIndexPath === "function") {
+                this.delegate.didSelectCellAtIndexPath(this, indexPath);
+            }                
+        }
+        else {
+            //TODO:
+        }
+
+    }
+
+    cellOnDblClickFn(cell) {
+
+/*        let indexPath: MIOIndexPath = this.indexPathForCell(cell);
+
+        let canSelectCell = true;
+
+        if (this.delegate != null) {
+            if (typeof this.delegate.canSelectCellAtIndexPath === "function")
+                canSelectCell = this.delegate.canSelectCellAtIndexPath(this, indexPath);
+        }
+
+        if (canSelectCell == false)
+            return;
+
+        if (this.delegate != null) {
+            if (typeof this.delegate.didMakeDoubleClick === "function")
+                this.delegate.didMakeDoubleClick(this, indexPath);
+        }
+
+        if (this.selectedIndexPath.isEqualToIndexPath(indexPath) == false) {
+
+            if (this.allowsMultipleSelection == false) {
+                if (this.selectedIndexPath != null)
+                    this.deselectCellAtIndexPath(this.selectedIndexPath);
+            }
+
+            this.selectedIndexPath = indexPath;
+            cell.selected = true;            
+        }
+
+        if (this.delegate != null) {
+            if (typeof this.delegate.didSelectCellAtIndexPath === "function")
+                this.delegate.didSelectCellAtIndexPath(this, indexPath);
+        }*/
+    }
+
+    cellOnAccessoryClickFn(cell:UITableViewCell) {
+        if (cell.accessoryType != UITableViewCellAccessoryType.None) return;
+
+        let indexPath: MIOIndexPath = this.indexPathForCell(cell);
+        if (this.delegate != null && typeof this.delegate.accessoryButtonTappedForRowWithIndexPath === "function") {
+            this.delegate.accessoryButtonTappedForRowWithIndexPath(this, indexPath);
+        }
+    }
+
+    cellOnEditingAccessoryClickFn(cell:UITableViewCell) {
+        let indexPath: MIOIndexPath = this.indexPathForCell(cell);
+
+        if (this.delegate != null && typeof this.delegate.editingStyleForRowAtIndexPath === "function") {
+            let editingStyle = this.delegate.editingStyleForRowAtIndexPath(this, indexPath);
+        
+            if (this.delegate != null && typeof this.delegate.commitEditingStyleForRowAtIndexPath === "function") {
+                this.delegate.commitEditingStyleForRowAtIndexPath(this, editingStyle, indexPath);
+            }
+        }
+    }
+
+
+    cellAtIndexPath(indexPath: MIOIndexPath) {
+
+        let s = this.sections[indexPath.section];
+        let c = s.cells[indexPath.row];
+
+        return c;
+    }
+
+    indexPathForCell(cell: UITableViewCell): MIOIndexPath {
+
+        let node: UITableViewCellNode = this.cellNodesByID[cell.nodeID];
+        if (node == null) return null;
+
+        let section = node.section;
+        let sectionIndex = this.sections.indexOf(section);
+
+        let rowIndex = section.cells.indexOf(cell);
+
+        return MIOIndexPath.indexForRowInSection(rowIndex, sectionIndex);
+    }
+
+    selectCellAtIndexPath(indexPath: MIOIndexPath) {
+
+        if (this.selectedIndexPath != null && this.selectedIndexPath.isEqualToIndexPath(indexPath) == true) return;
+
+        //if (this.selectedIndexPath != null) this.deselectCellAtIndexPath(this.selectedIndexPath);
+        //this.selectedIndexPath = indexPath;
+
+        let cell = this.sections[indexPath.section].cells[indexPath.row];
+        if (cell != null) cell.selected = true;
+    }
+
+    deselectCellAtIndexPath(indexPath: MIOIndexPath) {
+
+        if (this.selectedIndexPath == null) return;
+        if (this.selectedIndexPath.isEqualToIndexPath(indexPath) == false) return;
+
+        //this.selectedIndexPath = null;
+        let cell = this.sections[indexPath.section].cells[indexPath.row];
+        if (cell != null) cell.selected = false;
+    }
+
+    observeValueForKeyPath(keyPath:string, type:string, object, ctx) {
+        if (type != "did") return;
+        if (keyPath == "selected") {
+            let cell = object as UITableViewCell;
+            let indexPath = this.indexPathForCell(object);
+            if (cell.selected == false && this.selectedIndexPath != null && this.selectedIndexPath.isEqualToIndexPath(indexPath) == true) {                
+                this.selectedIndexPath = null;
+            }
+            else if (cell.selected == true){
+                //TODO: Support multiple selection
+                if (this.selectedIndexPath != null && this.selectedIndexPath.isEqualToIndexPath(indexPath) == false){
+                    let oldCell = this.cellAtIndexPath(this.selectedIndexPath);
+                    if (oldCell != null) oldCell.selected = false;
+                }
+                if (this.reloadingData == true) this.selectedCellWhileReloadingData = cell;
+                this.selectedIndexPath = indexPath;
+            }                                            
+        }
+    }
+
+
+    insertRowsAtIndexPaths(indexPaths, animation:UITableViewRowAnimation){
+               
+        let rows = indexPaths.count;
+        this.rowsCount += rows;
+        this.contentHeight += rows * this.defaultRowHeight;
+
+        let maxY = this.contentOffset.y + this.getHeight() + (this.defaultRowHeight * 4);
+
+        for (let index = 0; index < rows; index++){
+            let ip = indexPaths[index];
+
+            this.insertCellWithIndexPath(ip);
+
+            // if (posY >= maxY) {
+            //     break;
+            // }      
+            
+            this.lastIndexPath = ip;
+        }
+
+        //this.visibleRange = new MIORange(start, nextRow - start);
+                
+        let size = new MIOSize(0, this.contentHeight);
+        this.contentSize = size;
+    }
+
+    private insertCellWithIndexPath(indexPath:MIOIndexPath){
+        let section = this.sections[indexPath.section];        
+        let prevRow = this.prevCellRowAtIndexPath(indexPath);
+
+        let posY = 0;
+        if (prevRow == null) {
+            this.addCell(indexPath, posY, null, null);
+        }
+        else {            
+            posY = prevRow.view.getY() + prevRow.view.getHeight();
+            posY += this.addCell(indexPath, posY, null, prevRow, prevRow.nextRow);
+        }
+
+        // recalculate top of the cells
+        if (prevRow == null) return;
+
+        let nextRow = prevRow.nextRow.nextRow;
+        while(nextRow != null) {
+            nextRow.view.setY(posY);
+            posY += nextRow.view.getHeight();
+            nextRow = nextRow.nextRow;
+        }
+    }
+
+    private prevIndexPath(indexPath:MIOIndexPath){
+        let sectionIndex = indexPath.section;
+        let rowIndex = indexPath.row - 1;
+
+        if (rowIndex > -1) {
+            return MIOIndexPath.indexForRowInSection(rowIndex, sectionIndex);            
+        }
+        else {
+            sectionIndex--;
+            if (sectionIndex > -1) {
+                let section = this.sections[sectionIndex];
+                rowIndex = section.cells.length - 1;
+
+                return MIOIndexPath.indexForRowInSection(rowIndex, sectionIndex);
+            }
+        }
+
+        return null;
+    }
+
+    private prevCellRowAtIndexPath(indexPath:MIOIndexPath){
+        if (indexPath == null) return null;
+
+        let ip = this.prevIndexPath(indexPath);
+        if (ip == null) return null;
+
+        let section = this.sections[ip.section];
+        let row = section.rows[ip.row];
+
+        return row;
+    }
+
+    deleteRowsAtIndexPaths(indexPaths, animation:UITableViewRowAnimation){
+
+    }
+
+    moveRowAtIndexPathToIndexPath(indexPath:MIOIndexPath, newIndexPat:MIOIndexPath){
+
+    }
+
+    selectNextIndexPath() {
+
+        var sectionIndex = 0;
+        var rowIndex = 0;
+
+        if (this.selectedIndexPath != null) {
+            sectionIndex = this.selectedIndexPath.section;
+            rowIndex = this.selectedIndexPath.row;    
+
+            let ip = MIOIndexPath.indexForRowInSection(rowIndex, sectionIndex);
+            this.deselectCellAtIndexPath(ip);
+            rowIndex++;                
+        }
+
+        if (this.sections.length == 0) return;
+
+        var section = this.sections[sectionIndex];
+        if (rowIndex < section.cells.length) {
+            let ip = MIOIndexPath.indexForRowInSection(rowIndex, sectionIndex);
+            this.selectCellAtIndexPath(ip);
+        }
+        else {
+            rowIndex = 0;
+            sectionIndex++;
+            if (sectionIndex < this.sections.length) {
+                let ip = MIOIndexPath.indexForRowInSection(rowIndex, sectionIndex);
+                this.selectCellAtIndexPath(ip);
+            }
+        }
+    }
+
+    selectPrevIndexPath() {
+
+        if (this.selectedIndexPath == null) return;
+
+        var sectionIndex = this.selectedIndexPath.section;
+        var rowIndex = this.selectedIndexPath.row - 1;
+
+        if (rowIndex > -1) {
+            let ip = MIOIndexPath.indexForRowInSection(rowIndex + 1, sectionIndex);
+            this.deselectCellAtIndexPath(ip);
+            let ip2 = MIOIndexPath.indexForRowInSection(rowIndex, sectionIndex);
+            this.selectCellAtIndexPath(ip2);
+        }
+        else {
+            sectionIndex--;
+            if (sectionIndex > -1) {
+                let ip = MIOIndexPath.indexForRowInSection(rowIndex + 1, sectionIndex + 1);
+                this.deselectCellAtIndexPath(ip);
+
+                var section = this.sections[sectionIndex];
+                rowIndex = section.cells.length - 1;
+
+                let ip2 = MIOIndexPath.indexForRowInSection(rowIndex, sectionIndex);
+                this.selectCellAtIndexPath(ip2);
+            }
+        }
+    }
+
+}
+
+
+
+
+
+export enum UITableViewCellStyle {
+
+    Custom,
+    Default
+}
+
+export enum UITableViewCellAccessoryType {
+
+    None,
+    DisclosureIndicator,
+    DetailDisclosureButton,
+    Checkmark
+}
+
+export enum UITableViewCellEditingStyle {
+
+    None,
+    Delete,
+    Insert
+}
+
+export enum UITableViewCellSeparatorStyle {
+
+    None,
+    SingleLine,
+    SingleLineEtched // TODO 
+}
+
+export enum UITableViewCellSelectionStyle {
+
+    None,
+    Default
+}
+
+export class UITableViewCell extends UIView {
+
+    reuseIdentifier: string = null;
+
+    nodeID: string = null;
+
+    contentView: UIView = null;
+    style = UITableViewCellStyle.Custom;
+
+    textLabel = null;
+    
+    accessoryView:UIView = null;
+    separatorStyle = UITableViewCellSeparatorStyle.SingleLine;
+
+    private _editing = false;
+    editingAccessoryView: UIView = null;
+
+    selectionStyle = UITableViewCellSelectionStyle.Default;
+    private _selected = false;
+
+    _target = null;
+    _onClickFn = null;
+    _onDblClickFn = null;
+    _onAccessoryClickFn = null;
+    _onEditingAccessoryClickFn = null;
+
+    _section = null;
+
+    initWithStyle(style: UITableViewCellStyle) {
+
+        super.init();
+        this.style = style;
+
+        if (style == UITableViewCellStyle.Default) {
+            this.textLabel = new UILabel();
+            this.textLabel.init();
+            this.textLabel.layer.style.top = "";
+            this.textLabel.layer.style.left = "";
+            this.textLabel.layer.style.width = "";
+            this.textLabel.layer.style.height = "";
+            this.textLabel.layer.classList.add("tableviewcell_default_textlabel");
+            this.addSubview(this.textLabel);
+            this.layer.style.height = "44px";
+
+            UICoreLayerAddStyle(this.layer, "cell");
+        }
+
+        this._setupLayer();
+    }
+
+    initWithLayer(layer, owner, options?) {
+        super.initWithLayer(layer, owner, options);
+
+        this.scanLayerNodes(layer, owner);
+
+        this._setupLayer();
+    }
+
+    private scanLayerNodes(layer, owner) {
+
+        if (layer.childNodes.length == 0) return;
+
+        if (layer.childNodes.length > 0) {
+            for (var index = 0; index < layer.childNodes.length; index++) {
+                var subLayer = layer.childNodes[index];
+
+                if (subLayer.tagName != "DIV")
+                    continue;
+
+                this.scanLayerNodes(subLayer, owner);
+
+                if (subLayer.getAttribute("data-accessory-type") != null) {
+                    this.addAccessoryView(subLayer, owner);
+                }
+
+                if (subLayer.getAttribute("data-editing-accessory-view") != null) {
+                    this.addEditingAccessoryView(subLayer, owner);
+                }
+            }
+        }
+
+    }
+
+    //data-accessory-type="checkmark"
+
+    private addAccessoryView(layer, owner) {
+
+        let type = layer.getAttribute("data-accessory-type");
+
+        this.accessoryView = new UIView();
+        this.accessoryView.initWithLayer(layer, owner);
+
+        if (type == "checkmark") this.accessoryType = UITableViewCellAccessoryType.Checkmark;
+        else this.accessoryType = UITableViewCellAccessoryType.None;
+
+        if (this.accessoryType != UITableViewCellAccessoryType.None) return;
+        
+        this.accessoryView.layer.addEventListener("click", this.accessoryViewDidClick.bind(this));
+    }
+
+    private accessoryViewDidClick(e:Event){
+        e.stopPropagation();
+        this._onAccessoryClickFn.call(this._target, this);
+    }
+
+    private editingAccessoryInsertView:UIView = null;
+    private editingAccessoryDeleteView:UIView = null;
+    private addEditingAccessoryView(layer, owner) {
+
+        let type = layer.getAttribute("data-editing-accessory-view");
+        if (type == "insert") {
+            this.editingAccessoryInsertView = new UIView();
+            this.editingAccessoryInsertView.initWithLayer(layer, owner);
+
+            this.editingAccessoryInsertView.layer.addEventListener("click", this.editingAccessoryViewDidClick.bind(this));
+        }
+        else if (type == "delete") {
+            this.editingAccessoryDeleteView = new UIView();
+            this.editingAccessoryDeleteView.initWithLayer(layer, owner);
+
+            this.editingAccessoryDeleteView.layer.addEventListener("click", this.editingAccessoryViewDidClick.bind(this));
+        }
+        else {
+            this.editingAccessoryView = new UIView();
+            this.editingAccessoryView.initWithLayer(layer, owner);    
+
+            this.editingAccessoryView.layer.addEventListener("click", this.editingAccessoryViewDidClick.bind(this));
+        }
+
+        // // TODO: Change for a gesuture recongnizer or something independent of the html
+        // let instance = this;
+        // this.editingAccessoryView.layer.onclick = function (e) {
+        //     if (instance._onAccessoryClickFn != null) {
+        //         e.stopPropagation();
+        //         instance._onAccessoryClickFn.call(instance._target, instance);
+        //     }
+        // };
+    }
+
+    private _editingAccessoryType = UITableViewCellEditingStyle.None;
+
+    get editingAccessoryType(){ return this._editingAccessoryType;}
+    set editingAccessoryType(value:UITableViewCellEditingStyle){
+        this.setEditingAccessoryType(value);
+    }
+
+    setEditingAccessoryType(value:UITableViewCellEditingStyle){
+        this._editingAccessoryType = value;
+
+        // Reset
+        if (this.editingAccessoryDeleteView != null) this.editingAccessoryDeleteView.setHidden(true);
+        if (this.editingAccessoryInsertView != null) this.editingAccessoryInsertView.setHidden(true);
+        if (this.editingAccessoryView != null) this.editingAccessoryView.setHidden(true);
+
+        // Set the view type
+        if (value == UITableViewCellEditingStyle.Insert && this.editingAccessoryInsertView != null) {
+            this.editingAccessoryView = this.editingAccessoryInsertView;
+            this.editingAccessoryInsertView.setHidden(false);            
+        } 
+        else if (value == UITableViewCellEditingStyle.Delete && this.editingAccessoryDeleteView != null) {
+            this.editingAccessoryView = this.editingAccessoryDeleteView;
+            this.editingAccessoryDeleteView.setHidden(false);            
+        } 
+    }
+
+    private editingAccessoryViewDidClick(e:Event){
+        e.stopPropagation();
+        this._onEditingAccessoryClickFn.call(this._target, this);
+    }
+
+    private _setupLayer() {
+        //this.layer.style.position = "absolute";        
+
+        let instance = this;
+        this.layer.onclick = function (e) {
+            if (instance._onClickFn != null) {
+                e.stopPropagation();
+                instance._onClickFn.call(instance._target, instance);
+            }
+        };
+
+        this.layer.ondblclick = function (e) {
+            if (instance._onDblClickFn != null) {
+                e.stopPropagation();
+                instance._onDblClickFn.call(instance._target, instance);
+            }
+        };
+    }
+
+    private _accessoryType:UITableViewCellAccessoryType = UITableViewCellAccessoryType.None;
+    get accessoryType() {return this._accessoryType;}
+    set accessoryType(value:UITableViewCellAccessoryType){
+        this.setAccessoryType(value);
+    }
+
+    setAccessoryType(type) {
+        if (type == this._accessoryType)
+            return;
+
+        if (this.accessoryView == null) {
+            if (this.style == UITableViewCellStyle.Default) this.textLabel.layer.style.right = "25px";
+
+            let layer = document.createElement("div");
+            layer.style.position = "absolute";
+            layer.style.top = "15px";
+            layer.style.right = "5px";
+            layer.style.width = "15px";
+            layer.style.height = "15px";
+
+            this.accessoryView = new UIView("accessory_view");
+            this.accessoryView.initWithLayer(layer, null);
+
+            this.addSubview(this.accessoryView);
+        }
+
+        // if (type == UITableViewCellAccessoryType.None) this.accessoryView.setHidden(true);
+        // else this.accessoryView.setHidden(false);
+
+        if (type == UITableViewCellAccessoryType.None) UICoreLayerRemoveStyle(this.layer, "checked");
+        else UICoreLayerAddStyle(this.layer, "checked");
+
+        this._accessoryType = type;
+    }
+
+    setPaddingIndex(value) {
+
+        var offset = (value + 1) * 10;
+        if (this.style == UITableViewCellStyle.Default) this.textLabel.setX(offset);
+    }
+
+    setHeight(h) {
+        super.setHeight(h);
+
+        var offsetY = (h - 15) / 2;
+
+        if (this.accessoryView != null) {
+            this.accessoryView.layer.style.top = offsetY + "px";
+        }
+    }
+
+    setSelected(value) {
+        if (this._selected == value) return;
+
+        // WORKAORUND
+        //let fix = this.layer.getClientRects();
+        // WORKAORUND
+
+        this.willChangeValue("selected");
+        this._selected = value;
+        if (this.selectionStyle == UITableViewCellSelectionStyle.Default) {
+            if (value == true)
+                UICoreLayerAddStyle(this.layer, "selected");
+            else 
+                UICoreLayerRemoveStyle(this.layer, "selected");
+        }
+        
+        this.didChangeValue("selected"); 
+    }
+
+    set selected(value) {
+        this.setSelected(value);
+    }
+
+    get selected() {
+        return this._selected;
+    }
+
+    _setHightlightedSubviews(value) {
+        for (var count = 0; count < this.subviews.length; count++) {
+            var v = this.subviews[count];
+            if (v instanceof UILabel)
+                v.setHightlighted(value);
+        }
+        if (this.accessoryView == null) return;
+
+        if (value == true) {
+
+            switch (this.accessoryType) {
+
+                case UITableViewCellAccessoryType.DisclosureIndicator:
+                    //this.accessoryView.layer.classList.remove("tableviewcell_accessory_disclosure_indicator");
+                    //this.accessoryView.layer.classList.add("tableviewcell_accessory_disclosure_indicator_highlighted");
+                    break;
+            }
+        }
+        else {
+
+            switch (this.accessoryType) {
+
+                case UITableViewCellAccessoryType.DisclosureIndicator:
+                    //this.accessoryView.layer.classList.remove("tableviewcell_accessory_disclosure_indicator_highlighted");
+                    //this.accessoryView.layer.classList.add("tableviewcell_accessory_disclosure_indicator");
+                    break;
+            }
+        }
+    }
+
+    setEditing(editing, animated?) {
+
+        if (editing == this._editing) return;
+
+        this._editing = editing;
+
+        if (this.editingAccessoryView != null) {
+            this.editingAccessoryView.setHidden(!editing);
+        }
+    }
+
+    set editing(value: boolean) {
+        this.setEditing(value, false);
+    }
+
+    get isEditing(): boolean {
+        return this._editing;
+    }
+}
+
+
+export class UITableViewController extends UIViewController
+{
 
 }
 

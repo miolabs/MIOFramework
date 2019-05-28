@@ -28,10 +28,10 @@ export * from './UIViewController'
 export * from './UIViewController_PresentationController'
 export * from './UIViewController_PopoverPresentationController'
 
-export * from "./UIScrollView"
-export * from "./UITableView"
-export * from "./UITableViewCell"
-export * from "./UITableViewController"
+export * from './UIScrollView'
+export * from './UITableView'
+export * from './UITableViewCell'
+export * from './UITableViewController'
 
 export * from './UINavigationBar'
 export * from './UINavigationItem'
