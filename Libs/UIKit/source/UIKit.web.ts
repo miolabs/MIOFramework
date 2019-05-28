@@ -3909,9 +3909,14 @@ export class UITableViewCellContentView extends UIView
 }
 
 
+
 export class UITableViewController extends UIViewController
 {
+    tableView:UITableView = null;
 
+    viewWillAppear(animated?:boolean){
+      super.viewWillAppear(animated);
+    }
 }
 
 
