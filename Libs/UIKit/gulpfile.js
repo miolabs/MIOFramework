@@ -145,7 +145,7 @@ function UIBuildWebProdPackageFile(done) {
 	fs.copyFileSync("package.platform.json", DEST + "package.json");
 	
 	var content = fs.readFileSync("packages/mio-uikit-" + platform + "/package.json", "utf8");
-	content = content.reçplace(regEx, platform);
+	content = content.replace(regEx, platform);
 	fs.writeFileSync("packages/mio-uikit-" + platform + "/package.json", content);
 	done();
 }
