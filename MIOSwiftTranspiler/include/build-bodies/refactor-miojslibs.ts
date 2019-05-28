@@ -4,10 +4,7 @@ const optionals = require("./miojslibs-optionals.json")
 const renames = require("./miojslibs-renames.json")
 
 const project = new Project({
-  tsConfigFilePath: `${__dirname}/../../../Libs/UIKit/tsconfig.json`,
-  compilerOptions: {
-    outDir: `${__dirname}/../../../Libs/UIKit/dist-swift-transpiler`
-  }
+  tsConfigFilePath: `${__dirname}/../../../Libs/UIKit/tsconfig.json`
 })
 
 function getReferences(chain: string[]): ReferencedSymbol[] {
@@ -28,21 +25,27 @@ function getReferences(chain: string[]): ReferencedSymbol[] {
 let replacements = []
 
 for(let optional of optionals) {
-  console.log('----------------------')
-  console.log(optional)
+  //console.log('----------------------')
+  //console.log(optional)
+  let ok = optional[optional.length - 1] === 'window'
   for(const referencedSymbol of getReferences(optional)) {
     for(let reference of referencedSymbol.getReferences()) {
 
-      console.log('---')
-      console.log(reference.getNode().getStartLineNumber())
+      //console.log('---')
+      //console.log(reference.getNode().getStartLineNumber())
       let par = reference.getNode()
       while(par) {
-        console.log(par.getKindName())
+        //console.log(par.getKindName())
         par = par.getParent()
       }
 
       let isParameter = reference.getNode().getParent().getKindName() === 'Parameter'
       if(isParameter) {
+        continue
+      }
+
+      let isPropertySignature = reference.getNode().getParent().getKindName() === 'PropertySignature'//prop declaration in interface
+      if(isPropertySignature) {
         continue
       }
 

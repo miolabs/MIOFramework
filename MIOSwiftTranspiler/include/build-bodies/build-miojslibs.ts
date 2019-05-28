@@ -6,10 +6,11 @@ const project = new Project({
   tsConfigFilePath: `${__dirname}/../../../Libs/UIKit/tsconfig.json`
 })
 
-function getClass(className): {file: string, c: ClassDeclaration | InterfaceDeclaration} {
+function getClass(className): {file: string, getter: string, c: ClassDeclaration | InterfaceDeclaration} {
   for(let sourceFile of project.getSourceFiles()) {
-    let found = sourceFile.getClass(className) || sourceFile.getInterface(className)
-    if(found) return {file: sourceFile.getBaseName(), c: found}
+    let c = sourceFile.getClass(className)
+    let i = sourceFile.getInterface(className)
+    if(c || i) return {file: sourceFile.getBaseName(), getter: c ? 'getClass' : 'getInterface', c: c || i}
   }
 }
 
@@ -38,14 +39,14 @@ for(let className in UIKit) {
         let optionalParams = swift[i + 2]
 
         if(classMapping && classMapping[propName]) {
-            renames.push({chain: ["getSourceFile", foundClass.file, "getClass", className, "getInstanceMethod", classMapping[propName]], rename: propName})
+            renames.push({chain: ["getSourceFile", foundClass.file, foundClass.getter, className, foundClass.getter === "getInterface" ? "getMethod" : "getInstanceMethod", classMapping[propName]], rename: propName})
             propName = classMapping[propName]
         }
 
-        if(isOptional) optionals.push(["getSourceFile", foundClass.file, "getClass", className, "getInstanceProperty", propName])
+        if(isOptional) optionals.push(["getSourceFile", foundClass.file, foundClass.getter, className, foundClass.getter === "getInterface" ? "getProperty" : "getInstanceProperty", propName])
         else for(let opI = 0; opI < optionalParams.length; opI++) {
             if(!optionalParams[opI]) continue
-            optionals.push(["getSourceFile", className + ".ts", "getClass", className, "getInstanceMethod", propName, "getParameters", "", "0", null])
+            optionals.push(["getSourceFile", className + ".ts", foundClass.getter, className, foundClass.getter === "getInterface" ? "getMethod" : "getInstanceMethod", propName, "getParameters", "", "0", null])
         }
     }
 }

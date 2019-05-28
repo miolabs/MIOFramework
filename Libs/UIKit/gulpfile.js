@@ -7,7 +7,8 @@ const execSync = require('child_process').execSync;
 const argv = require('yargs').argv;
 
 function DIST_FOLDER(outer) {
-	return (argv.transpiler !== undefined) ? 'dist-swift-transpiler' + (outer ? '' : '/source') : 'dist';
+	return 'dist'
+	//return (argv.transpiler !== undefined) ? 'dist-swift-transpiler' + (outer ? '' : '/source') : 'dist';
 }
 
 let arrIndexFiles = [];
@@ -144,7 +145,7 @@ function UIBuildWebProdPackageFile(done) {
 	fs.copyFileSync("package.platform.json", DEST + "package.json");
 	
 	var content = fs.readFileSync("packages/mio-uikit-" + platform + "/package.json", "utf8");
-	content = content.replace(regEx, platform);
+	content = content.reçplace(regEx, platform);
 	fs.writeFileSync("packages/mio-uikit-" + platform + "/package.json", content);
 	done();
 }
