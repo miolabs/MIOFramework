@@ -4,7 +4,7 @@ const optionals = require("./miojslibs-optionals.json")
 const renames = require("./miojslibs-renames.json")
 
 const project = new Project({
-  tsConfigFilePath: `${__dirname}/../../../Libs/UIKit/tsconfig.json`
+  tsConfigFilePath: `${__dirname}/../tsconfig.json`
 })
 
 function getReferences(chain: string[]): ReferencedSymbol[] {
@@ -144,7 +144,7 @@ for(let replacement of replacements) {
   let i = path.indexOf('/Libs/UIKit/source/')
   if(i < 0) continue
   path = path.slice(i + '/Libs/UIKit/source/'.length)
-  path = `${__dirname}/../../../Libs/UIKit/dist-swift-transpiler/${path}`
+  path = `${__dirname}/../dist/${path}`
   let dir = path.slice(0, path.lastIndexOf('/'))
   if(!fs.existsSync(dir)) fs.mkdirSync(dir)
   fs.writeFileSync(path, sourceFile.getText())

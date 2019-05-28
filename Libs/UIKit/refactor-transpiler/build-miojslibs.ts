@@ -3,7 +3,7 @@ const execSync = require('child_process').execSync
 const fs = require('fs')
 
 const project = new Project({
-  tsConfigFilePath: `${__dirname}/../../../Libs/UIKit/tsconfig.json`
+  tsConfigFilePath: `${__dirname}/../tsconfig.json`
 })
 
 function getClass(className): {file: string, getter: string, c: ClassDeclaration | InterfaceDeclaration} {
