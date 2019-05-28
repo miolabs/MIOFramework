@@ -195,7 +195,7 @@ function UIBuildWebDevPackageFile(done) {
 
 function UIRemoveTempFolders(done) {
 	const buildDir = __dirname + "/.build";
-	const distDir =  __dirname + "./dist";
+	const distDir =  __dirname + "/dist";
 
 	if(fs.existsSync(buildDir)) {
 		rimraf(buildDir, function(err) {
