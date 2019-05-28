@@ -26,9 +26,14 @@ class ViewController: UIViewController {
       
     }
   
-  @IBAction func switchClicked(sender: UISwitch){
-    label.text = "Hello from switch button " + (sender.isOn ? "on" : "not on");
-  }
+    @IBAction func switchClicked(sender: UISwitch){
+        label.text = "Hello from switch button " + (sender.isOn ? "on" : "not on");
+    }
+    
+    @IBAction func segmentedClicked(sender: UISegmentedControl){
+        label.text = "Hello from switch button " + String(sender.selectedSegmentIndex);
+    }
+
 
 }
 

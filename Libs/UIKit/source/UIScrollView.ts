@@ -1,8 +1,9 @@
 import { NSTimer } from "mio-foundation-web";
+import { MIOCoreGetPlatform } from "mio-foundation-web";
+import { MIOCorePlatformType } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
 import { NSSize } from "mio-foundation-web";
-import { NSLog } from "mio-foundation-web";
 import { UIView } from "./UIView";
 
 /**
@@ -39,7 +40,7 @@ export class UIScrollView extends UIView {
     }
 
     private setupLayer() {        
-        if (MIOCoreDeviceOSString() == "ios") this.layer.style["-webkit-overflow-scrolling"] = "touch"; 
+        if (MIOCoreGetPlatform() == MIOCorePlatformType.Safari) this.layer.style["-webkit-overflow-scrolling"] = "touch"; 
 
         let contentLayer = MUICoreLayerCreate();
         MUICoreLayerAddStyle(contentLayer, "content-view");
@@ -91,7 +92,7 @@ export class UIScrollView extends UIView {
         }
 
         if (this.scrollTimer != null) this.scrollTimer.invalidate();
-        this.scrollTimer = MIOTimer.scheduledTimerWithTimeInterval(150, false, this, this.scrollEventStopCallback);        
+        this.scrollTimer = NSTimer.scheduledTimerWithTimeInterval(150, false, this, this.scrollEventStopCallback);        
 
         this.didScroll(0, deltaY);
         this.lastOffsetY = this.contentOffset.y;
@@ -145,26 +146,26 @@ export class UIScrollView extends UIView {
         }
     }
 
-    set contentOffset(point: MIOPoint) {
+    set contentOffset(point: NSPoint) {
         if (point.x > 0) this.layer.scrollLeft = point.x;
         if (point.y > 0) this.layer.scrollTop = point.y;
     }
 
-    get contentOffset(): MIOPoint {
-        let p = new MIOPoint(this.layer.scrollLeft, this.layer.scrollTop);
+    get contentOffset(): NSPoint {
+        let p = new NSPoint(this.layer.scrollLeft, this.layer.scrollTop);
         return p;
     }
 
-    get bounds():MIORect{
+    get bounds():NSRect{
         let p = this.contentOffset;
-        return MIORect.rectWithValues(p.x, p.y, this.getWidth(), this.getHeight());
+        return NSRect.rectWithValues(p.x, p.y, this.getWidth(), this.getHeight());
     }
 
     addSubview(view:UIView, index?) {
         this.contentView.addSubview(view, index);
     }
 
-    set contentSize(size: MIOSize) {
+    set contentSize(size: NSSize) {
         if (size.width > 0) {
             this.contentView.setWidth(size.width);
         }

@@ -31,9 +31,16 @@ import { UIStoryboard } from "./UIStoryboard";
      AllEvents = 0xFFFFFFFF
  }
 
+function MUICoreControlParseEventTypeString(eventTypeString:string){
+
+    if (eventTypeString == null) return UIControlEvents.AllEvents;
+
+    let value = eventTypeString[0].toUpperCase() + eventTypeString.substr(1);
+    return UIControlEvents[value];
+}
+
 export class UIControl extends UIView
 {
-
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
     
@@ -45,10 +52,11 @@ export class UIControl extends UIView
                 if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
 
                 let actionSelector = subLayer.getAttribute("data-action-selector");
+                let eventType = MUICoreControlParseEventTypeString(subLayer.getAttribute("data-event-type"));
                 if (actionSelector != null) {                    
                     this.addTarget(this, function(){
                         owner[actionSelector](this);
-                    }, UIControlEvents.AllEvents);
+                    }, eventType);
                     break;                    
                 }
             }
@@ -94,11 +102,15 @@ export class UIControl extends UIView
         }        
     }
 
-    target = null;
-    action = null;
+    private actions = [];    
     addTarget(target, action, controlEvents:UIControlEvents){
-        this.target = target;
-        this.action = action;
+        let item = {};
+
+        item["Target"] = target;
+        item["Action"] = action;
+        item["EvenrtType"] = controlEvents;
+
+        this.actions.push(item);
     }
 
     private _enabled = true;

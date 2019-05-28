@@ -1,7 +1,6 @@
 
 import { UIView } from "./UIView";
 import { UILabel } from "./UILabel";
-import { UIButton, UICoreLayerAddStyle, UICoreLayerRemoveStyle } from ".";
 
 export enum UITableViewCellStyle {
 
@@ -81,7 +80,7 @@ export class UITableViewCell extends UIView {
             this.addSubview(this.textLabel);
             this.layer.style.height = "44px";
 
-            UICoreLayerAddStyle(this.layer, "cell");
+            MUICoreLayerAddStyle(this.layer, "cell");
         }
 
         this._setupLayer();
@@ -255,8 +254,8 @@ export class UITableViewCell extends UIView {
         // if (type == UITableViewCellAccessoryType.None) this.accessoryView.setHidden(true);
         // else this.accessoryView.setHidden(false);
 
-        if (type == UITableViewCellAccessoryType.None) UICoreLayerRemoveStyle(this.layer, "checked");
-        else UICoreLayerAddStyle(this.layer, "checked");
+        if (type == UITableViewCellAccessoryType.None) MUICoreLayerRemoveStyle(this.layer, "checked");
+        else MUICoreLayerAddStyle(this.layer, "checked");
 
         this._accessoryType = type;
     }
@@ -288,9 +287,9 @@ export class UITableViewCell extends UIView {
         this._selected = value;
         if (this.selectionStyle == UITableViewCellSelectionStyle.Default) {
             if (value == true)
-                UICoreLayerAddStyle(this.layer, "selected");
+                MUICoreLayerAddStyle(this.layer, "selected");
             else 
-                UICoreLayerRemoveStyle(this.layer, "selected");
+                MUICoreLayerRemoveStyle(this.layer, "selected");
         }
         
         this.didChangeValue("selected"); 
