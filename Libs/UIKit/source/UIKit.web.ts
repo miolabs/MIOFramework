@@ -3603,6 +3603,7 @@ export class UIScrollView extends UIView {
 
 
 
+
 export class UITableView extends UIView
 {
     dataSource = null;
@@ -3929,7 +3930,8 @@ export class UITableViewController extends UIViewController
     viewDidLoad(){
       super.viewDidLoad();
 
-      this.tableView = this.view.subviews[0] as UITableView;
+      let temp = this.view.subviews[0] as UITableView;
+      this.tableView = temp
       this.tableView.dataSource = this;
       this.tableView.delegate = this;
     }
@@ -3987,7 +3989,7 @@ export class UITableViewCell extends UIView {
     contentView: UIView = null;
     style = UITableViewCellStyle.Custom;
 
-    textLabel = null;
+    textLabel: UILabel = null;
     
     accessoryView:UIView = null;
     separatorStyle = UITableViewCellSeparatorStyle.SingleLine;

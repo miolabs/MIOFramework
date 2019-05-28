@@ -6,6 +6,7 @@ import { UIGestureRecognizerState} from "./UIGestureRecognizer";
 import { NSUUID } from "mio-foundation-web";
 import { NSIndexPath } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
+import "mio-foundation-web/extensions"
 
 export class UITableView extends UIView
 {
