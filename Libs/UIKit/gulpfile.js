@@ -68,6 +68,7 @@ const PATH = __dirname + "/dist"
 let files = walkSync(PATH)
 
 let file = files.find(file => file.endsWith('UIKit.web.js'))
+if(!file) return
 file = file.slice(PATH.length + 1)
 
 let redundantPath = file.slice(0, file.lastIndexOf('/') + 1)
