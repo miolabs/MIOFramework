@@ -49,7 +49,40 @@ function UICleanWebUIkit(done) {
 	done();
 }
 
+function moveTsProdToRoot() {
+var walkSync = function(dir, filelist) {
+  var fs = fs || require('fs'),
+      files = fs.readdirSync(dir);
+  filelist = filelist || [];
+  files.forEach(function(file) {
+    if (fs.statSync(dir + '/' + file).isDirectory()) {
+      filelist = walkSync(dir + '/' + file, filelist);
+    }
+    else {
+      filelist.push(dir + '/' + file);
+    }
+  });
+  return filelist;
+}
+const PATH = __dirname + "/dist"
+let files = walkSync(PATH)
+
+let file = files.find(file => file.endsWith('UIKit.web.js'))
+file = file.slice(PATH.length + 1)
+
+let redundantPath = file.slice(0, file.lastIndexOf('/') + 1)
+if(!redundantPath) return
+
+console.log('!!!moving', redundantPath)
+
+for(let file of ['UIKit.web.js.map', 'UIKit.web.js', 'UIKit.web.d.ts']) {
+	fs.renameSync(PATH + '/' + redundantPath + file, PATH + '/' + file)
+}
+}
+
 function UICleanWebJsFile(done) {
+	moveTsProdToRoot()
+
 	const path = "./dist/UIKit.web.js";
 	const regExObject = /\}\)\((.*) = exports.*\{\}\)\);/g;
 	const ObjectReplace = "})($1 || ($1 = {}));";
