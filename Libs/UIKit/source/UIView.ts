@@ -22,12 +22,27 @@ function MUICoreViewSearchViewTag(view, tag) {
     if (view.tag == tag) return view;
 
     for (let index = 0; index < view.subviews.length; index++) {
-        let v: UIView = view.subviews[index];
+        let v = view.subviews[index];
         v = MUICoreViewSearchViewTag(v, tag);
         if (v != null) return v;
     }
 
     return null;
+}
+
+export function MUICoreViewCreateView(layer, owner){
+    let className = layer.getAttribute("data-class");
+    if (className == null || className.length == 0) className = "UIView";
+
+    let sv = NSClassFromString(className);
+    sv.initWithLayer(layer, owner);
+    sv.awakeFromHTML();
+    sv._checkSegues();    
+
+    let id = layer.getAttribute("id");
+    if (id != null) owner._outlets[id] = sv;
+
+    return sv;
 }
 
 export class UIView extends NSObject {
@@ -103,22 +118,20 @@ export class UIView extends NSObject {
         if (this.layer.childNodes.length > 0) {
             for (let index = 0; index < this.layer.childNodes.length; index++) {
                 let subLayer = this.layer.childNodes[index];
-
+    
                 if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
-
+    
                 let className = subLayer.getAttribute("data-class");
                 if (className == null || className.length == 0) className = "UIView";
-
-                let sv = NSClassFromString(className);
-                sv.initWithLayer(subLayer, owner);
-                sv._checkSegues();
+    
+                let sv = MUICoreViewCreateView(subLayer, owner);
                 this._linkViewToSubview(sv);
-
+    
                 let id = subLayer.getAttribute("id");
                 if (id != null) owner._outlets[id] = sv;
-            }
+            }   
         }
-
+    
         MUICoreStoryboardParseLayer(layer, this, owner);
     }
 

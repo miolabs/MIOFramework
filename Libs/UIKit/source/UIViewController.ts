@@ -6,6 +6,7 @@ import { NSBundle } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
 
 import { UIView } from "./UIView";
+import { MUICoreViewCreateView } from "./UIView";
 import { UINavigationItem } from "./UINavigationItem";
 import { UINavigationController } from "./UINavigationController";
 import { UIPresentationController } from "./UIViewController_PresentationController";
@@ -32,6 +33,7 @@ import { UIStoryboardSegue } from "./UIStoryboardSegue";
 
 export class UIViewController extends NSObject {
     layerID: string = null;
+    private layer = null;
 
     view: UIView = null;
 
@@ -80,10 +82,7 @@ export class UIViewController extends NSObject {
     initWithLayer(layer, owner, options?) {
         super.init();
 
-        let viewLayer = MUICoreLayerGetFirstElementWithTag(layer, "DIV");
-
-        this.view = new UIView();
-        this.view.initWithLayer(viewLayer, owner, options);
+        this.view = MUICoreViewCreateView(layer, owner);
         this.view._checkSegues();
 
         // Search for navigation item
@@ -141,7 +140,6 @@ export class UIViewController extends NSObject {
         MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (this: UIViewController, layer) {
             this.view.initWithLayer(layer, this);
             this.view.awakeFromHTML();
-            this.view._checkSegues();
             this._didLoadView();
         });
 
