@@ -29,7 +29,7 @@
 	  "gulp-uglify": "^3.0.2",
 	  "mio-foundation-node": "^1.0.7",
 	  "mio-foundation-web": "^1.0.10",
-	  "mio-uikit-web": "^1.0.4",
+	  "mio-uikit-web": "^1.0.5",
 	  "rimraf": "^2.6.3"
 	},
 	"dependencies": {
