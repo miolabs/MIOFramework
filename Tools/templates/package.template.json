@@ -27,13 +27,13 @@
 	  "gulp-sourcemaps": "^2.6.5",
 	  "gulp-typescript": "^5.0.1",
 	  "gulp-uglify": "^3.0.2",
-	  "mio-foundation-node": "^1.0.6",
-	  "mio-foundation-web": "^1.0.7",
-	  "mio-uikit-web": "^1.0.3",
+	  "mio-foundation-node": "^1.0.7",
+	  "mio-foundation-web": "^1.0.10",
+	  "mio-uikit-web": "^1.0.4",
 	  "rimraf": "^2.6.3"
 	},
 	"dependencies": {
-	  "swiftlib": "1.0.0",
+	  "mio-swiftlib": "1.0.0",
 	  "miojslibs": "^0.9.135",
 	  "readable-stream": "^3.3.0",
 	  "typescript": "^3.4.5"
