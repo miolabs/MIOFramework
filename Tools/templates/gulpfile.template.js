@@ -75,7 +75,7 @@ function copyResources(done) {
 	const APP_PLIST_PATH = "./{AppName}/Info.plist";
 	const FOUNDATION_PATH = "node_modules/mio-foundation-web/";
 	const UIKIT_PATH = "node_modules/mio-uikit-web/";
-	const SWIFT_PATH = "node_modules/swiftlib/";
+	const SWIFT_PATH = "node_modules/mio-swiftlib/";
 	const ANIMATECSS_PATH = "node_modules/animate.css/animate.min.css";
 
 	fs.copyFileSync(SRC + "index.html", DEST + "index.html");
