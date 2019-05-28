@@ -119,7 +119,7 @@ export class UIView extends NSObject {
             }
         }
 
-        MUICoreStoryboardParseLayer(layer, this);
+        MUICoreStoryboardParseLayer(layer, this, owner);
     }
 
     copy() {

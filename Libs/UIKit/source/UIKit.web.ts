@@ -1052,7 +1052,7 @@ export class UIView extends NSObject {
             }
         }
 
-        MUICoreStoryboardParseLayer(layer, this);
+        MUICoreStoryboardParseLayer(layer, this, owner);
     }
 
     copy() {
@@ -2226,8 +2226,7 @@ export class UISegmentedControl extends UIControl
     segmentedItems = [];
     selectedSegmentedIndex = -1;
 
-    initWithLayer(layer, owner, options?)
-    {
+    initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
 
         for (let index = 0; index < this.layer.childNodes.length; index++){
@@ -2248,9 +2247,9 @@ export class UISegmentedControl extends UIControl
         }
     }
 
-    private _addSegmentedItem(item){
+    private _addSegmentedItem(item:UIButton){
         this.segmentedItems.push(item);
-        item.setAction(this, this._didClickSegmentedButton);
+        item.addTarget(this, this._didClickSegmentedButton, UIControlEvents.AllTouchEvents);
     }
 
     private _didClickSegmentedButton(button){
@@ -2259,11 +2258,6 @@ export class UISegmentedControl extends UIControl
 
         if (this.mouseOutTarget != null)
             this.mouseOutAction.call(this.mouseOutTarget, this, index);
-    }
-
-    setAction(target, action){
-        this.mouseOutTarget = target;
-        this.mouseOutAction = action;
     }
 
     selectSegmentedAtIndex(index){
@@ -2366,6 +2360,7 @@ export class UISwitch extends UIControl
 
 
 
+
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -2398,7 +2393,7 @@ export class UIViewController extends NSObject {
 
     modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
     modalTransitionStyle = UIModalTransitionStyle.CoverVertical;
-    transitioningDelegate/*TODO: UIViewControllerTransitioningDelegate*/ = null;
+    transitioningDelegate = null;
 
     protected _contentSize = new NSSize(320, 200);
     protected _preferredContentSize = null;
@@ -2523,7 +2518,7 @@ export class UIViewController extends NSObject {
     _didLoadView() {
         this._layerIsReady = true;
         if (MIOCoreIsPhone() == true) MUICoreLayerAddStyle(this.view.layer, "phone");
-        MUICoreStoryboardParseLayer(this.view.layer, this);
+        MUICoreStoryboardParseLayer(this.view.layer, this, this);
         this._checkSegues();
 
         if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null) {
@@ -4357,7 +4352,7 @@ export class UIStoryboard extends NSObject
     }
 }
 
-export function MUICoreStoryboardParseLayer(layer, owner){
+export function MUICoreStoryboardParseLayer(layer, object, owner){
     
     // Check outlets and segues
     if (layer.childNodes.length > 0) {
@@ -4385,7 +4380,7 @@ export function MUICoreStoryboardParseLayer(layer, owner){
                         let relationship = d.getAttribute("data-segue-relationship");
                         let identifier = d.getAttribute("data-segue-identifier");
 
-                        MUICoreStoryboardAddSegue(owner, destination, kind, relationship, identifier);
+                        MUICoreStoryboardAddSegue(object, destination, kind, relationship, identifier);
                     }
                 }
             }
