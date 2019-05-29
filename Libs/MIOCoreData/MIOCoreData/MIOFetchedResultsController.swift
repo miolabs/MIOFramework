@@ -15,7 +15,7 @@ protocol MIOFetchedResultsControllerDelegate:NSObject {
 
 class MIOFetchedResultsController<ResultType> : NSObject where ResultType : MIOFetchRequestResult
 {
-    var sections:[MIOFetchSection] = []
+    var sections:[MIOFetchSection]? = []
     
     var delegate:MIOFetchedResultsControllerDelegate?
     
