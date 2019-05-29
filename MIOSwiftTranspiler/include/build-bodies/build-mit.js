@@ -11,9 +11,10 @@ files.forEach(file => {
 
     let contents = fs.readFileSync(`${dir}${file}.swift`, 'utf8')
     contents = '"-prefix-uikit"\n' + contents
+    if(!fs.existsSync(`${__dirname}/mit-files`))fs.mkdirSync(`${__dirname}/mit-files`)
     fs.writeFileSync(`${__dirname}/mit-files/${file}.swift`, contents)
 
-    output = execSync(`${__dirname}/../../../swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk -target arm64-apple-ios12.2 -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks '${__dirname}/mit-files/${file}.swift'`, {encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe']})
+    output = execSync(`${__dirname}/../../../../swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk -target arm64-apple-ios12.2 -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks '${__dirname}/mit-files/${file}.swift'`, {encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe']})
 
     fs.writeFileSync(`${__dirname}/../UIKit/M${file}.ts`, contents)
 })

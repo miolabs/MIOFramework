@@ -129,6 +129,7 @@ let swiftDefinitions = ''
 let transpilations = ''
 
 let success = 0, all = 0
+if(!fs.existsSync(`${__dirname}/bodies`)) fs.mkdirSync(`${__dirname}/bodies`)
 for(let file of fs.readdirSync(`${__dirname}/bodies`)) {
     if(!file.endsWith('.swift') || file === 'body.swift') continue
     //if(file !== 'Range.swift') continue

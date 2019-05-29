@@ -23,7 +23,7 @@ export class UIApplication {
 
     private static _sharedInstance: UIApplication;
 
-    static sharedInstance(): UIApplication {
+    static get shared(): UIApplication {
 
         if (UIApplication._sharedInstance == null) {
             UIApplication._sharedInstance = new UIApplication();

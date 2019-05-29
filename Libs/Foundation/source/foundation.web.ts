@@ -15,6 +15,7 @@ export function NSClassFromString(className:string){
     if (classObject == null) throw new Error("NSClassFromString: class '" + className + "' didn't register.");
 
     let newClass = new classObject();
+    if((newClass as any).init$vars) (newClass as any).init$vars()//quick fix for transpiler because it needs it
     return newClass;
 }
 

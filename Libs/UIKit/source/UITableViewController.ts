@@ -8,8 +8,7 @@ export class UITableViewController extends UIViewController
     viewDidLoad(){
       super.viewDidLoad();
 
-      let temp = this.view.subviews[0] as UITableView;
-      this.tableView = temp
+      this.tableView = this.view.subviews[0] as UITableView;
       this.tableView.dataSource = this;
       this.tableView.delegate = this;
     }

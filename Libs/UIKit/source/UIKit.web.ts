@@ -3930,8 +3930,12 @@ export class UITableViewController extends UIViewController
     viewDidLoad(){
       super.viewDidLoad();
 
+<<<<<<< HEAD
       let temp = this.view.subviews[0] as UITableView;
       this.tableView = temp
+=======
+      this.tableView = this.view.subviews[0] as UITableView;
+>>>>>>> 0047d5d0987e4a312bc85e79b357ef46c33210aa
       this.tableView.dataSource = this;
       this.tableView.delegate = this;
     }
@@ -5167,7 +5171,7 @@ export class UIWindow extends UIView
     }
 
     makeKey(){
-        UIApplication.sharedInstance().makeKeyWindow(this);
+        UIApplication.shared.makeKeyWindow(this);
     }
 
     makeKeyAndVisible(){
@@ -5279,7 +5283,7 @@ export class UIStoryboard extends NSObject
         let classname = this.items["ClassByID"][resource];
         if (classname == null) return null;
 
-        let vc = NSClassFromString(classname) as UIViewController;        
+        let vc = NSClassFromString(classname) as UIViewController;
         vc.initWithResource("layout/" + resource + ".html");
         vc.storyboard = this;
 
@@ -5413,7 +5417,7 @@ export class UIApplication {
 
     private static _sharedInstance: UIApplication;
 
-    static sharedInstance(): UIApplication {
+    static get shared(): UIApplication {
 
         if (UIApplication._sharedInstance == null) {
             UIApplication._sharedInstance = new UIApplication();

@@ -35,7 +35,7 @@ export class UIStoryboard extends NSObject
         let classname = this.items["ClassByID"][resource];
         if (classname == null) return null;
 
-        let vc = NSClassFromString(classname) as UIViewController;        
+        let vc = NSClassFromString(classname) as UIViewController;
         vc.initWithResource("layout/" + resource + ".html");
         vc.storyboard = this;
 
