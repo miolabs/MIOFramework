@@ -36,6 +36,7 @@ export * from './NSDate'
 
 export * from './NSUUID'
 
+export * from './NSArray'
 export * from './NSPredicate'
 export * from './NSSet'
 export * from './NSIndexPath'

@@ -960,12 +960,27 @@ function MUICoreViewSearchViewTag(view, tag) {
     if (view.tag == tag) return view;
 
     for (let index = 0; index < view.subviews.length; index++) {
-        let v: UIView = view.subviews[index];
+        let v = view.subviews[index];
         v = MUICoreViewSearchViewTag(v, tag);
         if (v != null) return v;
     }
 
     return null;
+}
+
+export function MUICoreViewCreateView(layer, owner){
+    let className = layer.getAttribute("data-class");
+    if (className == null || className.length == 0) className = "UIView";
+
+    let sv = NSClassFromString(className);
+    sv.initWithLayer(layer, owner);
+    sv.awakeFromHTML();
+    sv._checkSegues();    
+
+    let id = layer.getAttribute("id");
+    if (id != null) owner._outlets[id] = sv;
+
+    return sv;
 }
 
 export class UIView extends NSObject {
@@ -1041,22 +1056,20 @@ export class UIView extends NSObject {
         if (this.layer.childNodes.length > 0) {
             for (let index = 0; index < this.layer.childNodes.length; index++) {
                 let subLayer = this.layer.childNodes[index];
-
+    
                 if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
-
+    
                 let className = subLayer.getAttribute("data-class");
                 if (className == null || className.length == 0) className = "UIView";
-
-                let sv = NSClassFromString(className);
-                sv.initWithLayer(subLayer, owner);
-                sv._checkSegues();
+    
+                let sv = MUICoreViewCreateView(subLayer, owner);
                 this._linkViewToSubview(sv);
-
+    
                 let id = subLayer.getAttribute("id");
                 if (id != null) owner._outlets[id] = sv;
-            }
+            }   
         }
-
+    
         MUICoreStoryboardParseLayer(layer, this, owner);
     }
 
@@ -2378,12 +2391,14 @@ export class UISwitch extends UIControl
 
 
 
+
 /**
  * Created by godshadow on 11/3/16.
  */
 
 export class UIViewController extends NSObject {
     layerID: string = null;
+    private layer = null;
 
     view: UIView = null;
 
@@ -2432,10 +2447,7 @@ export class UIViewController extends NSObject {
     initWithLayer(layer, owner, options?) {
         super.init();
 
-        let viewLayer = MUICoreLayerGetFirstElementWithTag(layer, "DIV");
-
-        this.view = new UIView();
-        this.view.initWithLayer(viewLayer, owner, options);
+        this.view = MUICoreViewCreateView(layer, owner);
         this.view._checkSegues();
 
         // Search for navigation item
@@ -2493,7 +2505,6 @@ export class UIViewController extends NSObject {
         MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (this: UIViewController, layer) {
             this.view.initWithLayer(layer, this);
             this.view.awakeFromHTML();
-            this.view._checkSegues();
             this._didLoadView();
         });
 
@@ -3592,6 +3603,7 @@ export class UIScrollView extends UIView {
 
 
 
+
 export class UITableView extends UIView
 {
     dataSource = null;
@@ -3661,7 +3673,7 @@ export class UITableView extends UIView
         this.footerLayer = item;
     }    
 
-    dequeueReusableCellWithIdentifier(identifier:string): UITableViewCell {
+    dequeueReusableCellWithIdentifierFor(identifier:string, indexPath:NSIndexPath): UITableViewCell {
         let item = this.cellPrototypes[identifier];
 
         let cell: UITableViewCell = null;        
@@ -3696,14 +3708,15 @@ export class UITableView extends UIView
     private cells = [];
 
     private addSectionHeader(section){
-        let header = this.dataSource.viewForHeaderInSection(this, section) as UIView;
+        let header = null;
+        if (typeof this.dataSource.viewForHeaderInSection === "function") header = this.dataSource.viewForHeaderInSection(this, section) as UIView;        
         if (header == null) return;
         header.hidden = false;
         this.addSubview(header);
     }
 
     private addCell(indexPath:NSIndexPath){
-        let cell = this.dataSource.cellAtIndexPath(this, indexPath) as UITableViewCell;
+        let cell = this.dataSource.tableViewCellForRowAt(this, indexPath) as UITableViewCell;
         let section = this.sections[indexPath.section];                
                 
         let nextIP = this.nextIndexPath(indexPath);
@@ -3779,13 +3792,13 @@ export class UITableView extends UIView
         if (this.dataSource == null) return;
 
         let sections = 1;
-        if (typeof this.dataSource.numberOfSections === "function") sections = this.dataSource.numberOfSections(this);
+        if (typeof this.dataSource.numberOfSections === "function") sections = this.dataSource.numberOfSectionsIn(this);
         
         for (let sectionIndex = 0; sectionIndex < sections; sectionIndex++) {            
             let section = [];                                    
             this.sections.push(section);
             
-            let rows = this.dataSource.numberOfRowsInSection(this, sectionIndex);            
+            let rows = this.dataSource.tableViewNumberOfRowsInSection(this, sectionIndex);            
             if (rows == 0) continue;
             
             this.addSectionHeader(sectionIndex);
@@ -3965,7 +3978,7 @@ export class UITableViewCell extends UIView {
     contentView: UIView = null;
     style = UITableViewCellStyle.Custom;
 
-    textLabel = null;
+    textLabel: UILabel = null;
     
     accessoryView:UIView = null;
     separatorStyle = UITableViewCellSeparatorStyle.SingleLine;

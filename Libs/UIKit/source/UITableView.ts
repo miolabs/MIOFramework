@@ -6,6 +6,7 @@ import { UIGestureRecognizerState} from "./UIGestureRecognizer";
 import { NSUUID } from "mio-foundation-web";
 import { NSIndexPath } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
+import "mio-foundation-web/extensions"
 
 export class UITableView extends UIView
 {
@@ -76,7 +77,7 @@ export class UITableView extends UIView
         this.footerLayer = item;
     }    
 
-    dequeueReusableCellWithIdentifier(identifier:string): UITableViewCell {
+    dequeueReusableCellWithIdentifierFor(identifier:string, indexPath:NSIndexPath): UITableViewCell {
         let item = this.cellPrototypes[identifier];
 
         let cell: UITableViewCell = null;        
@@ -111,14 +112,15 @@ export class UITableView extends UIView
     private cells = [];
 
     private addSectionHeader(section){
-        let header = this.dataSource.viewForHeaderInSection(this, section) as UIView;
+        let header = null;
+        if (typeof this.dataSource.viewForHeaderInSection === "function") header = this.dataSource.viewForHeaderInSection(this, section) as UIView;        
         if (header == null) return;
         header.hidden = false;
         this.addSubview(header);
     }
 
     private addCell(indexPath:NSIndexPath){
-        let cell = this.dataSource.cellAtIndexPath(this, indexPath) as UITableViewCell;
+        let cell = this.dataSource.tableViewCellForRowAt(this, indexPath) as UITableViewCell;
         let section = this.sections[indexPath.section];                
                 
         let nextIP = this.nextIndexPath(indexPath);
@@ -194,13 +196,13 @@ export class UITableView extends UIView
         if (this.dataSource == null) return;
 
         let sections = 1;
-        if (typeof this.dataSource.numberOfSections === "function") sections = this.dataSource.numberOfSections(this);
+        if (typeof this.dataSource.numberOfSections === "function") sections = this.dataSource.numberOfSectionsIn(this);
         
         for (let sectionIndex = 0; sectionIndex < sections; sectionIndex++) {            
             let section = [];                                    
             this.sections.push(section);
             
-            let rows = this.dataSource.numberOfRowsInSection(this, sectionIndex);            
+            let rows = this.dataSource.tableViewNumberOfRowsInSection(this, sectionIndex);            
             if (rows == 0) continue;
             
             this.addSectionHeader(sectionIndex);

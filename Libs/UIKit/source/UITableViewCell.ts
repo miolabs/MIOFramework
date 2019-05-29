@@ -45,7 +45,7 @@ export class UITableViewCell extends UIView {
     contentView: UIView = null;
     style = UITableViewCellStyle.Custom;
 
-    textLabel = null;
+    textLabel: UILabel = null;
     
     accessoryView:UIView = null;
     separatorStyle = UITableViewCellSeparatorStyle.SingleLine;
