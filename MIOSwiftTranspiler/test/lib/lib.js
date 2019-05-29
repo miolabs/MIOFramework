@@ -54958,7 +54958,9 @@ var NSFetchedResultsController = /** @class */ (function (_super) {
     /*CoreData.(file).NSFetchedResultsController.init(fetchRequest:NSFetchRequest<ResultType>,managedObjectContext:NSManagedObjectContext,sectionNameKeyPath:String?,cacheName:String?)*/
     /*CoreData.(file).NSFetchedResultsController.init(fetchRequest:NSFetchRequest<ResultType>,managedObjectContext:NSManagedObjectContext,sectionNameKeyPath:String?,cacheName:String?)*/
     NSFetchedResultsController.prototype.initFetchRequestNSFetchRequestManagedObjectContextNSManagedObjectContextSectionNameKeyPathOptionalCacheNameOptional = function (fetchRequest, context, sectionNameKeyPath, _name, $info) {
-        throw 'unsupported method CoreData.(file).NSFetchedResultsController.init(fetchRequest:NSFetchRequest<ResultType>,managedObjectContext:NSManagedObjectContext,sectionNameKeyPath:String?,cacheName:String?) in ' + this.constructor.name;
+        var _this = this;
+        printSeparatorTerminator(/*vararg_expansion_expr*/ _create(Array, 'initArrayLiteralArray', ["ALL GOOD4"], {}), /*default_argument_expr*/ /**NULL EXPRESSION**/ null, /*default_argument_expr*/ /**NULL EXPRESSION**/ null, {});
+        return;
     };
     /*CoreData.(file).NSFetchedResultsController.performFetch()*/
     /*CoreData.(file).NSFetchedResultsController.performFetch()*/
@@ -56145,7 +56147,9 @@ var NSPersistentContainer = /** @class */ (function (_super) {
     /*CoreData.(file).NSPersistentContainer.init(name:String)*/
     /*CoreData.(file).NSPersistentContainer.init(name:String)*/
     NSPersistentContainer.prototype.initNameString = function (_name, $info) {
-        throw 'unsupported method CoreData.(file).NSPersistentContainer.init(name:String) in ' + this.constructor.name;
+        var _this = this;
+        printSeparatorTerminator(/*vararg_expansion_expr*/ _create(Array, 'initArrayLiteralArray', ["ALL GOOD"], {}), /*default_argument_expr*/ /**NULL EXPRESSION**/ null, /*default_argument_expr*/ /**NULL EXPRESSION**/ null, {});
+        return;
     };
     /*CoreData.(file).NSPersistentContainer.persistentContainerWithName(_:String)*/
     NSPersistentContainer.persistentContainerWithName = function (_name, $info) {
@@ -56167,7 +56171,9 @@ var NSPersistentContainer = /** @class */ (function (_super) {
     /*CoreData.(file).NSPersistentContainer.init(name:String)*/
     /*CoreData.(file).NSPersistentContainer.init(name:String)*/
     NSPersistentContainer.prototype.initNameString = function (_name, $info) {
-        throw 'unsupported method CoreData.(file).NSPersistentContainer.init(name:String) in ' + this.constructor.name;
+        var _this = this;
+        printSeparatorTerminator(/*vararg_expansion_expr*/ _create(Array, 'initArrayLiteralArray', ["ALL GOOD"], {}), /*default_argument_expr*/ /**NULL EXPRESSION**/ null, /*default_argument_expr*/ /**NULL EXPRESSION**/ null, {});
+        return;
     };
     /*CoreData.(file).NSPersistentContainer.init(name:String,managedObjectModel:NSManagedObjectModel)*/
     /*CoreData.(file).NSPersistentContainer.init(name:String,managedObjectModel:NSManagedObjectModel)*/
@@ -56177,7 +56183,8 @@ var NSPersistentContainer = /** @class */ (function (_super) {
     /*CoreData.(file).NSPersistentContainer.loadPersistentStores(completionHandler:(NSPersistentStoreDescription, Error?) -> Void)*/
     /*CoreData.(file).NSPersistentContainer.loadPersistentStores(completionHandler:(NSPersistentStoreDescription, Error?) -> Void)*/
     NSPersistentContainer.prototype.loadPersistentStoresCompletionHandler = function (block, $info) {
-        throw 'unsupported method CoreData.(file).NSPersistentContainer.loadPersistentStores(completionHandler:(NSPersistentStoreDescription, Error?) -> Void) in ' + this.constructor.name;
+        var _this = this;
+        printSeparatorTerminator(/*vararg_expansion_expr*/ _create(Array, 'initArrayLiteralArray', ["ALL GOOD2"], {}), /*default_argument_expr*/ /**NULL EXPRESSION**/ null, /*default_argument_expr*/ /**NULL EXPRESSION**/ null, {});
     };
     /*CoreData.(file).NSPersistentContainer.loadPersistentStoresWithCompletionHandler(_:(NSPersistentStoreDescription, Error?) -> Void)*/
     /*CoreData.(file).NSPersistentContainer.loadPersistentStoresWithCompletionHandler(_:(NSPersistentStoreDescription, Error?) -> Void)*/
@@ -57318,7 +57325,9 @@ var NSFetchRequest = /** @class */ (function (_super) {
     /*CoreData.(file).NSFetchRequest.init(entityName:String)*/
     /*CoreData.(file).NSFetchRequest.init(entityName:String)*/
     NSFetchRequest.prototype.initEntityNameString = function (entityName, $info) {
-        throw 'unsupported method CoreData.(file).NSFetchRequest.init(entityName:String) in ' + this.constructor.name;
+        var _this = this;
+        printSeparatorTerminator(/*vararg_expansion_expr*/ _create(Array, 'initArrayLiteralArray', ["ALL GOOD3"], {}), /*default_argument_expr*/ /**NULL EXPRESSION**/ null, /*default_argument_expr*/ /**NULL EXPRESSION**/ null, {});
+        return;
     };
     /*CoreData.(file).NSFetchRequest.fetchRequestWithEntityName(_:String)*/
     NSFetchRequest.fetchRequestWithEntityName = function (entityName, $info) {
@@ -57331,7 +57340,9 @@ var NSFetchRequest = /** @class */ (function (_super) {
     /*CoreData.(file).NSFetchRequest.init(entityName:String)*/
     /*CoreData.(file).NSFetchRequest.init(entityName:String)*/
     NSFetchRequest.prototype.initEntityNameString = function (entityName, $info) {
-        throw 'unsupported method CoreData.(file).NSFetchRequest.init(entityName:String) in ' + this.constructor.name;
+        var _this = this;
+        printSeparatorTerminator(/*vararg_expansion_expr*/ _create(Array, 'initArrayLiteralArray', ["ALL GOOD3"], {}), /*default_argument_expr*/ /**NULL EXPRESSION**/ null, /*default_argument_expr*/ /**NULL EXPRESSION**/ null, {});
+        return;
     };
     /*CoreData.(file).NSFetchRequest.execute()*/
     /*CoreData.(file).NSFetchRequest.execute()*/
