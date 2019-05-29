@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		14C7E6E0229E98DA003AB3C7 /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C7E6DF229E98DA003AB3C7 /* TableViewController.swift */; };
 		14E4603C229B06D600E03980 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E4603B229B06D600E03980 /* AppDelegate.swift */; };
 		14E4603E229B06D600E03980 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E4603D229B06D600E03980 /* ViewController.swift */; };
 		14E46041229B06D600E03980 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14E4603F229B06D600E03980 /* Main.storyboard */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		14C7E6DF229E98DA003AB3C7 /* TableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		14E46038229B06D600E03980 /* Demo4App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo4App.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		14E4603B229B06D600E03980 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		14E4603D229B06D600E03980 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -37,6 +39,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		14C7E6E1229E99E7003AB3C7 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				14E46042229B06D600E03980 /* Demo4App.xcdatamodeld */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
 		14E4602F229B06D600E03980 = {
 			isa = PBXGroup;
 			children = (
@@ -56,13 +66,14 @@
 		14E4603A229B06D600E03980 /* Demo4App */ = {
 			isa = PBXGroup;
 			children = (
+				14C7E6E1229E99E7003AB3C7 /* Model */,
 				14E4603B229B06D600E03980 /* AppDelegate.swift */,
 				14E4603D229B06D600E03980 /* ViewController.swift */,
+				14C7E6DF229E98DA003AB3C7 /* TableViewController.swift */,
 				14E4603F229B06D600E03980 /* Main.storyboard */,
 				14E46045229B06D800E03980 /* Assets.xcassets */,
 				14E46047229B06D800E03980 /* LaunchScreen.storyboard */,
 				14E4604A229B06D800E03980 /* Info.plist */,
-				14E46042229B06D600E03980 /* Demo4App.xcdatamodeld */,
 			);
 			path = Demo4App;
 			sourceTree = "<group>";
@@ -141,6 +152,7 @@
 				14E4603E229B06D600E03980 /* ViewController.swift in Sources */,
 				14E46044229B06D600E03980 /* Demo4App.xcdatamodeld in Sources */,
 				14E4603C229B06D600E03980 /* AppDelegate.swift in Sources */,
+				14C7E6E0229E98DA003AB3C7 /* TableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
