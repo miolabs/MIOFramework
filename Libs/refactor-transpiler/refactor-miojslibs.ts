@@ -1,17 +1,20 @@
 import { Project, BinaryExpression, PropertyDeclaration, ParameterDeclaration, ClassInstancePropertyTypes, ReferencedSymbol, SetAccessorDeclaration, GetAccessorDeclaration, ReturnStatement } from "ts-morph"
 import fs = require('fs')
-const optionals = require("./miojslibs-optionals.json")
-const renames = require("./miojslibs-renames.json")
+
+const module = process.argv[2]
+
+const optionals = require(`./miojslibs-optionals-${module}.json`)
+const renames = require(`./miojslibs-renames-${module}.json`)
 
 const project = new Project({
-  tsConfigFilePath: `${__dirname}/../tsconfig.json`
+  tsConfigFilePath: `${__dirname}/../${module === 'uikit' ? 'UIKit' : 'Foundation'}/tsconfig.json`
 })
 
 function getReferences(chain: string[]): ReferencedSymbol[] {
   let chained: any = project
   for(let i = 0; i < chain.length; i += 2) {
     if(!chained) break
-    if(!i) chain[i + 1] = 'UIKit.web.ts'
+    if(!i) chain[i + 1] = `${module === 'uikit' ? 'UIKit' : 'foundation'}.web.ts`
     if(typeof chain[i + 1] === 'string') chained = chained[chain[i]](chain[i + 1])
     else chained = chained[chain[i]]
   }
@@ -25,8 +28,8 @@ function getReferences(chain: string[]): ReferencedSymbol[] {
 let replacements = []
 
 for(let optional of optionals) {
-  console.log('----------------------')
-  console.log(optional)
+  //console.log('----------------------')
+  //console.log(optional)
   let ok = optional[optional.length - 1] === 'window'
   for(const referencedSymbol of getReferences(optional)) {
     for(let reference of referencedSymbol.getReferences()) {
