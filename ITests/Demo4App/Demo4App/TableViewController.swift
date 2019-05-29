@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class TableViewController: UITableViewController {
+class TableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,7 +24,7 @@ class TableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return fetchedResultsController.sections!.count
+        return fetchedResultsController.sections != nil ? fetchedResultsController.sections!.count : 0
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -115,7 +115,15 @@ class TableViewController: UITableViewController {
         let fetchedResultsController = NSFetchedResultsController<Movie>(fetchRequest: fetchRequest, managedObjectContext: managedContext, sectionNameKeyPath: nil, cacheName: nil)
         
         // Configure Fetched Results Controller
-        //    fetchedResultsController.delegate = self
+        fetchedResultsController.delegate = self
+        
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            let fetchError = error as NSError
+            print("Unable to Perform Fetch Request")
+            print("\(fetchError), \(fetchError.localizedDescription)")
+        }
         
         return fetchedResultsController
     }()
@@ -183,5 +191,24 @@ class TableViewController: UITableViewController {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         /*finally balance beginUpdates with endupdates*/
         tableView.endUpdates()
+    }
+    
+    @IBAction func addButtonClicked(sender:UIBarButtonItem){
+        let avc = UIAlertController(title: "Alert", message: "Add a new movie", preferredStyle: .alert)
+        
+        avc.addTextField { (textField:UITextField) in
+            textField.placeholder = "Name"
+        }
+        
+        avc.addAction(UIAlertAction.init(title: "OK", style: .default, handler: { (action:UIAlertAction) in
+            let ad = UIApplication.shared.delegate as! AppDelegate
+            let movie = NSEntityDescription.insertNewObject(forEntityName: "Movie", into: ad.persistentContainer.viewContext) as? Movie
+            movie?.name = avc.textFields?[0].text
+            ad.saveContext()
+        }))
+
+        avc.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+
+        present(avc, animated: true, completion: nil)
     }
 }

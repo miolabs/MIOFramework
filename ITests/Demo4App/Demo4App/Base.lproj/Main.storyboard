@@ -25,7 +25,7 @@
             </objects>
             <point key="canvasLocation" x="1047.8260869565217" y="137.94642857142856"/>
         </scene>
-        <!--Table View Controller-->
+        <!--Movies-->
         <scene sceneID="Pec-NC-Qyy">
             <objects>
                 <tableViewController id="v70-Xd-k1A" customClass="TableViewController" customModule="Demo4App" customModuleProvider="target" sceneMemberID="viewController">
@@ -60,7 +60,13 @@
                             <outlet property="delegate" destination="v70-Xd-k1A" id="TCt-hU-wlM"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="gbY-os-Dbh"/>
+                    <navigationItem key="navigationItem" title="Movies" id="zv9-5v-Zr5">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="Ltr-Kj-9HY">
+                            <connections>
+                                <action selector="addButtonClickedWithSender:" destination="v70-Xd-k1A" id="af7-32-jI0"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FlM-8d-U7U" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
