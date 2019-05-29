@@ -1,7 +1,6 @@
 [
   "MIOManagedObjectContext.swift",
   "MIOPredicate.swift",
-  "MIOSortDescriptor.swift",
   "MIOEntityDescription.swift",
   "MIOPropertyDescription.swift",
   "MIOAttributeDescription.swift",

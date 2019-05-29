@@ -196,7 +196,7 @@ export class UITableView extends UIView
         if (this.dataSource == null) return;
 
         let sections = 1;
-        if (typeof this.dataSource.numberOfSections === "function") sections = this.dataSource.numberOfSectionsIn(this);
+        if (typeof this.dataSource.numberOfSectionsIn === "function") sections = this.dataSource.numberOfSectionsIn(this);
         
         for (let sectionIndex = 0; sectionIndex < sections; sectionIndex++) {            
             let section = [];                                    
