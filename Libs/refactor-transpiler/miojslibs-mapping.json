@@ -1,0 +1,8 @@
+{
+  "MUIView": {
+    "initFrameCGRect": "initWithFrame"
+  },
+  "NSSortDescriptor": {
+    "initKeyOptionalAscendingBool": "initWithKey"
+  }
+}

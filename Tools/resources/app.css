@@ -144,3 +144,7 @@ input[type="checkbox"]:checked::after {
 .table-view .table-view-cell .label {
 	border-bottom: 1px solid #d6d6d6;
 }
+
+.table-view-cell {
+    margin-top: 15px;
+}

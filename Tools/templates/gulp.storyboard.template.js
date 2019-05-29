@@ -117,11 +117,11 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "rect"){		
 		let styles = currentElement["Styles"];
 		if (currentElement["CustomClass"] != "UITableViewCell") {			
-			styles.push("position:absolute;");
-		}
-		else {
 			styles.push("position:relative;");
 		}
+		// else {
+		// 	styles.push("position:relative;");
+		// }
 	
 		if (attributes["x"] != null) styles.push("left:" + attributes["x"] + "px;");
 		if (attributes["y"] != null) styles.push("top:" + attributes["y"] + "px;");

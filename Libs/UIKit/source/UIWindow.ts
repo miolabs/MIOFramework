@@ -27,7 +27,7 @@ export class UIWindow extends UIView
     }
 
     makeKey(){
-        UIApplication.sharedInstance().makeKeyWindow(this);
+        UIApplication.shared.makeKeyWindow(this);
     }
 
     makeKeyAndVisible(){

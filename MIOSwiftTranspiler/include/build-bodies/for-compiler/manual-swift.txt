@@ -267,32 +267,32 @@ return result;
 }
 get description() { return this.description$get()
 ----XCTest.(file).XCTAssert(_:() throws -> Bool,_:() -> String,file:StaticString,line:UInt)
-preconditionFileLine(() => expression( {}), () => message( {}), '?3', '?3', {})
+preconditionFileLine(() => expression( {}), () => message( {}), /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, {})
 ----XCTest.(file).XCTAssertFalse(_:() throws -> Bool,_:() -> String,file:StaticString,line:UInt)
-preconditionFileLine(() => Bool.prefix_33(expression( {}), {}), () => message( {}), '?3', '?3', {})
+preconditionFileLine(() => Bool.prefix_33(expression( {}), {}), () => message( {}), /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, {})
 ----XCTest.(file).XCTAssertGreaterThan(_:() throws -> T,_:() throws -> T,_:() -> String,file:StaticString,line:UInt)
-preconditionFileLine(() => (_.arg0 = expression1( {})).constructor.infix_62(_.arg0, expression2( {}), {}), () => message( {}), '?3', '?3', {})
+preconditionFileLine(() => (_.arg0 = expression1( {})).constructor.infix_62(_.arg0, expression2( {}), {}), () => message( {}), /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, {})
 ----XCTest.(file).XCTAssertGreaterThanOrEqual(_:() throws -> T,_:() throws -> T,_:() -> String,file:StaticString,line:UInt)
-preconditionFileLine(() => (_.arg0 = expression1( {})).constructor.infix_62_61(_.arg0, expression2( {}), {}), () => message( {}), '?3', '?3', {})
+preconditionFileLine(() => (_.arg0 = expression1( {})).constructor.infix_62_61(_.arg0, expression2( {}), {}), () => message( {}), /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, {})
 ----XCTest.(file).XCTAssertLessThan(_:() throws -> T,_:() throws -> T,_:() -> String,file:StaticString,line:UInt)
-preconditionFileLine(() => (_.arg0 = expression1( {})).constructor.infix_60(_.arg0, expression2( {}), {}), () => message( {}), '?3', '?3', {})
+preconditionFileLine(() => (_.arg0 = expression1( {})).constructor.infix_60(_.arg0, expression2( {}), {}), () => message( {}), /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, {})
 ----XCTest.(file).XCTAssertLessThanOrEqual(_:() throws -> T,_:() throws -> T,_:() -> String,file:StaticString,line:UInt)
-preconditionFileLine(() => (_.arg0 = expression1( {})).constructor.infix_60_61(_.arg0, expression2( {}), {}), () => message( {}), '?3', '?3', {})
+preconditionFileLine(() => (_.arg0 = expression1( {})).constructor.infix_60_61(_.arg0, expression2( {}), {}), () => message( {}), /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, {})
 ----XCTest.(file).XCTAssertNil(_:() throws -> Any?,_:() -> String,file:StaticString,line:UInt)
-preconditionFileLine(() => Optional.wrappedEqualsOptionalNilComparisonType(expression( {}), _create(_OptionalNilComparisonType, 'initNilLiteraltuple_type', {}), {}), () => message( {}), '?3', '?3', {})
+preconditionFileLine(() => Optional.wrappedEqualsOptionalNilComparisonType(expression( {}), _injectIntoOptional(null), {}), () => message( {}), /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, {})
 ----XCTest.(file).XCTAssertNotNil(_:() throws -> Any?,_:() -> String,file:StaticString,line:UInt)
-preconditionFileLine(() => Optional.wrappedNotEqualsOptionalNilComparisonType(expression( {}), _create(_OptionalNilComparisonType, 'initNilLiteraltuple_type', {}), {}), () => message( {}), '?3', '?3', {})
+preconditionFileLine(() => Optional.wrappedNotEqualsOptionalNilComparisonType(expression( {}), _injectIntoOptional(null), {}), () => message( {}), /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, {})
 ----XCTest.(file).XCTAssertTrue(_:() throws -> Bool,_:() -> String,file:StaticString,line:UInt)
-preconditionFileLine(() => Bool.infix_61_61(expression( {}), true, {}), () => message( {}), '?3', '?3', {})
+preconditionFileLine(() => Bool.infix_61_61(expression( {}), true, {}), () => message( {}), /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, {})
 ----XCTest.(file).XCTAssertEqual(_:() throws -> T,_:() throws -> T,_:() -> String,file:StaticString,line:UInt)
-preconditionFileLine(() => (_.arg0 = expression1( {})).constructor.infix_61_61(_.arg0, expression2( {}), {}), () => message( {}), '?3', '?3', {})
+preconditionFileLine(() => (_.arg0 = expression1( {})).constructor.infix_61_61(_.arg0, expression2( {}), {}), () => message( {}), /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, {})
 ----XCTest.(file).XCTAssertNotEqual(_:() throws -> T,_:() throws -> T,_:() -> String,file:StaticString,line:UInt)
-preconditionFileLine(() => (_.arg0 = expression1( {})).constructor.infix_33_61(_.arg0, expression2( {}), {}), () => message( {}), '?3', '?3', {})
+preconditionFileLine(() => (_.arg0 = expression1( {})).constructor.infix_33_61(_.arg0, expression2( {}), {}), () => message( {}), /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, {})
 ----XCTest.(file).XCTFail(_:String,file:StaticString,line:UInt)
-assertionFailureFileLine(() => message, '?3', '?3', {})
+assertionFailureFileLine(() => message, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, {})
 ----Swift.(file).precondition(_:() -> Bool,_:() -> String,file:StaticString,line:UInt)
 if((Bool.prefix_33(condition( {}), {}))) {
-assertionFailureFileLine(() => message( {}), '?3', '?3', {});
+assertionFailureFileLine(() => message( {}), /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, /*caller_default_argument_expr*//*magic_identifier_literal_expr*/null, {});
 }
 ----Swift.(file).assert(_:() -> Bool,_:() -> String,file:StaticString,line:UInt)
 if((Bool.prefix_33(condition( {}), {}))) {
@@ -309,4 +309,19 @@ throw message( {})
 
 ----ObjectiveC.(file).NSObject.init()
 
+----CoreData.(file).NSPersistentContainer.init(name:String)
+let _this = this;
+printSeparatorTerminator(/*vararg_expansion_expr*/_create(Array, 'initArrayLiteralArray', ["ALL GOOD"], {}), /*default_argument_expr*/ /**NULL EXPRESSION**/null, /*default_argument_expr*/ /**NULL EXPRESSION**/null, {});
+return
+----CoreData.(file).NSPersistentContainer.loadPersistentStores(completionHandler:(NSPersistentStoreDescription, Error?) -> Void)
+let _this = this;
+printSeparatorTerminator(/*vararg_expansion_expr*/_create(Array, 'initArrayLiteralArray', ["ALL GOOD2"], {}), /*default_argument_expr*/ /**NULL EXPRESSION**/null, /*default_argument_expr*/ /**NULL EXPRESSION**/null, {})
+----CoreData.(file).NSFetchRequest.init(entityName:String)
+let _this = this;
+printSeparatorTerminator(/*vararg_expansion_expr*/_create(Array, 'initArrayLiteralArray', ["ALL GOOD3"], {}), /*default_argument_expr*/ /**NULL EXPRESSION**/null, /*default_argument_expr*/ /**NULL EXPRESSION**/null, {});
+return
+----CoreData.(file).NSFetchedResultsController.init(fetchRequest:NSFetchRequest<ResultType>,managedObjectContext:NSManagedObjectContext,sectionNameKeyPath:String?,cacheName:String?)
+let _this = this;
+printSeparatorTerminator(/*vararg_expansion_expr*/_create(Array, 'initArrayLiteralArray', ["ALL GOOD4"], {}), /*default_argument_expr*/ /**NULL EXPRESSION**/null, /*default_argument_expr*/ /**NULL EXPRESSION**/null, {});
+return
 ----closing dashes needed for the last definition to be processed
