@@ -17,6 +17,11 @@ extension Unicode.ASCII : Unicode.Encoding  {
   }
 }
 
+----Swift.(file)..(error_type).isASCII(_:Unicode.ASCII.CodeUnit)
+extension Unicode.ASCII : Unicode.Encoding  {
+  public static func isASCII(_ x: CodeUnit) -> Bool { return UTF8.isASCII(x) }
+}
+
 ----Swift.(file)..(error_type).decode(_:Unicode.ASCII.EncodedScalar)
 extension Unicode.ASCII : Unicode.Encoding  {
   public static func decode(_ source: EncodedScalar) -> Unicode.Scalar {
@@ -2893,26 +2898,22 @@ extension Character {
 
 ----Swift.(file).Character.UTF8View
 extension Character  {
-  typealias UTF8View = String.U
+  public typealias UTF8View = String.U
 }
 
 ----Swift.(file).Character.utf8
 extension Character  {
-  internal var utf8: UTF8View {
-    return _str.utf8
-  }
+  public var utf8: UTF8View { return _str.utf8 }
 }
 
 ----Swift.(file).Character.UTF16View
 extension Character  {
-  typealias UTF16View = String.U
+  public typealias UTF16View = String.U
 }
 
 ----Swift.(file).Character.utf16
 extension Character  {
-  internal var utf16: UTF16View {
-    return _str.utf16
-  }
+  public var utf16: UTF16View { return _str.utf16 }
 }
 
 ----Swift.(file).Character.UnicodeScalarView
@@ -2922,9 +2923,7 @@ extension Character  {
 
 ----Swift.(file).Character.unicodeScalars
 extension Character  {
-  public var unicodeScalars: UnicodeScalarView {
-    return _str.unicodeScalars
-  }
+  public var unicodeScalars: UnicodeScalarView { return _str.unicodeScalars }
 }
 
 ----Swift.(file).Character.init(_:Unicode.Scalar)
@@ -3518,7 +3517,12 @@ extension ClosedRange where Bound: Strideable, Bound.Stride : SignedInteger  {
 ----Swift.(file).ClosedRange.overlaps(_:ClosedRange<Bound>)
 extension ClosedRange  {
   public func overlaps(_ other: ClosedRange<Bound>) -> Bool {
-    return self.contains(other.lowerBound) || other.contains(lowerBound)
+    // Disjoint iff the other range is completely before or after our range.
+    // Unlike a `Range`, a `ClosedRange` can *not* be empty, so no check for
+    // that case is needed here.
+    let isDisjoint = other.upperBound < self.lowerBound
+      || self.upperBound < other.lowerBound
+    return !isDisjoint
   }
 }
 
@@ -5466,7 +5470,8 @@ extension String: _HasContiguousBytes  {
   internal func withUnsafeBytes<R>(
     _ body: (UnsafeRawBufferPointer) throws -> R
   ) rethrows -> R {
-    return try self._withUTF8 { return try body(UnsafeRawBufferPointer($0)) }
+    var copy = self
+    return try copy.withUTF8 { return try body(UnsafeRawBufferPointer($0)) }
   }
 }
 
@@ -5475,68 +5480,8 @@ extension Substring: _HasContiguousBytes  {
   internal func withUnsafeBytes<R>(
     _ body: (UnsafeRawBufferPointer) throws -> R
   ) rethrows -> R {
-    return try self._withUTF8 { return try body(UnsafeRawBufferPointer($0)) }
-  }
-}
-
-----Swift.(file).Dictionary.init()
-extension Dictionary {
-  public init() {
-    self.init(_native: _NativeDictionary())
-  }
-}
-
-----Swift.(file).Dictionary.init(minimumCapacity:Int)
-extension Dictionary {
-  init(minimumCapacity: Int) {
-    _variant = _Variant(native: _NativeDictionary(capacity: minimumCapacity))
-  }
-}
-
-----Swift.(file).Dictionary.init(uniqueKeysWithValues:S)
-extension Dictionary {
-  public init<S: Sequence>(
-    uniqueKeysWithValues keysAndValues: __owned S
-  ) where S.Element == (Key, Value) {
-    if let d = keysAndValues as? Dictionary<Key, Value> {
-      self = d
-      return
-    }
-    var native = _NativeDictionary<Key, Value>(
-      capacity: keysAndValues.underestimatedCount)
-    // '_MergeError.keyCollision' is caught and handled with an appropriate
-    // error message one level down, inside native.merge(_:...). We throw an
-    // error instead of calling fatalError() directly because we want the
-    // message to include the duplicate key, and the closure only has access to
-    // the conflicting values.
-    try! native.merge(
-      keysAndValues,
-      isUnique: true,
-      uniquingKeysWith: { _, _ in throw _MergeError.keyCollision })
-    self.init(_native: native)
-  }
-}
-
-----Swift.(file).Dictionary.init(_:S,uniquingKeysWith:(Value, Value) throws -> Value)
-extension Dictionary {
-  public init<S: Sequence>(
-    _ keysAndValues: __owned S,
-    uniquingKeysWith combine: (Value, Value) throws -> Value
-  ) rethrows where S.Element == (Key, Value) {
-    var native = _NativeDictionary<Key, Value>(
-      capacity: keysAndValues.underestimatedCount)
-    try native.merge(keysAndValues, isUnique: true, uniquingKeysWith: combine)
-    self.init(_native: native)
-  }
-}
-
-----Swift.(file).Dictionary.init(grouping:S,by:(S.Element) throws -> Key)
-extension Dictionary {
-  public init<S: Sequence>(
-    grouping values: __owned S,
-    by keyForValue: (S.Element) throws -> Key
-  ) rethrows where Value == [S.Element] {
-    try self.init(_native: _NativeDictionary(grouping: values, by: keyForValue))
+    var copy = self
+    return try copy.withUTF8 { return try body(UnsafeRawBufferPointer($0)) }
   }
 }
 
@@ -5839,16 +5784,15 @@ extension __CocoaDictionary.Iterator: IteratorProtocol  {
   }
 }
 
-----Swift.(file).Dictionary.init(_unsafeUninitializedCapacity:Int,allowingDuplicates:Bool,initializingWith:(UnsafeMutableBufferPointer<Key>, UnsafeMutableBufferPointer<Value>, inout Int) -> Void)
+----Swift.(file).Dictionary.init(_unsafeUninitializedCapacity:Int,allowingDuplicates:Bool,initializingWith:(UnsafeMutableBufferPointer<Key>, UnsafeMutableBufferPointer<Value>) -> Int)
 extension Dictionary  {
   init(
     _unsafeUninitializedCapacity capacity: Int,
     allowingDuplicates: Bool,
     initializingWith initializer: (
       _ keys: UnsafeMutableBufferPointer<Key>,
-      _ values: UnsafeMutableBufferPointer<Value>,
-      _ initializedCount: inout Int
-    ) -> Void
+      _ values: UnsafeMutableBufferPointer<Value>
+    ) -> Int
   ) {
     self.init(_native: _NativeDictionary(
         _unsafeUninitializedCapacity: capacity,
@@ -5864,17 +5808,14 @@ extension _NativeDictionary  {
     allowingDuplicates: Bool,
     initializingWith initializer: (
       _ keys: UnsafeMutableBufferPointer<Key>,
-      _ values: UnsafeMutableBufferPointer<Value>,
-      _ initializedCount: inout Int
-    ) -> Void
+      _ values: UnsafeMutableBufferPointer<Value>
+    ) -> Int
   ) {
     self.init(capacity: capacity)
-    var initializedCount = 0
-    initializer(
+    let initializedCount = initializer(
       UnsafeMutableBufferPointer(start: _keys, count: capacity),
-      UnsafeMutableBufferPointer(start: _values, count: capacity),
-      &initializedCount)
-    _precondition(count >= 0 && count <= capacity)
+      UnsafeMutableBufferPointer(start: _values, count: capacity))
+    _precondition(initializedCount >= 0 && initializedCount <= capacity)
     _storage._count = initializedCount
 
     // Hash initialized elements and move each of them into their correct
@@ -5939,6 +5880,29 @@ extension _NativeDictionary  {
     }
     // When there are no more unprocessed entries, we're left with a valid
     // Dictionary.
+  }
+}
+
+----Swift.(file).Dictionary.init(_mapping:C,allowingDuplicates:Bool,transform:(C.Element) -> (key: Key, value: Value)?)
+extension Dictionary  {
+  internal init?<C: Collection>(
+    _mapping source: C,
+    allowingDuplicates: Bool,
+    transform: (C.Element) -> (key: Key, value: Value)?
+  ) {
+    var target = _NativeDictionary<Key, Value>(capacity: source.count)
+    if allowingDuplicates {
+      for member in source {
+        guard let (key, value) = transform(member) else { return nil }
+        target._unsafeUpdate(key: key, value: value)
+      }
+    } else {
+      for member in source {
+        guard let (key, value) = transform(member) else { return nil }
+        target._unsafeInsertNew(key: key, value: value)
+      }
+    }
+    self.init(_native: target)
   }
 }
 
@@ -8040,10 +8004,6 @@ extension FloatingPoint  {
 ----Swift.(file).FloatingPoint.minimum(_:Self,_:Self)
 extension FloatingPoint  {
   public static func minimum(_ x: Self, _ y: Self) -> Self {
-    if x.isSignalingNaN || y.isSignalingNaN {
-      //  Produce a quiet NaN matching platform arithmetic behavior.
-      return x + y
-    }
     if x <= y || y.isNaN { return x }
     return y
   }
@@ -8052,10 +8012,6 @@ extension FloatingPoint  {
 ----Swift.(file).FloatingPoint.maximum(_:Self,_:Self)
 extension FloatingPoint  {
   public static func maximum(_ x: Self, _ y: Self) -> Self {
-    if x.isSignalingNaN || y.isSignalingNaN {
-      //  Produce a quiet NaN matching platform arithmetic behavior.
-      return x + y
-    }
     if x > y || y.isNaN { return x }
     return y
   }
@@ -8064,10 +8020,6 @@ extension FloatingPoint  {
 ----Swift.(file).FloatingPoint.minimumMagnitude(_:Self,_:Self)
 extension FloatingPoint  {
   public static func minimumMagnitude(_ x: Self, _ y: Self) -> Self {
-    if x.isSignalingNaN || y.isSignalingNaN {
-      //  Produce a quiet NaN matching platform arithmetic behavior.
-      return x + y
-    }
     if x.magnitude <= y.magnitude || y.isNaN { return x }
     return y
   }
@@ -8076,10 +8028,6 @@ extension FloatingPoint  {
 ----Swift.(file).FloatingPoint.maximumMagnitude(_:Self,_:Self)
 extension FloatingPoint  {
   public static func maximumMagnitude(_ x: Self, _ y: Self) -> Self {
-    if x.isSignalingNaN || y.isSignalingNaN {
-      //  Produce a quiet NaN matching platform arithmetic behavior.
-      return x + y
-    }
     if x.magnitude > y.magnitude || y.isNaN { return x }
     return y
   }
@@ -11265,7 +11213,7 @@ public typealias LazyPrefixWhileBidirectionalCollection<T> = LazyPrefixWhileColl
 public typealias ReversedRandomAccessCollection<T: RandomAccessCollection> = ReversedCollection<T>
 
 ----Swift.(file).ReversedIndex
-public typealias ReversedIndex<T: BidirectionalCollection> = ReversedCollection<T>
+public typealias ReversedIndex<T: BidirectionalCollection> = ReversedCollection<T>.I
 
 ----Swift.(file).BidirectionalSlice
 public typealias BidirectionalSlice<T> = Slice<T> where T : B
@@ -12846,9 +12794,21 @@ extension _NativeSet  {
 extension _NativeSet  {
   internal func uncheckedInitialize(
     at bucket: Bucket,
-    to element: __owned Element) {
+    to element: __owned Element
+  ) {
     _internalInvariant(hashTable.isValid(bucket))
     (_elements + bucket.offset).initialize(to: element)
+  }
+}
+
+----Swift.(file)._NativeSet.uncheckedAssign(at:<<error type>>,to:Element)
+extension _NativeSet  {
+  internal func uncheckedAssign(
+    at bucket: Bucket,
+    to element: __owned Element
+  ) {
+    _internalInvariant(hashTable.isOccupied(bucket))
+    (_elements + bucket.offset).pointee = element
   }
 }
 
@@ -13245,204 +13205,6 @@ extension _SwiftNewtypeWrapper where Self: Hashable, Self.RawValue: Hashable  {
 extension _SwiftNewtypeWrapper where Self: Hashable, Self.RawValue: Hashable  {
   public func hash(into hasher: inout Hasher) {
     hasher.combine(rawValue)
-  }
-}
-
-----Swift.(file)._StringGuts.foreignHasNormalizationBoundary(before:String.Index)
-extension _StringGuts  {
-  internal func foreignHasNormalizationBoundary(
-    before index: String.Index
-  ) -> Bool {
-    let offset = index.encodedOffset
-    if offset == 0 || offset == count {
-      return true
-    }
-
-    let scalar = foreignErrorCorrectedScalar(startingAt: index).0
-    return scalar._hasNormalizationBoundaryBefore
-  }
-}
-
-----Swift.(file).UnsafeBufferPointer.hasNormalizationBoundary(before:Int)
-extension UnsafeBufferPointer where Element == UInt8  {
-  internal func hasNormalizationBoundary(before index: Int) -> Bool {
-    if index == 0 || index == count {
-      return true
-    }
-    assert(!_isContinuation(self[_unchecked: index]))
-
-    // Sub-300 latiny fast-path
-    if self[_unchecked: index] < 0xCC { return true }
-
-    let cu = _decodeScalar(self, startingAt: index).0
-    return cu._hasNormalizationBoundaryBefore
-  }
-}
-
-----Swift.(file)._SegmentSource.tryFill(into:<<error type>>)
-extension _SegmentSource  {
-  mutating func tryFill(
-    into output: UnsafeMutablePointer<_Normalization._SegmentOutputBuffer>
-  ) -> Int? {
-    return tryFill(into: _castOutputBuffer(output))
-  }
-}
-
-----Swift.(file)._NormalizedUTF8CodeUnitIterator_2.outputBufferThreshold
-extension _NormalizedUTF8CodeUnitIterator_2  {
-  private var outputBufferThreshold: Int {
-    return outputBuffer.capacity - 4
-  }
-}
-
-----Swift.(file)._NormalizedUTF8CodeUnitIterator_2.outputBufferEmpty
-extension _NormalizedUTF8CodeUnitIterator_2  {
-  private var outputBufferEmpty: Bool {
-    return outputPosition == outputBufferCount
-  }
-}
-
-----Swift.(file)._NormalizedUTF8CodeUnitIterator_2.outputBufferFull
-extension _NormalizedUTF8CodeUnitIterator_2  {
-  private var outputBufferFull: Bool {
-    return outputBufferCount >= outputBufferThreshold
-  }
-}
-
-----Swift.(file)._NormalizedUTF8CodeUnitIterator_2.inputBufferEmpty
-extension _NormalizedUTF8CodeUnitIterator_2  {
-  private var inputBufferEmpty: Bool {
-    return gutsSlice.range.isEmpty
-  }
-}
-
-----Swift.(file)._NormalizedUTF8CodeUnitIterator_2.fastPathFill()
-extension _NormalizedUTF8CodeUnitIterator_2  {
-  private mutating func fastPathFill() -> (numRead: Int, numWritten: Int) {
-    // TODO: Additional fast-path: All CCC-ascending NFC_QC segments are NFC
-    // TODO: Just freakin do normalization and don't bother with ICU
-    var outputCount = 0
-    let outputEnd = outputBufferThreshold
-    var inputCount = 0
-    let inputEnd = gutsSlice.count
-    if _fastPath(gutsSlice.isFastUTF8) {
-      gutsSlice.withFastUTF8 { utf8 in
-        while inputCount < inputEnd && outputCount < outputEnd {
-          // TODO: Slightly faster code-unit scan for latiny (<0xCC)
-
-          // Check scalar-based fast-paths
-          let (scalar, len) = _decodeScalar(utf8, startingAt: inputCount)
-          _internalInvariant(inputCount &+ len <= inputEnd)
-
-          if _slowPath(
-               !utf8.hasNormalizationBoundary(before: inputCount &+ len)
-            || !scalar._isNFCStarter
-          ) {
-            break 
-          }
-          inputCount &+= len
-
-          for cu in UTF8.encode(scalar)._unsafelyUnwrappedUnchecked {
-            outputBuffer[outputCount] = cu
-            outputCount &+= 1
-          }
-
-          _internalInvariant(inputCount == outputCount,
-            "non-normalizing UTF-8 fast path should be 1-to-1 in code units")
-        }
-      }
-    } else { // Foreign
-      while inputCount < inputEnd && outputCount < outputEnd {
-        let startIdx = gutsSlice.range.lowerBound.encoded(
-          offsetBy: inputCount)
-        let (scalar, len) = gutsSlice.foreignErrorCorrectedScalar(
-          startingAt: startIdx)
-        _internalInvariant(inputCount &+ len <= inputEnd)
-
-        if _slowPath(
-             !gutsSlice.foreignHasNormalizationBoundary(
-               before: startIdx.encoded(offsetBy: len))
-          || !scalar._isNFCStarter
-        ) {
-          break 
-        }
-        inputCount &+= len
-
-        for cu in UTF8.encode(scalar)._unsafelyUnwrappedUnchecked {
-          outputBuffer[outputCount] = cu
-          outputCount &+= 1
-        }
-
-        _internalInvariant(inputCount <= outputCount,
-          "non-normalizing UTF-16 fast path shoule be 1-to-many in code units")
-      }
-    }
-    return (inputCount, outputCount)
-  }
-}
-
-----Swift.(file)._NormalizedUTF8CodeUnitIterator_2.fill()
-extension _NormalizedUTF8CodeUnitIterator_2  {
-  private mutating func fill() {
-    _internalInvariant(outputBufferEmpty)
-
-    let priorInputCount = gutsSlice._offsetRange.count
-
-    outputPosition = 0
-    let (inputCount, outputCount) = fastPathFill()
-    self.outputBufferCount = outputCount
-
-    // Check if we filled in any, and adjust our scanning range appropriately
-    if inputCount > 0 {
-      _internalInvariant(outputCount > 0)
-      gutsSlice._offsetRange = Range(uncheckedBounds: (
-        gutsSlice._offsetRange.lowerBound + inputCount,
-        gutsSlice._offsetRange.upperBound))
-      _internalInvariant(gutsSlice._offsetRange.count >= 0)
-      return
-    }
-
-    let remaining: Int = gutsSlice.withNFCCodeUnitsIterator {
-      var nfc = $0
-      while !outputBufferFull, let cu = nfc.next() {
-        outputBuffer[outputBufferCount] = cu
-        outputBufferCount &+= 1
-      }
-      return nfc.utf16Iterator.source.remaining
-    }
-
-    if !(outputBufferCount == 0 || remaining < priorInputCount) {
-      // TODO: _internalInvariant(outputBufferCount == 0 || remaining < priorInputCount)
-    }
-
-    gutsSlice._offsetRange = Range(uncheckedBounds: (
-      gutsSlice._offsetRange.lowerBound + (priorInputCount - remaining),
-      gutsSlice._offsetRange.upperBound))
-
-    _internalInvariant(outputBufferFull || gutsSlice._offsetRange.isEmpty)
-    _internalInvariant(gutsSlice._offsetRange.count >= 0)
-  }
-}
-
-----Swift.(file)._NormalizedUTF8CodeUnitIterator_2.compare(with:_NormalizedUTF8CodeUnitIterator_2,expecting:<<error type>>)
-extension _NormalizedUTF8CodeUnitIterator_2  {
-  internal mutating func compare(
-    with other: _NormalizedUTF8CodeUnitIterator_2,
-    expecting: _StringComparisonResult
-  ) -> Bool {
-    var mutableOther = other
-
-    for cu in self {
-      guard let otherCU = mutableOther.next() else {
-        // We have more code units, therefore we are greater
-        return false
-      }
-      if cu == otherCU { continue }
-      return expecting == .less ? cu < otherCU : false
-    }
-
-    // We have exhausted our code units. We are less if there's more remaining
-    return mutableOther.next() == nil ? expecting == .equal : expecting == .less
   }
 }
 
@@ -15073,16 +14835,28 @@ extension MutableCollection  {
 ----Swift.(file).Range.overlaps(_:Range<Bound>)
 extension Range  {
   public func overlaps(_ other: Range<Bound>) -> Bool {
-    return (!other.isEmpty && self.contains(other.lowerBound))
-        || (!self.isEmpty && other.contains(self.lowerBound))
+    // Disjoint iff the other range is completely before or after our range.
+    // Additionally either `Range` (unlike a `ClosedRange`) could be empty, in
+    // which case it is disjoint with everything as overlap is defined as having
+    // an element in common.
+    let isDisjoint = other.upperBound <= self.lowerBound
+      || self.upperBound <= other.lowerBound
+      || self.isEmpty || other.isEmpty
+    return !isDisjoint
   }
 }
 
 ----Swift.(file).Range.overlaps(_:ClosedRange<Bound>)
 extension Range  {
   public func overlaps(_ other: ClosedRange<Bound>) -> Bool {
-    return self.contains(other.lowerBound)
-        || (!self.isEmpty && other.contains(self.lowerBound))
+    // Disjoint iff the other range is completely before or after our range.
+    // Additionally the `Range` (unlike the `ClosedRange`) could be empty, in
+    // which case it is disjoint with everything as overlap is defined as having
+    // an element in common.
+    let isDisjoint = other.upperBound < self.lowerBound
+      || self.upperBound <= other.lowerBound
+      || self.isEmpty
+    return !isDisjoint
   }
 }
 
@@ -15901,7 +15675,7 @@ extension BidirectionalCollection  {
 
 ----Swift.(file).SIMDStorage.Scalar
 extension SIMDStorage {
-  associatedtype Scalar : Codable, H
+  associatedtype Scalar: Codable, H
 }
 
 ----Swift.(file).SIMDStorage.scalarCount
@@ -15919,45 +15693,55 @@ extension SIMDStorage {
   subscript(index: Int) -> Scalar { get set }
 }
 
+----Swift.(file).SIMDStorage.scalarCount
+extension SIMDStorage  {
+  public static var scalarCount: Int {
+    // Wouldn't it make more sense to define the instance var in terms of the
+    // static var? Yes, probably, but by doing it this way we make the static
+    // var backdeployable.
+    return Self().scalarCount
+  }
+}
+
 ----Swift.(file).SIMDScalar.SIMDMaskScalar
 extension SIMDScalar {
-  associatedtype SIMDMaskScalar : SIMDScalar & FixedWidthInteger & S
+  associatedtype SIMDMaskScalar: SIMDScalar & FixedWidthInteger & S
 }
 
 ----Swift.(file).SIMDScalar.SIMD2Storage
 extension SIMDScalar {
-  associatedtype SIMD2Storage : SIMDStorage where SIMD2Storage.Scalar == S
+  associatedtype SIMD2Storage: SIMDStorage where SIMD2Storage.Scalar == S
 }
 
 ----Swift.(file).SIMDScalar.SIMD4Storage
 extension SIMDScalar {
-  associatedtype SIMD4Storage : SIMDStorage where SIMD4Storage.Scalar == S
+  associatedtype SIMD4Storage: SIMDStorage where SIMD4Storage.Scalar == S
 }
 
 ----Swift.(file).SIMDScalar.SIMD8Storage
 extension SIMDScalar {
-  associatedtype SIMD8Storage : SIMDStorage where SIMD8Storage.Scalar == S
+  associatedtype SIMD8Storage: SIMDStorage where SIMD8Storage.Scalar == S
 }
 
 ----Swift.(file).SIMDScalar.SIMD16Storage
 extension SIMDScalar {
-  associatedtype SIMD16Storage : SIMDStorage where SIMD16Storage.Scalar == S
+  associatedtype SIMD16Storage: SIMDStorage where SIMD16Storage.Scalar == S
 }
 
 ----Swift.(file).SIMDScalar.SIMD32Storage
 extension SIMDScalar {
-  associatedtype SIMD32Storage : SIMDStorage where SIMD32Storage.Scalar == S
+  associatedtype SIMD32Storage: SIMDStorage where SIMD32Storage.Scalar == S
 }
 
 ----Swift.(file).SIMDScalar.SIMD64Storage
 extension SIMDScalar {
-  associatedtype SIMD64Storage : SIMDStorage where SIMD64Storage.Scalar == S
+  associatedtype SIMD64Storage: SIMDStorage where SIMD64Storage.Scalar == S
 }
 
 ----Swift.(file).SIMD.MaskStorage
 extension SIMD {
-  associatedtype MaskStorage : SIMD
-    where MaskStorage.Scalar : FixedWidthInteger & S
+  associatedtype MaskStorage: SIMD
+    where MaskStorage.Scalar: FixedWidthInteger & S
 }
 
 ----Swift.(file).SIMD.indices
@@ -16079,8 +15863,92 @@ extension SIMD  {
   }
 }
 
+----Swift.(file).SIMD.subscript(_:SIMD2<Index>)
+extension SIMD  {
+  public subscript<Index>(index: SIMD2<Index>) -> SIMD2<Scalar>
+  where Index: FixedWidthInteger {
+    var result = SIMD2<Scalar>()
+    for i in result.indices {
+      result[i] = self[Int(index[i]) % scalarCount]
+    }
+    return result
+  }
+}
+
+----Swift.(file).SIMD.subscript(_:SIMD3<Index>)
+extension SIMD  {
+  public subscript<Index>(index: SIMD3<Index>) -> SIMD3<Scalar>
+  where Index: FixedWidthInteger {
+    var result = SIMD3<Scalar>()
+    for i in result.indices {
+      result[i] = self[Int(index[i]) % scalarCount]
+    }
+    return result
+  }
+}
+
+----Swift.(file).SIMD.subscript(_:SIMD4<Index>)
+extension SIMD  {
+  public subscript<Index>(index: SIMD4<Index>) -> SIMD4<Scalar>
+  where Index: FixedWidthInteger {
+    var result = SIMD4<Scalar>()
+    for i in result.indices {
+      result[i] = self[Int(index[i]) % scalarCount]
+    }
+    return result
+  }
+}
+
+----Swift.(file).SIMD.subscript(_:SIMD8<Index>)
+extension SIMD  {
+  public subscript<Index>(index: SIMD8<Index>) -> SIMD8<Scalar>
+  where Index: FixedWidthInteger {
+    var result = SIMD8<Scalar>()
+    for i in result.indices {
+      result[i] = self[Int(index[i]) % scalarCount]
+    }
+    return result
+  }
+}
+
+----Swift.(file).SIMD.subscript(_:SIMD16<Index>)
+extension SIMD  {
+  public subscript<Index>(index: SIMD16<Index>) -> SIMD16<Scalar>
+  where Index: FixedWidthInteger {
+    var result = SIMD16<Scalar>()
+    for i in result.indices {
+      result[i] = self[Int(index[i]) % scalarCount]
+    }
+    return result
+  }
+}
+
+----Swift.(file).SIMD.subscript(_:SIMD32<Index>)
+extension SIMD  {
+  public subscript<Index>(index: SIMD32<Index>) -> SIMD32<Scalar>
+  where Index: FixedWidthInteger {
+    var result = SIMD32<Scalar>()
+    for i in result.indices {
+      result[i] = self[Int(index[i]) % scalarCount]
+    }
+    return result
+  }
+}
+
+----Swift.(file).SIMD.subscript(_:SIMD64<Index>)
+extension SIMD  {
+  public subscript<Index>(index: SIMD64<Index>) -> SIMD64<Scalar>
+  where Index: FixedWidthInteger {
+    var result = SIMD64<Scalar>()
+    for i in result.indices {
+      result[i] = self[Int(index[i]) % scalarCount]
+    }
+    return result
+  }
+}
+
 ----Swift.(file).SIMD..<infix(_:Self,_:Self)
-extension SIMD where Scalar : Comparable  {
+extension SIMD where Scalar: Comparable  {
   public static func .<(lhs: Self, rhs: Self) -> SIMDMask<MaskStorage> {
     var result = SIMDMask<MaskStorage>()
     for i in result.indices { result[i] = lhs[i] < rhs[i] }
@@ -16089,11 +15957,25 @@ extension SIMD where Scalar : Comparable  {
 }
 
 ----Swift.(file).SIMD..<=infix(_:Self,_:Self)
-extension SIMD where Scalar : Comparable  {
+extension SIMD where Scalar: Comparable  {
   public static func .<=(lhs: Self, rhs: Self) -> SIMDMask<MaskStorage> {
     var result = SIMDMask<MaskStorage>()
     for i in result.indices { result[i] = lhs[i] <= rhs[i] }
     return result
+  }
+}
+
+----Swift.(file).SIMD.min()
+extension SIMD where Scalar: Comparable  {
+  public func min() -> Scalar {
+    return indices.reduce(into: self[0]) { $0 = Swift.min($0, self[$1]) }
+  }
+}
+
+----Swift.(file).SIMD.max()
+extension SIMD where Scalar: Comparable  {
+  public func max() -> Scalar {
+    return indices.reduce(into: self[0]) { $0 = Swift.max($0, self[$1]) }
   }
 }
 
@@ -16149,84 +16031,105 @@ extension SIMD  {
 }
 
 ----Swift.(file).SIMD..>=infix(_:Self,_:Self)
-extension SIMD where Scalar : Comparable  {
+extension SIMD where Scalar: Comparable  {
   public static func .>=(lhs: Self, rhs: Self) -> SIMDMask<MaskStorage> {
     return rhs .<= lhs
   }
 }
 
 ----Swift.(file).SIMD..>infix(_:Self,_:Self)
-extension SIMD where Scalar : Comparable  {
+extension SIMD where Scalar: Comparable  {
   public static func .>(lhs: Self, rhs: Self) -> SIMDMask<MaskStorage> {
     return rhs .< lhs
   }
 }
 
 ----Swift.(file).SIMD..<infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : Comparable  {
+extension SIMD where Scalar: Comparable  {
   public static func .<(lhs: Scalar, rhs: Self) -> SIMDMask<MaskStorage> {
     return Self(repeating: lhs) .< rhs
   }
 }
 
 ----Swift.(file).SIMD..<=infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : Comparable  {
+extension SIMD where Scalar: Comparable  {
   public static func .<=(lhs: Scalar, rhs: Self) -> SIMDMask<MaskStorage> {
     return Self(repeating: lhs) .<= rhs
   }
 }
 
 ----Swift.(file).SIMD..>=infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : Comparable  {
+extension SIMD where Scalar: Comparable  {
   public static func .>=(lhs: Scalar, rhs: Self) -> SIMDMask<MaskStorage> {
     return Self(repeating: lhs) .>= rhs
   }
 }
 
 ----Swift.(file).SIMD..>infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : Comparable  {
+extension SIMD where Scalar: Comparable  {
   public static func .>(lhs: Scalar, rhs: Self) -> SIMDMask<MaskStorage> {
     return Self(repeating: lhs) .> rhs
   }
 }
 
 ----Swift.(file).SIMD..<infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : Comparable  {
+extension SIMD where Scalar: Comparable  {
   public static func .<(lhs: Self, rhs: Scalar) -> SIMDMask<MaskStorage> {
     return lhs .< Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD..<=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : Comparable  {
+extension SIMD where Scalar: Comparable  {
   public static func .<=(lhs: Self, rhs: Scalar) -> SIMDMask<MaskStorage> {
     return lhs .<= Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD..>=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : Comparable  {
+extension SIMD where Scalar: Comparable  {
   public static func .>=(lhs: Self, rhs: Scalar) -> SIMDMask<MaskStorage> {
     return lhs .>= Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD..>infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : Comparable  {
+extension SIMD where Scalar: Comparable  {
   public static func .>(lhs: Self, rhs: Scalar) -> SIMDMask<MaskStorage> {
     return lhs .> Self(repeating: rhs)
   }
 }
 
+----Swift.(file).SIMD.clamp(lowerBound:Self,upperBound:Self)
+extension SIMD where Scalar: Comparable  {
+  public mutating func clamp(lowerBound: Self, upperBound: Self) {
+    self = self.clamped(lowerBound: lowerBound, upperBound: upperBound)
+  }
+}
+
+----Swift.(file).SIMD.clamped(lowerBound:Self,upperBound:Self)
+extension SIMD where Scalar: Comparable  {
+  public func clamped(lowerBound: Self, upperBound: Self) -> Self {
+    return pointwiseMin(upperBound, pointwiseMax(lowerBound, self))
+  }
+}
+
 ----Swift.(file).SIMD.zero
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static var zero: Self {
     return Self()
   }
 }
 
+----Swift.(file).SIMD.one
+extension SIMD where Scalar: FixedWidthInteger  {
+  public static var one: Self {
+    return Self(repeating: 1)
+  }
+}
+
 ----Swift.(file).SIMD.random(in:Range<Self.Scalar>,using:T)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func random<T: RandomNumberGenerator>(
     in range: Range<Scalar>,
     using generator: inout T
@@ -16240,7 +16143,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.random(in:Range<Self.Scalar>)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func random(in range: Range<Scalar>) -> Self {
     var g = SystemRandomNumberGenerator()
     return Self.random(in: range, using: &g)
@@ -16248,7 +16151,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.random(in:ClosedRange<Self.Scalar>,using:T)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func random<T: RandomNumberGenerator>(
     in range: ClosedRange<Scalar>,
     using generator: inout T
@@ -16262,7 +16165,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.random(in:ClosedRange<Self.Scalar>)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func random(in range: ClosedRange<Scalar>) -> Self {
     var g = SystemRandomNumberGenerator()
     return Self.random(in: range, using: &g)
@@ -16270,15 +16173,36 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.zero
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static var zero: Self {
     return Self()
   }
 }
 
+----Swift.(file).SIMD.one
+extension SIMD where Scalar: FloatingPoint  {
+  public static var one: Self {
+    return Self(repeating: 1)
+  }
+}
+
+----Swift.(file).SIMD.clamp(lowerBound:Self,upperBound:Self)
+extension SIMD where Scalar: FloatingPoint  {
+  public mutating func clamp(lowerBound: Self, upperBound: Self) {
+    self = self.clamped(lowerBound: lowerBound, upperBound: upperBound)
+  }
+}
+
+----Swift.(file).SIMD.clamped(lowerBound:Self,upperBound:Self)
+extension SIMD where Scalar: FloatingPoint  {
+  public func clamped(lowerBound: Self, upperBound: Self) -> Self {
+    return pointwiseMin(upperBound, pointwiseMax(lowerBound, self))
+  }
+}
+
 ----Swift.(file).SIMD.random(in:Range<Self.Scalar>,using:T)
 extension SIMD
-where Scalar : BinaryFloatingPoint, Scalar.RawSignificand : FixedWidthInteger  {
+where Scalar: BinaryFloatingPoint, Scalar.RawSignificand: FixedWidthInteger  {
   public static func random<T: RandomNumberGenerator>(
     in range: Range<Scalar>,
     using generator: inout T
@@ -16293,7 +16217,7 @@ where Scalar : BinaryFloatingPoint, Scalar.RawSignificand : FixedWidthInteger  {
 
 ----Swift.(file).SIMD.random(in:Range<Self.Scalar>)
 extension SIMD
-where Scalar : BinaryFloatingPoint, Scalar.RawSignificand : FixedWidthInteger  {
+where Scalar: BinaryFloatingPoint, Scalar.RawSignificand: FixedWidthInteger  {
   public static func random(in range: Range<Scalar>) -> Self {
     var g = SystemRandomNumberGenerator()
     return Self.random(in: range, using: &g)
@@ -16302,7 +16226,7 @@ where Scalar : BinaryFloatingPoint, Scalar.RawSignificand : FixedWidthInteger  {
 
 ----Swift.(file).SIMD.random(in:ClosedRange<Self.Scalar>,using:T)
 extension SIMD
-where Scalar : BinaryFloatingPoint, Scalar.RawSignificand : FixedWidthInteger  {
+where Scalar: BinaryFloatingPoint, Scalar.RawSignificand: FixedWidthInteger  {
   public static func random<T: RandomNumberGenerator>(
     in range: ClosedRange<Scalar>,
     using generator: inout T
@@ -16317,7 +16241,7 @@ where Scalar : BinaryFloatingPoint, Scalar.RawSignificand : FixedWidthInteger  {
 
 ----Swift.(file).SIMD.random(in:ClosedRange<Self.Scalar>)
 extension SIMD
-where Scalar : BinaryFloatingPoint, Scalar.RawSignificand : FixedWidthInteger  {
+where Scalar: BinaryFloatingPoint, Scalar.RawSignificand: FixedWidthInteger  {
   public static func random(in range: ClosedRange<Scalar>) -> Self {
     var g = SystemRandomNumberGenerator()
     return Self.random(in: range, using: &g)
@@ -16389,7 +16313,7 @@ extension SIMDMask  {
 }
 
 ----Swift.(file).SIMD.leadingZeroBitCount
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public var leadingZeroBitCount: Self {
     var result = Self()
     for i in indices { result[i] = Scalar(self[i].leadingZeroBitCount) }
@@ -16398,7 +16322,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.trailingZeroBitCount
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public var trailingZeroBitCount: Self {
     var result = Self()
     for i in indices { result[i] = Scalar(self[i].trailingZeroBitCount) }
@@ -16407,7 +16331,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.nonzeroBitCount
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public var nonzeroBitCount: Self {
     var result = Self()
     for i in indices { result[i] = Scalar(self[i].nonzeroBitCount) }
@@ -16416,7 +16340,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.~prefix(_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static prefix func ~(rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = ~rhs[i] }
@@ -16425,7 +16349,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.&infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] & rhs[i] }
@@ -16434,7 +16358,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.^infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func ^(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] ^ rhs[i] }
@@ -16443,7 +16367,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.|infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func |(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] | rhs[i] }
@@ -16452,7 +16376,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.&<<infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &<<(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] &<< rhs[i] }
@@ -16461,7 +16385,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.&>>infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &>>(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] &>> rhs[i] }
@@ -16470,7 +16394,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.&+infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &+(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] &+ rhs[i] }
@@ -16479,7 +16403,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.&-infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &-(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] &- rhs[i] }
@@ -16488,7 +16412,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.&*infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &*(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] &* rhs[i] }
@@ -16497,7 +16421,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD./infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func /(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] / rhs[i] }
@@ -16506,7 +16430,7 @@ extension SIMD where Scalar : FixedWidthInteger  {
 }
 
 ----Swift.(file).SIMD.%infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func %(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] % rhs[i] }
@@ -16514,8 +16438,15 @@ extension SIMD where Scalar : FixedWidthInteger  {
   }
 }
 
+----Swift.(file).SIMD.wrappedSum()
+extension SIMD where Scalar: FixedWidthInteger  {
+  public func wrappedSum() -> Scalar {
+    return indices.reduce(into: 0) { $0 &+= self[$1] }
+  }
+}
+
 ----Swift.(file).SIMD.+infix(_:Self,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func +(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] + rhs[i] }
@@ -16524,7 +16455,7 @@ extension SIMD where Scalar : FloatingPoint  {
 }
 
 ----Swift.(file).SIMD.-infix(_:Self,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func -(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] - rhs[i] }
@@ -16533,7 +16464,7 @@ extension SIMD where Scalar : FloatingPoint  {
 }
 
 ----Swift.(file).SIMD.*infix(_:Self,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func *(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] * rhs[i] }
@@ -16542,7 +16473,7 @@ extension SIMD where Scalar : FloatingPoint  {
 }
 
 ----Swift.(file).SIMD./infix(_:Self,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func /(lhs: Self, rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = lhs[i] / rhs[i] }
@@ -16551,7 +16482,7 @@ extension SIMD where Scalar : FloatingPoint  {
 }
 
 ----Swift.(file).SIMD.addingProduct(_:Self,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public func addingProduct(_ lhs: Self, _ rhs: Self) -> Self {
     var result = Self()
     for i in result.indices { result[i] = self[i].addingProduct(lhs[i], rhs[i]) }
@@ -16560,7 +16491,7 @@ extension SIMD where Scalar : FloatingPoint  {
 }
 
 ----Swift.(file).SIMD.squareRoot()
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public func squareRoot( ) -> Self {
     var result = Self()
     for i in result.indices { result[i] = self[i].squareRoot() }
@@ -16569,11 +16500,36 @@ extension SIMD where Scalar : FloatingPoint  {
 }
 
 ----Swift.(file).SIMD.rounded(_:FloatingPointRoundingRule)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public func rounded(_ rule: FloatingPointRoundingRule) -> Self {
     var result = Self()
     for i in result.indices { result[i] = self[i].rounded(rule) }
     return result
+  }
+}
+
+----Swift.(file).SIMD.min()
+extension SIMD where Scalar: FloatingPoint  {
+  public func min() -> Scalar {
+    return indices.reduce(into: self[0]) { $0 = Scalar.minimum($0, self[$1]) }
+  }
+}
+
+----Swift.(file).SIMD.max()
+extension SIMD where Scalar: FloatingPoint  {
+  public func max() -> Scalar {
+    return indices.reduce(into: self[0]) { $0 = Scalar.maximum($0, self[$1]) }
+  }
+}
+
+----Swift.(file).SIMD.sum()
+extension SIMD where Scalar: FloatingPoint  {
+  public func sum() -> Scalar {
+    // Implementation note: this eventually be defined to lower to either
+    // llvm.experimental.vector.reduce.fadd or an explicit tree-sum. Open-
+    // coding the tree sum is problematic, we probably need to define a
+    // Swift Builtin to support it.
+    return indices.reduce(into: 0) { $0 += self[$1] }
   }
 }
 
@@ -16606,553 +16562,553 @@ extension SIMDMask  {
 }
 
 ----Swift.(file).SIMD.&infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) & rhs
   }
 }
 
 ----Swift.(file).SIMD.^infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func ^(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) ^ rhs
   }
 }
 
 ----Swift.(file).SIMD.|infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func |(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) | rhs
   }
 }
 
 ----Swift.(file).SIMD.&<<infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &<<(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) &<< rhs
   }
 }
 
 ----Swift.(file).SIMD.&>>infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &>>(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) &>> rhs
   }
 }
 
 ----Swift.(file).SIMD.&+infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &+(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) &+ rhs
   }
 }
 
 ----Swift.(file).SIMD.&-infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &-(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) &- rhs
   }
 }
 
 ----Swift.(file).SIMD.&*infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &*(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) &* rhs
   }
 }
 
 ----Swift.(file).SIMD./infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func /(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) / rhs
   }
 }
 
 ----Swift.(file).SIMD.%infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func %(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) % rhs
   }
 }
 
 ----Swift.(file).SIMD.&infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &(lhs: Self, rhs: Scalar) -> Self {
     return lhs & Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD.^infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func ^(lhs: Self, rhs: Scalar) -> Self {
     return lhs ^ Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD.|infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func |(lhs: Self, rhs: Scalar) -> Self {
     return lhs | Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD.&<<infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &<<(lhs: Self, rhs: Scalar) -> Self {
     return lhs &<< Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD.&>>infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &>>(lhs: Self, rhs: Scalar) -> Self {
     return lhs &>> Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD.&+infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &+(lhs: Self, rhs: Scalar) -> Self {
     return lhs &+ Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD.&-infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &-(lhs: Self, rhs: Scalar) -> Self {
     return lhs &- Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD.&*infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &*(lhs: Self, rhs: Scalar) -> Self {
     return lhs &* Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD./infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func /(lhs: Self, rhs: Scalar) -> Self {
     return lhs / Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD.%infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func %(lhs: Self, rhs: Scalar) -> Self {
     return lhs % Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD.&=infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &=(lhs: inout Self, rhs: Self) {
     lhs = lhs & rhs
   }
 }
 
 ----Swift.(file).SIMD.^=infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func ^=(lhs: inout Self, rhs: Self) {
     lhs = lhs ^ rhs
   }
 }
 
 ----Swift.(file).SIMD.|=infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func |=(lhs: inout Self, rhs: Self) {
     lhs = lhs | rhs
   }
 }
 
 ----Swift.(file).SIMD.&<<=infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &<<=(lhs: inout Self, rhs: Self) {
     lhs = lhs &<< rhs
   }
 }
 
 ----Swift.(file).SIMD.&>>=infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &>>=(lhs: inout Self, rhs: Self) {
     lhs = lhs &>> rhs
   }
 }
 
 ----Swift.(file).SIMD.&+=infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &+=(lhs: inout Self, rhs: Self) {
     lhs = lhs &+ rhs
   }
 }
 
 ----Swift.(file).SIMD.&-=infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &-=(lhs: inout Self, rhs: Self) {
     lhs = lhs &- rhs
   }
 }
 
 ----Swift.(file).SIMD.&*=infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &*=(lhs: inout Self, rhs: Self) {
     lhs = lhs &* rhs
   }
 }
 
 ----Swift.(file).SIMD./=infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func /=(lhs: inout Self, rhs: Self) {
     lhs = lhs / rhs
   }
 }
 
 ----Swift.(file).SIMD.%=infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func %=(lhs: inout Self, rhs: Self) {
     lhs = lhs % rhs
   }
 }
 
 ----Swift.(file).SIMD.&=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs & rhs
   }
 }
 
 ----Swift.(file).SIMD.^=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func ^=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs ^ rhs
   }
 }
 
 ----Swift.(file).SIMD.|=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func |=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs | rhs
   }
 }
 
 ----Swift.(file).SIMD.&<<=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &<<=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs &<< rhs
   }
 }
 
 ----Swift.(file).SIMD.&>>=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &>>=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs &>> rhs
   }
 }
 
 ----Swift.(file).SIMD.&+=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &+=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs &+ rhs
   }
 }
 
 ----Swift.(file).SIMD.&-=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &-=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs &- rhs
   }
 }
 
 ----Swift.(file).SIMD.&*=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func &*=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs &* rhs
   }
 }
 
 ----Swift.(file).SIMD./=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func /=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs / rhs
   }
 }
 
 ----Swift.(file).SIMD.%=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func %=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs % rhs
   }
 }
 
 ----Swift.(file).SIMD.+infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func +(lhs: Self, rhs: Self) -> Self {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.-infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func -(lhs: Self, rhs: Self) -> Self {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.*infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func *(lhs: Self, rhs: Self) -> Self {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.+infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func +(lhs: Self, rhs: Scalar) -> Self {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.-infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func -(lhs: Self, rhs: Scalar) -> Self {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.*infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func *(lhs: Self, rhs: Scalar) -> Self {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.+infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func +(lhs: Scalar, rhs: Self) -> Self {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.-infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func -(lhs: Scalar, rhs: Self) -> Self {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.*infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func *(lhs: Scalar, rhs: Self) -> Self {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.+=infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func +=(lhs: inout Self, rhs: Self) {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.-=infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func -=(lhs: inout Self, rhs: Self) {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.*=infix(_:Self,_:Self)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func *=(lhs: inout Self, rhs: Self) {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.+=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func +=(lhs: inout Self, rhs: Scalar) {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.-=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func -=(lhs: inout Self, rhs: Scalar) {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.*=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FixedWidthInteger  {
+extension SIMD where Scalar: FixedWidthInteger  {
   public static func *=(lhs: inout Self, rhs: Scalar) {
     fatalError()
   }
 }
 
 ----Swift.(file).SIMD.-prefix(_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static prefix func -(rhs: Self) -> Self {
     return 0 - rhs
   }
 }
 
 ----Swift.(file).SIMD.+infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func +(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) + rhs
   }
 }
 
 ----Swift.(file).SIMD.-infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func -(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) - rhs
   }
 }
 
 ----Swift.(file).SIMD.*infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func *(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) * rhs
   }
 }
 
 ----Swift.(file).SIMD./infix(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func /(lhs: Scalar, rhs: Self) -> Self {
     return Self(repeating: lhs) / rhs
   }
 }
 
 ----Swift.(file).SIMD.+infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func +(lhs: Self, rhs: Scalar) -> Self {
     return lhs + Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD.-infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func -(lhs: Self, rhs: Scalar) -> Self {
     return lhs - Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD.*infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func *(lhs: Self, rhs: Scalar) -> Self {
     return lhs * Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD./infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func /(lhs: Self, rhs: Scalar) -> Self {
     return lhs / Self(repeating: rhs)
   }
 }
 
 ----Swift.(file).SIMD.+=infix(_:Self,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func +=(lhs: inout Self, rhs: Self) {
     lhs = lhs + rhs
   }
 }
 
 ----Swift.(file).SIMD.-=infix(_:Self,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func -=(lhs: inout Self, rhs: Self) {
     lhs = lhs - rhs
   }
 }
 
 ----Swift.(file).SIMD.*=infix(_:Self,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func *=(lhs: inout Self, rhs: Self) {
     lhs = lhs * rhs
   }
 }
 
 ----Swift.(file).SIMD./=infix(_:Self,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func /=(lhs: inout Self, rhs: Self) {
     lhs = lhs / rhs
   }
 }
 
 ----Swift.(file).SIMD.+=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func +=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs + rhs
   }
 }
 
 ----Swift.(file).SIMD.-=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func -=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs - rhs
   }
 }
 
 ----Swift.(file).SIMD.*=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func *=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs * rhs
   }
 }
 
 ----Swift.(file).SIMD./=infix(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public static func /=(lhs: inout Self, rhs: Scalar) {
     lhs = lhs / rhs
   }
 }
 
 ----Swift.(file).SIMD.addingProduct(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public func addingProduct(_ lhs: Scalar, _ rhs: Self) -> Self {
     return self.addingProduct(Self(repeating: lhs), rhs)
   }
 }
 
 ----Swift.(file).SIMD.addingProduct(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public func addingProduct(_ lhs: Self, _ rhs: Scalar) -> Self {
     return self.addingProduct(lhs, Self(repeating: rhs))
   }
 }
 
 ----Swift.(file).SIMD.addProduct(_:Self,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public mutating func addProduct(_ lhs: Self, _ rhs: Self) {
     self = self.addingProduct(lhs, rhs)
   }
 }
 
 ----Swift.(file).SIMD.addProduct(_:Self.Scalar,_:Self)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public mutating func addProduct(_ lhs: Scalar, _ rhs: Self) {
     self = self.addingProduct(lhs, rhs)
   }
 }
 
 ----Swift.(file).SIMD.addProduct(_:Self,_:Self.Scalar)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public mutating func addProduct(_ lhs: Self, _ rhs: Scalar) {
     self = self.addingProduct(lhs, rhs)
   }
 }
 
 ----Swift.(file).SIMD.formSquareRoot()
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public mutating func formSquareRoot( ) {
     self = self.squareRoot()
   }
 }
 
 ----Swift.(file).SIMD.round(_:FloatingPointRoundingRule)
-extension SIMD where Scalar : FloatingPoint  {
+extension SIMD where Scalar: FloatingPoint  {
   public mutating func round(_ rule: FloatingPointRoundingRule) {
     self = self.rounded(rule)
   }
@@ -17240,6 +17196,51 @@ extension SIMDMask  {
   public static func .|=(lhs: inout SIMDMask, rhs: Bool) {
     lhs = lhs .| rhs
   }
+}
+
+----Swift.(file).any(_:SIMDMask<Storage>)
+public func any<Storage>(_ mask: SIMDMask<Storage>) -> Bool {
+  return mask._storage.min() < 0
+}
+
+----Swift.(file).pointwiseMin(_:T,_:T)
+public func pointwiseMin<T>(_ a: T, _ b: T) -> T
+where T: SIMD, T.Scalar: Comparable {
+  var result = T()
+  for i in result.indices {
+    result[i] = min(a[i], b[i])
+  }
+  return result
+}
+
+----Swift.(file).pointwiseMax(_:T,_:T)
+public func pointwiseMax<T>(_ a: T, _ b: T) -> T
+where T: SIMD, T.Scalar: Comparable {
+  var result = T()
+  for i in result.indices {
+    result[i] = max(a[i], b[i])
+  }
+  return result
+}
+
+----Swift.(file).pointwiseMin(_:T,_:T)
+public func pointwiseMin<T>(_ a: T, _ b: T) -> T
+where T: SIMD, T.Scalar: FloatingPoint {
+  var result = T()
+  for i in result.indices {
+    result[i] = T.Scalar.minimum(a[i], b[i])
+  }
+  return result
+}
+
+----Swift.(file).pointwiseMax(_:T,_:T)
+public func pointwiseMax<T>(_ a: T, _ b: T) -> T
+where T: SIMD, T.Scalar: FloatingPoint {
+  var result = T()
+  for i in result.indices {
+    result[i] = T.Scalar.maximum(a[i], b[i])
+  }
+  return result
 }
 
 ----Swift.(file).IteratorProtocol.Element
@@ -17500,7 +17501,7 @@ extension Sequence  {
   public func first(
     where predicate: (Element) throws -> Bool
   ) rethrows -> Element? {
-    for element in self  {
+    for element in self {
       if try predicate(element) {
         return element
       }
@@ -17911,20 +17912,6 @@ extension Sequence  {
     _ transform: (Element) throws -> ElementOfResult?
   ) rethrows -> [ElementOfResult] {
     return try _compactMap(transform)
-  }
-}
-
-----Swift.(file).Set.init(minimumCapacity:Int)
-extension Set {
-  init(minimumCapacity: Int) {
-    _variant = _Variant(native: _NativeSet(capacity: minimumCapacity))
-  }
-}
-
-----Swift.(file).Set.init(_native:_NativeSet<Element>)
-extension Set {
-  internal init(_native: __owned _NativeSet<Element>) {
-    _variant = _Variant(native: _native)
   }
 }
 
@@ -18359,6 +18346,29 @@ extension __CocoaSet.Iterator: IteratorProtocol  {
     let key: AnyObject = itemsPtr[itemIndex]
     itemIndex += 1
     return key
+  }
+}
+
+----Swift.(file).Set.init(_mapping:C,allowingDuplicates:Bool,transform:(C.Element) -> Element?)
+extension Set  {
+  internal init?<C: Collection>(
+    _mapping source: C,
+    allowingDuplicates: Bool,
+    transform: (C.Element) -> Element?
+  ) {
+    var target = _NativeSet<Element>(capacity: source.count)
+    if allowingDuplicates {
+      for m in source {
+        guard let member = transform(m) else { return nil }
+        target._unsafeUpdate(with: member)
+      }
+    } else {
+      for m in source {
+        guard let member = transform(m) else { return nil }
+        target._unsafeInsertNew(member)
+      }
+    }
+    self.init(_native: target)
   }
 }
 
@@ -18999,13 +19009,11 @@ extension _SmallBuffer  {
 ----Swift.(file)._SmallString.capacity
 extension _SmallString  {
   internal static var capacity: Int {
-    @inline(__always) get {
 #if arch(i386) || arch(arm)
-      return 10
+    return 10
 #else
-      return 15
+    return 15
 #endif
-    }
   }
 }
 
@@ -19019,35 +19027,25 @@ extension _SmallString  {
 
 ----Swift.(file)._SmallString.capacity
 extension _SmallString  {
-  internal var capacity: Int {
-    @inline(__always) get {
-      return _SmallString.capacity
-    }
-  }
+  internal var capacity: Int { return _SmallString.capacity }
 }
 
 ----Swift.(file)._SmallString.count
 extension _SmallString  {
   internal var count: Int {
-    @inline(__always) get {
-      return _StringObject.getSmallCount(fromRaw: rawDiscriminatedObject)
-    }
+    return _StringObject.getSmallCount(fromRaw: rawDiscriminatedObject)
   }
 }
 
 ----Swift.(file)._SmallString.unusedCapacity
 extension _SmallString  {
-  internal var unusedCapacity: Int {
-    @inline(__always) get { return capacity &- count }
-  }
+  internal var unusedCapacity: Int { return capacity &- count }
 }
 
 ----Swift.(file)._SmallString.isASCII
 extension _SmallString  {
   internal var isASCII: Bool {
-    @inline(__always) get {
-      return _StringObject.getSmallIsASCII(fromRaw: rawDiscriminatedObject)
-    }
+    return _StringObject.getSmallIsASCII(fromRaw: rawDiscriminatedObject)
   }
 }
 
@@ -19085,12 +19083,12 @@ extension _SmallString: RandomAccessCollection, MutableCollection  {
 
 ----Swift.(file)._SmallString.startIndex
 extension _SmallString: RandomAccessCollection, MutableCollection  {
-  internal var startIndex: Int { @inline(__always) get { return 0 } }
+  internal var startIndex: Int { return 0 }
 }
 
 ----Swift.(file)._SmallString.endIndex
 extension _SmallString: RandomAccessCollection, MutableCollection  {
-  internal var endIndex: Int { @inline(__always) get { return count } }
+  internal var endIndex: Int { return count }
 }
 
 ----Swift.(file)._SmallString.subscript(_:Int)
@@ -19118,12 +19116,10 @@ extension _SmallString: RandomAccessCollection, MutableCollection  {
 ----Swift.(file)._SmallString.subscript(_:Range<_SmallString.Index>)
 extension _SmallString: RandomAccessCollection, MutableCollection  {
   internal subscript(_ bounds: Range<Index>) -> SubSequence {
-    @inline(__always) get {
-      // TODO(String performance): In-vector-register operation
-      return self.withUTF8 { utf8 in
-        let rebased = UnsafeBufferPointer(rebasing: utf8[bounds])
-        return _SmallString(rebased)._unsafelyUnwrappedUnchecked
-      }
+    // TODO(String performance): In-vector-register operation
+    return self.withUTF8 { utf8 in
+      let rebased = UnsafeBufferPointer(rebasing: utf8[bounds])
+      return _SmallString(rebased)._unsafelyUnwrappedUnchecked
     }
   }
 }
@@ -20028,24 +20024,18 @@ extension String: BidirectionalCollection  {
 
 ----Swift.(file).String.startIndex
 extension String: BidirectionalCollection  {
-  public var startIndex: Index {
-    @inline(__always) get { return _guts.startIndex }
-  }
+  public var startIndex: Index { return _guts.startIndex }
 }
 
 ----Swift.(file).String.endIndex
 extension String: BidirectionalCollection  {
-  public var endIndex: Index {
-    @inline(__always) get { return _guts.endIndex }
-  }
+  public var endIndex: Index { return _guts.endIndex }
 }
 
 ----Swift.(file).String.count
 extension String: BidirectionalCollection  {
   public var count: Int {
-    @inline(__always) get {
-      return distance(from: startIndex, to: endIndex)
-    }
+    return distance(from: startIndex, to: endIndex)
   }
 }
 
@@ -20106,14 +20096,12 @@ extension String: BidirectionalCollection  {
 ----Swift.(file).String.subscript(_:String.Index)
 extension String: BidirectionalCollection  {
   public subscript(i: Index) -> Character {
-    @inline(__always) get {
-      _boundsCheck(i)
+    _boundsCheck(i)
 
-      let i = _guts.scalarAlign(i)
-      let distance = _characterStride(startingAt: i)
-      return _guts.errorCorrectedCharacter(
-        startingAt: i._encodedOffset, endingAt: i._encodedOffset &+ distance)
-    }
+    let i = _guts.scalarAlign(i)
+    let distance = _characterStride(startingAt: i)
+    return _guts.errorCorrectedCharacter(
+      startingAt: i._encodedOffset, endingAt: i._encodedOffset &+ distance)
   }
 }
 
@@ -20245,7 +20233,7 @@ extension _StringGuts  {
 ----Swift.(file)._StringGuts.rawBits
 extension _StringGuts  {
   internal var rawBits: _StringObject.RawBitPattern {
-    @inline(__always) get { return _object.rawBits }
+    return _object.rawBits
   }
 }
 
@@ -20292,46 +20280,44 @@ extension _StringGuts  {
 
 ----Swift.(file)._StringGuts.count
 extension _StringGuts  {
-  internal var count: Int { @inline(__always) get { return _object.count } }
+  internal var count: Int { return _object.count }
 }
 
 ----Swift.(file)._StringGuts.isEmpty
 extension _StringGuts  {
-  internal var isEmpty: Bool { @inline(__always) get { return count == 0 } }
+  internal var isEmpty: Bool { return count == 0 }
 }
 
 ----Swift.(file)._StringGuts.isSmall
 extension _StringGuts  {
-  internal var isSmall: Bool {
-    @inline(__always) get { return _object.isSmall }
-  }
+  internal var isSmall: Bool { return _object.isSmall }
 }
 
 ----Swift.(file)._StringGuts.isSmallASCII
 extension _StringGuts  {
   internal var isSmallASCII: Bool {
-    @inline(__always) get { return _object.isSmall && _object.smallIsASCII }
+    return _object.isSmall && _object.smallIsASCII
   }
 }
 
 ----Swift.(file)._StringGuts.asSmall
 extension _StringGuts  {
   internal var asSmall: _SmallString {
-    @inline(__always) get { return _SmallString(_object) }
+    return _SmallString(_object)
   }
 }
 
 ----Swift.(file)._StringGuts.isASCII
 extension _StringGuts  {
   internal var isASCII: Bool  {
-    @inline(__always) get { return _object.isASCII }
+    return _object.isASCII
   }
 }
 
 ----Swift.(file)._StringGuts.isFastASCII
 extension _StringGuts  {
   internal var isFastASCII: Bool  {
-    @inline(__always) get { return isFastUTF8 && _object.isASCII }
+    return isFastUTF8 && _object.isASCII
   }
 }
 
@@ -20373,7 +20359,7 @@ extension _StringGuts  {
 ----Swift.(file)._StringGuts.isForeign
 extension _StringGuts  {
   internal var isForeign: Bool {
-    @inline(__always) get { return _slowPath(_object.isForeign) }
+     return _slowPath(_object.isForeign)
   }
 }
 
@@ -20451,10 +20437,8 @@ extension _StringGuts  {
 ----Swift.(file)._StringGuts.utf8Count
 extension _StringGuts  {
   internal var utf8Count: Int {
-    @inline(__always) get {
-      if _fastPath(self.isFastUTF8) { return count }
-      return String(self).utf8.count
-    }
+    if _fastPath(self.isFastUTF8) { return count }
+    return String(self).utf8.count
   }
 }
 
@@ -20466,14 +20450,14 @@ extension _StringGuts  {
 ----Swift.(file)._StringGuts.startIndex
 extension _StringGuts  {
   internal var startIndex: String.Index {
-    @inline(__always) get { return Index(_encodedOffset: 0) }
+   return Index(_encodedOffset: 0)
   }
 }
 
 ----Swift.(file)._StringGuts.endIndex
 extension _StringGuts  {
   internal var endIndex: String.Index {
-    @inline(__always) get { return Index(_encodedOffset: self.count) }
+    return Index(_encodedOffset: self.count)
   }
 }
 
@@ -20838,17 +20822,12 @@ extension String.Index {
 
 ----Swift.(file)..(error_type).orderingValue
 extension String.Index  {
-  internal var orderingValue: UInt64 {
-    // TODO(String micro-performance): Consider mask instead of shift
-    @inline(__always) get { return _rawBits &>> 14 }
-  }
+  internal var orderingValue: UInt64 { return _rawBits &>> 14 }
 }
 
 ----Swift.(file)..(error_type).isZeroPosition
 extension String.Index  {
-  internal var isZeroPosition: Bool {
-    @inline(__always) get { return orderingValue == 0 }
-  }
+  internal var isZeroPosition: Bool { return orderingValue == 0 }
 }
 
 ----Swift.(file)..(error_type).utf16Offset(in:S)
@@ -20866,9 +20845,7 @@ extension String.Index  {
 ----Swift.(file)..(error_type).transcodedOffset
 extension String.Index  {
   internal var transcodedOffset: Int {
-    @inline(__always) get {
-      return Int(truncatingIfNeeded: orderingValue & 0x3)
-    }
+    return Int(truncatingIfNeeded: orderingValue & 0x3)
   }
 }
 
@@ -20944,51 +20921,41 @@ extension String.Index  {
 ----Swift.(file)..(error_type).strippingTranscoding
 extension String.Index  {
   internal var strippingTranscoding: String.Index {
-    @inline(__always) get {
-      return String.Index(_encodedOffset: self._encodedOffset)
-    }
+    return String.Index(_encodedOffset: self._encodedOffset)
   }
 }
 
 ----Swift.(file)..(error_type).nextEncoded
 extension String.Index  {
   internal var nextEncoded: String.Index {
-    @inline(__always) get {
-      _internalInvariant(self.transcodedOffset == 0)
-      return String.Index(_encodedOffset: self._encodedOffset &+ 1)
-    }
+    _internalInvariant(self.transcodedOffset == 0)
+    return String.Index(_encodedOffset: self._encodedOffset &+ 1)
   }
 }
 
 ----Swift.(file)..(error_type).priorEncoded
 extension String.Index  {
   internal var priorEncoded: String.Index {
-    @inline(__always) get {
-      _internalInvariant(self.transcodedOffset == 0)
-      return String.Index(_encodedOffset: self._encodedOffset &- 1)
-    }
+    _internalInvariant(self.transcodedOffset == 0)
+    return String.Index(_encodedOffset: self._encodedOffset &- 1)
   }
 }
 
 ----Swift.(file)..(error_type).nextTranscoded
 extension String.Index  {
   internal var nextTranscoded: String.Index {
-    @inline(__always) get {
-      return String.Index(
-        encodedOffset: self._encodedOffset,
-        transcodedOffset: self.transcodedOffset &+ 1)
-    }
+    return String.Index(
+      encodedOffset: self._encodedOffset,
+      transcodedOffset: self.transcodedOffset &+ 1)
   }
 }
 
 ----Swift.(file)..(error_type).priorTranscoded
 extension String.Index  {
   internal var priorTranscoded: String.Index {
-    @inline(__always) get {
-      return String.Index(
-        encodedOffset: self._encodedOffset,
-        transcodedOffset: self.transcodedOffset &- 1)
-    }
+    return String.Index(
+      encodedOffset: self._encodedOffset,
+      transcodedOffset: self.transcodedOffset &- 1)
   }
 }
 
@@ -21028,16 +20995,34 @@ extension String.Index: Hashable  {
   }
 }
 
-----Swift.(file).String.Index.init(_:String.Index,within:String)
+----Swift.(file).String.Index.init(_:String.Index,_genericWithin:S)
 extension String.Index  {
-  public init?(
-    _ sourcePosition: String.Index,
-    within target: String
+  private init?<S: StringProtocol>(
+    _ idx: String.Index, _genericWithin target: S
   ) {
-    guard target._guts.isOnGraphemeClusterBoundary(sourcePosition) else {
+    guard target._wholeGuts.isOnGraphemeClusterBoundary(idx),
+          idx >= target.startIndex && idx <= target.endIndex
+    else {
       return nil
     }
-    self = sourcePosition
+
+    self = idx
+  }
+}
+
+----Swift.(file).String.Index.init(_:String.Index,within:String)
+extension String.Index  {
+  public init?(_ sourcePosition: String.Index, within target: String) {
+    self.init(sourcePosition, _genericWithin: target)
+  }
+}
+
+----Swift.(file).String.Index.init(_:String.Index,within:S)
+extension String.Index  {
+  public init?<S: StringProtocol>(
+    _ sourcePosition: String.Index, within target: S
+  ) {
+    self.init(sourcePosition, _genericWithin: target)
   }
 }
 
@@ -21045,7 +21030,7 @@ extension String.Index  {
 extension String.Index  {
   public func samePosition(
     in utf8: String.UTF8View
-    ) -> String.UTF8View.Index? {
+  ) -> String.UTF8View.Index? {
     return String.UTF8View.Index(self, within: utf8)
   }
 }
@@ -21249,7 +21234,7 @@ extension UnsafeBufferPointer where Element == UInt8  {
     if index == 0 || index == count {
       return true
     }
-    assert(!_isContinuation(self[_unchecked: index]))
+    assert(!UTF8.isContinuation(self[_unchecked: index]))
 
     // Sub-300 latiny fast-path
     if self[_unchecked: index] < 0xCC { return true }
@@ -21266,7 +21251,7 @@ extension UnsafeBufferPointer where Element == UInt8  {
       _internalInvariant(index == count)
       return true
     }
-    return !_isContinuation(self[index])
+    return !UTF8.isContinuation(self[index])
   }
 }
 
@@ -21375,9 +21360,7 @@ extension _StringObject  {
 ----Swift.(file)._StringObject.rawBits
 extension _StringObject  {
   internal var rawBits: RawBitPattern {
-    @inline(__always) get {
-      return (_countAndFlagsBits, discriminatedObjectRawBits)
-    }
+    return (_countAndFlagsBits, discriminatedObjectRawBits)
   }
 }
 
@@ -21490,7 +21473,7 @@ extension _StringObject.CountAndFlags  {
 ----Swift.(file)._StringObject.Nibbles.emptyString
 extension _StringObject.Nibbles  {
   internal static var emptyString: UInt64 {
-    @inline(__always) get { return _StringObject.Nibbles.small(isASCII: true) }
+    return _StringObject.Nibbles.small(isASCII: true)
   }
 }
 
@@ -21528,9 +21511,7 @@ extension _StringObject.Nibbles  {
 
 ----Swift.(file)._StringObject.Nibbles.largeMortal()
 extension _StringObject.Nibbles  {
-  internal static func largeMortal() -> UInt64 {
-    return 0x0000_0000_0000_0000
-  }
+  internal static func largeMortal() -> UInt64 { return 0x0000_0000_0000_0000 }
 }
 
 ----Swift.(file)._StringObject.Nibbles.largeCocoa(providesFastUTF8:Bool)
@@ -21543,60 +21524,48 @@ extension _StringObject.Nibbles  {
 ----Swift.(file)._StringObject.nativeBias
 extension _StringObject  {
   internal static var nativeBias: UInt {
-    @inline(__always) get {
 #if arch(i386) || arch(arm)
-      return 20
+    return 20
 #else
-      return 32
+    return 32
 #endif
-    }
   }
 }
 
 ----Swift.(file)._StringObject.isImmortal
 extension _StringObject  {
   internal var isImmortal: Bool {
-    @inline(__always) get {
-      return (discriminatedObjectRawBits & 0x8000_0000_0000_0000) != 0
-    }
+    return (discriminatedObjectRawBits & 0x8000_0000_0000_0000) != 0
   }
 }
 
 ----Swift.(file)._StringObject.isMortal
 extension _StringObject  {
-  internal var isMortal: Bool {
-    @inline(__always) get { return !isImmortal }
-  }
+  internal var isMortal: Bool { return !isImmortal }
 }
 
 ----Swift.(file)._StringObject.isSmall
 extension _StringObject  {
   internal var isSmall: Bool {
-    @inline(__always) get {
-      return (discriminatedObjectRawBits & 0x2000_0000_0000_0000) != 0
-    }
+    return (discriminatedObjectRawBits & 0x2000_0000_0000_0000) != 0
   }
 }
 
 ----Swift.(file)._StringObject.isLarge
 extension _StringObject  {
-  internal var isLarge: Bool { @inline(__always) get { return !isSmall } }
+  internal var isLarge: Bool { return !isSmall }
 }
 
 ----Swift.(file)._StringObject.providesFastUTF8
 extension _StringObject  {
   internal var providesFastUTF8: Bool {
-    @inline(__always) get {
-      return (discriminatedObjectRawBits & 0x1000_0000_0000_0000) == 0
-    }
+    return (discriminatedObjectRawBits & 0x1000_0000_0000_0000) == 0
   }
 }
 
 ----Swift.(file)._StringObject.isForeign
 extension _StringObject  {
-  internal var isForeign: Bool {
-    @inline(__always) get { return !providesFastUTF8 }
-  }
+  internal var isForeign: Bool { return !providesFastUTF8 }
 }
 
 ----Swift.(file)._StringObject.hasStorage
@@ -21691,11 +21660,8 @@ extension _StringObject  {
 ----Swift.(file)._StringObject.smallCount
 extension _StringObject  {
   internal var smallCount: Int {
-    @inline(__always)
-    get {
-      _internalInvariant(isSmall)
-      return _StringObject.getSmallCount(fromRaw: discriminatedObjectRawBits)
-    }
+    _internalInvariant(isSmall)
+    return _StringObject.getSmallCount(fromRaw: discriminatedObjectRawBits)
   }
 }
 
@@ -21709,11 +21675,8 @@ extension _StringObject  {
 ----Swift.(file)._StringObject.smallIsASCII
 extension _StringObject  {
   internal var smallIsASCII: Bool {
-    @inline(__always)
-    get {
-      _internalInvariant(isSmall)
-      return _StringObject.getSmallIsASCII(fromRaw: discriminatedObjectRawBits)
-    }
+    _internalInvariant(isSmall)
+    return _StringObject.getSmallIsASCII(fromRaw: discriminatedObjectRawBits)
   }
 }
 
@@ -21912,33 +21875,27 @@ extension _StringObject  {
 ----Swift.(file)._StringObject.largeAddressBits
 extension _StringObject  {
   internal var largeAddressBits: UInt {
-    @inline(__always) get {
-      _internalInvariant(isLarge)
-      return UInt(truncatingIfNeeded:
-        discriminatedObjectRawBits & Nibbles.largeAddressMask)
-    }
+    _internalInvariant(isLarge)
+    return UInt(truncatingIfNeeded:
+      discriminatedObjectRawBits & Nibbles.largeAddressMask)
   }
 }
 
 ----Swift.(file)._StringObject.nativeUTF8Start
 extension _StringObject  {
   internal var nativeUTF8Start: UnsafePointer<UInt8> {
-    @inline(__always) get {
-      _internalInvariant(largeFastIsTailAllocated)
-      return UnsafePointer(
-        bitPattern: largeAddressBits &+ _StringObject.nativeBias
-      )._unsafelyUnwrappedUnchecked
-    }
+    _internalInvariant(largeFastIsTailAllocated)
+    return UnsafePointer(
+      bitPattern: largeAddressBits &+ _StringObject.nativeBias
+    )._unsafelyUnwrappedUnchecked
   }
 }
 
 ----Swift.(file)._StringObject.nativeUTF8
 extension _StringObject  {
   internal var nativeUTF8: UnsafeBufferPointer<UInt8> {
-    @inline(__always) get {
-      _internalInvariant(largeFastIsTailAllocated)
-      return UnsafeBufferPointer(start: nativeUTF8Start, count: largeCount)
-    }
+    _internalInvariant(largeFastIsTailAllocated)
+    return UnsafeBufferPointer(start: nativeUTF8Start, count: largeCount)
   }
 }
 
@@ -21970,69 +21927,59 @@ extension _StringObject  {
 ----Swift.(file)._StringObject.nativeStorage
 extension _StringObject  {
   internal var nativeStorage: __StringStorage {
-    @inline(__always) get {
 #if arch(i386) || arch(arm)
-      guard case .native(let storage) = _variant else {
-        _internalInvariantFailure()
-      }
-      return _unsafeUncheckedDowncast(storage, to: __StringStorage.self)
-#else
-      _internalInvariant(hasNativeStorage)
-      return Builtin.reinterpretCast(largeAddressBits)
-#endif
+    guard case .native(let storage) = _variant else {
+      _internalInvariantFailure()
     }
+    return _unsafeUncheckedDowncast(storage, to: __StringStorage.self)
+#else
+    _internalInvariant(hasNativeStorage)
+    return Builtin.reinterpretCast(largeAddressBits)
+#endif
   }
 }
 
 ----Swift.(file)._StringObject.sharedStorage
 extension _StringObject  {
   internal var sharedStorage: __SharedStringStorage {
-    @inline(__always) get {
 #if arch(i386) || arch(arm)
-      guard case .native(let storage) = _variant else {
-        _internalInvariantFailure()
-      }
-      return _unsafeUncheckedDowncast(storage, to: __SharedStringStorage.self)
-#else
-      _internalInvariant(largeFastIsShared && !largeIsCocoa)
-      _internalInvariant(hasSharedStorage)
-      return Builtin.reinterpretCast(largeAddressBits)
-#endif
+    guard case .native(let storage) = _variant else {
+      _internalInvariantFailure()
     }
+    return _unsafeUncheckedDowncast(storage, to: __SharedStringStorage.self)
+#else
+    _internalInvariant(largeFastIsShared && !largeIsCocoa)
+    _internalInvariant(hasSharedStorage)
+    return Builtin.reinterpretCast(largeAddressBits)
+#endif
   }
 }
 
 ----Swift.(file)._StringObject.cocoaObject
 extension _StringObject  {
   internal var cocoaObject: AnyObject {
-    @inline(__always) get {
 #if arch(i386) || arch(arm)
-      guard case .bridged(let object) = _variant else {
-        _internalInvariantFailure()
-      }
-      return object
-#else
-      _internalInvariant(largeIsCocoa && !isImmortal)
-      return Builtin.reinterpretCast(largeAddressBits)
-#endif
+    guard case .bridged(let object) = _variant else {
+      _internalInvariantFailure()
     }
+    return object
+#else
+    _internalInvariant(largeIsCocoa && !isImmortal)
+    return Builtin.reinterpretCast(largeAddressBits)
+#endif
   }
 }
 
 ----Swift.(file)._StringObject.count
 extension _StringObject  {
-  internal var count: Int {
-    @inline(__always) get { return isSmall ? smallCount : largeCount }
-  }
+  internal var count: Int { return isSmall ? smallCount : largeCount }
 }
 
 ----Swift.(file)._StringObject.isASCII
 extension _StringObject  {
   internal var isASCII: Bool {
-    @inline(__always) get {
-      if isSmall { return smallIsASCII }
-      return _countAndFlags.isASCII
-    }
+    if isSmall { return smallIsASCII }
+    return _countAndFlags.isASCII
   }
 }
 
@@ -22268,6 +22215,58 @@ extension StringProtocol {
     encodedAs targetEncoding: Encoding.Type,
     _ body: (UnsafePointer<Encoding.CodeUnit>) throws -> Result
   ) rethrows -> R
+}
+
+----Swift.(file).String.isContiguousUTF8
+extension String  {
+  public var isContiguousUTF8: Bool { return _guts.isFastUTF8 }
+}
+
+----Swift.(file).String.makeContiguousUTF8()
+extension String  {
+  public mutating func makeContiguousUTF8() {
+    if _fastPath(isContiguousUTF8) { return }
+    self = String._copying(self)
+  }
+}
+
+----Swift.(file).String.withUTF8(_:(UnsafeBufferPointer<UInt8>) throws -> R)
+extension String  {
+  public mutating func withUTF8<R>(
+    _ body: (UnsafeBufferPointer<UInt8>) throws -> R
+  ) rethrows -> R {
+    makeContiguousUTF8()
+    return try _guts.withFastUTF8(body)
+  }
+}
+
+----Swift.(file).Substring.isContiguousUTF8
+extension Substring  {
+  public var isContiguousUTF8: Bool { return self.base.isContiguousUTF8 }
+}
+
+----Swift.(file).Substring.makeContiguousUTF8()
+extension Substring  {
+  public mutating func makeContiguousUTF8() {
+    if _fastPath(isContiguousUTF8) { return }
+    self = String._copying(self)[...]
+  }
+}
+
+----Swift.(file).Substring.withUTF8(_:(UnsafeBufferPointer<UInt8>) throws -> R)
+extension Substring  {
+  public mutating func withUTF8<R>(
+    _ body: (UnsafeBufferPointer<UInt8>) throws -> R
+  ) rethrows -> R {
+    if _fastPath(isContiguousUTF8) {
+      return try _wholeGuts.withFastUTF8(range: self._offsetRange) {
+        return try body($0)
+      }
+    }
+
+    makeContiguousUTF8()
+    return try _wholeGuts.withFastUTF8(body)
+  }
 }
 
 ----Swift.(file).String.init(repeating:Character,count:Int)
@@ -22553,7 +22552,7 @@ extension __StringStorage  {
 ----Swift.(file).__StringStorage.mutableEnd
 extension __StringStorage  {
   private var mutableEnd: UnsafeMutablePointer<UInt8> {
-    @inline(__always) get { return mutableStart + count }
+     return mutableStart + count
   }
 }
 
@@ -22567,23 +22566,21 @@ extension __StringStorage  {
 ----Swift.(file).__StringStorage.end
 extension __StringStorage  {
   private final var end: UnsafePointer<UInt8> {
-    @inline(__always) get { return UnsafePointer(mutableEnd) }
+    return UnsafePointer(mutableEnd)
   }
 }
 
 ----Swift.(file).__StringStorage.terminator
 extension __StringStorage  {
   private final var terminator: UnsafeMutablePointer<UInt8> {
-    @inline(__always) get { return mutableEnd }
+    return mutableEnd
   }
 }
 
 ----Swift.(file).__StringStorage.codeUnits
 extension __StringStorage  {
   private var codeUnits: UnsafeBufferPointer<UInt8> {
-    @inline(__always) get {
-      return UnsafeBufferPointer(start: start, count: count)
-    }
+    return UnsafeBufferPointer(start: start, count: count)
   }
 }
 
@@ -22597,18 +22594,14 @@ extension __StringStorage  {
 ----Swift.(file).__StringStorage.unusedStorage
 extension __StringStorage  {
   private var unusedStorage: UnsafeMutableBufferPointer<UInt8> {
-    @inline(__always) get {
-      return UnsafeMutableBufferPointer(
-        start: mutableEnd, count: unusedCapacity)
-    }
+    return UnsafeMutableBufferPointer(
+      start: mutableEnd, count: unusedCapacity)
   }
 }
 
 ----Swift.(file).__StringStorage.unusedCapacity
 extension __StringStorage  {
-  internal var unusedCapacity: Int {
-    get { return _realCapacity &- count &- 1 }
-  }
+  internal var unusedCapacity: Int { return _realCapacity &- count &- 1 }
 }
 
 ----Swift.(file).__StringStorage.appendInPlace(_:UnsafeBufferPointer<UInt8>,isASCII:Bool)
@@ -22732,16 +22725,12 @@ extension String.UTF16View: BidirectionalCollection  {
 
 ----Swift.(file)..(error_type).startIndex
 extension String.UTF16View: BidirectionalCollection  {
-  public var startIndex: Index {
-    @inline(__always) get { return _guts.startIndex }
-  }
+  public var startIndex: Index { return _guts.startIndex }
 }
 
 ----Swift.(file)..(error_type).endIndex
 extension String.UTF16View: BidirectionalCollection  {
-  public var endIndex: Index {
-    @inline(__always) get { return _guts.endIndex }
-  }
+  public var endIndex: Index { return _guts.endIndex }
 }
 
 ----Swift.(file)..(error_type).index(after:String.UTF16View.Index)
@@ -22850,20 +22839,18 @@ extension String.UTF16View: BidirectionalCollection  {
 ----Swift.(file)..(error_type).subscript(_:String.UTF16View.Index)
 extension String.UTF16View: BidirectionalCollection  {
   public subscript(i: Index) -> UTF16.CodeUnit {
-    @inline(__always) get {
-      String(_guts)._boundsCheck(i)
+    String(_guts)._boundsCheck(i)
 
-      if _fastPath(_guts.isFastUTF8) {
-        let scalar = _guts.fastUTF8Scalar(
-          startingAt: _guts.scalarAlign(i)._encodedOffset)
-        if scalar.value <= 0xFFFF {
-          return UInt16(truncatingIfNeeded: scalar.value)
-        }
-        return scalar.utf16[i.transcodedOffset]
+    if _fastPath(_guts.isFastUTF8) {
+      let scalar = _guts.fastUTF8Scalar(
+        startingAt: _guts.scalarAlign(i)._encodedOffset)
+      if scalar.value <= 0xFFFF {
+        return UInt16(truncatingIfNeeded: scalar.value)
       }
-
-      return _foreignSubscript(position: i)
+      return scalar.utf16[i.transcodedOffset]
     }
+
+    return _foreignSubscript(position: i)
   }
 }
 
@@ -22905,9 +22892,7 @@ extension String.UTF16View  {
 
 ----Swift.(file)..(error_type).description
 extension String.UTF16View: CustomStringConvertible  {
-  public var description: String {
-    @inline(__always) get { return String(_guts) }
-  }
+  public var description: String { return String(_guts) }
 }
 
 ----Swift.(file)..(error_type).debugDescription
@@ -22989,7 +22974,7 @@ internal func validateUTF8(_ buf: UnsafeBufferPointer<UInt8>) -> UTF8ValidationR
     guard f(cu) else { throw UTF8ValidationError() }
   }
   @inline(__always) func guaranteeContinuation() throws {
-    try guaranteeIn(_isContinuation)
+    try guaranteeIn(UTF8.isContinuation)
   }
 
   func _legacyInvalidLengthCalculation(_ _buffer: (_storage: UInt32, ())) -> Int {
@@ -23035,7 +23020,7 @@ internal func validateUTF8(_ buf: UnsafeBufferPointer<UInt8>) -> UTF8ValidationR
     var endIndex = buf.startIndex
     var iter = buf.makeIterator()
     _ = iter.next()
-    while let cu = iter.next(), !_isASCII(cu) && !_isUTF8MultiByteLeading(cu) {
+    while let cu = iter.next(), UTF8.isContinuation(cu) {
       endIndex += 1
     }
     let illegalRange = Range(buf.startIndex...endIndex)
@@ -23048,7 +23033,7 @@ internal func validateUTF8(_ buf: UnsafeBufferPointer<UInt8>) -> UTF8ValidationR
   do {
     var isASCII = true
     while let cu = iter.next() {
-      if _isASCII(cu) { lastValidIndex &+= 1; continue }
+      if UTF8.isASCII(cu) { lastValidIndex &+= 1; continue }
       isASCII = false
       if _slowPath(!_isUTF8MultiByteLeading(cu)) {
         throw UTF8ValidationError()
@@ -23169,16 +23154,12 @@ extension String.UTF8View: BidirectionalCollection  {
 
 ----Swift.(file)..(error_type).startIndex
 extension String.UTF8View: BidirectionalCollection  {
-  public var startIndex: Index {
-    @inline(__always) get { return _guts.startIndex }
-  }
+  public var startIndex: Index { return _guts.startIndex }
 }
 
 ----Swift.(file)..(error_type).endIndex
 extension String.UTF8View: BidirectionalCollection  {
-  public var endIndex: Index {
-    @inline(__always) get { return _guts.endIndex }
-  }
+  public var endIndex: Index { return _guts.endIndex }
 }
 
 ----Swift.(file)..(error_type).index(after:String.UTF8View.Index)
@@ -23253,29 +23234,25 @@ extension String.UTF8View: BidirectionalCollection  {
 ----Swift.(file)..(error_type).subscript(_:String.UTF8View.Index)
 extension String.UTF8View: BidirectionalCollection  {
   public subscript(i: Index) -> UTF8.CodeUnit {
-    @inline(__always) get {
-      String(_guts)._boundsCheck(i)
-      if _fastPath(_guts.isFastUTF8) {
-        return _guts.withFastUTF8 { utf8 in utf8[_unchecked: i._encodedOffset] }
-      }
-
-      return _foreignSubscript(position: i)
+    String(_guts)._boundsCheck(i)
+    if _fastPath(_guts.isFastUTF8) {
+      return _guts.withFastUTF8 { utf8 in utf8[_unchecked: i._encodedOffset] }
     }
+
+    return _foreignSubscript(position: i)
   }
 }
 
 ----Swift.(file)..(error_type).description
 extension String.UTF8View: CustomStringConvertible  {
- public var description: String {
-   @inline(__always) get { return String(String(_guts)) }
- }
+  public var description: String { return String(_guts) }
 }
 
 ----Swift.(file)..(error_type).debugDescription
 extension String.UTF8View: CustomDebugStringConvertible  {
- public var debugDescription: String {
-   return "UTF8View(\(self.description.debugDescription))"
- }
+  public var debugDescription: String {
+    return "UTF8View(\(self.description.debugDescription))"
+  }
 }
 
 ----Swift.(file).String.utf8
@@ -23309,12 +23286,10 @@ extension String  {
 ----Swift.(file)..(error_type).count
 extension String.UTF8View  {
   public var count: Int {
-    @inline(__always) get {
-      if _fastPath(_guts.isFastUTF8) {
-        return _guts.count
-      }
-      return _foreignCount()
+    if _fastPath(_guts.isFastUTF8) {
+      return _guts.count
     }
+    return _foreignCount()
   }
 }
 
@@ -23377,16 +23352,12 @@ extension String.UnicodeScalarView: BidirectionalCollection  {
 
 ----Swift.(file)..(error_type).startIndex
 extension String.UnicodeScalarView: BidirectionalCollection  {
-  public var startIndex: Index {
-    @inline(__always) get { return _guts.startIndex }
-  }
+  public var startIndex: Index { return _guts.startIndex }
 }
 
 ----Swift.(file)..(error_type).endIndex
 extension String.UnicodeScalarView: BidirectionalCollection  {
-  public var endIndex: Index {
-    @inline(__always) get { return _guts.endIndex }
-  }
+  public var endIndex: Index { return _guts.endIndex }
 }
 
 ----Swift.(file)..(error_type).index(after:String.UnicodeScalarView.Index)
@@ -23425,11 +23396,9 @@ extension String.UnicodeScalarView: BidirectionalCollection  {
 ----Swift.(file)..(error_type).subscript(_:String.UnicodeScalarView.Index)
 extension String.UnicodeScalarView: BidirectionalCollection  {
   public subscript(position: Index) -> Unicode.Scalar {
-    @inline(__always) get {
-      String(_guts)._boundsCheck(position)
-      let i = _guts.scalarAlign(position)
-      return _guts.errorCorrectedScalar(startingAt: i._encodedOffset).0
-    }
+    String(_guts)._boundsCheck(position)
+    let i = _guts.scalarAlign(position)
+    return _guts.errorCorrectedScalar(startingAt: i._encodedOffset).0
   }
 }
 
@@ -23461,9 +23430,7 @@ extension String.UnicodeScalarView  {
 
 ----Swift.(file)..(error_type).description
 extension String.UnicodeScalarView: CustomStringConvertible  {
- public var description: String {
-   @inline(__always) get { return String(_guts) }
- }
+ public var description: String { return String(_guts) }
 }
 
 ----Swift.(file)..(error_type).debugDescription
@@ -23610,6 +23577,11 @@ extension Substring {
   }
 }
 
+----Swift.(file).Substring.base
+extension Substring  {
+  public var base: String { return _slice.base }
+}
+
 ----Swift.(file).Substring.Index
 extension Substring: StringProtocol  {
   public typealias Index = String.I
@@ -23622,16 +23594,12 @@ extension Substring: StringProtocol  {
 
 ----Swift.(file).Substring.startIndex
 extension Substring: StringProtocol  {
-  public var startIndex: Index {
-    @inline(__always) get { return _slice.startIndex }
-  }
+  public var startIndex: Index { return _slice.startIndex }
 }
 
 ----Swift.(file).Substring.endIndex
 extension Substring: StringProtocol  {
-  public var endIndex: Index {
-    @inline(__always) get { return _slice.endIndex }
-  }
+  public var endIndex: Index { return _slice.endIndex }
 }
 
 ----Swift.(file).Substring.index(after:Substring.Index)
@@ -23766,9 +23734,7 @@ extension Substring : CustomReflectable  {
 
 ----Swift.(file).Substring.description
 extension Substring : CustomStringConvertible  {
-  public var description: String {
-    @inline(__always) get { return String(self) }
-  }
+  public var description: String { return String(self) }
 }
 
 ----Swift.(file).Substring.debugDescription
@@ -23898,7 +23864,7 @@ extension Substring.UTF8View : BidirectionalCollection  {
 extension Substring  {
   public var utf8: UTF8View {
     get {
-      return _wholeString.utf8[startIndex..<endIndex]
+      return base.utf8[startIndex..<endIndex]
     }
     set {
       self = Substring(newValue)
@@ -24040,7 +24006,7 @@ extension Substring.UTF16View : BidirectionalCollection  {
 extension Substring  {
   public var utf16: UTF16View {
     get {
-      return _wholeString.utf16[startIndex..<endIndex]
+      return base.utf16[startIndex..<endIndex]
     }
     set {
       self = Substring(newValue)
@@ -24182,7 +24148,7 @@ extension Substring.UnicodeScalarView : BidirectionalCollection  {
 extension Substring  {
   public var unicodeScalars: UnicodeScalarView {
     get {
-      return _wholeString.unicodeScalars[startIndex..<endIndex]
+      return base.unicodeScalars[startIndex..<endIndex]
     }
     set {
       self = Substring(newValue)
@@ -24579,6 +24545,104 @@ extension _UIntBuffer : RangeReplaceableCollection  {
   }
 }
 
+----Swift.(file)..(error_type).width(_:Unicode.Scalar)
+extension Unicode.UTF16  {
+  public static func width(_ x: Unicode.Scalar) -> Int {
+    return x.value <= UInt16.max ? 1 : 2
+  }
+}
+
+----Swift.(file)..(error_type).leadSurrogate(_:Unicode.Scalar)
+extension Unicode.UTF16  {
+  public static func leadSurrogate(_ x: Unicode.Scalar) -> UTF16.CodeUnit {
+    _precondition(width(x) == 2)
+    return 0xD800 + UTF16.CodeUnit(truncatingIfNeeded:
+      (x.value - 0x1_0000) &>> (10 as UInt32))
+  }
+}
+
+----Swift.(file)..(error_type).trailSurrogate(_:Unicode.Scalar)
+extension Unicode.UTF16  {
+  public static func trailSurrogate(_ x: Unicode.Scalar) -> UTF16.CodeUnit {
+    _precondition(width(x) == 2)
+    return 0xDC00 + UTF16.CodeUnit(truncatingIfNeeded:
+      (x.value - 0x1_0000) & (((1 as UInt32) &<< 10) - 1))
+  }
+}
+
+----Swift.(file)..(error_type).isLeadSurrogate(_:Unicode.UTF16.CodeUnit)
+extension Unicode.UTF16  {
+  public static func isLeadSurrogate(_ x: CodeUnit) -> Bool {
+    return (x & 0xFC00) == 0xD800
+  }
+}
+
+----Swift.(file)..(error_type).isTrailSurrogate(_:Unicode.UTF16.CodeUnit)
+extension Unicode.UTF16  {
+  public static func isTrailSurrogate(_ x: CodeUnit) -> Bool {
+    return (x & 0xFC00) == 0xDC00
+  }
+}
+
+----Swift.(file)..(error_type).isSurrogate(_:Unicode.UTF16.CodeUnit)
+extension Unicode.UTF16  {
+  public static func isSurrogate(_ x: CodeUnit) -> Bool {
+    return isLeadSurrogate(x) || isTrailSurrogate(x)
+  }
+}
+
+----Swift.(file)..(error_type).transcodedLength(of:Input,decodedAs:Encoding.Type,repairingIllFormedSequences:Bool)
+extension Unicode.UTF16  {
+  public static func transcodedLength<
+    Input : IteratorProtocol,
+    Encoding : Unicode.Encoding
+  >(
+    of input: Input,
+    decodedAs sourceEncoding: Encoding.Type,
+    repairingIllFormedSequences: Bool
+  ) -> (count: Int, isASCII: Bool)?
+    where Encoding.CodeUnit == Input.Element {
+
+    var utf16Count = 0
+    var i = input
+    var d = Encoding.ForwardParser()
+
+    // Fast path for ASCII in a UTF8 buffer
+    if sourceEncoding == Unicode.UTF8.self {
+      var peek: Encoding.CodeUnit = 0
+      while let u = i.next() {
+        peek = u
+        guard _fastPath(peek < 0x80) else { break }
+        utf16Count = utf16Count + 1
+      }
+      if _fastPath(peek < 0x80) { return (utf16Count, true) }
+
+      var d1 = UTF8.ForwardParser()
+      d1._buffer.append(numericCast(peek))
+      d = _identityCast(d1, to: Encoding.ForwardParser.self)
+    }
+
+    var utf16BitUnion: CodeUnit = 0
+    while true {
+      let s = d.parseScalar(from: &i)
+      if _fastPath(s._valid != nil), let scalarContent = s._valid {
+        let utf16 = transcode(scalarContent, from: sourceEncoding)
+          ._unsafelyUnwrappedUnchecked
+        utf16Count += utf16.count
+        for x in utf16 { utf16BitUnion |= x }
+      }
+      else if let _ = s._error {
+        guard _fastPath(repairingIllFormedSequences) else { return nil }
+        utf16Count += 1
+        utf16BitUnion |= UTF16._replacementCodeUnit
+      }
+      else {
+        return (utf16Count, utf16BitUnion < 0x80)
+      }
+    }
+  }
+}
+
 ----Swift.(file)..(error_type).CodeUnit
 extension Unicode.UTF16 : Unicode.Encoding  {
   public typealias CodeUnit = U
@@ -24593,6 +24657,13 @@ extension Unicode.UTF16 : Unicode.Encoding  {
 extension Unicode.UTF16 : Unicode.Encoding  {
   public static var encodedReplacementCharacter : EncodedScalar {
     return EncodedScalar(_storage: 0xFFFD, _bitCount: 16)
+  }
+}
+
+----Swift.(file)..(error_type).isASCII(_:Unicode.UTF16.CodeUnit)
+extension Unicode.UTF16 : Unicode.Encoding  {
+  public static func isASCII(_ x: CodeUnit) -> Bool {
+    return x <= 0x7f
   }
 }
 
@@ -24710,6 +24781,13 @@ extension Unicode.UTF32 : Unicode.Encoding  {
   }
 }
 
+----Swift.(file)..(error_type).isASCII(_:Unicode.UTF32.CodeUnit)
+extension Unicode.UTF32 : Unicode.Encoding  {
+  public static func isASCII(_ x: CodeUnit) -> Bool {
+    return x <= 0x7F
+  }
+}
+
 ----Swift.(file)..(error_type).decode(_:Unicode.UTF32.EncodedScalar)
 extension Unicode.UTF32 : Unicode.Encoding  {
   public static func decode(_ source: EncodedScalar) -> Unicode.Scalar {
@@ -24765,6 +24843,18 @@ extension UTF32.Parser : Unicode.Parser  {
   }
 }
 
+----Swift.(file)..(error_type).width(_:Unicode.Scalar)
+extension Unicode.UTF8  {
+  public static func width(_ x: Unicode.Scalar) -> Int {
+    switch x.value {
+      case 0..<0x80: return 1
+      case 0x80..<0x0800: return 2
+      case 0x0800..<0x1_0000: return 3
+      default: return 4
+    }
+  }
+}
+
 ----Swift.(file)..(error_type).CodeUnit
 extension Unicode.UTF8 : _UnicodeEncoding  {
   public typealias CodeUnit = U
@@ -24779,6 +24869,13 @@ extension Unicode.UTF8 : _UnicodeEncoding  {
 extension Unicode.UTF8 : _UnicodeEncoding  {
   public static var encodedReplacementCharacter : EncodedScalar {
     return EncodedScalar.encodedReplacementCharacter
+  }
+}
+
+----Swift.(file)..(error_type).isASCII(_:Unicode.UTF8.CodeUnit)
+extension Unicode.UTF8 : _UnicodeEncoding  {
+  public static func isASCII(_ x: CodeUnit) -> Bool {
+    return x & 0b1000_0000 == 0
   }
 }
 
@@ -25005,6 +25102,240 @@ extension UnfoldSequence {
   }
 }
 
+----Swift.(file).UnicodeDecodingResult.scalarValue
+extension UnicodeDecodingResult {
+  case scalarValue(Unicode.Scalar)
+}
+
+----Swift.(file).UnicodeDecodingResult.emptyInput
+extension UnicodeDecodingResult {
+  case e
+}
+
+----Swift.(file).UnicodeDecodingResult.error
+extension UnicodeDecodingResult {
+  case e
+}
+
+----Swift.(file).UnicodeDecodingResult.==infix(_:UnicodeDecodingResult,_:UnicodeDecodingResult)
+extension UnicodeDecodingResult {
+  public static func == (
+    lhs: UnicodeDecodingResult,
+    rhs: UnicodeDecodingResult
+  ) -> Bool {
+    switch (lhs, rhs) {
+    case (.scalarValue(let lhsScalar), .scalarValue(let rhsScalar)):
+      return lhsScalar == rhsScalar
+    case (.emptyInput, .emptyInput):
+      return true
+    case (.error, .error):
+      return true
+    default:
+      return false
+    }
+  }
+}
+
+----Swift.(file).UnicodeCodec.init()
+extension UnicodeCodec {
+  init()
+}
+
+----Swift.(file).UnicodeCodec.decode(_:I)
+extension UnicodeCodec {
+  mutating func decode<I : IteratorProtocol>(
+    _ input: inout I
+  ) -> UnicodeDecodingResult where I.Element == C
+}
+
+----Swift.(file).UnicodeCodec.encode(_:<<error type>>,into:<<error type>>)
+extension UnicodeCodec {
+  static func encode(
+    _ input: Unicode.Scalar,
+    into processCodeUnit: (CodeUnit) -> Void
+  )
+}
+
+----Swift.(file)..(error_type).init()
+extension Unicode.UTF8 : UnicodeCodec  {
+  public init() { self = ._swift3Buffer(ForwardParser()) }
+}
+
+----Swift.(file)..(error_type).decode(_:I)
+extension Unicode.UTF8 : UnicodeCodec  {
+  public mutating func decode<I : IteratorProtocol>(
+    _ input: inout I
+  ) -> UnicodeDecodingResult where I.Element == CodeUnit {
+    guard case ._swift3Buffer(var parser) = self else {
+      Builtin.unreachable()
+    }
+    defer { self = ._swift3Buffer(parser) }
+
+    switch parser.parseScalar(from: &input) {
+    case .valid(let s): return .scalarValue(UTF8.decode(s))
+    case .error: return .error
+    case .emptyInput: return .emptyInput
+    }
+  }
+}
+
+----Swift.(file)..(error_type).encode(_:<<error type>>,into:<<error type>>)
+extension Unicode.UTF8 : UnicodeCodec  {
+  public static func encode(
+    _ input: Unicode.Scalar,
+    into processCodeUnit: (CodeUnit) -> Void
+  ) {
+    var s = encode(input)!._biasedBits
+    processCodeUnit(UInt8(truncatingIfNeeded: s) &- 0x01)
+    s &>>= 8
+    if _fastPath(s == 0) { return }
+    processCodeUnit(UInt8(truncatingIfNeeded: s) &- 0x01)
+    s &>>= 8
+    if _fastPath(s == 0) { return }
+    processCodeUnit(UInt8(truncatingIfNeeded: s) &- 0x01)
+    s &>>= 8
+    if _fastPath(s == 0) { return }
+    processCodeUnit(UInt8(truncatingIfNeeded: s) &- 0x01)
+  }
+}
+
+----Swift.(file)..(error_type).isContinuation(_:<<error type>>)
+extension Unicode.UTF8 : UnicodeCodec  {
+  public static func isContinuation(_ byte: CodeUnit) -> Bool {
+    return byte & 0b11_00__0000 == 0b10_00__0000
+  }
+}
+
+----Swift.(file)..(error_type).init()
+extension Unicode.UTF16 : UnicodeCodec  {
+  public init() { self = ._swift3Buffer(ForwardParser()) }
+}
+
+----Swift.(file)..(error_type).decode(_:I)
+extension Unicode.UTF16 : UnicodeCodec  {
+  public mutating func decode<I : IteratorProtocol>(
+    _ input: inout I
+  ) -> UnicodeDecodingResult where I.Element == CodeUnit {
+    guard case ._swift3Buffer(var parser) = self else {
+      Builtin.unreachable()
+    }
+    defer { self = ._swift3Buffer(parser) }
+    switch parser.parseScalar(from: &input) {
+    case .valid(let s): return .scalarValue(UTF16.decode(s))
+    case .error: return .error
+    case .emptyInput: return .emptyInput
+    }
+  }
+}
+
+----Swift.(file)..(error_type).encode(_:<<error type>>,into:<<error type>>)
+extension Unicode.UTF16 : UnicodeCodec  {
+  public static func encode(
+    _ input: Unicode.Scalar,
+    into processCodeUnit: (CodeUnit) -> Void
+  ) {
+    var s = encode(input)!._storage
+    processCodeUnit(UInt16(truncatingIfNeeded: s))
+    s &>>= 16
+    if _fastPath(s == 0) { return }
+    processCodeUnit(UInt16(truncatingIfNeeded: s))
+  }
+}
+
+----Swift.(file)..(error_type).init()
+extension Unicode.UTF32 : UnicodeCodec  {
+  public init() { self = ._swift3Codec }
+}
+
+----Swift.(file)..(error_type).decode(_:I)
+extension Unicode.UTF32 : UnicodeCodec  {
+  public mutating func decode<I : IteratorProtocol>(
+    _ input: inout I
+  ) -> UnicodeDecodingResult where I.Element == CodeUnit {
+    var parser = ForwardParser()
+    
+    switch parser.parseScalar(from: &input) {
+    case .valid(let s): return .scalarValue(UTF32.decode(s))
+    case .error:      return .error
+    case .emptyInput:   return .emptyInput
+    }
+  }
+}
+
+----Swift.(file)..(error_type).encode(_:<<error type>>,into:<<error type>>)
+extension Unicode.UTF32 : UnicodeCodec  {
+  public static func encode(
+    _ input: Unicode.Scalar,
+    into processCodeUnit: (CodeUnit) -> Void
+  ) {
+    processCodeUnit(UInt32(input))
+  }
+}
+
+----Swift.(file).transcode(_:Input,from:InputEncoding.Type,to:OutputEncoding.Type,stoppingOnError:Bool,into:<<error type>>)
+public func transcode<
+  Input : IteratorProtocol,
+  InputEncoding : Unicode.Encoding,
+  OutputEncoding : Unicode.Encoding
+>(
+  _ input: Input,
+  from inputEncoding: InputEncoding.Type,
+  to outputEncoding: OutputEncoding.Type,
+  stoppingOnError stopOnError: Bool,
+  into processCodeUnit: (OutputEncoding.CodeUnit) -> Void
+) -> Bool
+  where InputEncoding.CodeUnit == Input.Element {
+  var input = input
+
+  // NB.  It is not possible to optimize this routine to a memcpy if
+  // InputEncoding == OutputEncoding.  The reason is that memcpy will not
+  // substitute U+FFFD replacement characters for ill-formed sequences.
+
+  var p = InputEncoding.ForwardParser()
+  var hadError = false
+  loop:
+  while true {
+    switch p.parseScalar(from: &input) {
+    case .valid(let s):
+      let t = OutputEncoding.transcode(s, from: inputEncoding)
+      guard _fastPath(t != nil), let s = t else { break }
+      s.forEach(processCodeUnit)
+      continue loop
+    case .emptyInput:
+      return hadError
+    case .error:
+      if _slowPath(stopOnError) { return true }
+      hadError = true
+    }
+    OutputEncoding.encodedReplacementCharacter.forEach(processCodeUnit)
+  }
+}
+
+----Swift.(file)..(error_type).init(_unchecked:UInt32)
+extension Unicode.Scalar  {
+  internal init(_unchecked value: UInt32) {
+    _internalInvariant(value < 0xD800 || value > 0xDFFF,
+      "high- and low-surrogate code points are not valid Unicode scalar values")
+    _internalInvariant(value <= 0x10FFFF, "value is outside of Unicode codespace")
+
+    self._value = value
+  }
+}
+
+----Swift.(file).transcode(_:InputEncoding.Type,_:OutputEncoding.Type,_:Input,_:<<error type>>,stopOnError:Bool)
+public func transcode<Input, InputEncoding, OutputEncoding>(
+  _ inputEncoding: InputEncoding.Type, _ outputEncoding: OutputEncoding.Type,
+  _ input: Input, _ output: (OutputEncoding.CodeUnit) -> Void,
+  stopOnError: Bool
+) -> Bool
+  where
+  Input : IteratorProtocol,
+  InputEncoding : UnicodeCodec,
+  OutputEncoding : UnicodeCodec,
+  InputEncoding.CodeUnit == Input.Element {
+  Builtin.unreachable()
+}
+
 ----Swift.(file)._UnicodeEncoding.transcode(_:<<error type>>,from:FromEncoding.Type)
 extension _UnicodeEncoding  {
   public static func transcode<FromEncoding : Unicode.Encoding>(
@@ -25061,9 +25392,9 @@ extension _StringGuts  {
     _internalInvariant(isFastUTF8)
 
     return self.withFastUTF8 { utf8 in
-      _internalInvariant(i == utf8.count || !_isContinuation(utf8[i]))
+      _internalInvariant(i == utf8.count || !UTF8.isContinuation(utf8[i]))
       var len = 1
-      while _isContinuation(utf8[i &- len]) {
+      while UTF8.isContinuation(utf8[i &- len]) {
         _internalInvariant(i &- len > 0)
         len += 1
       }
@@ -25091,7 +25422,9 @@ extension _StringGuts  {
     if i == self.startIndex || i == self.endIndex { return true }
 
     if _fastPath(isFastUTF8) {
-      return self.withFastUTF8 { return !_isContinuation($0[i._encodedOffset]) }
+      return self.withFastUTF8 {
+        return !UTF8.isContinuation($0[i._encodedOffset])
+      }
     }
 
     return i == foreignScalarAlign(i)
@@ -25109,7 +25442,7 @@ extension _StringGuts  {
     let start = idx._encodedOffset
     let leading = _getForeignCodeUnit(at: start)
 
-    if _fastPath(!_isSurrogate(leading)) {
+    if _fastPath(!UTF16.isSurrogate(leading)) {
       return (Unicode.Scalar(_unchecked: UInt32(leading)), 1)
     }
 
@@ -25119,17 +25452,15 @@ extension _StringGuts  {
     // TODO(String performance): Consider having a valid performance flag
     // available to check, and assert it's not set in the condition here.
     let nextOffset = start &+ 1
-    if _slowPath(_isTrailingSurrogate(leading) || nextOffset == self.count) {
+    if _slowPath(UTF16.isTrailSurrogate(leading) || nextOffset == self.count) {
       return (Unicode.Scalar._replacementCharacter, 1)
     }
     let trailing = _getForeignCodeUnit(at: nextOffset)
-    if _slowPath(!_isTrailingSurrogate(trailing)) {
+    if _slowPath(!UTF16.isTrailSurrogate(trailing)) {
       return (Unicode.Scalar._replacementCharacter, 1)
     }
 
-    return (Unicode.Scalar(
-      _unchecked: _decodeSurrogatePair(leading: leading, trailing: trailing)),
-      2)
+    return (UTF16._decodeSurrogates(leading, trailing), 2)
   }
 }
 
@@ -25144,7 +25475,7 @@ extension _StringGuts  {
 
     let end = idx._encodedOffset
     let trailing = _getForeignCodeUnit(at: end &- 1)
-    if _fastPath(!_isSurrogate(trailing)) {
+    if _fastPath(!UTF16.isSurrogate(trailing)) {
       return (Unicode.Scalar(_unchecked: UInt32(trailing)), 1)
     }
 
@@ -25154,17 +25485,15 @@ extension _StringGuts  {
     // TODO(String performance): Consider having a valid performance flag
     // available to check, and assert it's not set in the condition here.
     let priorOffset = end &- 2
-    if _slowPath(_isLeadingSurrogate(trailing) || priorOffset < 0) {
+    if _slowPath(UTF16.isLeadSurrogate(trailing) || priorOffset < 0) {
       return (Unicode.Scalar._replacementCharacter, 1)
     }
     let leading = _getForeignCodeUnit(at: priorOffset)
-    if _slowPath(!_isLeadingSurrogate(leading)) {
+    if _slowPath(!UTF16.isLeadSurrogate(leading)) {
       return (Unicode.Scalar._replacementCharacter, 1)
     }
 
-    return (Unicode.Scalar(
-      _unchecked: _decodeSurrogatePair(leading: leading, trailing: trailing)),
-      2)
+    return (UTF16._decodeSurrogates(leading, trailing), 2)
   }
 }
 
@@ -25178,7 +25507,7 @@ extension _StringGuts  {
 
     let start = idx._encodedOffset
     let cu = _getForeignCodeUnit(at: start)
-    if _fastPath(!_isSurrogate(cu)) {
+    if _fastPath(!UTF16.isSurrogate(cu)) {
       return cu
     }
 
@@ -25187,15 +25516,15 @@ extension _StringGuts  {
     //
     // TODO(String performance): Consider having a valid performance flag
     // available to check, and assert it's not set in the condition here.
-    if _isLeadingSurrogate(cu) {
+    if UTF16.isLeadSurrogate(cu) {
       let nextOffset = start &+ 1
       guard nextOffset < self.count,
-            _isTrailingSurrogate(_getForeignCodeUnit(at: nextOffset))
+            UTF16.isTrailSurrogate(_getForeignCodeUnit(at: nextOffset))
       else { return UTF16._replacementCodeUnit }
     } else {
       let priorOffset = start &- 1
       guard priorOffset >= 0,
-            _isLeadingSurrogate(_getForeignCodeUnit(at: priorOffset))
+            UTF16.isLeadSurrogate(_getForeignCodeUnit(at: priorOffset))
       else { return UTF16._replacementCodeUnit }
     }
 
@@ -25209,7 +25538,7 @@ extension _StringGuts  {
     _internalInvariant(idx._encodedOffset < self.count)
 
     let ecCU = foreignErrorCorrectedUTF16CodeUnit(at: idx)
-    if _fastPath(!_isTrailingSurrogate(ecCU)) {
+    if _fastPath(!UTF16.isTrailSurrogate(ecCU)) {
       return idx
     }
     _internalInvariant(idx._encodedOffset > 0,
@@ -25579,6 +25908,47 @@ extension Unicode.Scalar.UTF16View : RandomAccessCollection  {
     return position == 0 ? (
       endIndex == 1 ? UTF16.CodeUnit(value.value) : UTF16.leadSurrogate(value)
     ) : UTF16.trailSurrogate(value)
+  }
+}
+
+----Swift.(file)..(error_type).UTF8View.init(value:<<error type>>)
+extension  {
+    internal init(value: Unicode.Scalar) {
+      self.value = value
+    }
+}
+
+----Swift.(file)..(error_type).UTF8View.value
+extension  {
+    internal var v
+}
+
+----Swift.(file)..(error_type).utf8
+extension Unicode.Scalar  {
+  public var utf8: UTF8View { return UTF8View(value: self) }
+}
+
+----Swift.(file)..(error_type).Indices
+extension Unicode.Scalar.UTF8View : RandomAccessCollection  {
+  public typealias Indices = Range<Int>
+}
+
+----Swift.(file)..(error_type).startIndex
+extension Unicode.Scalar.UTF8View : RandomAccessCollection  {
+  public var startIndex: Int { return 0 }
+}
+
+----Swift.(file)..(error_type).endIndex
+extension Unicode.Scalar.UTF8View : RandomAccessCollection  {
+  public var endIndex: Int { return 0 + UTF8.width(value) }
+}
+
+----Swift.(file)..(error_type).subscript(_:Int)
+extension Unicode.Scalar.UTF8View : RandomAccessCollection  {
+  public subscript(position: Int) -> UTF8.CodeUnit {
+    _precondition(position >= startIndex && position < endIndex,
+      "Unicode.Scalar.UTF8View index is out of bounds")
+    return value.withUTF8CodeUnits { $0[position] }
   }
 }
 

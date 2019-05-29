@@ -26,7 +26,7 @@ let renames = []
 
 for(let className in UIKit) {
     let foundClass = getClass(className)
-    if(!foundClass) {console.log('notfound', className);continue}
+    if(!foundClass) {/*console.log('notfound', className);*/continue}
     console.log('-------------------', className)
 
     let swift = UIKit[className]
@@ -37,6 +37,8 @@ for(let className in UIKit) {
         let propName = swift[i]
         let isOptional = swift[i + 1]
         let optionalParams = swift[i + 2]
+
+        //console.log(propName, isOptional)
 
         if(classMapping && classMapping[propName]) {
             renames.push({chain: ["getSourceFile", foundClass.file, foundClass.getter, className, foundClass.getter === "getInterface" ? "getMethod" : "getInstanceMethod", classMapping[propName]], rename: propName})

@@ -5166,7 +5166,7 @@ export class UIWindow extends UIView
     }
 
     makeKey(){
-        UIApplication.sharedInstance().makeKeyWindow(this);
+        UIApplication.shared.makeKeyWindow(this);
     }
 
     makeKeyAndVisible(){
@@ -5278,7 +5278,7 @@ export class UIStoryboard extends NSObject
         let classname = this.items["ClassByID"][resource];
         if (classname == null) return null;
 
-        let vc = NSClassFromString(classname) as UIViewController;        
+        let vc = NSClassFromString(classname) as UIViewController;
         vc.initWithResource("layout/" + resource + ".html");
         vc.storyboard = this;
 
@@ -5412,7 +5412,7 @@ export class UIApplication {
 
     private static _sharedInstance: UIApplication;
 
-    static sharedInstance(): UIApplication {
+    static get shared(): UIApplication {
 
         if (UIApplication._sharedInstance == null) {
             UIApplication._sharedInstance = new UIApplication();

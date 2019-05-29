@@ -26,6 +26,8 @@
 		14E46045229B06D800E03980 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		14E46048229B06D800E03980 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		14E4604A229B06D800E03980 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ABE1E5FF229E9DB000F15E79 /* Movie+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Movie+CoreDataClass.swift"; path = "Demo4App/Movie+CoreDataClass.swift"; sourceTree = "<group>"; };
+		ABE1E600229E9DB000F15E79 /* Movie+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Movie+CoreDataProperties.swift"; path = "Demo4App/Movie+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +52,8 @@
 		14E4602F229B06D600E03980 = {
 			isa = PBXGroup;
 			children = (
+				ABE1E5FF229E9DB000F15E79 /* Movie+CoreDataClass.swift */,
+				ABE1E600229E9DB000F15E79 /* Movie+CoreDataProperties.swift */,
 				14E4603A229B06D600E03980 /* Demo4App */,
 				14E46039229B06D600E03980 /* Products */,
 			);
