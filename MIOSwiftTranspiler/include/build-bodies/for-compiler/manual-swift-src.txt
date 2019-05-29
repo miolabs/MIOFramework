@@ -425,28 +425,4 @@ public func assertionFailure(
 
 ----ObjectiveC.(file).NSObject.init()
 
-----CoreData.(file).NSPersistentContainer.init(name:String)
-extension NSPersistentContainer {
-  convenience init(name:String) {
-    print("ALL GOOD")
-  }
-}
-----CoreData.(file).NSPersistentContainer.loadPersistentStores(completionHandler:(NSPersistentStoreDescription, Error?) -> Void)
-extension NSPersistentContainer {
-  public func loadPersistentStores(completionHandler:(NSPersistentStoreDescription, Error?) -> Void) {
-    print("ALL GOOD2")
-  }
-}
-----CoreData.(file).NSFetchRequest.init(entityName:String)
-extension NSPersistentContainer {
-  init(entityName:String) {
-    print("ALL GOOD3")
-  }
-}
-----CoreData.(file).NSFetchedResultsController.init(fetchRequest:NSFetchRequest<ResultType>,managedObjectContext:NSManagedObjectContext,sectionNameKeyPath:String?,cacheName:String?)
-extension NSFetchedResultsController {
-  init(fetchRequest:NSFetchRequest<ResultType>,managedObjectContext:NSManagedObjectContext,sectionNameKeyPath:String?,cacheName:String?) {
-    print("ALL GOOD4")
-  }
-}
 ----closing dashes needed for the last definition to be processed
