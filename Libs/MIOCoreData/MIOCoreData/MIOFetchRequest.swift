@@ -7,8 +7,11 @@
 
 import Foundation
 
-class MIOFetchRequest:MIOPersistentStoreRequest {
-    
+protocol MIOFetchRequestResult {
+}
+
+class MIOFetchRequest<ResultType>: MIOPersistentStoreRequest where ResultType : MIOFetchRequestResult
+{
     var entityName:String!
     var entity:MIOEntityDescription?
     var predicate:MIOPredicate?
@@ -19,11 +22,11 @@ class MIOFetchRequest:MIOPersistentStoreRequest {
     var relationshipKeyPathsForPrefetching:[String] = []
 
     static func fetchRequest(withEntityName entityName:String) -> MIOFetchRequest {
-        let fetch = MIOFetchRequest(withEntityName: entityName)
+        let fetch = MIOFetchRequest(entityName: entityName)
         return fetch;
     }
     
-    init(withEntityName entityName:String) {
+    init(entityName:String) {
         super.init()
         self.entityName = entityName;
         self.requestType = MIORequestType.Fetch;

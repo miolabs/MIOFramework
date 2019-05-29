@@ -10,25 +10,16 @@ import Foundation
 
 
 protocol MIOFetchedResultsControllerDelegate:NSObject {
-    func controllerWillChangeContent(_ controller: MIOFetchedResultsController<MIOFetchRequest>)
-}
-
-class MIOFetchSection:NSObject
-{
-    var objects:[Any] = []
     
-    func numberOfObjects() -> Int {
-        return objects.count
-    }
 }
 
-class MIOFetchedResultsController<Element>:NSObject
+class MIOFetchedResultsController<ResultType> : NSObject where ResultType : MIOFetchRequestResult
 {
     var sections:[MIOFetchSection] = []
     
     var delegate:MIOFetchedResultsControllerDelegate?
     
-    init(WithFetchRequest request:MIOFetchRequest, managedObjectContext:MIOManagedObjectContext, sectionNameKeyPath:String?){
+    init(fetchRequest:MIOFetchRequest<ResultType>, managedObjectContext:MIOManagedObjectContext, sectionNameKeyPath:String?, cacheName:String?) {
     
     }
     
@@ -39,3 +30,11 @@ class MIOFetchedResultsController<Element>:NSObject
     }
 }
 
+class MIOFetchSection:NSObject
+{
+    var objects:[Any] = []
+    
+    func numberOfObjects() -> Int {
+        return objects.count
+    }
+}
