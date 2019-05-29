@@ -59,8 +59,12 @@ for(let optional of optionals) {
             let expression = (child as ReturnStatement).getExpression()
             replacements.push({
               file: reference.getSourceFile().getFilePath(),
-              range: [expression.getStart(), expression.getEnd()],
-              text: `_injectIntoOptional(${expression.getText()})`
+              range: [expression.getStart(), expression.getStart()],
+              text: '_injectIntoOptional('
+            }, {
+              file: reference.getSourceFile().getFilePath(),
+              range: [expression.getEnd(), expression.getEnd()],
+              text: ')'
             })
           }
         }
@@ -83,8 +87,12 @@ for(let optional of optionals) {
         if(declaration.getInitializer()) {
           replacements.push({
             file: reference.getSourceFile().getFilePath(),
-            range: [declaration.getInitializer().getStart(), declaration.getInitializer().getEnd()],
-            text: "_injectIntoOptional(" + declaration.getInitializer().getText() + ")"
+            range: [declaration.getInitializer().getStart(), declaration.getInitializer().getStart()],
+            text: "_injectIntoOptional("
+          }, {
+            file: reference.getSourceFile().getFilePath(),
+            range: [declaration.getInitializer().getEnd(), declaration.getInitializer().getEnd()],
+            text: ")"
           })
         }
         continue
@@ -99,8 +107,12 @@ for(let optional of optionals) {
           isAssignment = true
           replacements.push({
             file: reference.getSourceFile().getFilePath(),
-            range: [bin.getRight().getStart(), bin.getRight().getEnd()],
-            text: "_injectIntoOptional(" + bin.getRight().getText() + ")"
+            range: [bin.getRight().getStart(), bin.getRight().getStart()],
+            text: "_injectIntoOptional("
+          }, {
+            file: reference.getSourceFile().getFilePath(),
+            range: [bin.getRight().getEnd(), bin.getRight().getEnd()],
+            text: ")"
           })
         }
       }
