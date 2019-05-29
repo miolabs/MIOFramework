@@ -8,7 +8,7 @@
 
 import Foundation
 
-class NSPersistentContainer:NSObject
+class MIOPersistentContainer:NSObject
 {
     init(name:String){
         
