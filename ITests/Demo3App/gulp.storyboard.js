@@ -114,9 +114,14 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "stepper"){
 		let item = pushNewElement(element, attributes);
 	}
-	else if (element == "rect"){
+	else if (element == "rect"){		
 		let styles = currentElement["Styles"];
-		styles.push("position:absolute;");
+		if (currentElement["CustomClass"] != "UITableViewCell") {			
+			styles.push("position:relative;");
+		}
+		// else {
+		// 	styles.push("position:relative;");
+		// }
 	
 		if (attributes["x"] != null) styles.push("left:" + attributes["x"] + "px;");
 		if (attributes["y"] != null) styles.push("top:" + attributes["y"] + "px;");
