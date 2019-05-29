@@ -33,6 +33,8 @@ export * from './UITableView'
 export * from './UITableViewController'
 export * from './UITableViewCell'
 
+export * from "./UIAlertController"
+
 export * from './UINavigationBar'
 export * from './UINavigationItem'
 export * from './UINavigationController'

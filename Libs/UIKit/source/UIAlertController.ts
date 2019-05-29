@@ -1,16 +1,19 @@
-import { MIOObject, MIOSize, MIOIndexPath } from "../MIOFoundation";
+import { NSObject } from "mio-foundation-web";
+import { NSSize } from "mio-foundation-web";
+import { NSIndexPath } from "mio-foundation-web";
 import { UITextField } from "./UITextField";
-import { UIComboBox } from "./UIComboBox";
 import { UIViewController } from "./UIViewController";
 import { UIView } from "./UIView";
 import { UITableView } from "./UITableView";
 import { UIModalPresentationStyle } from "./UIViewController_PresentationController";
-import { MIOCoreGetBrowser, MIOCoreBrowserType } from "../MIOCore/platform";
-import { UITableViewCell, UITableViewCellSeparatorStyle, UITableViewCellStyle } from "./UITableViewCell";
+import { UITableViewCell } from "./UITableViewCell";
+import { UITableViewCellSeparatorStyle } from "./UITableViewCell";
+import { UITableViewCellStyle } from "./UITableViewCell";
 import { UILabel } from "./UILabel";
-import { UIAnimationType, UIClassListForAnimationType } from "./MIOUI_CoreAnimation";
-import { UICoreLayerRemoveStyle } from ".";
-import { UICoreLayerAddStyle } from "./MIOUI_CoreLayer";
+import { MUIAnimationType } from "./core/MUICoreAnimation";
+import { MUIClassListForAnimationType } from "./core/MUICoreAnimation";
+import { MUICoreLayerRemoveStyle } from ".";
+
 
 export enum UIAlertViewStyle
 {
@@ -32,7 +35,7 @@ export enum UIAlertItemType {
     ComboBox
 }
 
-export class UIAlertItem extends MIOObject
+export class UIAlertItem extends NSObject
 {
     type = UIAlertItemType.None;
 
@@ -55,24 +58,6 @@ export class UIAlertTextField extends UIAlertItem
     
         if (target != null && handler != null) {
             handler.call(target, this.textField);
-        }
-    }
-}
-
-export class UIAlertComboBox extends UIAlertItem
-{
-    comboBox:UIComboBox = null;
-
-    initWithConfigurationHandler(target, handler) {
-
-        super.initWithType(UIAlertItemType.ComboBox);
-
-        this.comboBox = new UIComboBox();
-        this.comboBox.init();
-
-        if (target != null && handler != null) {
-
-            handler.call(target, this.comboBox);
         }
     }
 }
@@ -104,7 +89,7 @@ export class UIAlertAction extends UIAlertItem
     }
 }
 
-export class UIAlertViewController extends UIViewController
+export class UIAlertController extends UIViewController
 {
     textFields = [];
     comboBoxes = [];
@@ -123,7 +108,7 @@ export class UIAlertViewController extends UIViewController
 
     private _headerCell = null;
 
-    private _alertViewSize = new MIOSize(320, 50);
+    private _alertViewSize = new NSSize(320, 50);
 
     initWithTitle(title:string, message:string, style:UIAlertViewStyle){
         super.init();
@@ -146,7 +131,7 @@ export class UIAlertViewController extends UIViewController
 
         this._backgroundView = new UIView();
         this._backgroundView.init();
-        UICoreLayerAddStyle(this._backgroundView.layer, "alert-container");
+        MUICoreLayerAddStyle(this._backgroundView.layer, "alert-container");
         this.view.addSubview(this._backgroundView);
 
         this.tableView = new UITableView();
@@ -157,7 +142,7 @@ export class UIAlertViewController extends UIViewController
         this.tableView.layer.style.position = "";
         this.tableView.layer.style.width = "";
         this.tableView.layer.style.height = "";
-        UICoreLayerAddStyle(this.tableView.layer, "alert-table");
+        MUICoreLayerAddStyle(this.tableView.layer, "alert-table");
 
         this._backgroundView.addSubview(this.tableView);
     }
@@ -200,14 +185,6 @@ export class UIAlertViewController extends UIViewController
         this._addItem(ai);
     }
 
-    addComboBoxWithConfigurationHandler(target, handler)
-    {
-        var ac = new UIAlertComboBox();
-        ac.initWithConfigurationHandler(target, handler);
-        this.comboBoxes.push(ac.comboBox);
-        this._addItem(ac);
-    }    
-
     addCompletionHandler(target, handler){
 
         this.target = target;
@@ -216,19 +193,18 @@ export class UIAlertViewController extends UIViewController
 
     private _calculateContentSize(){
         let h = 80 + (this._items.length * 50) + 1;
-        this._alertViewSize = new MIOSize(320, h);
+        this._alertViewSize = new NSSize(320, h);
     }
 
     numberOfSections(tableview){
         return 1;
     }
 
-    numberOfRowsInSection(tableview, section)
-    {
+    numberOfRowsInSection(tableview, section){
         return this._items.length + 1;
     }
 
-    cellAtIndexPath(tableview, indexPath:MIOIndexPath){
+    cellAtIndexPath(tableview, indexPath:NSIndexPath){
         let cell:UITableViewCell = null;
         if (indexPath.row == 0){
             cell = this._createHeaderCell();
@@ -241,23 +217,20 @@ export class UIAlertViewController extends UIViewController
             else if (item.type == UIAlertItemType.TextField) {
                 cell = this._createTextFieldCell(item.textField);
             }
-            else if (item.type == UIAlertItemType.ComboBox) {
-                cell = this._createComboBoxCell(item.comboBox);
-            }
         }
 
         cell.separatorStyle = UITableViewCellSeparatorStyle.None;
         return cell;
     }
 
-    heightForRowAtIndexPath(tableView:UITableView, indexPath:MIOIndexPath) {
+    heightForRowAtIndexPath(tableView:UITableView, indexPath:NSIndexPath) {
         let h = 50;
         if (indexPath.row == 0) h = 80;
         
         return h;
     }
 
-    canSelectCellAtIndexPath(tableview, indexPath:MIOIndexPath)
+    canSelectCellAtIndexPath(tableview, indexPath:NSIndexPath)
     {
         if (indexPath.row == 0) return false;
 
@@ -267,7 +240,7 @@ export class UIAlertViewController extends UIViewController
         return false;
     }
 
-    didSelectCellAtIndexPath(tableView, indexPath:MIOIndexPath)
+    didSelectCellAtIndexPath(tableView, indexPath:NSIndexPath)
     {
         var item = this._items[indexPath.row - 1];
         if (item.type == UIAlertItemType.Action) {
@@ -284,7 +257,7 @@ export class UIAlertViewController extends UIViewController
     private _createHeaderCell():UITableViewCell{
         let cell = new UITableViewCell();
         cell.initWithStyle(UITableViewCellStyle.Custom);
-        UICoreLayerAddStyle(cell.layer, "alert-header");
+        MUICoreLayerAddStyle(cell.layer, "alert-header");
 
         let titleLabel = new UILabel();
         titleLabel.init();
@@ -295,8 +268,8 @@ export class UIAlertViewController extends UIViewController
         titleLabel.layer.style.height = "";
         titleLabel.layer.style.width = ""; 
         titleLabel.layer.style.background = "";
-        UICoreLayerAddStyle(titleLabel.layer, "large");
-        UICoreLayerAddStyle(titleLabel.layer, "strong");        
+        MUICoreLayerAddStyle(titleLabel.layer, "large");
+        MUICoreLayerAddStyle(titleLabel.layer, "strong");        
         cell.addSubview(titleLabel);
 
         let messageLabel = new UILabel();
@@ -308,7 +281,7 @@ export class UIAlertViewController extends UIViewController
         messageLabel.layer.style.height = "";
         messageLabel.layer.style.width = "";
         messageLabel.layer.style.background = "";
-        UICoreLayerAddStyle(messageLabel.layer, "light");        
+        MUICoreLayerAddStyle(messageLabel.layer, "light");        
         cell.addSubview(messageLabel);          
         
         //cell.layer.style.background = "transparent";
@@ -319,7 +292,7 @@ export class UIAlertViewController extends UIViewController
     private _createActionCellWithTitle(title:string, style:UIAlertActionStyle):UITableViewCell{
         let cell = new UITableViewCell();
         cell.initWithStyle(UITableViewCellStyle.Custom);
-        UICoreLayerAddStyle(cell.layer, "alert-cell");
+        MUICoreLayerAddStyle(cell.layer, "alert-cell");
 
         let buttonLabel = new UILabel();
         buttonLabel.init();
@@ -334,8 +307,8 @@ export class UIAlertViewController extends UIViewController
         cell.addSubview(buttonLabel);  
 
         //cell.layer.style.background = "transparent";
-        UICoreLayerAddStyle(buttonLabel.layer, "btn");                
-        //UICoreLayerAddStyle(buttonLabel.layer, "label");                
+        MUICoreLayerAddStyle(buttonLabel.layer, "btn");                
+        //MUICoreLayerAddStyle(buttonLabel.layer, "label");                
 
         switch(style){
 
@@ -357,7 +330,7 @@ export class UIAlertViewController extends UIViewController
     private _createTextFieldCell(textField:UITextField):UITableViewCell{
         var cell = new UITableViewCell();
         cell.initWithStyle(UITableViewCellStyle.Custom);    
-        UICoreLayerAddStyle(cell.layer, "alert-cell");    
+        MUICoreLayerAddStyle(cell.layer, "alert-cell");    
 
         textField.layer.style.left = "";
         textField.layer.style.top = "";
@@ -365,26 +338,9 @@ export class UIAlertViewController extends UIViewController
         textField.layer.style.height = "";
         textField.layer.style.width = "";
         textField.layer.style.background = "";
-        UICoreLayerAddStyle(textField.layer, "input-text");
+        MUICoreLayerAddStyle(textField.layer, "input-text");
 
         cell.addSubview(textField);
-
-        return cell;
-    }
-
-    private _createComboBoxCell(comboBox:UIComboBox):UITableViewCell{
-        let cell = new UITableViewCell();
-        cell.initWithStyle(UITableViewCellStyle.Custom);   
-        UICoreLayerAddStyle(cell.layer, "alert-cell");         
-
-        // comboBox.layer.style.left = "";
-        // comboBox.layer.style.top = "";
-        // comboBox.layer.style.right = "";
-        // comboBox.layer.style.height = "";
-        // comboBox.layer.style.width = "";
-        //comboBox.layer.style.background = "";
-        UICoreLayerAddStyle(comboBox.layer, "input-combobox");
-        cell.addSubview(comboBox);
 
         return cell;
     }
@@ -413,7 +369,7 @@ export class UIAlertViewController extends UIViewController
     }
 }
 
-export class UIAlertFadeInAnimationController extends MIOObject{
+export class UIAlertFadeInAnimationController extends NSObject{
     
     transitionDuration(transitionContext){
         return 0.25;
@@ -429,13 +385,13 @@ export class UIAlertFadeInAnimationController extends MIOObject{
 
     // TODO: Not iOS like transitions. For now we use css animations
     animations(transitionContext){
-        var animations = UIClassListForAnimationType(UIAnimationType.FadeIn);
+        var animations = MUIClassListForAnimationType(MUIAnimationType.FadeIn);
         return animations;
     }
 
 }
 
-export class UIAlertFadeOutAnimationController extends MIOObject
+export class UIAlertFadeOutAnimationController extends NSObject
 {
     transitionDuration(transitionContext){
         return 0.25;
@@ -451,7 +407,7 @@ export class UIAlertFadeOutAnimationController extends MIOObject
 
     // TODO: Not iOS like transitions. For now we use css animations
     animations(transitionContext){
-        var animations = UIClassListForAnimationType(UIAnimationType.FadeOut);
+        var animations = MUIClassListForAnimationType(MUIAnimationType.FadeOut);
         return animations;
     }
     
