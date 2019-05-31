@@ -4,5 +4,15 @@
   },
   "NSSortDescriptor": {
     "initKeyOptionalAscendingBool": "initWithKey"
+  },
+  "UIAlertController": {
+    "initTitleOptionalMessageOptionalPreferredStyleUIAlertControllerStyle": "initWithTitle",
+    "addTextFieldConfigurationHandler": "addTextFieldWithConfigurationHandler"
+  },
+  "UIAlertAction": {
+    "initTitleOptionalStyleUIAlertActionStyleHandlerOptional": "initWithTitle"
+  },
+  "UIViewController": {
+    "presentAnimatedCompletion": "presentViewController"
   }
 }

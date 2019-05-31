@@ -80,10 +80,7 @@ function parserDidStartElement(parser, element, attributes){
 		pushNewElement(element, attributes);
 	}
 	else if(element == "tableViewCell") {
-		let item = pushNewElement(element, attributes);
-
-		let reuseIdentifier = attributes["reuseIdentifier"];
-		item["ExtraAttributes"].push('data-cell-identifier="' + reuseIdentifier + '"');
+		pushNewElement(element, attributes);
 	}
 	else if(element == "tableViewCellContentView") {
 		pushNewElement(element, attributes);
@@ -114,14 +111,9 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "stepper"){
 		let item = pushNewElement(element, attributes);
 	}
-	else if (element == "rect"){		
+	else if (element == "rect"){
 		let styles = currentElement["Styles"];
-		if (currentElement["CustomClass"] != "UITableViewCell") {			
-			styles.push("position:relative;");
-		}
-		// else {
-		// 	styles.push("position:relative;");
-		// }
+		styles.push("position:absolute;");
 	
 		if (attributes["x"] != null) styles.push("left:" + attributes["x"] + "px;");
 		if (attributes["y"] != null) styles.push("top:" + attributes["y"] + "px;");
@@ -163,9 +155,8 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "action") {
 		let selector =  attributes["selector"];
-		let eventType = attributes["eventType"];		
-		let actionDiv = '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "Sender") + '" data-event-type="' + eventType + '"></div>';
-		currentElement["Content"] = currentElement["Content"] + actionDiv;
+		//TODO: let eventType = attributes["eventType"];		
+		currentElement["Content"] = currentElement["Content"] + '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "") +'"></div>';
 	}
 	else if (element == "outlet") {
 		let outlets = currentElement["Outlets"];
@@ -178,14 +169,13 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "segue"){
 		let segues = currentElement["Segues"];
-				
+		
+		let id = attributes["id"];
 		let destination = attributes["destination"];
 		let kind = attributes["kind"];
 		let relationship = attributes["relationship"];		
-		let identifier = attributes["identifier"];
 						
 		let segue = {"Destination" : destination, "Kind" : kind };
-		if (identifier != null) segue["Identifier"] = identifier;
 		if (relationship != null) segue["Relationship"] = relationship;
 
 		segues.push(segue);
@@ -317,7 +307,6 @@ function popElement(){
 		content += '<div class="hidden" data-connection-type="segue"';
 		content += ' data-segue-destination="' + item["Destination"] + '"';
 		content += ' data-segue-kind="' + item["Kind"] + '"';
-		if (item["Identifier"] != null) content += ' data-segue-identifier="' + item["Identifier"] + '"';
 		if (item["Relationship"] != null) content += ' data-segue-relationship="' + item["Relationship"] + '"';
 		content += '></div>';
 	}

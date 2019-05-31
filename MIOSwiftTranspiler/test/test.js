@@ -28,7 +28,7 @@ const todo = []
 
 const skip = ['github/swift-algorithm-club/Queue/Queue-Simple.swift', 'github/swift-algorithm-club/Rootish Array Stack/Tests/RootishArrayStack.swift', 'github/swift-algorithm-club/Trie/Trie/Trie/AppDelegate.swift', 'github/swift-algorithm-club/Trie/Trie/Trie/ViewController.swift', 'github/swift-algorithm-club/Trie/Trie/TrieUITests/TrieUITests.swift']
 
-const suiteNames = ['local', 'github']
+const suiteNames = ['github']
 
 let isTestCache = {}
 function isTest(path) {
@@ -39,7 +39,7 @@ function isTest(path) {
 }
 
 function transpile(suiteName, dirName, fileName) {
-    return execSync(`${__dirname}/../../swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks '${__dirname}/${suiteName}/${dirName}/${fileName}'`, {encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe']})
+    return execSync(`${__dirname}/../../../swift-source/build/Ninja-RelWithDebInfoAssert/swift-macosx-x86_64/bin/swiftc -dump-ast -O -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks '${__dirname}/${suiteName}/${dirName}/${fileName}'`, {encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe']})
 }
 
 function executeTranspiled(code) {
