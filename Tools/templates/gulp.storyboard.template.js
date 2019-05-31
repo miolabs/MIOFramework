@@ -81,9 +81,13 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if(element == "tableViewCell") {
 		let item = pushNewElement(element, attributes);
+		let style = attributes["style"];
+		let textLabelID = attributes["textLabel"];
 
 		let reuseIdentifier = attributes["reuseIdentifier"];
 		item["ExtraAttributes"].push('data-cell-identifier="' + reuseIdentifier + '"');
+		if (style != null) item["ExtraAttributes"].push('data-cell-style="' + style + '"');
+		if (textLabelID != null) item["ExtraAttributes"].push('data-cell-textlabel-id="' + textLabelID + '"');
 	}
 	else if(element == "tableViewCellContentView") {
 		pushNewElement(element, attributes);
