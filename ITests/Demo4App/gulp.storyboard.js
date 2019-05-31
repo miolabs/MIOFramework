@@ -81,13 +81,9 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if(element == "tableViewCell") {
 		let item = pushNewElement(element, attributes);
-		let style = attributes["style"];
-		let textLabelID = attributes["textLabel"];
 
 		let reuseIdentifier = attributes["reuseIdentifier"];
 		item["ExtraAttributes"].push('data-cell-identifier="' + reuseIdentifier + '"');
-		if (style != null) item["ExtraAttributes"].push('data-cell-style="' + style + '"');
-		if (textLabelID != null) item["ExtraAttributes"].push('data-cell-textlabel-id="' + textLabelID + '"');
 	}
 	else if(element == "tableViewCellContentView") {
 		pushNewElement(element, attributes);
@@ -121,11 +117,11 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "rect"){		
 		let styles = currentElement["Styles"];
 		if (currentElement["CustomClass"] != "UITableViewCell") {			
+			styles.push("position:absolute;");
+		}
+		else {
 			styles.push("position:relative;");
 		}
-		// else {
-		// 	styles.push("position:relative;");
-		// }
 	
 		if (attributes["x"] != null) styles.push("left:" + attributes["x"] + "px;");
 		if (attributes["y"] != null) styles.push("top:" + attributes["y"] + "px;");
@@ -168,7 +164,7 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "action") {
 		let selector =  attributes["selector"];
 		let eventType = attributes["eventType"];		
-		let actionDiv = '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "Sender") + '" data-event-type="' + eventType + '"></div>';
+		let actionDiv = '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "") + '" data-event-type="' + eventType + '"></div>';
 		currentElement["Content"] = currentElement["Content"] + actionDiv;
 	}
 	else if (element == "outlet") {
