@@ -20,12 +20,6 @@ export enum UIAlertViewStyle
     Default
 }
 
-export enum UIAlertActionStyle
-{
-    Default,
-    Cancel,
-    Destructive
-}
 
 export enum UIAlertItemType {
 
@@ -65,12 +59,18 @@ export class UIAlertTextField extends UIAlertItem
 export class UIAlertAction extends UIAlertItem
 {
     title = null;
-    style = UIAlertActionStyle.Default;
+    style = UIAlertAction.Style._default;
 
     target = null;
     completion = null;
 
-    static alertActionWithTitle(title:string, style:UIAlertActionStyle, target, completion):UIAlertAction
+    static Style = class {
+        static get _default() {return Object.assign(new UIAlertAction.Style(), {rawValue: 0})}
+        static get cancel() {return Object.assign(new UIAlertAction.Style(), {rawValue: 1})}
+        static get destructive() {return Object.assign(new UIAlertAction.Style(), {rawValue: 2})}
+    }
+
+    static alertActionWithTitle(title:string, style:any/*UIAlertAction.Style*/, target, completion):UIAlertAction
     {
         var action = new UIAlertAction();
         action.initWithTitle(title, style);
@@ -109,6 +109,11 @@ export class UIAlertController extends UIViewController
     private _headerCell = null;
 
     private _alertViewSize = new NSSize(320, 50);
+
+    static Style = class {
+        static get actionSheet() {return Object.assign(new UIAlertController.Style(), {rawValue: 0})}
+        static get alert() {return Object.assign(new UIAlertController.Style(), {rawValue: 1})}
+    }
 
     initWithTitle(title:string, message:string, style:UIAlertViewStyle){
         super.init();
@@ -289,7 +294,7 @@ export class UIAlertController extends UIViewController
         return cell;
     }
 
-    private _createActionCellWithTitle(title:string, style:UIAlertActionStyle):UITableViewCell{
+    private _createActionCellWithTitle(title:string, style:any/*UIAlertAction.Style*/):UITableViewCell{
         let cell = new UITableViewCell();
         cell.initWithStyle(UITableViewCellStyle.Custom);
         MUICoreLayerAddStyle(cell.layer, "alert-cell");
@@ -310,16 +315,16 @@ export class UIAlertController extends UIViewController
         MUICoreLayerAddStyle(buttonLabel.layer, "btn");                
         //MUICoreLayerAddStyle(buttonLabel.layer, "label");                
 
-        switch(style){
+        switch(style.rawValue){
 
-            case UIAlertActionStyle.Default:                                
+            case UIAlertAction.Style._default.rawValue:                                
                 break;
 
-            case UIAlertActionStyle.Cancel:                
+            case UIAlertAction.Style.cancel.rawValue:                
                 buttonLabel.layer.classList.add("alert");                
                 break;
 
-            case UIAlertActionStyle.Destructive:                
+            case UIAlertAction.Style.destructive.rawValue:                
                 buttonLabel.layer.classList.add("alert");                
                 break;
         }

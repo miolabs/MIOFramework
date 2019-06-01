@@ -5485,6 +5485,67 @@ extension Substring: _HasContiguousBytes  {
   }
 }
 
+----Swift.(file).Dictionary.init()
+extension Dictionary {
+  public init() {
+    self.init(_native: _NativeDictionary())
+  }
+}
+
+----Swift.(file).Dictionary.init(minimumCapacity:Int)
+extension Dictionary {
+  init(minimumCapacity: Int) {
+    _variant = _Variant(native: _NativeDictionary(capacity: minimumCapacity))
+  }
+}
+
+----Swift.(file).Dictionary.init(uniqueKeysWithValues:S)
+extension Dictionary {
+  public init<S: Sequence>(
+    uniqueKeysWithValues keysAndValues: __owned S
+  ) where S.Element == (Key, Value) {
+    if let d = keysAndValues as? Dictionary<Key, Value> {
+      self = d
+      return
+    }
+    var native = _NativeDictionary<Key, Value>(
+      capacity: keysAndValues.underestimatedCount)
+    // '_MergeError.keyCollision' is caught and handled with an appropriate
+    // error message one level down, inside native.merge(_:...). We throw an
+    // error instead of calling fatalError() directly because we want the
+    // message to include the duplicate key, and the closure only has access to
+    // the conflicting values.
+    try! native.merge(
+      keysAndValues,
+      isUnique: true,
+      uniquingKeysWith: { _, _ in throw _MergeError.keyCollision })
+    self.init(_native: native)
+  }
+}
+
+----Swift.(file).Dictionary.init(_:S,uniquingKeysWith:(Value, Value) throws -> Value)
+extension Dictionary {
+  public init<S: Sequence>(
+    _ keysAndValues: __owned S,
+    uniquingKeysWith combine: (Value, Value) throws -> Value
+  ) rethrows where S.Element == (Key, Value) {
+    var native = _NativeDictionary<Key, Value>(
+      capacity: keysAndValues.underestimatedCount)
+    try native.merge(keysAndValues, isUnique: true, uniquingKeysWith: combine)
+    self.init(_native: native)
+  }
+}
+
+----Swift.(file).Dictionary.init(grouping:S,by:(S.Element) throws -> Key)
+extension Dictionary {
+  public init<S: Sequence>(
+    grouping values: __owned S,
+    by keyForValue: (S.Element) throws -> Key
+  ) rethrows where Value == [S.Element] {
+    try self.init(_native: _NativeDictionary(grouping: values, by: keyForValue))
+  }
+}
+
 ----Swift.(file)..(error_type).bridged()
 extension _NativeDictionary  {
   __consuming internal func bridged() -> AnyObject {
@@ -17912,6 +17973,20 @@ extension Sequence  {
     _ transform: (Element) throws -> ElementOfResult?
   ) rethrows -> [ElementOfResult] {
     return try _compactMap(transform)
+  }
+}
+
+----Swift.(file).Set.init(minimumCapacity:Int)
+extension Set {
+  init(minimumCapacity: Int) {
+    _variant = _Variant(native: _NativeSet(capacity: minimumCapacity))
+  }
+}
+
+----Swift.(file).Set.init(_native:_NativeSet<Element>)
+extension Set {
+  internal init(_native: __owned _NativeSet<Element>) {
+    _variant = _Variant(native: _native)
   }
 }
 

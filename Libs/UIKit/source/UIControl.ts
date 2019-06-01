@@ -54,10 +54,7 @@ export class UIControl extends UIView
                 let actionSelector = subLayer.getAttribute("data-action-selector");
                 let eventType = MUICoreControlParseEventTypeString(subLayer.getAttribute("data-event-type"));
                 if (actionSelector != null) {                    
-                    this.addTarget(this, function(){
-                        owner[actionSelector](this);
-                    }, eventType);
-                    break;                    
+                    this.addTarget(owner, owner[actionSelector], eventType);
                 }
             }
         }
@@ -108,9 +105,22 @@ export class UIControl extends UIView
 
         item["Target"] = target;
         item["Action"] = action;
-        item["EvenrtType"] = controlEvents;
+        item["EventType"] = controlEvents;
 
         this.actions.push(item);
+    }
+
+    protected _performActionsForEvents(events:UIControlEvents){
+
+        for (let index = 0; index < this.actions.length; index++){
+            let action = this.actions[index];
+
+            let target = action["Target"];
+            let block = action["Action"];
+
+            if (block != null && target != null)
+                block.call(target, this);
+        }
     }
 
     private _enabled = true;

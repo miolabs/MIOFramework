@@ -55,7 +55,7 @@ for(let className in swiftModule) {
         if(isOptional) optionals.push(["getSourceFile", foundClass.file, foundClass.getter, className, foundClass.getter === "getInterface" ? "getProperty" : "getInstanceProperty", propName])
         else for(let opI = 0; opI < optionalParams.length; opI++) {
             if(!optionalParams[opI]) continue
-            optionals.push(["getSourceFile", className + ".ts", foundClass.getter, className, foundClass.getter === "getInterface" ? "getMethod" : "getInstanceMethod", propName, "getParameters", "", "0", null])
+            optionals.push(["getSourceFile", className + ".ts", foundClass.getter, className, foundClass.getter === "getInterface" ? "getMethod" : "getInstanceMethod", propName, "getParameters", "", opI, null])
         }
     }
 }

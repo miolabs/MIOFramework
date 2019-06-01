@@ -1,5 +1,5 @@
 import { NSLocalizeString } from "mio-foundation-web";
-import { UIControl } from "./UIControl";
+import { UIControl, UIControlEvents } from "./UIControl";
 import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
 import { MUICoreLayerRemoveStyle } from "./core/MUICoreLayer";
 import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
@@ -102,8 +102,10 @@ export class UIButton extends UIControl
             if (this.enabled == false) return;            
             if (this.type == UIButtonType.MomentaryPushIn) this.setSelected(false);
 
-            if (this.action != null && this.target != null)
-                this.action.call(this.target, this);
+            this._performActionsForEvents(UIControlEvents.TouchUpInside);
+
+            // if (this.action != null && this.target != null)
+            //     this.action.call(this.target, this);
             
         }.bind(this));
     }
