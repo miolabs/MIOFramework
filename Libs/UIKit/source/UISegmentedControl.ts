@@ -46,8 +46,7 @@ export class UISegmentedControl extends UIControl
     }
 
     selectSegmentedAtIndex(index){
-        if (this.selectedSegmentedIndex == index)
-            return;
+        if (this.selectedSegmentedIndex == index) return;
 
         if (this.selectedSegmentedIndex > -1){
             let lastItem = this.segmentedItems[this.selectedSegmentedIndex];
@@ -58,5 +57,7 @@ export class UISegmentedControl extends UIControl
         
         let item = this.segmentedItems[this.selectedSegmentedIndex];
         item.setSelected(true);
+
+        this._performActionsForEvents(UIControlEvents.ValueChanged);
     }
 }

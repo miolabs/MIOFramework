@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		148BADE822A14AEA001949D7 /* MIOPersistentStoreCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148BADE722A14AEA001949D7 /* MIOPersistentStoreCoordinator.swift */; };
+		148BADEA22A14D93001949D7 /* MIOPersistentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148BADE922A14D93001949D7 /* MIOPersistentStore.swift */; };
 		14C7E6E7229EF4BD003AB3C7 /* MIOFetchedResultsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C7E6E6229EF4BD003AB3C7 /* MIOFetchedResultsController.swift */; };
 		14C7E6E9229EF672003AB3C7 /* MIOManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C7E6E8229EF672003AB3C7 /* MIOManagedObject.swift */; };
 		14C7E6EB229F039C003AB3C7 /* MIOPersistentContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C7E6EA229F039C003AB3C7 /* MIOPersistentContainer.swift */; };
 		14C7E6ED229F03FB003AB3C7 /* MIOPersistentStoreDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C7E6EC229F03FB003AB3C7 /* MIOPersistentStoreDescription.swift */; };
 		14E46014229B063800E03980 /* MIOCoreData.h in Headers */ = {isa = PBXBuildFile; fileRef = 14E46012229B063800E03980 /* MIOCoreData.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		14E46025229B067A00E03980 /* MIOSortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E4601B229B067900E03980 /* MIOSortDescriptor.swift */; };
 		14E46026229B067A00E03980 /* MIOManagedObjectModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E4601C229B067900E03980 /* MIOManagedObjectModel.swift */; };
-		14E46027229B067A00E03980 /* MIOPredicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E4601D229B067900E03980 /* MIOPredicate.swift */; };
 		14E46028229B067A00E03980 /* MIORelationshipDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E4601E229B067900E03980 /* MIORelationshipDescription.swift */; };
 		14E46029229B067A00E03980 /* MIOPersistentStoreRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E4601F229B067900E03980 /* MIOPersistentStoreRequest.swift */; };
 		14E4602A229B067A00E03980 /* MIOManagedObjectContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E46020229B067900E03980 /* MIOManagedObjectContext.swift */; };
@@ -25,6 +25,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		148BADE722A14AEA001949D7 /* MIOPersistentStoreCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIOPersistentStoreCoordinator.swift; sourceTree = "<group>"; };
+		148BADE922A14D93001949D7 /* MIOPersistentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIOPersistentStore.swift; sourceTree = "<group>"; };
 		14C7E6E6229EF4BD003AB3C7 /* MIOFetchedResultsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIOFetchedResultsController.swift; sourceTree = "<group>"; };
 		14C7E6E8229EF672003AB3C7 /* MIOManagedObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIOManagedObject.swift; sourceTree = "<group>"; };
 		14C7E6EA229F039C003AB3C7 /* MIOPersistentContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIOPersistentContainer.swift; sourceTree = "<group>"; };
@@ -32,9 +34,7 @@
 		14E4600F229B063800E03980 /* MIOCoreData.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MIOCoreData.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		14E46012229B063800E03980 /* MIOCoreData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MIOCoreData.h; sourceTree = "<group>"; };
 		14E46013229B063800E03980 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		14E4601B229B067900E03980 /* MIOSortDescriptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MIOSortDescriptor.swift; sourceTree = "<group>"; };
 		14E4601C229B067900E03980 /* MIOManagedObjectModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MIOManagedObjectModel.swift; sourceTree = "<group>"; };
-		14E4601D229B067900E03980 /* MIOPredicate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MIOPredicate.swift; sourceTree = "<group>"; };
 		14E4601E229B067900E03980 /* MIORelationshipDescription.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MIORelationshipDescription.swift; sourceTree = "<group>"; };
 		14E4601F229B067900E03980 /* MIOPersistentStoreRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MIOPersistentStoreRequest.swift; sourceTree = "<group>"; };
 		14E46020229B067900E03980 /* MIOManagedObjectContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MIOManagedObjectContext.swift; sourceTree = "<group>"; };
@@ -90,14 +90,14 @@
 				14E46020229B067900E03980 /* MIOManagedObjectContext.swift */,
 				14E4601C229B067900E03980 /* MIOManagedObjectModel.swift */,
 				14E4601F229B067900E03980 /* MIOPersistentStoreRequest.swift */,
-				14E4601D229B067900E03980 /* MIOPredicate.swift */,
 				14E46021229B067900E03980 /* MIOPropertyDescription.swift */,
-				14E4601B229B067900E03980 /* MIOSortDescriptor.swift */,
 				14E4601E229B067900E03980 /* MIORelationshipDescription.swift */,
 				14C7E6E6229EF4BD003AB3C7 /* MIOFetchedResultsController.swift */,
 				14C7E6E8229EF672003AB3C7 /* MIOManagedObject.swift */,
 				14C7E6EA229F039C003AB3C7 /* MIOPersistentContainer.swift */,
 				14C7E6EC229F03FB003AB3C7 /* MIOPersistentStoreDescription.swift */,
+				148BADE722A14AEA001949D7 /* MIOPersistentStoreCoordinator.swift */,
+				148BADE922A14D93001949D7 /* MIOPersistentStore.swift */,
 			);
 			name = source;
 			sourceTree = "<group>";
@@ -185,16 +185,16 @@
 				14C7E6ED229F03FB003AB3C7 /* MIOPersistentStoreDescription.swift in Sources */,
 				14E46029229B067A00E03980 /* MIOPersistentStoreRequest.swift in Sources */,
 				14E46028229B067A00E03980 /* MIORelationshipDescription.swift in Sources */,
+				148BADEA22A14D93001949D7 /* MIOPersistentStore.swift in Sources */,
 				14E4602C229B067A00E03980 /* MIOEntityDescription.swift in Sources */,
 				14E4602E229B067A00E03980 /* MIOFetchRequest.swift in Sources */,
 				14E4602A229B067A00E03980 /* MIOManagedObjectContext.swift in Sources */,
-				14E46027229B067A00E03980 /* MIOPredicate.swift in Sources */,
 				14E4602D229B067A00E03980 /* MIOAttributeDescription.swift in Sources */,
 				14C7E6E7229EF4BD003AB3C7 /* MIOFetchedResultsController.swift in Sources */,
 				14E46026229B067A00E03980 /* MIOManagedObjectModel.swift in Sources */,
 				14C7E6E9229EF672003AB3C7 /* MIOManagedObject.swift in Sources */,
-				14E46025229B067A00E03980 /* MIOSortDescriptor.swift in Sources */,
 				14C7E6EB229F039C003AB3C7 /* MIOPersistentContainer.swift in Sources */,
+				148BADE822A14AEA001949D7 /* MIOPersistentStoreCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -101,8 +101,10 @@ export class UIControl extends UIView
 
     private actions = [];    
     addTarget(target, action, controlEvents:UIControlEvents){
-        let item = {};
+        
+        if (action == null) throw new Error("UIControl: Can't add null action");
 
+        let item = {};        
         item["Target"] = target;
         item["Action"] = action;
         item["EventType"] = controlEvents;

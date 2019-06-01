@@ -4044,12 +4044,20 @@ export class UITableViewCell extends UIView {
     initWithLayer(layer, owner, options?) {
         super.initWithLayer(layer, owner, options);
 
-        this.scanLayerNodes(layer, owner);
-
+        let outletIDs = {};
+        this.scanLayerNodes(layer, owner, outletIDs);
+        
+        let style = layer.getAttribute("data-cell-style");
+        if (style == "IBUITableViewCellStyleDefault") {
+            this.style = UITableViewCellStyle.Default;
+            let propertyID = layer.getAttribute("data-cell-textlabel-id")
+            let item = outletIDs[propertyID];
+            this.textLabel = item;
+        }                
         this._setupLayer();
     }
 
-    private scanLayerNodes(layer, owner) {
+    private scanLayerNodes(layer, owner, outlets) {
 
         if (layer.childNodes.length == 0) return;
 
@@ -4060,7 +4068,7 @@ export class UITableViewCell extends UIView {
                 if (subLayer.tagName != "DIV")
                     continue;
 
-                this.scanLayerNodes(subLayer, owner);
+                this.scanLayerNodes(subLayer, owner, outlets);
 
                 if (subLayer.getAttribute("data-accessory-type") != null) {
                     this.addAccessoryView(subLayer, owner);
