@@ -3,6 +3,7 @@ var pipeline = require('readable-stream').pipeline;
 var ts = require("gulp-typescript");
 var fs = require("file-system");
 var sb = require("./gulp.storyboard");
+var parseModel = require("./gulp.datamodel");
 var utils = require("./gulp.utils");
 
 function unifySwiftFiles(done) {
@@ -69,6 +70,20 @@ function parseStoryBoard(done) {
 	done();
 }
 
+function parseDataModel(done) {
+	var DATAMODEL_PATH = "./{AppName}/{AppName}" + ".xcdatamodeld/{AppName}.xcdatamodel/contents";
+
+	if(fs.existsSync(DATAMODEL_PATH)) {
+		var fileString = fs.readFileSync(DATAMODEL_PATH, "utf8");
+		console.log(fileString);
+		parseModel.parserDidStartElement(fileString); //gulp.datamodel.js
+	} else {
+		console.log("DATAMODEL PATH DOES NOT EXIST!");
+	}
+	
+	done();
+}
+
 function copyResources(done) {
 	const SRC = "../../Tools/resources/";
 	const DEST = __dirname + "/dist/";
@@ -113,5 +128,6 @@ module.exports = {
 	unifySwiftFiles,
 	uglifyJs,
 	parseStoryBoard,
+	parseDataModel,
 	copyResources
 }
