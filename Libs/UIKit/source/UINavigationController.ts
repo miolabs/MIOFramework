@@ -1,4 +1,5 @@
 import { NSObject } from "mio-foundation-web";
+import { NSLocalizeString } from "mio-foundation-web";
 import { UIViewController } from "./UIViewController";
 import { _MUIHideViewController } from "./core/MUICore";
 import { _MUIShowViewController } from "./core/MUICore";
@@ -6,6 +7,9 @@ import { MUIClassListForAnimationType } from "./core/MUICoreAnimation";
 import { MUIAnimationType } from "./core/MUICoreAnimation";
 import { UIControlEvents } from "./UIControl";
 import { UINavigationBar } from "./UINavigationBar";
+import { UIBarButtonSystemItem } from "./UIBarButtonItem";
+import { UINavigationItem } from "./UINavigationItem";
+import { UIButton } from "./UIButton";
 
 /**
  * Created by godshadow on 9/4/16.
@@ -93,11 +97,23 @@ export class UINavigationController extends UIViewController
 
         vc.onLoadView(this, function (this:UINavigationController) {
 
-            if (vc.navigationItem != null && vc.navigationItem.backBarButtonItem != null) {
-                vc.navigationItem.backBarButtonItem.addTarget(this, function(){
-                    vc.navigationController.popViewController();
-                }, UIControlEvents.AllTouchEvents);
+            if (vc.navigationItem == null) {
+                vc.navigationItem = new UINavigationItem();
+                vc.navigationItem.init();
             }
+
+            let backButton = new UIButton();
+            backButton.init();    
+            backButton.setTitle(NSLocalizeString("Back", "BACK"));
+            MUICoreLayerAddStyle(backButton.layer, "system-back-icon");
+            backButton.addTarget(vc, function(this:UIViewController){
+                this.navigationController.popViewController(true);
+            }, UIControlEvents.TouchUpInside);
+
+            let backBarButtonItem = new UIBarButtonItem();
+            backBarButtonItem.initWithCustomView(backButton);
+            backBarButtonItem.target = vc;
+            backBarButtonItem.action = vc.navigationController.popViewController();
 
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);
