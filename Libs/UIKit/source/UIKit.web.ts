@@ -7,18 +7,17 @@ import { MIOCoreBundleGetContentsFromURLString } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
-import "mio-foundation-web/extensions"
 import { NSFormatter } from "mio-foundation-web";
 import { NSSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
-import { NSBundle } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
 import { MIOCoreIsMobile } from "mio-foundation-web";
 import { NSTimer } from "mio-foundation-web";
 import { MIOCoreGetPlatform } from "mio-foundation-web";
 import { MIOCorePlatformType } from "mio-foundation-web";
-import { NSUUID } from "mio-foundation-web";
 import { NSIndexPath } from "mio-foundation-web";
+import "mio-foundation-web/extensions"
+import { NSBundle } from "mio-foundation-web";
 import { MIOCoreBundleGetAppResource } from "mio-foundation-web";
 import { NSURLRequest } from "mio-foundation-web";
 import { MIOCoreBundleDownloadResource } from "mio-foundation-web";
@@ -894,6 +893,8 @@ export class UITapGestureRecognizer extends UIGestureRecognizer
 
 
 
+
+
 export class UIPanGestureRecognizer extends UIGestureRecognizer
 {
     minimumNumberOfTouches = 1;
@@ -973,7 +974,7 @@ export function MUICoreViewCreateView(layer, owner){
     if (className == null || className.length == 0) className = "UIView";
 
     let sv = NSClassFromString(className);
-    sv.initWithLayer(layer, owner);
+    sv.initWithLayer(layer, owner);    
     sv.awakeFromHTML();
     sv._checkSegues();    
 
@@ -1062,6 +1063,8 @@ export class UIView extends NSObject {
                 let className = subLayer.getAttribute("data-class");
                 if (className == null || className.length == 0) className = "UIView";
     
+                if (className == "UIBarItem" || className == "UIBarButtonItem" || className == "UINavigationItem") continue;
+
                 let sv = MUICoreViewCreateView(subLayer, owner);
                 this._linkViewToSubview(sv);
     
@@ -1864,10 +1867,6 @@ export class UIControl extends UIView
 
 
 
-
-
-
-
 /**
  * Created by godshadow on 12/3/16.
  */
@@ -2374,8 +2373,6 @@ export class UISwitch extends UIControl
         this.isOn = !this.isOn;
     }
 }
-
-
 
 
 
@@ -3197,6 +3194,7 @@ export class UIModalDismissAnimationController extends NSObject
 
 
 
+
 /**
  * Created by godshadow on 11/11/2016.
  */
@@ -3408,6 +3406,8 @@ export class MIOPopOverDismissAnimationController extends NSObject
 
 
 
+
+
 /**
  * Created by godshadow on 01/09/16.
  */
@@ -3605,8 +3605,6 @@ export class UIScrollView extends UIView {
         //TODO: Implement this
     }
 }
-
-
 
 
 
@@ -4735,6 +4733,58 @@ export class UIAlertFadeOutAnimationController extends NSObject
 }
 
 
+export class UIBarItem extends NSObject
+{
+    title:string;
+    enabled:boolean;
+    tag:number;
+
+
+}
+
+
+
+
+export class UIBarButtonItem extends UIBarItem
+{
+    target:any;
+    action:any;
+
+    layer = null;
+    owner = null;
+
+    customView:UIView = null;
+
+    initWithLayer(layer, owner){
+        this.layer = layer;
+        this.owner = owner;
+
+        let button = new UIButton();
+        button.init();
+        let systemStyle = layer.getAttribute("data-bar-button-item-system");
+        if (systemStyle != null) MUICoreLayerAddStyle(button.layer, systemStyle);
+
+        if (layer.childNodes.length > 0) {
+            for (let index = 0; index < layer.childNodes.length; index++) {
+                let subLayer = layer.childNodes[index] as HTMLElement;
+    
+                if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+    
+                if (subLayer.getAttribute("data-action-selector")) {
+                    let action = subLayer.getAttribute("data-action-selector");
+                    this.target = owner;
+                    this.action = owner[action];
+
+                    button.addTarget(this.target, this.action, UIControlEvents.TouchUpInside);
+                }
+            }
+        }
+
+        this.customView = button;
+    }
+}
+
+
 
 
 
@@ -4779,8 +4829,14 @@ export class UINavigationBar extends UIView
         for (let index = 0; index < items.length; index++){
             let ni = items[index];
 
+            // Add title
             if (ni.titleView != null) {
                 this.titleView.addSubview(ni.titleView);
+            }
+
+            // Add right button
+            if (ni.rightBarButtonItem != null) {
+                this.rigthView.addSubview(ni.rightBarButtonItem.customView);                
             }
         }
     }    
@@ -4811,55 +4867,72 @@ export class UINavigationBar extends UIView
 
 
 
+
+
 export class UINavigationItem extends NSObject
 {    
     backBarButtonItem:UIButton = null;
     titleView:UIView = null;
     title:string = null;
-
-    private leftView:UIView = null;    
-    private rightView:UIView = null;
+    rightBarButtonItem:UIBarButtonItem;
+    leftBarButtonItem:UIBarButtonItem;
     
     initWithTitle(title:string){
         super.init();
-
         this.title = title;
+
         let titleLabel = new UILabel();
         titleLabel.init();
-        titleLabel.text = title;
+        titleLabel.text = title;   
         
         this.titleView = titleLabel;
     }
+    
+    initWithLayer(layer, owner){
+        let title = layer.getAttribute("data-navigation-title");
+        this.title = title;
 
-    initWithLayer(layer){
+        let titleLabel = new UILabel();
+        titleLabel.init();
+        titleLabel.text = title;        
+        this.titleView = titleLabel;
+
         if (layer.childNodes.length > 0) {
             for (let index = 0; index < layer.childNodes.length; index++) {
                 let subLayer = layer.childNodes[index];
         
                 if (subLayer.tagName != "DIV") continue;
     
-                if (subLayer.getAttribute("data-nav-item-left") != null) {
-                    let v:UIView = new UIView();
-                    v.initWithLayer(subLayer, this);
-                    this.leftView = v;
-                }
-                else if (subLayer.getAttribute("data-nav-item-center") != null) {
-                    let v:UIView = new UIView();
-                    v.initWithLayer(subLayer, this);
-                    this.titleView = v;
-                }
-                else if (subLayer.getAttribute("data-nav-item-right") != null) {
-                    let v:UIView = new UIView();
-                    v.initWithLayer(subLayer, this);
-                    this.rightView = v;
-                }
+                let key = subLayer.getAttribute("data-bar-button-item-key");
+                let button = new UIBarButtonItem();
+                button.initWithLayer(subLayer, owner);
+
+                if (key == "rightBarButtonItem") {
+                    (owner as UIViewController).navigationItem.rightBarButtonItem = button;
+                }                    
+
+                // if (subLayer.getAttribute("data-nav-item-left") != null) {
+                //     let v:UIView = new UIView();
+                //     v.initWithLayer(subLayer, this);
+                //     this.leftView = v;
+                // }
+                // else if (subLayer.getAttribute("data-nav-item-center") != null) {
+                //     let v:UIView = new UIView();
+                //     v.initWithLayer(subLayer, this);
+                //     this.titleView = v;
+                // }
+                // else if (subLayer.getAttribute("data-nav-item-right") != null) {
+                //     let v:UIView = new UIView();
+                //     v.initWithLayer(subLayer, this);
+                //     this.rightView = v;
+                // }
             }
 
-            let backButtonLayer = MUICoreLayerSearchElementByAttribute(layer, "data-nav-item-back");
-            if (backButtonLayer != null) {
-                this.backBarButtonItem = new UIButton();
-                this.backBarButtonItem.initWithLayer(backButtonLayer, this);
-            }
+            // let backButtonLayer = MUICoreLayerSearchElementByAttribute(layer, "data-nav-item-back");
+            // if (backButtonLayer != null) {
+            //     this.backBarButtonItem = new UIButton();
+            //     this.backBarButtonItem.initWithLayer(backButtonLayer, this);
+            // }
         }
     }
 }
@@ -5350,6 +5423,7 @@ export class UISplitViewController extends UIViewController
 
 
 
+
 export function MUIOutletRegister(owner, layerID, c)
 {
     owner._outlets[layerID] = c;
@@ -5707,6 +5781,7 @@ export class UIWindow extends UIView
 
 
 
+
 export class UIStoryboard extends NSObject
 {
     private name:string = null;
@@ -5778,11 +5853,9 @@ export function MUICoreStoryboardParseLayer(layer, object, owner){
                     }
                 }
             }
-            else if (subLayer.getAttribute("data-navigation-key") == "navigationItem"){
-                let title = subLayer.getAttribute("data-navigation-title");
-
+            else if (subLayer.getAttribute("data-navigation-key") == "navigationItem"){             
                 owner.navigationItem = new UINavigationItem();
-                owner.navigationItem.initWithTitle(title);
+                owner.navigationItem.initWithLayer(subLayer, owner);
             }
         }
     }

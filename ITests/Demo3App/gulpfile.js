@@ -12,7 +12,7 @@ function unifySwiftFiles(done) {
 	var content = "";
 
 	fs.mkdirSync(dir);
-	fs.recurseSync("./Demo4App/", ["*.swift"], function(filepath, relative, filename) {
+	fs.recurseSync("./Demo3App/", ["*.swift"], function(filepath, relative, filename) {
 		if(filename === "app.swift" || filename === "app.ts" || filename === "app.js") {
 			fs.unlinkSync("./.build/app.swift");
 			fs.unlinkSync("./.build/app.ts");
@@ -21,10 +21,10 @@ function unifySwiftFiles(done) {
 			fileArr.push(filepath);
 		}
 	});
-	//if there's a file '/Demo4App/order.json', we expect it in the format ["file1.swift", "subfolder/file2.swift"]
+	//if there's a file '/Demo3App/order.json', we expect it in the format ["file1.swift", "subfolder/file2.swift"]
 	//it's a way to provide a custom order for the swift files (with proper dependency order)
-	if(fs.existsSync("./Demo4App/order.json")) {
-		let order = JSON.parse(fs.readFileSync("./Demo4App/order.json", "utf8"))
+	if(fs.existsSync("./Demo3App/order.json")) {
+		let order = JSON.parse(fs.readFileSync("./Demo3App/order.json", "utf8"))
 		fileArr.sort((a, b) => {
 			let aIndex = order.indexOf(a.slice(a.indexOf('/') + 1))
 			let bIndex = order.indexOf(b.slice(b.indexOf('/') + 1))
@@ -57,7 +57,7 @@ function uglifyJs() {
 
 function parseStoryBoard(done) {
 	var filesArr = [];
-	var pathStoryBoard = "./Demo4App/Base.lproj/";
+	var pathStoryBoard = "./Demo3App/Base.lproj/";
 
 	fs.readdirSync(pathStoryBoard).forEach(item => {
 		filesArr.unshift(item);
@@ -71,7 +71,7 @@ function parseStoryBoard(done) {
 }
 
 function parseDataModel(done) {
-	var DATAMODEL_PATH = "./Demo4App/Demo4App" + ".xcdatamodeld/Demo4App.xcdatamodel/contents";
+	var DATAMODEL_PATH = "./Demo3App/Demo3App" + ".xcdatamodeld/Demo3App.xcdatamodel/contents";
 
 	if(fs.existsSync(DATAMODEL_PATH)) {
 		var fileString = fs.readFileSync(DATAMODEL_PATH, "utf8");
@@ -87,7 +87,7 @@ function parseDataModel(done) {
 function copyResources(done) {
 	const SRC = "../../Tools/resources/";
 	const DEST = __dirname + "/dist/";
-	const APP_PLIST_PATH = "./Demo4App/Info.plist";
+	const APP_PLIST_PATH = "./Demo3App/Info.plist";
 	const FOUNDATION_PATH = "node_modules/mio-foundation-web/";
 	const UIKIT_PATH = "node_modules/mio-uikit-web/";
 	const SWIFT_PATH = "node_modules/mio-swiftlib/";

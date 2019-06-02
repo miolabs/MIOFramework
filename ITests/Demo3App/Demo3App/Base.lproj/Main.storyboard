@@ -45,7 +45,13 @@
                             <outlet property="delegate" destination="HkK-wC-lvX" id="RGf-gn-E2D"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Table View Controller" id="wBb-6L-Lax"/>
+                    <navigationItem key="navigationItem" title="Table View Controller" id="wBb-6L-Lax">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="hLF-Oe-o5n">
+                            <connections>
+                                <action selector="addButtonClickedWithSender:" destination="HkK-wC-lvX" id="LwF-Lp-So5"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3tf-hY-jmh" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

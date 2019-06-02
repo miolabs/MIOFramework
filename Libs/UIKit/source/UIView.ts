@@ -35,7 +35,7 @@ export function MUICoreViewCreateView(layer, owner){
     if (className == null || className.length == 0) className = "UIView";
 
     let sv = NSClassFromString(className);
-    sv.initWithLayer(layer, owner);
+    sv.initWithLayer(layer, owner);    
     sv.awakeFromHTML();
     sv._checkSegues();    
 
@@ -124,6 +124,8 @@ export class UIView extends NSObject {
                 let className = subLayer.getAttribute("data-class");
                 if (className == null || className.length == 0) className = "UIView";
     
+                if (className == "UIBarItem" || className == "UIBarButtonItem" || className == "UINavigationItem") continue;
+
                 let sv = MUICoreViewCreateView(subLayer, owner);
                 this._linkViewToSubview(sv);
     

@@ -50,6 +50,27 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "navigationBar"){
 		pushNewElement(element, attributes);
 	}
+	else if (element == "navigationItem"){
+		let item = pushNewElement(element, attributes);
+		let title = attributes["title"];
+		let key = attributes["key"];		
+		
+		item["Classes"].push("hidden");
+		item["ExtraAttributes"].push('data-navigation-key="' +  key + '"');		
+		if (title != null) item["ExtraAttributes"].push('data-navigation-title="' + title + '"');		
+	}
+	else if (element == "barButtonItem"){
+		let item = pushNewElement(element, attributes);
+
+		let key = attributes["key"];
+		item["ExtraAttributes"].push('data-bar-button-item-key="' +  key + '"');		
+
+		let systemItem = attributes["systemItem"];
+		if (systemItem != null) {
+			let si = systemItem + "-icon";
+			item["Classes"].push(si);
+		}		
+	}
 	else if (element == "label"){
 		let item = pushNewElement(element, attributes);
 		parseTextAlignment(attributes["textAlignment"], item["Classes"]);
@@ -81,9 +102,13 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if(element == "tableViewCell") {
 		let item = pushNewElement(element, attributes);
+		let style = attributes["style"];
+		let textLabelID = attributes["textLabel"];
 
 		let reuseIdentifier = attributes["reuseIdentifier"];
 		item["ExtraAttributes"].push('data-cell-identifier="' + reuseIdentifier + '"');
+		if (style != null) item["ExtraAttributes"].push('data-cell-style="' + style + '"');
+		if (textLabelID != null) item["ExtraAttributes"].push('data-cell-textlabel-id="' + textLabelID + '"');
 	}
 	else if(element == "tableViewCellContentView") {
 		pushNewElement(element, attributes);
@@ -117,11 +142,11 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "rect"){		
 		let styles = currentElement["Styles"];
 		if (currentElement["CustomClass"] != "UITableViewCell") {			
-			styles.push("position:absolute;");
-		}
-		else {
 			styles.push("position:relative;");
 		}
+		// else {
+		// 	styles.push("position:relative;");
+		// }
 	
 		if (attributes["x"] != null) styles.push("left:" + attributes["x"] + "px;");
 		if (attributes["y"] != null) styles.push("top:" + attributes["y"] + "px;");
@@ -163,8 +188,10 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "action") {
 		let selector =  attributes["selector"];
-		let eventType = attributes["eventType"];		
-		let actionDiv = '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "") + '" data-event-type="' + eventType + '"></div>';
+		let eventType = attributes["eventType"];			
+		let actionDiv = '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "Sender") + '"';
+		if (eventType != null) actionDiv += ' data-event-type="' + eventType + '"';
+		actionDiv += '></div>';
 		currentElement["Content"] = currentElement["Content"] + actionDiv;
 	}
 	else if (element == "outlet") {
@@ -208,6 +235,12 @@ function parserDidEndElement(parser, element){
 		popElement();
 	}
 	else if (element == "navigationBar"){
+		popElement();
+	}
+	else if (element == "navigationItem"){
+		popElement();
+	}
+	else if (element == "barButtonItem"){
 		popElement();
 	}
 	else if (element == "label"){
