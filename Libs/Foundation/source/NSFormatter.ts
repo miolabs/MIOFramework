@@ -1,6 +1,6 @@
 import { NSObject } from "./NSObject";
 
-export class NSFormatter extends NSObject {
+export class Formatter extends NSObject {
 
     stringForObjectValue(value) {
         return value;

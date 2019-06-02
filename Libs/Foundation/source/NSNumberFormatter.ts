@@ -1,4 +1,4 @@
-import { NSFormatter } from "./NSFormatter";
+import { Formatter } from "./NSFormatter";
 import { NSLocale } from "./NSLocale";
 
 export enum NSNumberFormatterStyle {
@@ -15,7 +15,7 @@ export enum _NSNumberFormatterType {
     Decimal
 }
 
-export class NSNumberFormatter extends NSFormatter {
+export class NumberFormatter extends Formatter {
 
     numberStyle = NSNumberFormatterStyle.NoStyle;
     locale:NSLocale = null;

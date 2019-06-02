@@ -1,36 +1,36 @@
 import { NSObject } from "./NSObject";
 import { NSError } from "./NSError";
-import { NSXMLParser } from "./NSXMLParser";
+import { XMLParser } from "./NSXMLParser";
 
-export enum NSPropertyListFormat
+export enum PropertyListFormat
 {
     OpenStepFormat,
     XMLFormat_v1_0,
     BinaryFormat_v1_0,    
 }
 
-export enum NSPropertyListReadOptions
+export enum PropertyListReadOptions
 {
     None
 }
 
-export enum NSPropertyListWriteOptions
+export enum PropertyListWriteOptions
 {
     None
 }
 
-export class NSPropertyListSerialization extends NSObject
+export class PropertyListSerialization extends NSObject
 {            
-    static propertyListWithData(data:string, options:NSPropertyListReadOptions, format:NSPropertyListFormat, error:NSError){
-        let pl = new NSPropertyListSerialization();
+    static propertyListWithData(data:string, options:PropertyListReadOptions, format:PropertyListFormat, error:NSError){
+        let pl = new PropertyListSerialization();
         pl.initWithData(data, options, format);
 
         let item = pl.parseData(error);
         return item;
     }
 
-    static dataWithpropertyList(plist:any, format:NSPropertyListFormat, options:NSPropertyListReadOptions, error:NSError){
-        let pl = new NSPropertyListSerialization();
+    static dataWithpropertyList(plist:any, format:PropertyListFormat, options:PropertyListReadOptions, error:NSError){
+        let pl = new PropertyListSerialization();
         pl.initWithObject(plist, options, format);
 
         let data = pl.parsePList(error);
@@ -39,13 +39,13 @@ export class NSPropertyListSerialization extends NSObject
 
 
     private data:string = null;
-    private initWithData(data:string, options:NSPropertyListReadOptions, format:NSPropertyListFormat){
+    private initWithData(data:string, options:PropertyListReadOptions, format:PropertyListFormat){
         super.init();
         this.data = data;
     }
 
     private plist:any = null;
-    private initWithObject(plist:any, options:NSPropertyListReadOptions, format:NSPropertyListFormat){
+    private initWithObject(plist:any, options:PropertyListReadOptions, format:PropertyListFormat){
         super.init();
         this.plist = plist;
     }
@@ -53,7 +53,7 @@ export class NSPropertyListSerialization extends NSObject
     private rootItem = null;        
     private parseData(error:NSError){
         this.currentElement = null;
-        let parser = new NSXMLParser();
+        let parser = new XMLParser();
         parser.initWithString(this.data, this);
         parser.parse();
         
@@ -69,7 +69,7 @@ export class NSPropertyListSerialization extends NSObject
     private currentString:string = null;
     private itemStack = [];
     
-    parserDidStartElement(parser:NSXMLParser, element:string, attributes){
+    parserDidStartElement(parser:XMLParser, element:string, attributes){
         
         if (element == "dict"){            
             let item = {};
@@ -106,11 +106,11 @@ export class NSPropertyListSerialization extends NSObject
         this.currentString = "";
     }
     
-    parserFoundCharacters(parser:NSXMLParser, characters:string){
+    parserFoundCharacters(parser:XMLParser, characters:string){
         this.currentString += characters;
     }
 
-    parserDidEndElement(parser:NSXMLParser, element:string){
+    parserDidEndElement(parser:XMLParser, element:string){
                 
         if (element == "key") {
             this.currentKey = this.currentString;            
@@ -140,7 +140,7 @@ export class NSPropertyListSerialization extends NSObject
         }
     }    
     
-    parserDidEndDocument(parser:NSXMLParser){
+    parserDidEndDocument(parser:XMLParser){
 
     }
 

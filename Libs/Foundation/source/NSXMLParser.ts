@@ -1,18 +1,18 @@
 import { NSLog } from "./NSLog";
 import { NSObject } from "./NSObject";
 
-export interface NSXMLParserDelegate {
-    parserDidStartDocument?(parser:NSXMLParser);
-    parserDidEndDocument?(parser:NSXMLParser);
+export interface XMLParserDelegate {
+    parserDidStartDocument?(parser:XMLParser);
+    parserDidEndDocument?(parser:XMLParser);
     
-    parserDidStartElement?(parser:NSXMLParser, element:string, attributes);
-    parserDidEndElement?(parser:NSXMLParser, element:string);
+    parserDidStartElement?(parser:XMLParser, element:string, attributes);
+    parserDidEndElement?(parser:XMLParser, element:string);
 
-    parserFoundCharacters?(parser:NSXMLParser, characters:string);
-    parserFoundComment?(parser:NSXMLParser, comment:string);
+    parserFoundCharacters?(parser:XMLParser, characters:string);
+    parserFoundComment?(parser:XMLParser, comment:string);
 }
 
-export enum NSXMLTokenType{
+export enum XMLTokenType{
     Identifier,
     QuestionMark,
     ExclamationMark,
@@ -24,22 +24,22 @@ export enum NSXMLTokenType{
     End
 }
 
-export class NSXMLParser extends NSObject
+export class XMLParser extends NSObject
 {
     private str:string = null;
-    private delegate:NSXMLParserDelegate = null;
+    private delegate:XMLParserDelegate = null;
 
     private strIndex = 0;
 
     private elements = [];
     private attributes = null;
     private currentElement = null;
-    private currentTokenValue:NSXMLTokenType = null;
-    private lastTokenValue:NSXMLTokenType = null;
+    private currentTokenValue:XMLTokenType = null;
+    private lastTokenValue:XMLTokenType = null;
 
     private ignoreWhiteSpace = false;
 
-    initWithString(str:string, delegate:NSXMLParserDelegate){
+    initWithString(str:string, delegate:XMLParserDelegate){
         this.str = str;
         this.delegate = delegate;
     }
@@ -100,40 +100,40 @@ export class NSXMLParser extends NSObject
         return value;
     }    
 
-    private nextToken():[NSXMLTokenType, string]{
+    private nextToken():[XMLTokenType, string]{
         
         this.lastTokenValue = this.currentTokenValue;
 
         let exit = false;
-        let token = NSXMLTokenType.Identifier;
+        let token = XMLTokenType.Identifier;
         let value = this.readToken();                        
 
-        if (value == null) return [NSXMLTokenType.End, null];
+        if (value == null) return [XMLTokenType.End, null];
 
         switch(value){
 
             case "<":
-                token = NSXMLTokenType.OpenTag;
+                token = XMLTokenType.OpenTag;
                 break;
 
             case ">":
-                token = NSXMLTokenType.CloseTag;
+                token = XMLTokenType.CloseTag;
                 break;                
 
             case "/":
-                token = NSXMLTokenType.Slash;
+                token = XMLTokenType.Slash;
                 break;
 
             case "?":
-                token = NSXMLTokenType.QuestionMark;
+                token = XMLTokenType.QuestionMark;
                 break;
 
             case "!":
-                token = NSXMLTokenType.ExclamationMark;
+                token = XMLTokenType.ExclamationMark;
                 break;
             
             case " ":
-                token = NSXMLTokenType.WhiteSpace;
+                token = XMLTokenType.WhiteSpace;
                 break;
 
             default:
@@ -145,7 +145,7 @@ export class NSXMLParser extends NSObject
         return [token, value];
     }
 
-    private prevToken():NSXMLTokenType{
+    private prevToken():XMLTokenType{
         
         return this.lastTokenValue;
     }
@@ -164,19 +164,19 @@ export class NSXMLParser extends NSObject
         let token, value;
         [token, value] = this.nextToken();
                 
-        while(token != NSXMLTokenType.End){
+        while(token != XMLTokenType.End){
 
             switch(token) {
 
-                case NSXMLTokenType.OpenTag:
+                case XMLTokenType.OpenTag:
                     this.ignoreWhiteSpace = true;
                     this.openTag();
                     this.ignoreWhiteSpace = false;
                     break;
 
-                case NSXMLTokenType.Identifier:
-                case NSXMLTokenType.Slash:
-                case NSXMLTokenType.WhiteSpace:
+                case XMLTokenType.Identifier:
+                case XMLTokenType.Slash:
+                case XMLTokenType.WhiteSpace:
                     this.text(value);
                     break;                    
 
@@ -204,19 +204,19 @@ export class NSXMLParser extends NSObject
 
         switch(token){
 
-            case NSXMLTokenType.Identifier:
+            case XMLTokenType.Identifier:
                 this.beginElement(value);
                 break;                        
 
-            case NSXMLTokenType.QuestionMark:
+            case XMLTokenType.QuestionMark:
                 this.questionMark();
                 break;
 
-            case NSXMLTokenType.ExclamationMark:
+            case XMLTokenType.ExclamationMark:
                 this.exclamationMark();
                 break;
 
-            case NSXMLTokenType.Slash:
+            case XMLTokenType.Slash:
                 this.slash();
                 break;
 
@@ -234,11 +234,11 @@ export class NSXMLParser extends NSObject
 
         switch (token){
 
-            case NSXMLTokenType.Identifier:
+            case XMLTokenType.Identifier:
                 this.xmlOpenTag(val);
                 break;
 
-            case NSXMLTokenType.CloseTag:
+            case XMLTokenType.CloseTag:
                 this.xmlCloseTag();
                 break;   
                 
@@ -289,11 +289,11 @@ export class NSXMLParser extends NSObject
 
         switch (token){
 
-            case NSXMLTokenType.Identifier:
+            case XMLTokenType.Identifier:
                 this.attribute(val);
                 break;
 
-            case NSXMLTokenType.QuestionMark:
+            case XMLTokenType.QuestionMark:
                 this.questionMark();
                 break;
 
@@ -319,15 +319,15 @@ export class NSXMLParser extends NSObject
 
         switch (token){
 
-            case NSXMLTokenType.Identifier:
+            case XMLTokenType.Identifier:
                 this.attribute(val);
                 break;
 
-            case NSXMLTokenType.Slash:
+            case XMLTokenType.Slash:
                 this.slash();
                 break;
 
-            case NSXMLTokenType.CloseTag:
+            case XMLTokenType.CloseTag:
                 this.closeTag();
                 this.didStartElement();                                
                 break;
@@ -350,7 +350,7 @@ export class NSXMLParser extends NSObject
 
         switch (token){
 
-            case NSXMLTokenType.CloseTag:
+            case XMLTokenType.CloseTag:
                 this.closeTag();
                 this.didEndElement();
                 break;
@@ -372,19 +372,19 @@ export class NSXMLParser extends NSObject
 
         switch (token){
 
-            case NSXMLTokenType.Identifier:
+            case XMLTokenType.Identifier:
                 this.attribute(value);
                 break;
 
-            case NSXMLTokenType.Slash:
+            case XMLTokenType.Slash:
                 this.slash();
                 break;
 
-            case NSXMLTokenType.QuestionMark:
+            case XMLTokenType.QuestionMark:
                 this.questionMark();
                 break;
 
-            case NSXMLTokenType.CloseTag:
+            case XMLTokenType.CloseTag:
                 this.closeTag();
                 this.didStartElement();                
                 break;
@@ -435,13 +435,13 @@ export class NSXMLParser extends NSObject
 
         switch(token){
 
-            case NSXMLTokenType.CloseTag:                    
+            case XMLTokenType.CloseTag:                    
                 this.closeTag();
                 this.didStartElement();
                 this.didEndElement();                
                 break;            
 
-            case NSXMLTokenType.Identifier:
+            case XMLTokenType.Identifier:
                 this.endElement(value);
                 break;     
                 
