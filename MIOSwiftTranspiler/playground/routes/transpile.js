@@ -53,7 +53,7 @@ router.post('*', function(req, res, next) {
         err2 => {
             console.log('!!!!!!!!!!err');
             console.log(err);
-            if(err) return res.sendStatus(500);
+            if(!transpiled) return res.status(500).send((err && err.message) || err);
             res.send(transpiled);
         })
     });

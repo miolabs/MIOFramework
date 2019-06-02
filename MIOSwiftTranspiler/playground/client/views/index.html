@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <title>Swift to TypeScript Transpiler - Playground</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="/lib.js"></script>
+    <script src="/loader.js"></script>
+    <script src="/typescriptServices.js"></script>
 </head>
 <style>
     * {
@@ -62,9 +65,7 @@
     margin: 0 20px 20px 20px;
     position: relative;
     }
-    #transpiler textarea {
-    font-family: monospace;
-    resize: none;
+    .code-wrapper {
     border: 2px solid #eee;
     padding: 8px 12px;
     border-radius: 12px;
@@ -72,15 +73,37 @@
     top: 0;
     width: calc(50% - 83px);
     height: calc(100% - 20px);
+    }
+    #transpiler textarea, #target-output {
+    font-family: monospace;
+    resize: none;
     font-size: 15px;
     line-height: 1.42857;
     }
     #source-code {
     left: 0;
     }
-    #target-code {
+    #target-code-wrapper {
     right: 0;
     transition: color 0.3s linear;
+    }
+    #target-code {
+    width: 100%;
+    height: calc(100% - 110px);
+    }
+    #target-output-wrapper {
+    width: 100%;
+    height: 110px;
+    border-top: 2px solid #eee;
+    }
+    /*#target-output-headline {
+    padding: 8px 12px;
+    }*/
+    #target-output {
+    width: 100%;
+    height: 90px;
+    overflow: auto;
+    padding-top: 10px;
     }
     .transpile-btn {
     position: absolute;
@@ -179,12 +202,32 @@
         <h1>Swift to TypeScript Transpiler - Playground</h1>
     </div>
     <div id="transpiler">
-            <textarea id="source-code" spellcheck="false" autofocus>
+            <textarea id="source-code" class="code-wrapper" spellcheck="false" autofocus>
 var arr = [3, 1, 2]
-arr.sort(by: <)</textarea>
+arr.sort(by: <)
+for el in arr {
+  print(el)
+}</textarea>
+        <div id="target-code-wrapper" class="code-wrapper">
             <textarea id="target-code" spellcheck="false" readonly>
 let arr = _create(Array, 'initArrayLiteralArray', [3, 1, 2], {});
-arr.sortBy(Int.$lessThan, { $setThis: $val => arr = $val });</textarea>
+arr.sortBy(Int.$lessThan, { $setThis: $val => arr = $val });
+{
+  let $el$generator = _cloneStruct(arr.makeIterator({}));
+  while (true) {
+    const $ifLet0, el_1;
+    if (!((($ifLet0 = $el$generator.next({ $setThis: $val => $el$generator = $val })) || true) && $ifLet0.rawValue == 'some' && ((el_1 = $ifLet0[0]) || true))) break
+    printSeparatorTerminator(_create(Array, 'initArrayLiteralArray', [el_1], {}), null, null);
+  }
+};</textarea>
+            <div id="target-output-wrapper">
+                <!--<div id="target-output-header">Console output</div>-->
+                <textarea id="target-output" readonly>
+1
+2
+3</textarea>
+            </div>
+        </div>
         <button class="transpile-btn" data-language="ts"   type="button">Transpile</button>
         <!--<button class="transpile-btn" data-language="java" type="button">Transpile to Java</button>-->
         <svg id="target-code-spinner" class="spinner" width="50" height="50"><circle cx="25" cy="25" r="20"/></svg>
@@ -192,45 +235,141 @@ arr.sortBy(Int.$lessThan, { $setThis: $val => arr = $val });</textarea>
 </div>
 
 <script>
-        const TRANSPILE_URL = "/api/transpile";
-        (function(){
-            var sourceCodeEl = document.getElementById("source-code"),
-                targetCodeEl = document.getElementById("target-code"),
-                transpileBtns = document.getElementsByClassName("transpile-btn"),
-                spinner = document.getElementById("target-code-spinner"),
-                lastSourceCode = sourceCodeEl.value,
-                lastLanguage = "ts",
+const TRANSPILE_URL = "/api/transpile";
+function formatAndTranspile(input, options) {
+
+    //Format
+    function createDefaultFormatCodeSettings() {
+
+        return {
+            baseIndentSize: 0,
+            indentSize: 2,
+            tabSize: 2,
+            indentStyle: ts.IndentStyle.Smart,
+            newLineCharacter: "\r\n",
+            convertTabsToSpaces: true,
+            insertSpaceAfterCommaDelimiter: true,
+            insertSpaceAfterSemicolonInForStatements: true,
+            insertSpaceBeforeAndAfterBinaryOperators: true,
+            insertSpaceAfterConstructor: false,
+            insertSpaceAfterKeywordsInControlFlowStatements: true,
+            insertSpaceAfterFunctionKeywordForAnonymousFunctions: false,
+            insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis: false,
+            insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets: false,
+            insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces: true,
+            insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces: false,
+            insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces: false,
+            insertSpaceAfterTypeAssertion: false,
+            insertSpaceBeforeFunctionParenthesis: false,
+            placeOpenBraceOnNewLineForFunctions: false,
+            placeOpenBraceOnNewLineForControlBlocks: false,
+            insertSpaceBeforeTypeAnnotation: false,
+        };
+    }
+    var LanguageServiceHost = /** @class */ (function () {
+        function LanguageServiceHost() {
+            var _this = this;
+            this.files = {};
+            // for ts.LanguageServiceHost
+            this.getCompilationSettings = function () { return ts.getDefaultCompilerOptions(); };
+            this.getScriptFileNames = function () { return Object.keys(_this.files); };
+            this.getScriptVersion = function (_fileName) { return "0"; };
+            this.getScriptSnapshot = function (fileName) { return _this.files[fileName]; };
+            this.getCurrentDirectory = function () { return '' };
+            this.getDefaultLibFileName = function (options) { return ts.getDefaultLibFilePath(options); };
+        }
+        LanguageServiceHost.prototype.addFile = function (fileName, text) {
+            this.files[fileName] = ts.ScriptSnapshot.fromString(text);
+        };
+        return LanguageServiceHost;
+    }());
+    function format(fileName, text, options) {
+        if (options === void 0) { options = createDefaultFormatCodeSettings(); }
+        var host = new LanguageServiceHost();
+        host.addFile(fileName, text);
+        var languageService = ts.createLanguageService(host);
+        var edits = languageService.getFormattingEditsForDocument(fileName, options);
+        edits
+            .sort(function (a, b) { return a.span.start - b.span.start; })
+            .reverse()
+            .forEach(function (edit) {
+            var head = text.slice(0, edit.span.start);
+            var tail = text.slice(edit.span.start + edit.span.length);
+            text = "" + head + edit.newText + tail;
+        });
+        return text;
+    }
+    let formatText = format('elo.ts', input)
+
+    // Output
+    var inputFileName = options.jsx ? "module.tsx" : "module.ts";
+    var sourceFile = ts.createSourceFile(inputFileName, input, options.target || ts.ScriptTarget.ES5);
+    var outputText;
+    var program = ts.createProgram([inputFileName], options, {
+        getSourceFile: function (fileName) { return fileName.indexOf("module") === 0 ? sourceFile : undefined; },
+        writeFile: function (_name, text) { outputText = text; },
+        getDefaultLibFileName: function () { return "lib.d.ts"; },
+        useCaseSensitiveFileNames: function () { return false; },
+        getCanonicalFileName: function (fileName) { return fileName; },
+        getCurrentDirectory: function () { return ""; },
+        getNewLine: function () { return "\r\n"; },
+        fileExists: function (fileName) { return fileName === inputFileName; },
+        readFile: function () { return ""; },
+        directoryExists: function () { return true; },
+        getDirectories: function () { return []; }
+    });
+    // Emit
+    program.emit();
+    if (outputText === undefined) {
+        throw new Error("Output generation failed");
+    }
+    return {outputText, formatText};
+}
+(function(){
+    var sourceCodeEl = document.getElementById("source-code"),
+        targetCodeEl = document.getElementById("target-code"),
+        targetOutputEl = document.getElementById("target-output"),
+        transpileBtns = document.getElementsByClassName("transpile-btn"),
+        spinner = document.getElementById("target-code-spinner"),
+        lastSourceCode = sourceCodeEl.value,
+        lastLanguage = "ts",
+        isWaitingForTranspilation = false;
+    Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
+        transpileBtn.onclick = function() {
+            if(isWaitingForTranspilation) return;
+            var language = transpileBtn.getAttribute("data-language");
+            if(!sourceCodeEl.value || (sourceCodeEl.value === lastSourceCode && language === lastLanguage)) return;
+            isWaitingForTranspilation = true;
+            spinner.style.display = 'block';
+            targetCodeEl.style.color = '#aaa';
+            lastSourceCode = sourceCodeEl.value;
+            lastLanguage = language;
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", TRANSPILE_URL);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if(xhr.readyState !== 4) return;
                 isWaitingForTranspilation = false;
-            Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
-                transpileBtn.onclick = function() {
-                    if(isWaitingForTranspilation) return;
-                    var language = transpileBtn.getAttribute("data-language");
-                    if(!sourceCodeEl.value || (sourceCodeEl.value === lastSourceCode && language === lastLanguage)) return;
-                    isWaitingForTranspilation = true;
-                    spinner.style.display = 'block';
-                    targetCodeEl.style.color = '#aaa';
-                    lastSourceCode = sourceCodeEl.value;
-                    lastLanguage = language;
-                    var xhr = new XMLHttpRequest();
-                    xhr.open("POST", TRANSPILE_URL);
-                    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-                    xhr.onreadystatechange = function () {
-                        if(xhr.readyState !== 4) return;
-                        isWaitingForTranspilation = false;
-                        spinner.style.display = 'none';
-                        if(xhr.status === 200) {
-                            targetCodeEl.value = xhr.responseText;
-                            targetCodeEl.style.color = '';
-                        }
-                        else {
-                            targetCodeEl.value = 'Transpilation failed :(';
-                            targetCodeEl.style.color = '#fc605e';
-                        }
-                    };
-                    xhr.send(JSON.stringify({code: sourceCodeEl.value, language: language}));
+                spinner.style.display = 'none';
+                if(xhr.status === 200) {
+                    let {outputText, formatText} = formatAndTranspile(xhr.responseText, {})
+                    targetCodeEl.value = formatText;
+                    targetCodeEl.style.color = '';
+                    targetOutputEl.value = '';
+                    printSeparatorTerminator = function(text) { targetOutputEl.value += text + '\n' }
+                    eval('(function(){' + outputText + '})();')
                 }
-            });
-        })();
-    </script>
+                else {
+                    let errorMessage = xhr.responseText || 'Transpilation failed :(';
+                    targetCodeEl.value = errorMessage;
+                    targetCodeEl.style.color = '#fc605e';
+                    targetOutputEl.value = '';
+                }
+            };
+            xhr.send(JSON.stringify({code: sourceCodeEl.value, language: language}));
+        }
+    });
+})();
+</script>
 </body>
 </html>
