@@ -50,6 +50,27 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "navigationBar"){
 		pushNewElement(element, attributes);
 	}
+	else if (element == "navigationItem"){
+		let item = pushNewElement(element, attributes);
+		let title = attributes["title"];
+		let key = attributes["key"];		
+		
+		item["Classes"].push("hidden");
+		item["ExtraAttributes"].push('data-navigation-key="' +  key + '"');		
+		if (title != null) item["ExtraAttributes"].push('data-navigation-title="' + title + '"');		
+	}
+	else if (element == "barButtonItem"){
+		let item = pushNewElement(element, attributes);
+
+		let key = attributes["key"];
+		item["ExtraAttributes"].push('data-bar-button-item-key="' +  key + '"');		
+
+		let systemItem = attributes["systemItem"];
+		if (systemItem != null) {
+			let si = "system-" + systemItem + "-icon";
+			item["ExtraAttributes"].push('data-bar-button-item-system="' + si + '"');
+		}		
+	}
 	else if (element == "label"){
 		let item = pushNewElement(element, attributes);
 		parseTextAlignment(attributes["textAlignment"], item["Classes"]);
@@ -167,8 +188,10 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "action") {
 		let selector =  attributes["selector"];
-		let eventType = attributes["eventType"];		
-		let actionDiv = '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "Sender") + '" data-event-type="' + eventType + '"></div>';
+		let eventType = attributes["eventType"];			
+		let actionDiv = '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "Sender") + '"';
+		if (eventType != null) actionDiv += ' data-event-type="' + eventType + '"';
+		actionDiv += '></div>';
 		currentElement["Content"] = currentElement["Content"] + actionDiv;
 	}
 	else if (element == "outlet") {
@@ -212,6 +235,12 @@ function parserDidEndElement(parser, element){
 		popElement();
 	}
 	else if (element == "navigationBar"){
+		popElement();
+	}
+	else if (element == "navigationItem"){
+		popElement();
+	}
+	else if (element == "barButtonItem"){
 		popElement();
 	}
 	else if (element == "label"){
