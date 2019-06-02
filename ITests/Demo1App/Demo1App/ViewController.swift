@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var textField: UITextField!
@@ -21,9 +21,7 @@ class ViewController: UIViewController {
     
     @IBAction func buttonClicked(sender: UIButton){
         NSLog("Button clicked!!")
-        label.text = textField.text
-        switchButton.isOn = !switchButton.isOn
-      
+        label.text = "You push the button!!"
     }
   
     @IBAction func switchClicked(sender: UISwitch){
@@ -31,10 +29,16 @@ class ViewController: UIViewController {
     }
     
     @IBAction func segmentedClicked(sender: UISegmentedControl){
-        label.text = "Hello from switch button " + String(sender.selectedSegmentIndex);
+        label.text = "Hello from segment " + String(sender.selectedSegmentIndex);
     }
 
 
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let txt = NSString(string: textField.text!)
+        label.text = txt.replacingCharacters(in: range, with: string)
+        return true
+    }
+    
 }
 
 
