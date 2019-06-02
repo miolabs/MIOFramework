@@ -4,6 +4,7 @@ import { UIViewController } from "./UIViewController";
 import { MIOCoreBundleGetAppResource } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 import { UINavigationItem } from "./UINavigationItem";
+import { UIBarButtonItem } from "./UIBarButtonItem";
 
 export class UIStoryboard extends NSObject
 {
@@ -76,21 +77,9 @@ export function MUICoreStoryboardParseLayer(layer, object, owner){
                     }
                 }
             }
-            else if (subLayer.getAttribute("data-navigation-key") == "navigationItem"){
-                let title = subLayer.getAttribute("data-navigation-title");
-
+            else if (subLayer.getAttribute("data-navigation-key") == "navigationItem"){             
                 owner.navigationItem = new UINavigationItem();
-                owner.navigationItem.initWithTitle(title);
-
-                for (let index2 = 0; index2 < subLayer.childNodes.length; index2++) {
-                    let d = subLayer.childNodes[index2] as HTMLElement;
-                    if (d.tagName != "DIV") continue;
-
-                    let key = d.getAttribute("data-bar-button-item-key");
-                    if (key == "rightBarButtonItem") {
-                        
-                    }
-                }
+                owner.navigationItem.initWithLayer(subLayer, owner);
             }
         }
     }

@@ -10,6 +10,8 @@ import UIKit
 
 class TableViewController: UITableViewController {
 
+    private var items:[String] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -27,7 +29,7 @@ class TableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return items.count
     }
 
     
@@ -35,7 +37,8 @@ class TableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
 
         // Configure the cell...
-        cell.textLabel?.text = "Row " + String(indexPath.row + 1)
+        let item = items[indexPath.row];
+        cell.textLabel?.text = item
 
         return cell
     }
@@ -86,8 +89,28 @@ class TableViewController: UITableViewController {
             let vc = segue.destination as! ViewController
             let cell = sender as! UITableViewCell
             let indexPath = tableView.indexPath(for: cell)!
-            vc.setRow(index: indexPath.row)
+            vc.setTitle(title: items[indexPath.row])
         }
+    }
+    
+    @IBAction func addButtonClicked(sender:UIBarButtonItem){
+        let avc = UIAlertController(title: "Alert", message: "Add a new movie", preferredStyle: .alert)
+        
+        avc.addTextField { (textField:UITextField) in
+            textField.placeholder = "Name"
+        }
+        
+        avc.addAction(UIAlertAction.init(title: "OK", style: .default, handler: { (action:UIAlertAction) in
+            guard let title = avc.textFields?[0].text else {
+                return
+            }
+            self.items.append(title)
+            self.tableView.reloadData()
+        }))
+        
+        avc.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+        
+        present(avc, animated: true, completion: nil)
     }
 
 }

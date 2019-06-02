@@ -1,7 +1,7 @@
 import { UIView } from "./UIView";
 import { UINavigationItem } from "./UINavigationItem";
 import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
-import "mio-foundation-web/extensions"
+import "./node_modules/mio-foundation-web/extensions"
 
 export class UINavigationBar extends UIView
 {
@@ -44,8 +44,14 @@ export class UINavigationBar extends UIView
         for (let index = 0; index < items.length; index++){
             let ni = items[index];
 
+            // Add title
             if (ni.titleView != null) {
                 this.titleView.addSubview(ni.titleView);
+            }
+
+            // Add right button
+            if (ni.rightBarButtonItem != null) {
+                this.rigthView.addSubview(ni.rightBarButtonItem.customView);                
             }
         }
     }    

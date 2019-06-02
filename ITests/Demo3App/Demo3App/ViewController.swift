@@ -21,8 +21,8 @@ class ViewController: UIViewController {
     
     var rowTitle:String!
     
-    func setRow(index:Int){
-        rowTitle = "Row " + String(index + 1)
+    func setTitle(title:String){
+        rowTitle = title
     }
     
     /*
