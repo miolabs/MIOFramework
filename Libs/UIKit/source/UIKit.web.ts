@@ -1766,8 +1766,10 @@ export class UIControl extends UIView
 
     private actions = [];    
     addTarget(target, action, controlEvents:UIControlEvents){
-        let item = {};
+        
+        if (action == null) throw new Error("UIControl: Can't add null action");
 
+        let item = {};        
         item["Target"] = target;
         item["Action"] = action;
         item["EventType"] = controlEvents;
@@ -2266,7 +2268,7 @@ export class UITextField extends UIControl
 export class UISegmentedControl extends UIControl
 {
     segmentedItems = [];
-    selectedSegmentedIndex = -1;
+    selectedSegmentIndex = -1;
 
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
@@ -2285,7 +2287,7 @@ export class UISegmentedControl extends UIControl
         if (this.segmentedItems.length > 0){
             let item = this.segmentedItems[0];
             item.setSelected(true);
-            this.selectedSegmentedIndex = 0;
+            this.selectedSegmentIndex = 0;
         }
     }
 
@@ -2303,18 +2305,19 @@ export class UISegmentedControl extends UIControl
     }
 
     selectSegmentedAtIndex(index){
-        if (this.selectedSegmentedIndex == index)
-            return;
+        if (this.selectedSegmentIndex == index) return;
 
-        if (this.selectedSegmentedIndex > -1){
-            let lastItem = this.segmentedItems[this.selectedSegmentedIndex];
+        if (this.selectedSegmentIndex > -1){
+            let lastItem = this.segmentedItems[this.selectedSegmentIndex];
             lastItem.setSelected(false);
         }
 
-        this.selectedSegmentedIndex = index;
+        this.selectedSegmentIndex = index;
         
-        let item = this.segmentedItems[this.selectedSegmentedIndex];
+        let item = this.segmentedItems[this.selectedSegmentIndex];
         item.setSelected(true);
+
+        this._performActionsForEvents(UIControlEvents.ValueChanged);
     }
 }
 
@@ -2352,12 +2355,6 @@ export class UISwitch extends UIControl
         }
     }
 
-    setOnChangeValue(target, action){
-        this.target = target;
-        this.action = action;
-    }
-
-
     private _on = false;
     get isOn() {return this._on;}
     set isOn(value){this.setOn(value);}
@@ -2365,13 +2362,12 @@ export class UISwitch extends UIControl
         if (value == this._on) return;
         this._inputLayer.checked = value;
         this._on = value;
+
+        this._performActionsForEvents(UIControlEvents.ValueChanged);
     }
 
     private _toggleValue(){
         this.isOn = !this.isOn;
-
-        if (this.target != null && this.action != null)
-            this.action.call(this.target, this, this.isOn);
     }
 }
 
