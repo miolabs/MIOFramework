@@ -12,17 +12,17 @@ import { MIOCoreBundleSetAppResource } from "./core/MIOCoreBundle";
  * Created by godshadow on 9/4/16.
  */
 
-export class NSBundle extends NSObject
+export class Bundle extends NSObject
 {
     url:NSURL = null;
 
     private static _mainBundle = null;
     
-    public static mainBundle():NSBundle{
+    public static mainBundle():Bundle{
         if (this._mainBundle == null){            
             let urlString = MIOCoreBundleGetMainURLString();
 
-            this._mainBundle = new NSBundle();
+            this._mainBundle = new Bundle();
             this._mainBundle.initWithURL(NSURL.urlWithString(urlString));
         }
 

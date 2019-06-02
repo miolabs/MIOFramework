@@ -1,6 +1,6 @@
 import { NSObject } from "./NSObject";
 
-export class NSOperation extends NSObject {
+export class Operation extends NSObject {
 
     name:string = null;
     target = null;
@@ -41,7 +41,7 @@ export class NSOperation extends NSObject {
         return this._ready;
     }
 
-    addDependency(operation:NSOperation){
+    addDependency(operation:Operation){
         
         this._dependencies.push(operation);
         if (operation.isFinished == false) {
@@ -75,7 +75,7 @@ export class NSOperation extends NSObject {
         if (type != "did") return;
 
         if (keyPath == "isFinished") {
-            let op:NSOperation = object;
+            let op:Operation = object;
             if (op.isFinished == true){
                 object.removeObserver(this, "isFinished");
                 this.checkDependecies();
@@ -96,7 +96,7 @@ export class NSOperation extends NSObject {
     }
 }
 
-class NSBlockOperation extends NSOperation {
+class NSBlockOperation extends Operation {
     
     private executionBlocks = [];
 
