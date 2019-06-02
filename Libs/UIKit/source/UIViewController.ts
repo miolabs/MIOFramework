@@ -25,6 +25,7 @@ import { MUICoreBundleLoadNibName } from "./core/MUICoreNibParser";
 import { UIStoryboard } from "./UIStoryboard";
 import { MUICoreStoryboardParseLayer } from "./UIStoryboard";
 import { UIStoryboardSegue } from "./UIStoryboardSegue";
+import { UIAlertController } from "./UIAlertController";
 
 
 /**
@@ -132,7 +133,7 @@ export class UIViewController extends NSObject {
 
         if (this._htmlResourcePath == null) {
             this.view.init();
-            MUICoreLayerAddStyle(this.view.layer, "page");
+            MUICoreLayerAddStyle(this.view.layer, "view-controller");
             this._didLoadView();
             return;
         }
@@ -372,7 +373,8 @@ export class UIViewController extends NSObject {
                     w.addSubview(pc.presentedView);
                     pc.window = w;
                 }
-                w.setHidden(false);
+				w.setHidden(false);
+				if (vc instanceof UIAlertController) MUICoreLayerAddStyle(w.layer, "alert");
 
                 _MUIShowViewController(this, vc, null, animated, this, function () {
                     w.makeKey();
