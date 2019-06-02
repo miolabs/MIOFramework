@@ -289,7 +289,6 @@ function formatAndTranspile(input, options) {
         host.addFile(fileName, text);
         var languageService = ts.createLanguageService(host);
         var edits = languageService.getFormattingEditsForDocument(fileName, options);
-        console.log(edits)
         edits
             .sort(function (a, b) { return a.span.start - b.span.start; })
             .reverse()
@@ -357,7 +356,7 @@ function formatAndTranspile(input, options) {
                     targetCodeEl.value = formatText;
                     targetCodeEl.style.color = '';
                     targetOutputEl.value = '';
-                    console.log = function(text) { targetOutputEl.value += text + '\n' }
+                    printSeparatorTerminator = function(text) { targetOutputEl.value += text + '\n' }
                     eval('(function(){' + outputText + '})();')
                 }
                 else {
