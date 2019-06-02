@@ -204,16 +204,28 @@
     <div id="transpiler">
             <textarea id="source-code" class="code-wrapper" spellcheck="false" autofocus>
 var arr = [3, 1, 2]
-arr.sort(by: <)</textarea>
+arr.sort(by: <)
+for el in arr {
+  print(el)
+}</textarea>
         <div id="target-code-wrapper" class="code-wrapper">
             <textarea id="target-code" spellcheck="false" readonly>
 let arr = _create(Array, 'initArrayLiteralArray', [3, 1, 2], {});
-arr.sortBy(Int.$lessThan, { $setThis: $val => arr = $val });</textarea>
+arr.sortBy(Int.$lessThan, { $setThis: $val => arr = $val });
+{
+  let $el$generator = _cloneStruct(arr.makeIterator({}));
+  while (true) {
+    const $ifLet0, el_1;
+    if (!((($ifLet0 = $el$generator.next({ $setThis: $val => $el$generator = $val })) || true) && $ifLet0.rawValue == 'some' && ((el_1 = $ifLet0[0]) || true))) break
+    printSeparatorTerminator(_create(Array, 'initArrayLiteralArray', [el_1], {}), null, null);
+  }
+};</textarea>
             <div id="target-output-wrapper">
                 <!--<div id="target-output-header">Console output</div>-->
                 <textarea id="target-output" readonly>
-Bla
-bla</textarea>
+1
+2
+3</textarea>
             </div>
         </div>
         <button class="transpile-btn" data-language="ts"   type="button">Transpile</button>
