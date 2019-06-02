@@ -16223,7 +16223,7 @@ var MutableCollection$implementation = /** @class */ (function () {
     /*Swift.(file).MutableCollection.sort()*/
     MutableCollection$implementation.prototype.sortSwift = function ($info) {
         var _this = this;
-        _this.sortBy(this.first[0].constructor.$lessThan, { $setThis: function ($val) { return $info.$setThis(_this = _cloneStruct($val)); } });
+        _this.sortSwiftBy(this.first[0].constructor.$lessThan, { $setThis: function ($val) { return $info.$setThis(_this = _cloneStruct($val)); } });
     };
     /*Swift.(file).MutableCollection.sort(by:(Self.Element, Self.Element) throws -> Bool)*/
     /*Swift.(file).MutableCollection.sort(by:(Self.Element, Self.Element) throws -> Bool)*/
@@ -21045,13 +21045,13 @@ var SIMD$implementation = /** @class */ (function () {
     /*Swift.(file).SIMD.min()*/
     SIMD$implementation.prototype.min = function ($info) {
         var _this = this;
-        return _this.indices.reduceInto(_this.subscript$get(0), (function ($0$inout, $1, $info) { return $0 = min($0, _this.subscript$get($1)); }));
+        return _this.indices.reduceSwiftInto(_this.subscript$get(0), (function ($0$inout, $1, $info) { return $0 = min($0, _this.subscript$get($1)); }));
     };
     /*Swift.(file).SIMD.max()*/
     /*Swift.(file).SIMD.max()*/
     SIMD$implementation.prototype.max = function ($info) {
         var _this = this;
-        return _this.indices.reduceInto(_this.subscript$get(0), (function ($0$inout, $1, $info) { return $0 = max($0, _this.subscript$get($1)); }));
+        return _this.indices.reduceSwiftInto(_this.subscript$get(0), (function ($0$inout, $1, $info) { return $0 = max($0, _this.subscript$get($1)); }));
     };
     /*Swift.(file).SIMD..==infix(_:Self.Scalar,_:Self)*/
     /*!!!DUPLICATE NAME*/
@@ -21577,7 +21577,7 @@ var SIMD$implementation = /** @class */ (function () {
     /*Swift.(file).SIMD.wrappedSum()*/
     SIMD$implementation.prototype.wrappedSum = function ($info) {
         var _this = this;
-        return _this.indices.reduceInto(0, (function ($0$inout, $1, $info) { return ((function () { throw '!unclarifiedGeneric:Self.Scalar'; })()).infix_38_43_61({ get: function () { return $0; }, set: function ($val) { return $0 = $val; } }, _this.subscript$get($1)); }));
+        return _this.indices.reduceSwiftInto(0, (function ($0$inout, $1, $info) { return ((function () { throw '!unclarifiedGeneric:Self.Scalar'; })()).infix_38_43_61({ get: function () { return $0; }, set: function ($val) { return $0 = $val; } }, _this.subscript$get($1)); }));
     };
     /*Swift.(file).SIMD.+infix(_:Self,_:Self)*/
     SIMD$implementation.$add = function (lhs, rhs, $info) {
@@ -21698,19 +21698,19 @@ var SIMD$implementation = /** @class */ (function () {
     /*Swift.(file).SIMD.min()*/
     SIMD$implementation.prototype.min = function ($info) {
         var _this = this;
-        return _this.indices.reduceInto(_this.subscript$get(0), (function ($0$inout, $1, $info) { return $0 = min($0, _this.subscript$get($1)); }));
+        return _this.indices.reduceSwiftInto(_this.subscript$get(0), (function ($0$inout, $1, $info) { return $0 = min($0, _this.subscript$get($1)); }));
     };
     /*Swift.(file).SIMD.max()*/
     /*Swift.(file).SIMD.max()*/
     SIMD$implementation.prototype.max = function ($info) {
         var _this = this;
-        return _this.indices.reduceInto(_this.subscript$get(0), (function ($0$inout, $1, $info) { return $0 = max($0, _this.subscript$get($1)); }));
+        return _this.indices.reduceSwiftInto(_this.subscript$get(0), (function ($0$inout, $1, $info) { return $0 = max($0, _this.subscript$get($1)); }));
     };
     /*Swift.(file).SIMD.sum()*/
     /*Swift.(file).SIMD.sum()*/
     SIMD$implementation.prototype.sum = function ($info) {
         var _this = this;
-        return _this.indices.reduceInto(0, (function ($0$inout, $1, $info) { return ((function () { throw '!unclarifiedGeneric:Self.Scalar'; })()).$addAndAssign({ get: function () { return $0; }, set: function ($val) { return $0 = $val; } }, _this.subscript$get($1)); }));
+        return _this.indices.reduceSwiftInto(0, (function ($0$inout, $1, $info) { return ((function () { throw '!unclarifiedGeneric:Self.Scalar'; })()).$addAndAssign({ get: function () { return $0; }, set: function ($val) { return $0 = $val; } }, _this.subscript$get($1)); }));
     };
     /*Swift.(file).SIMD.&infix(_:Self.Scalar,_:Self)*/
     /*!!!DUPLICATE NAME*/
@@ -28613,14 +28613,14 @@ var StringProtocol$implementation = /** @class */ (function () {
     /*!!!DUPLICATE NAME*/
     StringProtocol$implementation.prototype.hasPrefix = function (prefix, $info) {
         var _this = this;
-        return _this.startsWithSwift(prefix);
+        return _this.startsWith(prefix);
     };
     /*Swift.(file).StringProtocol.hasSuffix(_:Suffix)*/
     /*Swift.(file).StringProtocol.hasSuffix(_:Suffix)*/
     /*!!!DUPLICATE NAME*/
     StringProtocol$implementation.prototype.hasSuffix = function (suffix, $info) {
         var _this = this;
-        return _this.reversed({}).startsWithSwift(suffix.reversed({}));
+        return _this.reversed({}).startsWith(suffix.reversed({}));
     };
     return StringProtocol$implementation;
 }());
@@ -52115,21 +52115,21 @@ var NSObject = /** @class */ (function () {
         throw 'unsupported method ObjectiveC.(file).NSObject.hash(into:Hasher) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],to:NSPasteboard)*/
-    NSObject.tableView = function (tableView, rows, pboard, $info) {
+    NSObject.tableViewWriteRowsTo = function (tableView, rows, pboard, $info) {
         throw 'unsupported method AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],to:NSPasteboard) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],to:NSPasteboard)*/
     /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],to:NSPasteboard)*/
-    NSObject.prototype.tableView = function (tableView, rows, pboard, $info) {
+    NSObject.prototype.tableViewWriteRowsTo = function (tableView, rows, pboard, $info) {
         throw 'unsupported method AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],to:NSPasteboard) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],toPasteboard:NSPasteboard)*/
-    NSObject.tableView1 = function (tableView, rows, pboard, $info) {
+    NSObject.tableView1WriteRowsToPasteboard = function (tableView, rows, pboard, $info) {
         throw 'unsupported method AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],toPasteboard:NSPasteboard) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],toPasteboard:NSPasteboard)*/
     /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],toPasteboard:NSPasteboard)*/
-    NSObject.prototype.tableView1 = function (tableView, rows, pboard, $info) {
+    NSObject.prototype.tableView1WriteRowsToPasteboard = function (tableView, rows, pboard, $info) {
         throw 'unsupported method AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],toPasteboard:NSPasteboard) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.textStorageWillProcessEditing(_:Notification)*/
@@ -52151,39 +52151,39 @@ var NSObject = /** @class */ (function () {
         throw 'unsupported method AppKit.(file).NSObject.textStorageDidProcessEditing(_:Notification) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.panel(_:Any,isValidFilename:String)*/
-    NSObject.panel = function (sender, filename, $info) {
+    NSObject.panelIsValidFilename = function (sender, filename, $info) {
         throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,isValidFilename:String) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.panel(_:Any,isValidFilename:String)*/
     /*AppKit.(file).NSObject.panel(_:Any,isValidFilename:String)*/
-    NSObject.prototype.panel = function (sender, filename, $info) {
+    NSObject.prototype.panelIsValidFilename = function (sender, filename, $info) {
         throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,isValidFilename:String) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.panel(_:Any,directoryDidChange:String)*/
-    NSObject.panel1 = function (sender, path, $info) {
+    NSObject.panel1DirectoryDidChange = function (sender, path, $info) {
         throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,directoryDidChange:String) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.panel(_:Any,directoryDidChange:String)*/
     /*AppKit.(file).NSObject.panel(_:Any,directoryDidChange:String)*/
-    NSObject.prototype.panel1 = function (sender, path, $info) {
+    NSObject.prototype.panel1DirectoryDidChange = function (sender, path, $info) {
         throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,directoryDidChange:String) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.panel(_:Any,compareFilename:String,with:String,caseSensitive:Bool)*/
-    NSObject.panel2 = function (sender, name1, name2, caseSensitive, $info) {
+    NSObject.panel2CompareFilenameWithCaseSensitive = function (sender, name1, name2, caseSensitive, $info) {
         throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,compareFilename:String,with:String,caseSensitive:Bool) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.panel(_:Any,compareFilename:String,with:String,caseSensitive:Bool)*/
     /*AppKit.(file).NSObject.panel(_:Any,compareFilename:String,with:String,caseSensitive:Bool)*/
-    NSObject.prototype.panel2 = function (sender, name1, name2, caseSensitive, $info) {
+    NSObject.prototype.panel2CompareFilenameWithCaseSensitive = function (sender, name1, name2, caseSensitive, $info) {
         throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,compareFilename:String,with:String,caseSensitive:Bool) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.panel(_:Any,shouldShowFilename:String)*/
-    NSObject.panel3 = function (sender, filename, $info) {
+    NSObject.panel3ShouldShowFilename = function (sender, filename, $info) {
         throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,shouldShowFilename:String) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.panel(_:Any,shouldShowFilename:String)*/
     /*AppKit.(file).NSObject.panel(_:Any,shouldShowFilename:String)*/
-    NSObject.prototype.panel3 = function (sender, filename, $info) {
+    NSObject.prototype.panel3ShouldShowFilename = function (sender, filename, $info) {
         throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,shouldShowFilename:String) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.awakeFromNib()*/
@@ -52205,32 +52205,32 @@ var NSObject = /** @class */ (function () {
         throw 'unsupported method AppKit.(file).NSObject.prepareForInterfaceBuilder() in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.fontManager(_:Any,willIncludeFont:String)*/
-    NSObject.fontManager = function (sender, fontName, $info) {
+    NSObject.fontManagerWillIncludeFont = function (sender, fontName, $info) {
         throw 'unsupported method AppKit.(file).NSObject.fontManager(_:Any,willIncludeFont:String) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.fontManager(_:Any,willIncludeFont:String)*/
     /*AppKit.(file).NSObject.fontManager(_:Any,willIncludeFont:String)*/
-    NSObject.prototype.fontManager = function (sender, fontName, $info) {
+    NSObject.prototype.fontManagerWillIncludeFont = function (sender, fontName, $info) {
         throw 'unsupported method AppKit.(file).NSObject.fontManager(_:Any,willIncludeFont:String) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.setDefaultPlaceholder(_:Any?,for:Any?,with:NSBindingName)*/
-    NSObject.setDefaultPlaceholder = function (placeholder, marker, binding, $info) {
+    NSObject.setDefaultPlaceholderForWith = function (placeholder, marker, binding, $info) {
         throw 'unsupported method AppKit.(file).NSObject.setDefaultPlaceholder(_:Any?,for:Any?,with:NSBindingName) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.setDefaultPlaceholder(_:Any?,forMarker:Any?,withBinding:NSBindingName)*/
-    NSObject.setDefaultPlaceholder1 = function (placeholder, marker, binding, $info) {
+    NSObject.setDefaultPlaceholder1ForMarkerWithBinding = function (placeholder, marker, binding, $info) {
         throw 'unsupported method AppKit.(file).NSObject.setDefaultPlaceholder(_:Any?,forMarker:Any?,withBinding:NSBindingName) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.defaultPlaceholder(for:Any?,with:NSBindingName)*/
-    NSObject.defaultPlaceholder = function (marker, binding, $info) {
+    NSObject.defaultPlaceholderForWith = function (marker, binding, $info) {
         throw 'unsupported method AppKit.(file).NSObject.defaultPlaceholder(for:Any?,with:NSBindingName) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.defaultPlaceholder(forMarker:Any?,withBinding:NSBindingName)*/
-    NSObject.defaultPlaceholder1 = function (marker, binding, $info) {
+    NSObject.defaultPlaceholder1ForMarkerWithBinding = function (marker, binding, $info) {
         throw 'unsupported method AppKit.(file).NSObject.defaultPlaceholder(forMarker:Any?,withBinding:NSBindingName) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.defaultPlaceholderForMarker(_:Any?,withBinding:NSBindingName)*/
-    NSObject.defaultPlaceholderForMarker = function (marker, binding, $info) {
+    NSObject.defaultPlaceholderForMarkerWithBinding = function (marker, binding, $info) {
         throw 'unsupported method AppKit.(file).NSObject.defaultPlaceholderForMarker(_:Any?,withBinding:NSBindingName) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.exposeBinding(_:NSBindingName)*/
@@ -52247,21 +52247,21 @@ var NSObject = /** @class */ (function () {
         throw 'unsupported method AppKit.(file).NSObject.valueClassForBinding(_:NSBindingName) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.bind(_:NSBindingName,to:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
-    NSObject.bind = function (binding, observable, keyPath, options, $info) {
+    NSObject.bindToWithKeyPathOptions = function (binding, observable, keyPath, options, $info) {
         throw 'unsupported method AppKit.(file).NSObject.bind(_:NSBindingName,to:Any,withKeyPath:String,options:[NSBindingOption : Any]?) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.bind(_:NSBindingName,to:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
     /*AppKit.(file).NSObject.bind(_:NSBindingName,to:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
-    NSObject.prototype.bind = function (binding, observable, keyPath, options, $info) {
+    NSObject.prototype.bindToWithKeyPathOptions = function (binding, observable, keyPath, options, $info) {
         throw 'unsupported method AppKit.(file).NSObject.bind(_:NSBindingName,to:Any,withKeyPath:String,options:[NSBindingOption : Any]?) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.bind(_:NSBindingName,toObject:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
-    NSObject.bind1 = function (binding, observable, keyPath, options, $info) {
+    NSObject.bind1ToObjectWithKeyPathOptions = function (binding, observable, keyPath, options, $info) {
         throw 'unsupported method AppKit.(file).NSObject.bind(_:NSBindingName,toObject:Any,withKeyPath:String,options:[NSBindingOption : Any]?) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.bind(_:NSBindingName,toObject:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
     /*AppKit.(file).NSObject.bind(_:NSBindingName,toObject:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
-    NSObject.prototype.bind1 = function (binding, observable, keyPath, options, $info) {
+    NSObject.prototype.bind1ToObjectWithKeyPathOptions = function (binding, observable, keyPath, options, $info) {
         throw 'unsupported method AppKit.(file).NSObject.bind(_:NSBindingName,toObject:Any,withKeyPath:String,options:[NSBindingOption : Any]?) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.unbind(_:NSBindingName)*/
@@ -52296,66 +52296,70 @@ var NSObject = /** @class */ (function () {
         throw 'unsupported method AppKit.(file).NSObject.exposedBindings() in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.namesOfPromisedFilesDropped(atDestination:URL)*/
-    NSObject.namesOfPromisedFilesDropped = function (dropDestination, $info) {
+    NSObject.namesOfPromisedFilesDroppedAtDestination = function (dropDestination, $info) {
         throw 'unsupported method AppKit.(file).NSObject.namesOfPromisedFilesDropped(atDestination:URL) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.namesOfPromisedFilesDropped(atDestination:URL)*/
     /*AppKit.(file).NSObject.namesOfPromisedFilesDropped(atDestination:URL)*/
-    NSObject.prototype.namesOfPromisedFilesDropped = function (dropDestination, $info) {
+    NSObject.prototype.namesOfPromisedFilesDroppedAtDestination = function (dropDestination, $info) {
         throw 'unsupported method AppKit.(file).NSObject.namesOfPromisedFilesDropped(atDestination:URL) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.namesOfPromisedFilesDroppedAtDestination(_:URL)*/
+    /*!!!DUPLICATE NAME*/
     NSObject.namesOfPromisedFilesDroppedAtDestination = function (dropDestination, $info) {
         throw 'unsupported method AppKit.(file).NSObject.namesOfPromisedFilesDroppedAtDestination(_:URL) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.namesOfPromisedFilesDroppedAtDestination(_:URL)*/
     /*AppKit.(file).NSObject.namesOfPromisedFilesDroppedAtDestination(_:URL)*/
+    /*!!!DUPLICATE NAME*/
     NSObject.prototype.namesOfPromisedFilesDroppedAtDestination = function (dropDestination, $info) {
         throw 'unsupported method AppKit.(file).NSObject.namesOfPromisedFilesDroppedAtDestination(_:URL) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.draggingSourceOperationMask(forLocal:Bool)*/
-    NSObject.draggingSourceOperationMask = function (flag, $info) {
+    NSObject.draggingSourceOperationMaskForLocal = function (flag, $info) {
         throw 'unsupported method AppKit.(file).NSObject.draggingSourceOperationMask(forLocal:Bool) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.draggingSourceOperationMask(forLocal:Bool)*/
     /*AppKit.(file).NSObject.draggingSourceOperationMask(forLocal:Bool)*/
-    NSObject.prototype.draggingSourceOperationMask = function (flag, $info) {
+    NSObject.prototype.draggingSourceOperationMaskForLocal = function (flag, $info) {
         throw 'unsupported method AppKit.(file).NSObject.draggingSourceOperationMask(forLocal:Bool) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.draggingSourceOperationMaskForLocal(_:Bool)*/
+    /*!!!DUPLICATE NAME*/
     NSObject.draggingSourceOperationMaskForLocal = function (flag, $info) {
         throw 'unsupported method AppKit.(file).NSObject.draggingSourceOperationMaskForLocal(_:Bool) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.draggingSourceOperationMaskForLocal(_:Bool)*/
     /*AppKit.(file).NSObject.draggingSourceOperationMaskForLocal(_:Bool)*/
+    /*!!!DUPLICATE NAME*/
     NSObject.prototype.draggingSourceOperationMaskForLocal = function (flag, $info) {
         throw 'unsupported method AppKit.(file).NSObject.draggingSourceOperationMaskForLocal(_:Bool) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.draggedImage(_:NSImage?,beganAt:NSPoint)*/
-    NSObject.draggedImage = function (_image, screenPoint, $info) {
+    NSObject.draggedImageBeganAt = function (_image, screenPoint, $info) {
         throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,beganAt:NSPoint) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.draggedImage(_:NSImage?,beganAt:NSPoint)*/
     /*AppKit.(file).NSObject.draggedImage(_:NSImage?,beganAt:NSPoint)*/
-    NSObject.prototype.draggedImage = function (_image, screenPoint, $info) {
+    NSObject.prototype.draggedImageBeganAt = function (_image, screenPoint, $info) {
         throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,beganAt:NSPoint) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,operation:NSDragOperation)*/
-    NSObject.draggedImage1 = function (_image, screenPoint, operation, $info) {
+    NSObject.draggedImage1EndedAtOperation = function (_image, screenPoint, operation, $info) {
         throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,operation:NSDragOperation) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,operation:NSDragOperation)*/
     /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,operation:NSDragOperation)*/
-    NSObject.prototype.draggedImage1 = function (_image, screenPoint, operation, $info) {
+    NSObject.prototype.draggedImage1EndedAtOperation = function (_image, screenPoint, operation, $info) {
         throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,operation:NSDragOperation) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.draggedImage(_:NSImage?,movedTo:NSPoint)*/
-    NSObject.draggedImage2 = function (_image, screenPoint, $info) {
+    NSObject.draggedImage2MovedTo = function (_image, screenPoint, $info) {
         throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,movedTo:NSPoint) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.draggedImage(_:NSImage?,movedTo:NSPoint)*/
     /*AppKit.(file).NSObject.draggedImage(_:NSImage?,movedTo:NSPoint)*/
-    NSObject.prototype.draggedImage2 = function (_image, screenPoint, $info) {
+    NSObject.prototype.draggedImage2MovedTo = function (_image, screenPoint, $info) {
         throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,movedTo:NSPoint) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.ignoreModifierKeysWhileDragging()*/
@@ -52368,21 +52372,21 @@ var NSObject = /** @class */ (function () {
         throw 'unsupported method AppKit.(file).NSObject.ignoreModifierKeysWhileDragging() in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,deposited:Bool)*/
-    NSObject.draggedImage3 = function (_image, screenPoint, flag, $info) {
+    NSObject.draggedImage3EndedAtDeposited = function (_image, screenPoint, flag, $info) {
         throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,deposited:Bool) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,deposited:Bool)*/
     /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,deposited:Bool)*/
-    NSObject.prototype.draggedImage3 = function (_image, screenPoint, flag, $info) {
+    NSObject.prototype.draggedImage3EndedAtDeposited = function (_image, screenPoint, flag, $info) {
         throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,deposited:Bool) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilitySetOverrideValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
-    NSObject.accessibilitySetOverrideValue = function (value, attribute, $info) {
+    NSObject.accessibilitySetOverrideValueForAttribute = function (value, attribute, $info) {
         throw 'unsupported method AppKit.(file).NSObject.accessibilitySetOverrideValue(_:Any?,forAttribute:NSAccessibility.Attribute) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilitySetOverrideValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
     /*AppKit.(file).NSObject.accessibilitySetOverrideValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
-    NSObject.prototype.accessibilitySetOverrideValue = function (value, attribute, $info) {
+    NSObject.prototype.accessibilitySetOverrideValueForAttribute = function (value, attribute, $info) {
         throw 'unsupported method AppKit.(file).NSObject.accessibilitySetOverrideValue(_:Any?,forAttribute:NSAccessibility.Attribute) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilityAttributeNames()*/
@@ -52413,12 +52417,12 @@ var NSObject = /** @class */ (function () {
         throw 'unsupported method AppKit.(file).NSObject.accessibilityIsAttributeSettable(_:NSAccessibility.Attribute) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilitySetValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
-    NSObject.accessibilitySetValue = function (value, attribute, $info) {
+    NSObject.accessibilitySetValueForAttribute = function (value, attribute, $info) {
         throw 'unsupported method AppKit.(file).NSObject.accessibilitySetValue(_:Any?,forAttribute:NSAccessibility.Attribute) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilitySetValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
     /*AppKit.(file).NSObject.accessibilitySetValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
-    NSObject.prototype.accessibilitySetValue = function (value, attribute, $info) {
+    NSObject.prototype.accessibilitySetValueForAttribute = function (value, attribute, $info) {
         throw 'unsupported method AppKit.(file).NSObject.accessibilitySetValue(_:Any?,forAttribute:NSAccessibility.Attribute) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilityParameterizedAttributeNames()*/
@@ -52431,12 +52435,12 @@ var NSObject = /** @class */ (function () {
         throw 'unsupported method AppKit.(file).NSObject.accessibilityParameterizedAttributeNames() in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilityAttributeValue(_:NSAccessibility.ParameterizedAttribute,forParameter:Any?)*/
-    NSObject.accessibilityAttributeValue1 = function (attribute, parameter, $info) {
+    NSObject.accessibilityAttributeValue1ForParameter = function (attribute, parameter, $info) {
         throw 'unsupported method AppKit.(file).NSObject.accessibilityAttributeValue(_:NSAccessibility.ParameterizedAttribute,forParameter:Any?) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilityAttributeValue(_:NSAccessibility.ParameterizedAttribute,forParameter:Any?)*/
     /*AppKit.(file).NSObject.accessibilityAttributeValue(_:NSAccessibility.ParameterizedAttribute,forParameter:Any?)*/
-    NSObject.prototype.accessibilityAttributeValue1 = function (attribute, parameter, $info) {
+    NSObject.prototype.accessibilityAttributeValue1ForParameter = function (attribute, parameter, $info) {
         throw 'unsupported method AppKit.(file).NSObject.accessibilityAttributeValue(_:NSAccessibility.ParameterizedAttribute,forParameter:Any?) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilityActionNames()*/
@@ -52485,20 +52489,22 @@ var NSObject = /** @class */ (function () {
         throw 'unsupported method AppKit.(file).NSObject.accessibilityHitTest(_:NSPoint) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilityIndex(ofChild:Any)*/
-    NSObject.accessibilityIndex = function (child, $info) {
+    NSObject.accessibilityIndexOfChild = function (child, $info) {
         throw 'unsupported method AppKit.(file).NSObject.accessibilityIndex(ofChild:Any) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilityIndex(ofChild:Any)*/
     /*AppKit.(file).NSObject.accessibilityIndex(ofChild:Any)*/
-    NSObject.prototype.accessibilityIndex = function (child, $info) {
+    NSObject.prototype.accessibilityIndexOfChild = function (child, $info) {
         throw 'unsupported method AppKit.(file).NSObject.accessibilityIndex(ofChild:Any) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilityIndexOfChild(_:Any)*/
+    /*!!!DUPLICATE NAME*/
     NSObject.accessibilityIndexOfChild = function (child, $info) {
         throw 'unsupported method AppKit.(file).NSObject.accessibilityIndexOfChild(_:Any) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilityIndexOfChild(_:Any)*/
     /*AppKit.(file).NSObject.accessibilityIndexOfChild(_:Any)*/
+    /*!!!DUPLICATE NAME*/
     NSObject.prototype.accessibilityIndexOfChild = function (child, $info) {
         throw 'unsupported method AppKit.(file).NSObject.accessibilityIndexOfChild(_:Any) in ' + this.constructor.name;
     };
@@ -52512,12 +52518,12 @@ var NSObject = /** @class */ (function () {
         throw 'unsupported method AppKit.(file).NSObject.accessibilityArrayAttributeCount(_:NSAccessibility.Attribute) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilityArrayAttributeValues(_:NSAccessibility.Attribute,index:Int,maxCount:Int)*/
-    NSObject.accessibilityArrayAttributeValues = function (attribute, index, maxCount, $info) {
+    NSObject.accessibilityArrayAttributeValuesIndexMaxCount = function (attribute, index, maxCount, $info) {
         throw 'unsupported method AppKit.(file).NSObject.accessibilityArrayAttributeValues(_:NSAccessibility.Attribute,index:Int,maxCount:Int) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilityArrayAttributeValues(_:NSAccessibility.Attribute,index:Int,maxCount:Int)*/
     /*AppKit.(file).NSObject.accessibilityArrayAttributeValues(_:NSAccessibility.Attribute,index:Int,maxCount:Int)*/
-    NSObject.prototype.accessibilityArrayAttributeValues = function (attribute, index, maxCount, $info) {
+    NSObject.prototype.accessibilityArrayAttributeValuesIndexMaxCount = function (attribute, index, maxCount, $info) {
         throw 'unsupported method AppKit.(file).NSObject.accessibilityArrayAttributeValues(_:NSAccessibility.Attribute,index:Int,maxCount:Int) in ' + this.constructor.name;
     };
     /*AppKit.(file).NSObject.accessibilityFocusedUIElement()*/
@@ -53971,12 +53977,12 @@ var NSObject = /** @class */ (function () {
         throw 'unsupported method Foundation.(file).NSObject.classForCoder() in ' + this.constructor.name;
     };
     /*CoreImage.(file).NSObject.provideImageData(_:UnsafeMutableRawPointer,bytesPerRow:Int,origin:Int,_:Int,size:Int,_:Int,userInfo:Any?)*/
-    NSObject.provideImageData = function (data, rowbytes, x, y, width, height, info, $info) {
+    NSObject.provideImageDataBytesPerRowOriginSizeUserInfo = function (data, rowbytes, x, y, width, height, info, $info) {
         throw 'unsupported method CoreImage.(file).NSObject.provideImageData(_:UnsafeMutableRawPointer,bytesPerRow:Int,origin:Int,_:Int,size:Int,_:Int,userInfo:Any?) in ' + this.constructor.name;
     };
     /*CoreImage.(file).NSObject.provideImageData(_:UnsafeMutableRawPointer,bytesPerRow:Int,origin:Int,_:Int,size:Int,_:Int,userInfo:Any?)*/
     /*CoreImage.(file).NSObject.provideImageData(_:UnsafeMutableRawPointer,bytesPerRow:Int,origin:Int,_:Int,size:Int,_:Int,userInfo:Any?)*/
-    NSObject.prototype.provideImageData = function (data, rowbytes, x, y, width, height, info, $info) {
+    NSObject.prototype.provideImageDataBytesPerRowOriginSizeUserInfo = function (data, rowbytes, x, y, width, height, info, $info) {
         throw 'unsupported method CoreImage.(file).NSObject.provideImageData(_:UnsafeMutableRawPointer,bytesPerRow:Int,origin:Int,_:Int,size:Int,_:Int,userInfo:Any?) in ' + this.constructor.name;
     };
     NSObject.prototype.init$vars = function () {

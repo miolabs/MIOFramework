@@ -17264,6 +17264,11 @@ public func any<Storage>(_ mask: SIMDMask<Storage>) -> Bool {
   return mask._storage.min() < 0
 }
 
+----Swift.(file).all(_:SIMDMask<Storage>)
+public func all<Storage>(_ mask: SIMDMask<Storage>) -> Bool {
+  return mask._storage.max() < 0
+}
+
 ----Swift.(file).pointwiseMin(_:T,_:T)
 public func pointwiseMin<T>(_ a: T, _ b: T) -> T
 where T: SIMD, T.Scalar: Comparable {
