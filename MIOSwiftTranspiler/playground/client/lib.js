@@ -16203,7 +16203,7 @@ var MutableCollection$implementation = /** @class */ (function () {
     };
     /*Swift.(file).MutableCollection.reverse()*/
     /*Swift.(file).MutableCollection.reverse()*/
-    MutableCollection$implementation.prototype.reverse = function ($info) {
+    MutableCollection$implementation.prototype.reverseSwift = function ($info) {
         var _this = this;
         if ((_this.isEmpty)) {
             return;

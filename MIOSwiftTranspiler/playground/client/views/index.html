@@ -224,10 +224,75 @@ bla</textarea>
 
 <script>
 const TRANSPILE_URL = "/api/transpile";
-function transpileModule(input, options) {
+function formatAndTranspile(input, options) {
+
+    //Format
+    function createDefaultFormatCodeSettings() {
+
+        return {
+            baseIndentSize: 0,
+            indentSize: 2,
+            tabSize: 2,
+            indentStyle: ts.IndentStyle.Smart,
+            newLineCharacter: "\r\n",
+            convertTabsToSpaces: true,
+            insertSpaceAfterCommaDelimiter: true,
+            insertSpaceAfterSemicolonInForStatements: true,
+            insertSpaceBeforeAndAfterBinaryOperators: true,
+            insertSpaceAfterConstructor: false,
+            insertSpaceAfterKeywordsInControlFlowStatements: true,
+            insertSpaceAfterFunctionKeywordForAnonymousFunctions: false,
+            insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis: false,
+            insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets: false,
+            insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces: true,
+            insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces: false,
+            insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces: false,
+            insertSpaceAfterTypeAssertion: false,
+            insertSpaceBeforeFunctionParenthesis: false,
+            placeOpenBraceOnNewLineForFunctions: false,
+            placeOpenBraceOnNewLineForControlBlocks: false,
+            insertSpaceBeforeTypeAnnotation: false,
+        };
+    }
+    var LanguageServiceHost = /** @class */ (function () {
+        function LanguageServiceHost() {
+            var _this = this;
+            this.files = {};
+            // for ts.LanguageServiceHost
+            this.getCompilationSettings = function () { return ts.getDefaultCompilerOptions(); };
+            this.getScriptFileNames = function () { return Object.keys(_this.files); };
+            this.getScriptVersion = function (_fileName) { return "0"; };
+            this.getScriptSnapshot = function (fileName) { return _this.files[fileName]; };
+            this.getCurrentDirectory = function () { return '' };
+            this.getDefaultLibFileName = function (options) { return ts.getDefaultLibFilePath(options); };
+        }
+        LanguageServiceHost.prototype.addFile = function (fileName, text) {
+            this.files[fileName] = ts.ScriptSnapshot.fromString(text);
+        };
+        return LanguageServiceHost;
+    }());
+    function format(fileName, text, options) {
+        if (options === void 0) { options = createDefaultFormatCodeSettings(); }
+        var host = new LanguageServiceHost();
+        host.addFile(fileName, text);
+        var languageService = ts.createLanguageService(host);
+        var edits = languageService.getFormattingEditsForDocument(fileName, options);
+        console.log(edits)
+        edits
+            .sort(function (a, b) { return a.span.start - b.span.start; })
+            .reverse()
+            .forEach(function (edit) {
+            var head = text.slice(0, edit.span.start);
+            var tail = text.slice(edit.span.start + edit.span.length);
+            text = "" + head + edit.newText + tail;
+        });
+        return text;
+    }
+    let formatText = format('elo.ts', input)
+
+    // Output
     var inputFileName = options.jsx ? "module.tsx" : "module.ts";
     var sourceFile = ts.createSourceFile(inputFileName, input, options.target || ts.ScriptTarget.ES5);
-    // Output
     var outputText;
     var program = ts.createProgram([inputFileName], options, {
         getSourceFile: function (fileName) { return fileName.indexOf("module") === 0 ? sourceFile : undefined; },
@@ -247,7 +312,7 @@ function transpileModule(input, options) {
     if (outputText === undefined) {
         throw new Error("Output generation failed");
     }
-    return outputText;
+    return {outputText, formatText};
 }
 (function(){
     var sourceCodeEl = document.getElementById("source-code"),
@@ -276,15 +341,16 @@ function transpileModule(input, options) {
                 isWaitingForTranspilation = false;
                 spinner.style.display = 'none';
                 if(xhr.status === 200) {
-                    targetCodeEl.value = xhr.responseText;
+                    let {outputText, formatText} = formatAndTranspile(xhr.responseText, {})
+                    targetCodeEl.value = formatText;
                     targetCodeEl.style.color = '';
                     targetOutputEl.value = '';
-                    let js = transpileModule(xhr.responseText, {})
                     console.log = function(text) { targetOutputEl.value += text + '\n' }
-                    eval('(function(){' + js + '})();')
+                    eval('(function(){' + outputText + '})();')
                 }
                 else {
-                    targetCodeEl.value = 'Transpilation failed :(';
+                    let errorMessage = xhr.responseText || 'Transpilation failed :(';
+                    targetCodeEl.value = errorMessage;
                     targetCodeEl.style.color = '#fc605e';
                     targetOutputEl.value = '';
                 }
