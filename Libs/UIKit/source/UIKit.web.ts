@@ -2404,6 +2404,7 @@ export class UISwitch extends UIControl
 
 
 
+
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -2509,7 +2510,7 @@ export class UIViewController extends NSObject {
 
         if (this._htmlResourcePath == null) {
             this.view.init();
-            MUICoreLayerAddStyle(this.view.layer, "page");
+            MUICoreLayerAddStyle(this.view.layer, "view-controller");
             this._didLoadView();
             return;
         }
@@ -2749,7 +2750,8 @@ export class UIViewController extends NSObject {
                     w.addSubview(pc.presentedView);
                     pc.window = w;
                 }
-                w.setHidden(false);
+				w.setHidden(false);
+				if (vc instanceof UIAlertController) MUICoreLayerAddStyle(w.layer, "alert");
 
                 _MUIShowViewController(this, vc, null, animated, this, function () {
                     w.makeKey();
@@ -4044,12 +4046,20 @@ export class UITableViewCell extends UIView {
     initWithLayer(layer, owner, options?) {
         super.initWithLayer(layer, owner, options);
 
-        this.scanLayerNodes(layer, owner);
-
+        let outletIDs = {};
+        this.scanLayerNodes(layer, owner, outletIDs);
+        
+        let style = layer.getAttribute("data-cell-style");
+        if (style == "IBUITableViewCellStyleDefault") {
+            this.style = UITableViewCellStyle.Default;
+            let propertyID = layer.getAttribute("data-cell-textlabel-id")
+            let item = outletIDs[propertyID];
+            this.textLabel = item;
+        }                
         this._setupLayer();
     }
 
-    private scanLayerNodes(layer, owner) {
+    private scanLayerNodes(layer, owner, outlets) {
 
         if (layer.childNodes.length == 0) return;
 
@@ -4060,7 +4070,7 @@ export class UITableViewCell extends UIView {
                 if (subLayer.tagName != "DIV")
                     continue;
 
-                this.scanLayerNodes(subLayer, owner);
+                this.scanLayerNodes(subLayer, owner, outlets);
 
                 if (subLayer.getAttribute("data-accessory-type") != null) {
                     this.addAccessoryView(subLayer, owner);
@@ -5586,7 +5596,7 @@ export class UIWindow extends UIView
 
     init(){
         super.init();
-        MUICoreLayerAddStyle(this.layer, "view");
+        MUICoreLayerAddStyle(this.layer, "window");
     }
 
     initWithRootViewController(vc: UIViewController){
