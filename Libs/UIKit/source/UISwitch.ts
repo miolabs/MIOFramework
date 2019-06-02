@@ -1,4 +1,5 @@
 import { UIControl } from "./UIControl";
+import { UIControlEvents } from "./UIControl";
 import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
 
 /**

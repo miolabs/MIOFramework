@@ -1,5 +1,7 @@
 import { UIControl } from "./UIControl";
-import { UIButton, UIButtonType } from "./UIButton";
+import { UIControlEvents } from "./UIControl";
+import { UIButtonType } from "./UIButton";
+import { UIButton } from "./UIButton";
 import { MUIOutletRegister } from "./core/MUICore";
 
 /**

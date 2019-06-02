@@ -1668,6 +1668,7 @@ export class UILabel extends UIView
 
 
 
+
 /**
  * Created by godshadow on 12/3/16.
  */
@@ -1766,8 +1767,10 @@ export class UIControl extends UIView
 
     private actions = [];    
     addTarget(target, action, controlEvents:UIControlEvents){
-        let item = {};
+        
+        if (action == null) throw new Error("UIControl: Can't add null action");
 
+        let item = {};        
         item["Target"] = target;
         item["Action"] = action;
         item["EventType"] = controlEvents;
@@ -2259,6 +2262,8 @@ export class UITextField extends UIControl
 
 
 
+
+
 /**
  * Created by godshadow on 29/08/16.
  */
@@ -2266,7 +2271,7 @@ export class UITextField extends UIControl
 export class UISegmentedControl extends UIControl
 {
     segmentedItems = [];
-    selectedSegmentedIndex = -1;
+    selectedSegmentIndex = -1;
 
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
@@ -2285,7 +2290,7 @@ export class UISegmentedControl extends UIControl
         if (this.segmentedItems.length > 0){
             let item = this.segmentedItems[0];
             item.setSelected(true);
-            this.selectedSegmentedIndex = 0;
+            this.selectedSegmentIndex = 0;
         }
     }
 
@@ -2303,20 +2308,22 @@ export class UISegmentedControl extends UIControl
     }
 
     selectSegmentedAtIndex(index){
-        if (this.selectedSegmentedIndex == index)
-            return;
+        if (this.selectedSegmentIndex == index) return;
 
-        if (this.selectedSegmentedIndex > -1){
-            let lastItem = this.segmentedItems[this.selectedSegmentedIndex];
+        if (this.selectedSegmentIndex > -1){
+            let lastItem = this.segmentedItems[this.selectedSegmentIndex];
             lastItem.setSelected(false);
         }
 
-        this.selectedSegmentedIndex = index;
+        this.selectedSegmentIndex = index;
         
-        let item = this.segmentedItems[this.selectedSegmentedIndex];
+        let item = this.segmentedItems[this.selectedSegmentIndex];
         item.setSelected(true);
+
+        this._performActionsForEvents(UIControlEvents.ValueChanged);
     }
 }
+
 
 
 
@@ -2352,12 +2359,6 @@ export class UISwitch extends UIControl
         }
     }
 
-    setOnChangeValue(target, action){
-        this.target = target;
-        this.action = action;
-    }
-
-
     private _on = false;
     get isOn() {return this._on;}
     set isOn(value){this.setOn(value);}
@@ -2365,16 +2366,14 @@ export class UISwitch extends UIControl
         if (value == this._on) return;
         this._inputLayer.checked = value;
         this._on = value;
+
+        this._performActionsForEvents(UIControlEvents.ValueChanged);
     }
 
     private _toggleValue(){
         this.isOn = !this.isOn;
-
-        if (this.target != null && this.action != null)
-            this.action.call(this.target, this, this.isOn);
     }
 }
-
 
 
 
@@ -2459,8 +2458,8 @@ export class UIViewController extends NSObject {
     initWithLayer(layer, owner, options?) {
         super.init();
 
-        this.view = MUICoreViewCreateView(layer, owner);
-        this.view._checkSegues();
+        // this.view = MUICoreViewCreateView(layer, owner);
+        // this.view._checkSegues();
 
         // Search for navigation item
         //this.navigationItem = UINavItemSearchInLayer(layer);        
@@ -4751,8 +4750,23 @@ export class UINavigationBar extends UIView
         this.setup();
     }
 
+    private leftView:UIView = null;
+    private titleView:UIView = null;
+    private rigthView:UIView = null;
     private setup(){
-        MUICoreLayerAddStyle(this.layer, "navbar");
+        MUICoreLayerAddStyle(this.layer, "navigation-bar");
+
+        this.leftView = new UIView();
+        this.leftView.init();
+        this.addSubview(this.leftView);
+
+        this.titleView = new UIView();
+        this.titleView.init();
+        this.addSubview(this.titleView);
+
+        this.rigthView = new UIView();
+        this.rigthView.init();
+        this.addSubview(this.rigthView);
     }
 
     private _items = [];
@@ -4761,6 +4775,14 @@ export class UINavigationBar extends UIView
         this._items = items;
 
         //TODO: Animate!!!
+
+        for (let index = 0; index < items.length; index++){
+            let ni = items[index];
+
+            if (ni.titleView != null) {
+                this.titleView.addSubview(ni.titleView);
+            }
+        }
     }    
     
     pushNavigationItem(item:UINavigationItem, animated){
@@ -4788,6 +4810,7 @@ export class UINavigationBar extends UIView
 
 
 
+
 export class UINavigationItem extends NSObject
 {    
     backBarButtonItem:UIButton = null;
@@ -4797,6 +4820,17 @@ export class UINavigationItem extends NSObject
     private leftView:UIView = null;    
     private rightView:UIView = null;
     
+    initWithTitle(title:string){
+        super.init();
+
+        this.title = title;
+        let titleLabel = new UILabel();
+        titleLabel.init();
+        titleLabel.text = title;
+        
+        this.titleView = titleLabel;
+    }
+
     initWithLayer(layer){
         if (layer.childNodes.length > 0) {
             for (let index = 0; index < layer.childNodes.length; index++) {
@@ -4830,34 +4864,6 @@ export class UINavigationItem extends NSObject
     }
 }
 
-export function UINavItemSearchInLayer(layer)
-{
-    if (layer.childNodes.length > 0) {
-        for (let index = 0; index < layer.childNodes.length; index++) {
-            let subLayer = layer.childNodes[index];
-    
-            if (subLayer.tagName != "DIV") continue;
-
-            if (subLayer.getAttribute("data-nav-item") != null) {
-                let ni = new UINavigationItem();
-                ni.initWithLayer(subLayer);  
-                
-                // Check for tittle if center view doesn't exists
-                if (ni.titleView == null) {
-                    let title = subLayer.getAttribute("data-nav-item-title");
-                    if (title != null) ni.title = title;
-                }
-
-                return ni;             
-            }
-        }
-    }
-
-    return null;
- }
-
-
-
 
 
 
@@ -4876,20 +4882,25 @@ export class UINavigationController extends UIViewController
     rootViewController = null;
     viewControllersStack = [];
     currentViewControllerIndex = -1;
+    
+    private _navigationBar:UINavigationBar = null;
+    get navigationBar():UINavigationBar {
+        return this._navigationBar;
+    }
 
     init(){
         super.init();
         this.view.layer.style.overflow = "hidden";        
     }
 
-    initWithRootViewController(vc:UIViewController){
+    initWithRootViewController(vc:UIViewController){        
         this.init();
-        this.setRootViewController(vc);
+        this.setRootViewController(vc);        
     }
 
     setRootViewController(vc:UIViewController){
-        //this.transitioningDelegate = this;
-        
+        //this.transitioningDelegate = this;                
+
         this.rootViewController = vc;
         this.view.addSubview(vc.view);
 
@@ -4899,10 +4910,19 @@ export class UINavigationController extends UIViewController
         this.rootViewController.navigationController = this;
 
         this.addChildViewController(vc);
+
         // if (this.presentationController != null) {
         //     var size = vc.preferredContentSize;
         //     this.contentSize = size;
         // }
+    }
+
+    protected _setViewLoaded(value) {
+        super._setViewLoaded(value);
+
+        this._navigationBar = this.view.subviews[0] as UINavigationBar;
+        let navItems = [this.rootViewController.navigationItem];
+        this._navigationBar.setItems(navItems, false);
     }
 
     viewWillAppear(animated?:boolean){
@@ -5686,6 +5706,7 @@ export class UIWindow extends UIView
 
 
 
+
 export class UIStoryboard extends NSObject
 {
     private name:string = null;
@@ -5756,6 +5777,12 @@ export function MUICoreStoryboardParseLayer(layer, object, owner){
                         MUICoreStoryboardAddSegue(object, destination, kind, relationship, identifier);
                     }
                 }
+            }
+            else if (subLayer.getAttribute("data-navigation-key") == "navigationItem"){
+                let title = subLayer.getAttribute("data-navigation-title");
+
+                owner.navigationItem = new UINavigationItem();
+                owner.navigationItem.initWithTitle(title);
             }
         }
     }

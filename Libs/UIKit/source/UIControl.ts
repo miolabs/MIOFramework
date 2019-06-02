@@ -1,7 +1,8 @@
 import { UIView } from "./UIView";
 import { UIViewController } from "./UIViewController";
 import { UIStoryboardSegue } from "./UIStoryboardSegue";
-import { UIStoryboard } from "./UIStoryboard";
+import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
+import { MUICoreLayerRemoveStyle } from "./core/MUICoreLayer";
 
 /**
  * Created by godshadow on 12/3/16.
