@@ -5,6 +5,8 @@ import { NSPoint } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
 import { NSSize } from "mio-foundation-web";
 import { UIView } from "./UIView";
+import { MUICoreLayerCreate } from "./core/MUICoreLayer";
+import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
 
 /**
  * Created by godshadow on 01/09/16.

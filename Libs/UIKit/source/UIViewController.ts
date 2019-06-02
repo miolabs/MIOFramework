@@ -2,11 +2,9 @@ import { NSObject } from "mio-foundation-web";
 import { NSSize } from "mio-foundation-web";
 import { NSLocalizeString } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
-import { NSBundle } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
 
 import { UIView } from "./UIView";
-import { MUICoreViewCreateView } from "./UIView";
 import { UINavigationItem } from "./UINavigationItem";
 import { UINavigationController } from "./UINavigationController";
 import { UIPresentationController } from "./UIViewController_PresentationController";

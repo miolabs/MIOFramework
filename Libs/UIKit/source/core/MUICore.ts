@@ -4,7 +4,8 @@ import { NSSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
 import { UIView } from "../UIView";
 import { UIViewController } from "../UIViewController";
-import { UIModalPresentationStyle, UIPresentationController } from "../UIViewController_PresentationController";
+import { UIModalPresentationStyle } from "../UIViewController_PresentationController";
+import { UIPresentationController } from "../UIViewController_PresentationController";
 import { _MUIAnimationStart } from "./MUICoreAnimation";
 import { MUICoreLayerSearchElementByID } from "./MUICoreLayer";
 

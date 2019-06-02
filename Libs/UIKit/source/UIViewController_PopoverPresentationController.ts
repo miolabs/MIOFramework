@@ -2,7 +2,8 @@
 import { NSRect } from "mio-foundation-web";
 import { NSObject } from "mio-foundation-web";
 import { UIPresentationController } from "./UIViewController_PresentationController";
-import { MUIClassListForAnimationType, MUIAnimationType } from "./core/MUICoreAnimation";
+import { MUIClassListForAnimationType } from "./core/MUICoreAnimation";
+import { MUIAnimationType } from "./core/MUICoreAnimation";
 import { MUICoreLayerAddStyle } from ".";
 
 

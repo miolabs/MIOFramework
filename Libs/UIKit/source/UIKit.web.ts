@@ -32,14 +32,14 @@ import { MIOCoreStringSetLocalizedStrings } from "mio-foundation-web";
 
 export var _MUICoreLayerIDCount = 0;
 
-export function MUICoreLayerIDFromObject(object): string {
-
-    var classname = object.constructor.name.substring(3);
+export function MUICoreLayerIDFromObject(object): string 
+{
+    var classname = object.constructor.name;
     return MUICoreLayerIDFromClassname(classname);
 }
 
-export function MUICoreLayerIDFromClassname(classname:string): string {
-
+export function MUICoreLayerIDFromClassname(classname:string): string 
+{
     var digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
 
     var random = "";
@@ -4771,7 +4771,7 @@ export class UINavigationBar extends UIView
 
     private _items = [];
     get items(){return this._items;}
-    setItems(items, animated){        
+    setItems(items:UINavigationItem[], animated:boolean){        
         this._items = items;
 
         //TODO: Animate!!!
@@ -4879,7 +4879,7 @@ export class UINavigationItem extends NSObject
 
 export class UINavigationController extends UIViewController
 {
-    rootViewController = null;
+    rootViewController:UIViewController = null;
     viewControllersStack = [];
     currentViewControllerIndex = -1;
     
@@ -4957,7 +4957,7 @@ export class UINavigationController extends UIViewController
 
         vc.navigationController = this;
 
-        vc.onLoadView(this, function () {
+        vc.onLoadView(this, function (this:UINavigationController) {
 
             if (vc.navigationItem != null && vc.navigationItem.backBarButtonItem != null) {
                 vc.navigationItem.backBarButtonItem.addTarget(this, function(){

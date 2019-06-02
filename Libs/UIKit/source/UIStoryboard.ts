@@ -81,6 +81,16 @@ export function MUICoreStoryboardParseLayer(layer, object, owner){
 
                 owner.navigationItem = new UINavigationItem();
                 owner.navigationItem.initWithTitle(title);
+
+                for (let index2 = 0; index2 < subLayer.childNodes.length; index2++) {
+                    let d = subLayer.childNodes[index2] as HTMLElement;
+                    if (d.tagName != "DIV") continue;
+
+                    let key = d.getAttribute("data-bar-button-item-key");
+                    if (key == "rightBarButtonItem") {
+                        
+                    }
+                }
             }
         }
     }

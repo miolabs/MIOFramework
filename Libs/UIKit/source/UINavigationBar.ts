@@ -36,7 +36,7 @@ export class UINavigationBar extends UIView
 
     private _items = [];
     get items(){return this._items;}
-    setItems(items, animated){        
+    setItems(items:UINavigationItem[], animated:boolean){        
         this._items = items;
 
         //TODO: Animate!!!

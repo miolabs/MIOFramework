@@ -1,6 +1,8 @@
 
 import { NSPoint } from "mio-foundation-web";
-import { UIEvent, UIGestureRecognizer, UIGestureRecognizerState } from ".";
+import { UIEvent } from ".";
+import { UIGestureRecognizer } from ".";
+import { UIGestureRecognizerState } from ".";
 import { UIView } from "./UIView";
 
 export class UIPanGestureRecognizer extends UIGestureRecognizer
