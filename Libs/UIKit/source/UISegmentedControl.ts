@@ -9,7 +9,7 @@ import { MUIOutletRegister } from "./core/MUICore";
 export class UISegmentedControl extends UIControl
 {
     segmentedItems = [];
-    selectedSegmentedIndex = -1;
+    selectedSegmentIndex = -1;
 
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
@@ -28,7 +28,7 @@ export class UISegmentedControl extends UIControl
         if (this.segmentedItems.length > 0){
             let item = this.segmentedItems[0];
             item.setSelected(true);
-            this.selectedSegmentedIndex = 0;
+            this.selectedSegmentIndex = 0;
         }
     }
 
@@ -46,16 +46,16 @@ export class UISegmentedControl extends UIControl
     }
 
     selectSegmentedAtIndex(index){
-        if (this.selectedSegmentedIndex == index) return;
+        if (this.selectedSegmentIndex == index) return;
 
-        if (this.selectedSegmentedIndex > -1){
-            let lastItem = this.segmentedItems[this.selectedSegmentedIndex];
+        if (this.selectedSegmentIndex > -1){
+            let lastItem = this.segmentedItems[this.selectedSegmentIndex];
             lastItem.setSelected(false);
         }
 
-        this.selectedSegmentedIndex = index;
+        this.selectedSegmentIndex = index;
         
-        let item = this.segmentedItems[this.selectedSegmentedIndex];
+        let item = this.segmentedItems[this.selectedSegmentIndex];
         item.setSelected(true);
 
         this._performActionsForEvents(UIControlEvents.ValueChanged);
