@@ -13,7 +13,7 @@ import { UINavigationBar } from "./UINavigationBar";
 
 export class UINavigationController extends UIViewController
 {
-    rootViewController = null;
+    rootViewController:UIViewController = null;
     viewControllersStack = [];
     currentViewControllerIndex = -1;
     
@@ -91,7 +91,7 @@ export class UINavigationController extends UIViewController
 
         vc.navigationController = this;
 
-        vc.onLoadView(this, function () {
+        vc.onLoadView(this, function (this:UINavigationController) {
 
             if (vc.navigationItem != null && vc.navigationItem.backBarButtonItem != null) {
                 vc.navigationItem.backBarButtonItem.addTarget(this, function(){

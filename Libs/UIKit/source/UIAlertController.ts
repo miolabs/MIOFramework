@@ -12,7 +12,7 @@ import { UITableViewCellStyle } from "./UITableViewCell";
 import { UILabel } from "./UILabel";
 import { MUIAnimationType } from "./core/MUICoreAnimation";
 import { MUIClassListForAnimationType } from "./core/MUICoreAnimation";
-import { MUICoreLayerRemoveStyle } from ".";
+import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
 
 
 export enum UIAlertViewStyle

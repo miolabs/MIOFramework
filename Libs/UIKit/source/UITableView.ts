@@ -1,9 +1,7 @@
 import { UIView} from "./UIView";
 import { UITableViewCell } from "./UITableViewCell";
 import { UIGestureRecognizer } from "./UIGestureRecognizer";
-import { UITapGestureRecognizer } from "./UITapGestureRecognizer";
 import { UIGestureRecognizerState} from "./UIGestureRecognizer";
-import { NSUUID } from "mio-foundation-web";
 import { NSIndexPath } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 import "mio-foundation-web/extensions"
