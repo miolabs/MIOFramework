@@ -31,6 +31,7 @@
 .button {
 	text-align: center;
 	height: auto !important;
+	padding: 10px;
 }
 .button:hover {
 	opacity: .82;
@@ -42,8 +43,9 @@
 	background-color: #00bebe;
 	color: #fff;
 	border-radius: 5px;
-	padding: 5px;
+	padding: 10px;
 	cursor: pointer;
+	width: fit-content !important;
 }
 .button.rounded-rect span {
 	/*line-height: 30px;*/
@@ -133,11 +135,39 @@ input[type="checkbox"]:checked::after {
 
 /* STEPPER */
 
+/* ALERT VIEW */
+.alert {
+	position: absolute;
+    border-radius: 15px;
+    background-color: #fafafa;
+    left: 50% !important;
+	transform: translateX(-50%);
+	box-shadow: 1px 1px 10px grey;
+	z-index: 1;
+}
+
 /* NAVIGATION BAR */
 .navigation-bar {
 	top: 0 !important;
 	background-color: #fafafa;
 	border-bottom: 1px solid #d6d6d6;
+}
+
+.navigation-bar .label {
+	position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    line-height: 44px;
+}
+
+.navigation-bar .btn.system-add-icon {
+	background-image: url('../icons/manager-icon-add.png');
+	background-position: center;
+	background-position-y: 50%;
+	width: 15px;
+	height: 15px;
+	background-color: transparent;
+	border-radius: 0;
 }
 
 /* TABLE VIEW */

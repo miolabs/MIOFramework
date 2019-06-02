@@ -2,19 +2,19 @@
  * Created by godshadow on 29/09/2016.
  */
 
-export class NSUserDefaults
+export class UserDefaults
 {
-    private static _sharedInstance:NSUserDefaults = new NSUserDefaults();
+    private static _sharedInstance:UserDefaults = new UserDefaults();
 
     constructor(){
-        if (NSUserDefaults._sharedInstance){
+        if (UserDefaults._sharedInstance){
             throw new Error("Error: Instantiation failed: Use standardUserDefaults() instead of new.");
         }
-        NSUserDefaults._sharedInstance = this;
+        UserDefaults._sharedInstance = this;
     }
 
-    public static standardUserDefaults():NSUserDefaults{
-        return NSUserDefaults._sharedInstance;
+    public static standardUserDefaults():UserDefaults{
+        return UserDefaults._sharedInstance;
     }
 
     setBooleanForKey(key, value:boolean){

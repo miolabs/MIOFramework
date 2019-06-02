@@ -16,7 +16,7 @@ export class UIWindow extends UIView
 
     init(){
         super.init();
-        MUICoreLayerAddStyle(this.layer, "view");
+        MUICoreLayerAddStyle(this.layer, "window");
     }
 
     initWithRootViewController(vc: UIViewController){

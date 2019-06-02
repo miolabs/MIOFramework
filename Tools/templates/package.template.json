@@ -4,7 +4,7 @@
 	"description": "The MIO Framework!",
 	"scripts": {
 	  "test": "echo \"Error: no test specified\" && exit 1",
-	  "buildTs": "~/Library/Developer/Toolchains/swift-LOCAL-2019-05-28-a.xctoolchain/usr/bin/swiftc -dump-ast -O -Xfrontend -disable-access-control -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk -target arm64-apple-ios12.2 -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks .build/app.swift > .build/app.ts",
+	  "buildTs": "~/Library/Developer/Toolchains/swift-LOCAL-2019-06-02-a.xctoolchain/usr/bin/swiftc -dump-ast -O -Xfrontend -disable-access-control -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk -target arm64-apple-ios12.2 -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks .build/app.swift > .build/app.ts",
 	  "transpileTs": "tsc .build/app.ts",
 	  "build": "npm install ; gulp unifySwiftFiles ; npm run buildTs ; npm run transpileTs ; gulp parseStoryBoard ; gulp parseDataModel ; gulp copyResources",
 	  "build-dev": "gulp unifySwiftFiles ; npm run buildTs ; npm run transpileTs ; gulp parseStoryBoard ; gulp parseDataModel ; gulp copyResources"

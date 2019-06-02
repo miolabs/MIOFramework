@@ -16,23 +16,23 @@ export class NSNotification
     }
 }
 
-export class NSNotificationCenter
+export class NotificationCenter
 {
-    private static _sharedInstance:NSNotificationCenter = new NSNotificationCenter();
+    private static _sharedInstance:NotificationCenter = new NotificationCenter();
     notificationNames = {};
 
     constructor()
     {
-        if (NSNotificationCenter._sharedInstance)
+        if (NotificationCenter._sharedInstance)
         {
             throw new Error("Error: Instantiation failed: Use defaultCenter() instead of new.");
         }
-        NSNotificationCenter._sharedInstance = this;
+        NotificationCenter._sharedInstance = this;
     }
 
-    public static defaultCenter():NSNotificationCenter
+    public static defaultCenter():NotificationCenter
     {
-        return NSNotificationCenter._sharedInstance;
+        return NotificationCenter._sharedInstance;
     }
 
     addObserver(obs, name, fn)

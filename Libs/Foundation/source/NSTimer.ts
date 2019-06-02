@@ -4,7 +4,7 @@ import { NSObject } from "./NSObject";
  * Created by godshadow on 21/3/16.
  */
 
-export class NSTimer extends NSObject
+export class Timer extends NSObject
 {    
     private _timerInterval = 0;
     private _repeat = false;
@@ -15,7 +15,7 @@ export class NSTimer extends NSObject
 
     static scheduledTimerWithTimeInterval(timeInterval, repeat, target, completion)
     {
-        var timer = new NSTimer();
+        var timer = new Timer();
         timer.initWithTimeInterval(timeInterval, repeat, target, completion);
 
         timer.fire();

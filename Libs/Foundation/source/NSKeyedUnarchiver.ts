@@ -1,5 +1,5 @@
 import { NSCoder } from "./NSCoder";
-import { NSPropertyListSerialization } from "./NSPropertyListSerialization";
+import { PropertyListSerialization } from "./NSPropertyListSerialization";
 import { NSClassFromString } from "./core/MIOCore";
 
 
@@ -14,7 +14,7 @@ export class NSKeyedUnarchiver extends NSCoder
 
     private objects = null;
     _parseData(data:string, error){
-        let items = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);
+        let items = PropertyListSerialization.propertyListWithData(data, 0, 0, null);
 
         this.objects = items["$objects"];
         let rootIndex = items["$top"]["$0"]["CF$UID"];

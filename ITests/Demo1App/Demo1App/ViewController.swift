@@ -21,7 +21,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     
     @IBAction func buttonClicked(sender: UIButton){
         NSLog("Button clicked!!")
-        label.text = "You push the button!!"
+        label.text = "Button clicked!"
     }
   
     @IBAction func switchClicked(sender: UISwitch){

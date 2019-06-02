@@ -1,4 +1,4 @@
-import { NSFormatter } from './NSFormatter'
+import { Formatter } from './NSFormatter'
 import { MIOCoreGetPlatform } from './core/MIOCore';
 import { MIOCorePlatformType } from './core/MIOCoreTypes';
 
@@ -10,7 +10,7 @@ export enum NSDateFormatterStyle {
     FullStyle
 }
 
-export class NSDateFormatter extends NSFormatter {
+export class DateFormatter extends Formatter {
 
     dateStyle = NSDateFormatterStyle.ShortStyle;
     timeStyle = NSDateFormatterStyle.ShortStyle;    

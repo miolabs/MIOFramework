@@ -2400,6 +2400,7 @@ export class UISwitch extends UIControl
 
 
 
+
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -2505,7 +2506,7 @@ export class UIViewController extends NSObject {
 
         if (this._htmlResourcePath == null) {
             this.view.init();
-            MUICoreLayerAddStyle(this.view.layer, "page");
+            MUICoreLayerAddStyle(this.view.layer, "view-controller");
             this._didLoadView();
             return;
         }
@@ -2745,7 +2746,8 @@ export class UIViewController extends NSObject {
                     w.addSubview(pc.presentedView);
                     pc.window = w;
                 }
-                w.setHidden(false);
+				w.setHidden(false);
+				if (vc instanceof UIAlertController) MUICoreLayerAddStyle(w.layer, "alert");
 
                 _MUIShowViewController(this, vc, null, animated, this, function () {
                     w.makeKey();
@@ -5748,7 +5750,7 @@ export class UIWindow extends UIView
 
     init(){
         super.init();
-        MUICoreLayerAddStyle(this.layer, "view");
+        MUICoreLayerAddStyle(this.layer, "window");
     }
 
     initWithRootViewController(vc: UIViewController){

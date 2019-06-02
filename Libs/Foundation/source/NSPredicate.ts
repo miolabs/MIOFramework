@@ -1,5 +1,5 @@
 import { NSObject } from "./NSObject";
-import { NSISO8601DateFormatter } from "./NSISO8601DateFormatter";
+import { ISO8601DateFormatter } from "./NSISO8601DateFormatter";
 import { MIOCoreLexer } from "./core/MIOCoreLexer";
 
 /**
@@ -93,7 +93,7 @@ export class NSPredicateItem {
             }
             
             if (lValue instanceof Date) {
-                let sdf = new NSISO8601DateFormatter();
+                let sdf = new ISO8601DateFormatter();
                 sdf.init();
                 lValue = sdf.stringFromDate(lValue);
             }

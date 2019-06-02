@@ -1,12 +1,12 @@
 import { NSObject } from "./NSObject";
-import { NSOperation } from "./NSOperation";
+import { Operation } from "./NSOperation";
 import "./NSArray";
 
-export class NSOperationQueue extends NSObject {
+export class OperationQueue extends NSObject {
 
     private _operations = [];
 
-    addOperation(operation: NSOperation) {
+    addOperation(operation: Operation) {
 
         if (operation.isFinished == true) {
             throw new Error("NSOperationQueue: Tying to add an operation already finished");
@@ -27,7 +27,7 @@ export class NSOperationQueue extends NSObject {
         }
     }
 
-    removeOperation(operation:NSOperation) {
+    removeOperation(operation:Operation) {
 
         let index = this._operations.indexOf(operation);
         if (index == -1) return;
@@ -64,7 +64,7 @@ export class NSOperationQueue extends NSObject {
 
         // This means we need to re-active every operation
         for(let index = 0; index < this.operations.length; index++){
-            let op:NSOperation = this.operations[index];
+            let op:Operation = this.operations[index];
             if (op.ready == true) op.start();
         }
     }
@@ -74,7 +74,7 @@ export class NSOperationQueue extends NSObject {
         if (type != "did") return;
 
         if (keyPath == "ready") {
-            let op:NSOperation = object; 
+            let op:Operation = object; 
             if (op.ready == true) {
                 op.removeObserver(this, "ready");
                 op.addObserver(this, "isFinished", null);
@@ -82,7 +82,7 @@ export class NSOperationQueue extends NSObject {
             }
         }
         else if (keyPath == "isFinished"){
-            let op:NSOperation = object; 
+            let op:Operation = object; 
             if (op.isFinished == true) {
                 op.removeObserver(this, "isFinished");
                 this.removeOperation(op);
