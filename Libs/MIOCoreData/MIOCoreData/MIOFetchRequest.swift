@@ -14,7 +14,7 @@ class MIOFetchRequest<ResultType>: MIOPersistentStoreRequest where ResultType : 
 {
     var entityName:String!
     var entity:MIOEntityDescription?
-    var predicate:MIOPredicate?
+    var predicate:NSPredicate?
     var sortDescriptors:NSSortDescriptor?
     //resultType = MIOFetchRequestResultType.MIOManagedObject
     var fetchLimit = 0

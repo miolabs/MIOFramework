@@ -2,6 +2,7 @@ import { NSObject } from "mio-foundation-web";
 import { UIView } from "./UIView";
 import { UIButton } from "./UIButton";
 import { MUICoreLayerSearchElementByAttribute } from "./core/MUICoreLayer";
+import { UILabel } from "./UILabel";
 
 export class UINavigationItem extends NSObject
 {    
@@ -12,6 +13,17 @@ export class UINavigationItem extends NSObject
     private leftView:UIView = null;    
     private rightView:UIView = null;
     
+    initWithTitle(title:string){
+        super.init();
+
+        this.title = title;
+        let titleLabel = new UILabel();
+        titleLabel.init();
+        titleLabel.text = title;
+        
+        this.titleView = titleLabel;
+    }
+
     initWithLayer(layer){
         if (layer.childNodes.length > 0) {
             for (let index = 0; index < layer.childNodes.length; index++) {
@@ -44,29 +56,3 @@ export class UINavigationItem extends NSObject
         }
     }
 }
-
-export function UINavItemSearchInLayer(layer)
-{
-    if (layer.childNodes.length > 0) {
-        for (let index = 0; index < layer.childNodes.length; index++) {
-            let subLayer = layer.childNodes[index];
-    
-            if (subLayer.tagName != "DIV") continue;
-
-            if (subLayer.getAttribute("data-nav-item") != null) {
-                let ni = new UINavigationItem();
-                ni.initWithLayer(subLayer);  
-                
-                // Check for tittle if center view doesn't exists
-                if (ni.titleView == null) {
-                    let title = subLayer.getAttribute("data-nav-item-title");
-                    if (title != null) ni.title = title;
-                }
-
-                return ni;             
-            }
-        }
-    }
-
-    return null;
- }

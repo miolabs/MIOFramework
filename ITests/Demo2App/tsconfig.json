@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "sourceMap": true,
+        "removeComments": true,
+        "outDir": "resources",
+        "outFile": "resources/app.js",
+        "typeRoots": [
+            "./node_modules/@types/"
+        ],
+        "types": [
+            "mio-foundation-web",
+            "mio-uikit-web"        
+        ]
+    }
+}

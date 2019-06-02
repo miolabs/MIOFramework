@@ -31,6 +31,7 @@
 .button {
 	text-align: center;
 	height: auto !important;
+	padding: 10px;
 }
 .button:hover {
 	opacity: .82;
@@ -42,8 +43,9 @@
 	background-color: #00bebe;
 	color: #fff;
 	border-radius: 5px;
-	padding: 5px;
+	padding: 10px;
 	cursor: pointer;
+	width: fit-content !important;
 }
 .button.rounded-rect span {
 	/*line-height: 30px;*/
@@ -132,6 +134,13 @@ input[type="checkbox"]:checked::after {
 /* PAGE CONTROL */
 
 /* STEPPER */
+
+/* ALERT VIEW */
+.alert {
+	position: absolute;
+	border-radius: 15px;
+	background-color: #fafafa;
+}
 
 /* NAVIGATION BAR */
 .navigation-bar {

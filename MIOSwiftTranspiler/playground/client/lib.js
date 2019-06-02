@@ -16203,7 +16203,7 @@ var MutableCollection$implementation = /** @class */ (function () {
     };
     /*Swift.(file).MutableCollection.reverse()*/
     /*Swift.(file).MutableCollection.reverse()*/
-    MutableCollection$implementation.prototype.reverse = function ($info) {
+    MutableCollection$implementation.prototype.reverseSwift = function ($info) {
         var _this = this;
         if ((_this.isEmpty)) {
             return;
@@ -24939,7 +24939,7 @@ var MIO_Mixin_Dictionary = /** @class */ (function () {
     MIO_Mixin_Dictionary.prototype.keys$get = function () {
         throw 'unsupported variable Swift.(file).Dictionary.keys in ' + this.constructor.name;
     };
-    Object.defineProperty(MIO_Mixin_Dictionary.prototype, "keys", {
+    Object.defineProperty(MIO_Mixin_Dictionary.prototype, "keysSwift", {
         get: function () { return this.keys$get(); },
         enumerable: true,
         configurable: true
@@ -24949,7 +24949,7 @@ var MIO_Mixin_Dictionary = /** @class */ (function () {
     MIO_Mixin_Dictionary.prototype.values$get = function () {
         throw 'unsupported variable Swift.(file).Dictionary.values in ' + this.constructor.name;
     };
-    Object.defineProperty(MIO_Mixin_Dictionary.prototype, "values", {
+    Object.defineProperty(MIO_Mixin_Dictionary.prototype, "valuesSwift", {
         get: function () { return this.values$get(); },
         enumerable: true,
         configurable: true

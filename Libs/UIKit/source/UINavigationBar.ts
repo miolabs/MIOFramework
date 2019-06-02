@@ -15,16 +15,39 @@ export class UINavigationBar extends UIView
         this.setup();
     }
 
+    private leftView:UIView = null;
+    private titleView:UIView = null;
+    private rigthView:UIView = null;
     private setup(){
-        MUICoreLayerAddStyle(this.layer, "navbar");
+        MUICoreLayerAddStyle(this.layer, "navigation-bar");
+
+        this.leftView = new UIView();
+        this.leftView.init();
+        this.addSubview(this.leftView);
+
+        this.titleView = new UIView();
+        this.titleView.init();
+        this.addSubview(this.titleView);
+
+        this.rigthView = new UIView();
+        this.rigthView.init();
+        this.addSubview(this.rigthView);
     }
 
     private _items = [];
     get items(){return this._items;}
-    setItems(items, animated){        
+    setItems(items:UINavigationItem[], animated:boolean){        
         this._items = items;
 
         //TODO: Animate!!!
+
+        for (let index = 0; index < items.length; index++){
+            let ni = items[index];
+
+            if (ni.titleView != null) {
+                this.titleView.addSubview(ni.titleView);
+            }
+        }
     }    
     
     pushNavigationItem(item:UINavigationItem, animated){

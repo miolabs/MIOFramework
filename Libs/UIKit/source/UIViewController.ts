@@ -2,11 +2,9 @@ import { NSObject } from "mio-foundation-web";
 import { NSSize } from "mio-foundation-web";
 import { NSLocalizeString } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
-import { NSBundle } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
 
 import { UIView } from "./UIView";
-import { MUICoreViewCreateView } from "./UIView";
 import { UINavigationItem } from "./UINavigationItem";
 import { UINavigationController } from "./UINavigationController";
 import { UIPresentationController } from "./UIViewController_PresentationController";
@@ -16,7 +14,6 @@ import { UIPopoverPresentationController } from "./UIViewController_PopoverPrese
 import { MUICoreLayerIDFromObject } from "./core/MUICoreLayer";
 import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
 import { MUICoreLayerSearchElementByID } from "./core/MUICoreLayer";
-import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
 import { _MUIShowViewController } from "./core/MUICore";
 import { _MUIHideViewController } from "./core/MUICore";
 import { UIWindow } from "./UIWindow";
@@ -83,8 +80,8 @@ export class UIViewController extends NSObject {
     initWithLayer(layer, owner, options?) {
         super.init();
 
-        this.view = MUICoreViewCreateView(layer, owner);
-        this.view._checkSegues();
+        // this.view = MUICoreViewCreateView(layer, owner);
+        // this.view._checkSegues();
 
         // Search for navigation item
         //this.navigationItem = UINavItemSearchInLayer(layer);        

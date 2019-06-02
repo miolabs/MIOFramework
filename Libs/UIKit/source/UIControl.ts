@@ -1,7 +1,8 @@
 import { UIView } from "./UIView";
 import { UIViewController } from "./UIViewController";
 import { UIStoryboardSegue } from "./UIStoryboardSegue";
-import { UIStoryboard } from "./UIStoryboard";
+import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
+import { MUICoreLayerRemoveStyle } from "./core/MUICoreLayer";
 
 /**
  * Created by godshadow on 12/3/16.
@@ -101,8 +102,10 @@ export class UIControl extends UIView
 
     private actions = [];    
     addTarget(target, action, controlEvents:UIControlEvents){
-        let item = {};
+        
+        if (action == null) throw new Error("UIControl: Can't add null action");
 
+        let item = {};        
         item["Target"] = target;
         item["Action"] = action;
         item["EventType"] = controlEvents;

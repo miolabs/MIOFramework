@@ -20536,7 +20536,7 @@ _this.formIndexBefore({get: () => l, set: $val => l = $val});
 /*Swift.(file).MutableCollection.sort()*/
 sortSwift($info?) {
 let _this = this;
-_this.sortBy(this.first[0].constructor.$lessThan, {$setThis: $val => $info.$setThis(_this = _cloneStruct($val))})
+_this.sortSwiftBy(this.first[0].constructor.$lessThan, {$setThis: $val => $info.$setThis(_this = _cloneStruct($val))})
 }
 /*Swift.(file).MutableCollection.sort(by:(Self.Element, Self.Element) throws -> Bool)*/
 /*Swift.(file).MutableCollection.sort(by:(Self.Element, Self.Element) throws -> Bool)*/
@@ -25509,13 +25509,13 @@ return result
 /*Swift.(file).SIMD.min()*/
 min($info?) {
 let _this = this;
-return _this.indices.reduceInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = min($0, _this.subscript$get($1))))
+return _this.indices.reduceSwiftInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = min($0, _this.subscript$get($1))))
 }
 /*Swift.(file).SIMD.max()*/
 /*Swift.(file).SIMD.max()*/
 max($info?) {
 let _this = this;
-return _this.indices.reduceInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = max($0, _this.subscript$get($1))))
+return _this.indices.reduceSwiftInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = max($0, _this.subscript$get($1))))
 }
 static /*Swift.(file).SIMD..==infix(_:Self.Scalar,_:Self)*/
 /*Swift.(file).SIMD..==infix(_:Self.Scalar,_:Self)*/
@@ -26041,7 +26041,7 @@ return result
 /*Swift.(file).SIMD.wrappedSum()*/
 wrappedSum($info?) {
 let _this = this;
-return _this.indices.reduceInto(0, (($0$inout, $1, $info?) => ((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).infix_38_43_61({get: () => $0, set: $val => $0 = $val}, _this.subscript$get($1))))
+return _this.indices.reduceSwiftInto(0, (($0$inout, $1, $info?) => ((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).infix_38_43_61({get: () => $0, set: $val => $0 = $val}, _this.subscript$get($1))))
 }
 static /*Swift.(file).SIMD.+infix(_:Self,_:Self)*/
 /*Swift.(file).SIMD.+infix(_:Self,_:Self)*/
@@ -26152,19 +26152,19 @@ return result
 /*Swift.(file).SIMD.min()*/
 min($info?) {
 let _this = this;
-return _this.indices.reduceInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = min($0, _this.subscript$get($1))))
+return _this.indices.reduceSwiftInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = min($0, _this.subscript$get($1))))
 }
 /*Swift.(file).SIMD.max()*/
 /*Swift.(file).SIMD.max()*/
 max($info?) {
 let _this = this;
-return _this.indices.reduceInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = max($0, _this.subscript$get($1))))
+return _this.indices.reduceSwiftInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = max($0, _this.subscript$get($1))))
 }
 /*Swift.(file).SIMD.sum()*/
 /*Swift.(file).SIMD.sum()*/
 sum($info?) {
 let _this = this;
-return _this.indices.reduceInto(0, (($0$inout, $1, $info?) => ((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).$addAndAssign({get: () => $0, set: $val => $0 = $val}, _this.subscript$get($1))))
+return _this.indices.reduceSwiftInto(0, (($0$inout, $1, $info?) => ((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).$addAndAssign({get: () => $0, set: $val => $0 = $val}, _this.subscript$get($1))))
 }
 static /*Swift.(file).SIMD.&infix(_:Self.Scalar,_:Self)*/
 /*Swift.(file).SIMD.&infix(_:Self.Scalar,_:Self)*/
@@ -34193,14 +34193,14 @@ return Bool.$not((_.arg0 = lhs).constructor.$lessThan(_.arg0, rhs))
 /*!!!DUPLICATE NAME*/
 hasPrefix<Prefix>(prefix, $info?) {
 let _this = this;
-return _this.startsWithSwift(prefix)
+return _this.startsWith(prefix)
 }
 /*Swift.(file).StringProtocol.hasSuffix(_:Suffix)*/
 /*Swift.(file).StringProtocol.hasSuffix(_:Suffix)*/
 /*!!!DUPLICATE NAME*/
 hasSuffix<Suffix>(suffix, $info?) {
 let _this = this;
-return _this.reversed( {}).startsWithSwift(suffix.reversed( {}))
+return _this.reversed( {}).startsWith(suffix.reversed( {}))
 }
 }
 if(typeof BidirectionalCollection$implementation != 'undefined') _mixin(StringProtocol$implementation, BidirectionalCollection$implementation, false)
@@ -59081,22 +59081,22 @@ throw 'unsupported method ObjectiveC.(file).NSObject.hash(into:Hasher) in ' + th
 
 static /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],to:NSPasteboard)*/
 /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],to:NSPasteboard)*/
-tableView(tableView, rows, pboard, $info?) {
+tableViewWriteRowsTo(tableView, rows, pboard, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],to:NSPasteboard) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],to:NSPasteboard)*/
 /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],to:NSPasteboard)*/
-tableView(tableView, rows, pboard, $info?) {
+tableViewWriteRowsTo(tableView, rows, pboard, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],to:NSPasteboard) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],toPasteboard:NSPasteboard)*/
 /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],toPasteboard:NSPasteboard)*/
-tableView1(tableView, rows, pboard, $info?) {
+tableView1WriteRowsToPasteboard(tableView, rows, pboard, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],toPasteboard:NSPasteboard) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],toPasteboard:NSPasteboard)*/
 /*AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],toPasteboard:NSPasteboard)*/
-tableView1(tableView, rows, pboard, $info?) {
+tableView1WriteRowsToPasteboard(tableView, rows, pboard, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.tableView(_:NSTableView,writeRows:[Any],toPasteboard:NSPasteboard) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.textStorageWillProcessEditing(_:Notification)*/
@@ -59121,42 +59121,42 @@ throw 'unsupported method AppKit.(file).NSObject.textStorageDidProcessEditing(_:
 }
 static /*AppKit.(file).NSObject.panel(_:Any,isValidFilename:String)*/
 /*AppKit.(file).NSObject.panel(_:Any,isValidFilename:String)*/
-panel(sender, filename, $info?) {
+panelIsValidFilename(sender, filename, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,isValidFilename:String) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.panel(_:Any,isValidFilename:String)*/
 /*AppKit.(file).NSObject.panel(_:Any,isValidFilename:String)*/
-panel(sender, filename, $info?) {
+panelIsValidFilename(sender, filename, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,isValidFilename:String) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.panel(_:Any,directoryDidChange:String)*/
 /*AppKit.(file).NSObject.panel(_:Any,directoryDidChange:String)*/
-panel1(sender, path, $info?) {
+panel1DirectoryDidChange(sender, path, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,directoryDidChange:String) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.panel(_:Any,directoryDidChange:String)*/
 /*AppKit.(file).NSObject.panel(_:Any,directoryDidChange:String)*/
-panel1(sender, path, $info?) {
+panel1DirectoryDidChange(sender, path, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,directoryDidChange:String) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.panel(_:Any,compareFilename:String,with:String,caseSensitive:Bool)*/
 /*AppKit.(file).NSObject.panel(_:Any,compareFilename:String,with:String,caseSensitive:Bool)*/
-panel2(sender, name1, name2, caseSensitive, $info?) {
+panel2CompareFilenameWithCaseSensitive(sender, name1, name2, caseSensitive, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,compareFilename:String,with:String,caseSensitive:Bool) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.panel(_:Any,compareFilename:String,with:String,caseSensitive:Bool)*/
 /*AppKit.(file).NSObject.panel(_:Any,compareFilename:String,with:String,caseSensitive:Bool)*/
-panel2(sender, name1, name2, caseSensitive, $info?) {
+panel2CompareFilenameWithCaseSensitive(sender, name1, name2, caseSensitive, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,compareFilename:String,with:String,caseSensitive:Bool) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.panel(_:Any,shouldShowFilename:String)*/
 /*AppKit.(file).NSObject.panel(_:Any,shouldShowFilename:String)*/
-panel3(sender, filename, $info?) {
+panel3ShouldShowFilename(sender, filename, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,shouldShowFilename:String) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.panel(_:Any,shouldShowFilename:String)*/
 /*AppKit.(file).NSObject.panel(_:Any,shouldShowFilename:String)*/
-panel3(sender, filename, $info?) {
+panel3ShouldShowFilename(sender, filename, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.panel(_:Any,shouldShowFilename:String) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.awakeFromNib()*/
@@ -59181,37 +59181,37 @@ throw 'unsupported method AppKit.(file).NSObject.prepareForInterfaceBuilder() in
 }
 static /*AppKit.(file).NSObject.fontManager(_:Any,willIncludeFont:String)*/
 /*AppKit.(file).NSObject.fontManager(_:Any,willIncludeFont:String)*/
-fontManager(sender, fontName, $info?) {
+fontManagerWillIncludeFont(sender, fontName, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.fontManager(_:Any,willIncludeFont:String) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.fontManager(_:Any,willIncludeFont:String)*/
 /*AppKit.(file).NSObject.fontManager(_:Any,willIncludeFont:String)*/
-fontManager(sender, fontName, $info?) {
+fontManagerWillIncludeFont(sender, fontName, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.fontManager(_:Any,willIncludeFont:String) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.setDefaultPlaceholder(_:Any?,for:Any?,with:NSBindingName)*/
 /*AppKit.(file).NSObject.setDefaultPlaceholder(_:Any?,for:Any?,with:NSBindingName)*/
-setDefaultPlaceholder(placeholder, marker, binding, $info?) {
+setDefaultPlaceholderForWith(placeholder, marker, binding, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.setDefaultPlaceholder(_:Any?,for:Any?,with:NSBindingName) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.setDefaultPlaceholder(_:Any?,forMarker:Any?,withBinding:NSBindingName)*/
 /*AppKit.(file).NSObject.setDefaultPlaceholder(_:Any?,forMarker:Any?,withBinding:NSBindingName)*/
-setDefaultPlaceholder1(placeholder, marker, binding, $info?) {
+setDefaultPlaceholder1ForMarkerWithBinding(placeholder, marker, binding, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.setDefaultPlaceholder(_:Any?,forMarker:Any?,withBinding:NSBindingName) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.defaultPlaceholder(for:Any?,with:NSBindingName)*/
 /*AppKit.(file).NSObject.defaultPlaceholder(for:Any?,with:NSBindingName)*/
-defaultPlaceholder(marker, binding, $info?) {
+defaultPlaceholderForWith(marker, binding, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.defaultPlaceholder(for:Any?,with:NSBindingName) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.defaultPlaceholder(forMarker:Any?,withBinding:NSBindingName)*/
 /*AppKit.(file).NSObject.defaultPlaceholder(forMarker:Any?,withBinding:NSBindingName)*/
-defaultPlaceholder1(marker, binding, $info?) {
+defaultPlaceholder1ForMarkerWithBinding(marker, binding, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.defaultPlaceholder(forMarker:Any?,withBinding:NSBindingName) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.defaultPlaceholderForMarker(_:Any?,withBinding:NSBindingName)*/
 /*AppKit.(file).NSObject.defaultPlaceholderForMarker(_:Any?,withBinding:NSBindingName)*/
-defaultPlaceholderForMarker(marker, binding, $info?) {
+defaultPlaceholderForMarkerWithBinding(marker, binding, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.defaultPlaceholderForMarker(_:Any?,withBinding:NSBindingName) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.exposeBinding(_:NSBindingName)*/
@@ -59233,22 +59233,22 @@ throw 'unsupported method AppKit.(file).NSObject.valueClassForBinding(_:NSBindin
 }
 static /*AppKit.(file).NSObject.bind(_:NSBindingName,to:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
 /*AppKit.(file).NSObject.bind(_:NSBindingName,to:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
-bind(binding, observable, keyPath, options, $info?) {
+bindToWithKeyPathOptions(binding, observable, keyPath, options, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.bind(_:NSBindingName,to:Any,withKeyPath:String,options:[NSBindingOption : Any]?) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.bind(_:NSBindingName,to:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
 /*AppKit.(file).NSObject.bind(_:NSBindingName,to:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
-bind(binding, observable, keyPath, options, $info?) {
+bindToWithKeyPathOptions(binding, observable, keyPath, options, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.bind(_:NSBindingName,to:Any,withKeyPath:String,options:[NSBindingOption : Any]?) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.bind(_:NSBindingName,toObject:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
 /*AppKit.(file).NSObject.bind(_:NSBindingName,toObject:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
-bind1(binding, observable, keyPath, options, $info?) {
+bind1ToObjectWithKeyPathOptions(binding, observable, keyPath, options, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.bind(_:NSBindingName,toObject:Any,withKeyPath:String,options:[NSBindingOption : Any]?) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.bind(_:NSBindingName,toObject:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
 /*AppKit.(file).NSObject.bind(_:NSBindingName,toObject:Any,withKeyPath:String,options:[NSBindingOption : Any]?)*/
-bind1(binding, observable, keyPath, options, $info?) {
+bind1ToObjectWithKeyPathOptions(binding, observable, keyPath, options, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.bind(_:NSBindingName,toObject:Any,withKeyPath:String,options:[NSBindingOption : Any]?) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.unbind(_:NSBindingName)*/
@@ -59288,72 +59288,76 @@ throw 'unsupported method AppKit.(file).NSObject.exposedBindings() in ' + this.c
 }
 static /*AppKit.(file).NSObject.namesOfPromisedFilesDropped(atDestination:URL)*/
 /*AppKit.(file).NSObject.namesOfPromisedFilesDropped(atDestination:URL)*/
-namesOfPromisedFilesDropped(dropDestination, $info?) {
+namesOfPromisedFilesDroppedAtDestination(dropDestination, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.namesOfPromisedFilesDropped(atDestination:URL) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.namesOfPromisedFilesDropped(atDestination:URL)*/
 /*AppKit.(file).NSObject.namesOfPromisedFilesDropped(atDestination:URL)*/
-namesOfPromisedFilesDropped(dropDestination, $info?) {
+namesOfPromisedFilesDroppedAtDestination(dropDestination, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.namesOfPromisedFilesDropped(atDestination:URL) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.namesOfPromisedFilesDroppedAtDestination(_:URL)*/
 /*AppKit.(file).NSObject.namesOfPromisedFilesDroppedAtDestination(_:URL)*/
+/*!!!DUPLICATE NAME*/
 namesOfPromisedFilesDroppedAtDestination(dropDestination, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.namesOfPromisedFilesDroppedAtDestination(_:URL) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.namesOfPromisedFilesDroppedAtDestination(_:URL)*/
 /*AppKit.(file).NSObject.namesOfPromisedFilesDroppedAtDestination(_:URL)*/
+/*!!!DUPLICATE NAME*/
 namesOfPromisedFilesDroppedAtDestination(dropDestination, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.namesOfPromisedFilesDroppedAtDestination(_:URL) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.draggingSourceOperationMask(forLocal:Bool)*/
 /*AppKit.(file).NSObject.draggingSourceOperationMask(forLocal:Bool)*/
-draggingSourceOperationMask(flag, $info?) {
+draggingSourceOperationMaskForLocal(flag, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.draggingSourceOperationMask(forLocal:Bool) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.draggingSourceOperationMask(forLocal:Bool)*/
 /*AppKit.(file).NSObject.draggingSourceOperationMask(forLocal:Bool)*/
-draggingSourceOperationMask(flag, $info?) {
+draggingSourceOperationMaskForLocal(flag, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.draggingSourceOperationMask(forLocal:Bool) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.draggingSourceOperationMaskForLocal(_:Bool)*/
 /*AppKit.(file).NSObject.draggingSourceOperationMaskForLocal(_:Bool)*/
+/*!!!DUPLICATE NAME*/
 draggingSourceOperationMaskForLocal(flag, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.draggingSourceOperationMaskForLocal(_:Bool) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.draggingSourceOperationMaskForLocal(_:Bool)*/
 /*AppKit.(file).NSObject.draggingSourceOperationMaskForLocal(_:Bool)*/
+/*!!!DUPLICATE NAME*/
 draggingSourceOperationMaskForLocal(flag, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.draggingSourceOperationMaskForLocal(_:Bool) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.draggedImage(_:NSImage?,beganAt:NSPoint)*/
 /*AppKit.(file).NSObject.draggedImage(_:NSImage?,beganAt:NSPoint)*/
-draggedImage(_image, screenPoint, $info?) {
+draggedImageBeganAt(_image, screenPoint, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,beganAt:NSPoint) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.draggedImage(_:NSImage?,beganAt:NSPoint)*/
 /*AppKit.(file).NSObject.draggedImage(_:NSImage?,beganAt:NSPoint)*/
-draggedImage(_image, screenPoint, $info?) {
+draggedImageBeganAt(_image, screenPoint, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,beganAt:NSPoint) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,operation:NSDragOperation)*/
 /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,operation:NSDragOperation)*/
-draggedImage1(_image, screenPoint, operation, $info?) {
+draggedImage1EndedAtOperation(_image, screenPoint, operation, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,operation:NSDragOperation) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,operation:NSDragOperation)*/
 /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,operation:NSDragOperation)*/
-draggedImage1(_image, screenPoint, operation, $info?) {
+draggedImage1EndedAtOperation(_image, screenPoint, operation, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,operation:NSDragOperation) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.draggedImage(_:NSImage?,movedTo:NSPoint)*/
 /*AppKit.(file).NSObject.draggedImage(_:NSImage?,movedTo:NSPoint)*/
-draggedImage2(_image, screenPoint, $info?) {
+draggedImage2MovedTo(_image, screenPoint, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,movedTo:NSPoint) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.draggedImage(_:NSImage?,movedTo:NSPoint)*/
 /*AppKit.(file).NSObject.draggedImage(_:NSImage?,movedTo:NSPoint)*/
-draggedImage2(_image, screenPoint, $info?) {
+draggedImage2MovedTo(_image, screenPoint, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,movedTo:NSPoint) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.ignoreModifierKeysWhileDragging()*/
@@ -59368,22 +59372,22 @@ throw 'unsupported method AppKit.(file).NSObject.ignoreModifierKeysWhileDragging
 }
 static /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,deposited:Bool)*/
 /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,deposited:Bool)*/
-draggedImage3(_image, screenPoint, flag, $info?) {
+draggedImage3EndedAtDeposited(_image, screenPoint, flag, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,deposited:Bool) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,deposited:Bool)*/
 /*AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,deposited:Bool)*/
-draggedImage3(_image, screenPoint, flag, $info?) {
+draggedImage3EndedAtDeposited(_image, screenPoint, flag, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.draggedImage(_:NSImage?,endedAt:NSPoint,deposited:Bool) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.accessibilitySetOverrideValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
 /*AppKit.(file).NSObject.accessibilitySetOverrideValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
-accessibilitySetOverrideValue(value, attribute, $info?) {
+accessibilitySetOverrideValueForAttribute(value, attribute, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.accessibilitySetOverrideValue(_:Any?,forAttribute:NSAccessibility.Attribute) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.accessibilitySetOverrideValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
 /*AppKit.(file).NSObject.accessibilitySetOverrideValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
-accessibilitySetOverrideValue(value, attribute, $info?) {
+accessibilitySetOverrideValueForAttribute(value, attribute, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.accessibilitySetOverrideValue(_:Any?,forAttribute:NSAccessibility.Attribute) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.accessibilityAttributeNames()*/
@@ -59418,12 +59422,12 @@ throw 'unsupported method AppKit.(file).NSObject.accessibilityIsAttributeSettabl
 }
 static /*AppKit.(file).NSObject.accessibilitySetValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
 /*AppKit.(file).NSObject.accessibilitySetValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
-accessibilitySetValue(value, attribute, $info?) {
+accessibilitySetValueForAttribute(value, attribute, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.accessibilitySetValue(_:Any?,forAttribute:NSAccessibility.Attribute) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.accessibilitySetValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
 /*AppKit.(file).NSObject.accessibilitySetValue(_:Any?,forAttribute:NSAccessibility.Attribute)*/
-accessibilitySetValue(value, attribute, $info?) {
+accessibilitySetValueForAttribute(value, attribute, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.accessibilitySetValue(_:Any?,forAttribute:NSAccessibility.Attribute) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.accessibilityParameterizedAttributeNames()*/
@@ -59438,12 +59442,12 @@ throw 'unsupported method AppKit.(file).NSObject.accessibilityParameterizedAttri
 }
 static /*AppKit.(file).NSObject.accessibilityAttributeValue(_:NSAccessibility.ParameterizedAttribute,forParameter:Any?)*/
 /*AppKit.(file).NSObject.accessibilityAttributeValue(_:NSAccessibility.ParameterizedAttribute,forParameter:Any?)*/
-accessibilityAttributeValue1(attribute, parameter, $info?) {
+accessibilityAttributeValue1ForParameter(attribute, parameter, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.accessibilityAttributeValue(_:NSAccessibility.ParameterizedAttribute,forParameter:Any?) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.accessibilityAttributeValue(_:NSAccessibility.ParameterizedAttribute,forParameter:Any?)*/
 /*AppKit.(file).NSObject.accessibilityAttributeValue(_:NSAccessibility.ParameterizedAttribute,forParameter:Any?)*/
-accessibilityAttributeValue1(attribute, parameter, $info?) {
+accessibilityAttributeValue1ForParameter(attribute, parameter, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.accessibilityAttributeValue(_:NSAccessibility.ParameterizedAttribute,forParameter:Any?) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.accessibilityActionNames()*/
@@ -59500,21 +59504,23 @@ throw 'unsupported method AppKit.(file).NSObject.accessibilityHitTest(_:NSPoint)
 accessibilityFocusedUIElement
 static /*AppKit.(file).NSObject.accessibilityIndex(ofChild:Any)*/
 /*AppKit.(file).NSObject.accessibilityIndex(ofChild:Any)*/
-accessibilityIndex(child, $info?) {
+accessibilityIndexOfChild(child, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.accessibilityIndex(ofChild:Any) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.accessibilityIndex(ofChild:Any)*/
 /*AppKit.(file).NSObject.accessibilityIndex(ofChild:Any)*/
-accessibilityIndex(child, $info?) {
+accessibilityIndexOfChild(child, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.accessibilityIndex(ofChild:Any) in ' + this.constructor.name
 }
 static /*AppKit.(file).NSObject.accessibilityIndexOfChild(_:Any)*/
 /*AppKit.(file).NSObject.accessibilityIndexOfChild(_:Any)*/
+/*!!!DUPLICATE NAME*/
 accessibilityIndexOfChild(child, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.accessibilityIndexOfChild(_:Any) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.accessibilityIndexOfChild(_:Any)*/
 /*AppKit.(file).NSObject.accessibilityIndexOfChild(_:Any)*/
+/*!!!DUPLICATE NAME*/
 accessibilityIndexOfChild(child, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.accessibilityIndexOfChild(_:Any) in ' + this.constructor.name
 }
@@ -59530,12 +59536,12 @@ throw 'unsupported method AppKit.(file).NSObject.accessibilityArrayAttributeCoun
 }
 static /*AppKit.(file).NSObject.accessibilityArrayAttributeValues(_:NSAccessibility.Attribute,index:Int,maxCount:Int)*/
 /*AppKit.(file).NSObject.accessibilityArrayAttributeValues(_:NSAccessibility.Attribute,index:Int,maxCount:Int)*/
-accessibilityArrayAttributeValues(attribute, index, maxCount, $info?) {
+accessibilityArrayAttributeValuesIndexMaxCount(attribute, index, maxCount, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.accessibilityArrayAttributeValues(_:NSAccessibility.Attribute,index:Int,maxCount:Int) in ' + this.constructor.name
 }
 /*AppKit.(file).NSObject.accessibilityArrayAttributeValues(_:NSAccessibility.Attribute,index:Int,maxCount:Int)*/
 /*AppKit.(file).NSObject.accessibilityArrayAttributeValues(_:NSAccessibility.Attribute,index:Int,maxCount:Int)*/
-accessibilityArrayAttributeValues(attribute, index, maxCount, $info?) {
+accessibilityArrayAttributeValuesIndexMaxCount(attribute, index, maxCount, $info?) {
 throw 'unsupported method AppKit.(file).NSObject.accessibilityArrayAttributeValues(_:NSAccessibility.Attribute,index:Int,maxCount:Int) in ' + this.constructor.name
 }
 
@@ -61194,12 +61200,12 @@ throw 'unsupported method Foundation.(file).NSObject.classForCoder() in ' + this
 }
 static /*CoreImage.(file).NSObject.provideImageData(_:UnsafeMutableRawPointer,bytesPerRow:Int,origin:Int,_:Int,size:Int,_:Int,userInfo:Any?)*/
 /*CoreImage.(file).NSObject.provideImageData(_:UnsafeMutableRawPointer,bytesPerRow:Int,origin:Int,_:Int,size:Int,_:Int,userInfo:Any?)*/
-provideImageData(data, rowbytes, x, y, width, height, info, $info?) {
+provideImageDataBytesPerRowOriginSizeUserInfo(data, rowbytes, x, y, width, height, info, $info?) {
 throw 'unsupported method CoreImage.(file).NSObject.provideImageData(_:UnsafeMutableRawPointer,bytesPerRow:Int,origin:Int,_:Int,size:Int,_:Int,userInfo:Any?) in ' + this.constructor.name
 }
 /*CoreImage.(file).NSObject.provideImageData(_:UnsafeMutableRawPointer,bytesPerRow:Int,origin:Int,_:Int,size:Int,_:Int,userInfo:Any?)*/
 /*CoreImage.(file).NSObject.provideImageData(_:UnsafeMutableRawPointer,bytesPerRow:Int,origin:Int,_:Int,size:Int,_:Int,userInfo:Any?)*/
-provideImageData(data, rowbytes, x, y, width, height, info, $info?) {
+provideImageDataBytesPerRowOriginSizeUserInfo(data, rowbytes, x, y, width, height, info, $info?) {
 throw 'unsupported method CoreImage.(file).NSObject.provideImageData(_:UnsafeMutableRawPointer,bytesPerRow:Int,origin:Int,_:Int,size:Int,_:Int,userInfo:Any?) in ' + this.constructor.name
 }
 init$vars() {let _this = this;

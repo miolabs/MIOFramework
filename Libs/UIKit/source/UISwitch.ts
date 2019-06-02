@@ -1,4 +1,5 @@
 import { UIControl } from "./UIControl";
+import { UIControlEvents } from "./UIControl";
 import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
 
 /**
@@ -33,12 +34,6 @@ export class UISwitch extends UIControl
         }
     }
 
-    setOnChangeValue(target, action){
-        this.target = target;
-        this.action = action;
-    }
-
-
     private _on = false;
     get isOn() {return this._on;}
     set isOn(value){this.setOn(value);}
@@ -46,12 +41,11 @@ export class UISwitch extends UIControl
         if (value == this._on) return;
         this._inputLayer.checked = value;
         this._on = value;
+
+        this._performActionsForEvents(UIControlEvents.ValueChanged);
     }
 
     private _toggleValue(){
         this.isOn = !this.isOn;
-
-        if (this.target != null && this.action != null)
-            this.action.call(this.target, this, this.isOn);
     }
 }

@@ -6235,10 +6235,10 @@ result.subscript$set((_.arg0 = lhs.subscript$get(i_1)).constructor.$lessThanOrEq
 return result
 ----Swift.(file).SIMD.min()
 let _this = this;
-return _this.indices.reduceInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = min($0, _this.subscript$get($1))))
+return _this.indices.reduceSwiftInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = min($0, _this.subscript$get($1))))
 ----Swift.(file).SIMD.max()
 let _this = this;
-return _this.indices.reduceInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = max($0, _this.subscript$get($1))))
+return _this.indices.reduceSwiftInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = max($0, _this.subscript$get($1))))
 ----Swift.(file).SIMD..==infix(_:Self.Scalar,_:Self)
 let _this = this;
 return (_.arg0 = _create(_this, 'initRepeating', lhs, {})).constructor.infix_46_61_61(_.arg0, rhs)
@@ -6615,7 +6615,7 @@ result.subscript$set(((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).$
 return result
 ----Swift.(file).SIMD.wrappedSum()
 let _this = this;
-return _this.indices.reduceInto(0, (($0$inout, $1, $info?) => ((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).infix_38_43_61({get: () => $0, set: $val => $0 = $val}, _this.subscript$get($1))))
+return _this.indices.reduceSwiftInto(0, (($0$inout, $1, $info?) => ((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).infix_38_43_61({get: () => $0, set: $val => $0 = $val}, _this.subscript$get($1))))
 ----Swift.(file).SIMD.+infix(_:Self,_:Self)
 let _this = this;
 let result = _create(_this, 'init', {});
@@ -6702,13 +6702,13 @@ result.subscript$set(((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).p
 return result
 ----Swift.(file).SIMD.min()
 let _this = this;
-return _this.indices.reduceInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = ((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).minimum($0, _this.subscript$get($1))))
+return _this.indices.reduceSwiftInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = ((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).minimum($0, _this.subscript$get($1))))
 ----Swift.(file).SIMD.max()
 let _this = this;
-return _this.indices.reduceInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = ((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).maximum($0, _this.subscript$get($1))))
+return _this.indices.reduceSwiftInto(_this.subscript$get(0), (($0$inout, $1, $info?) => $0 = ((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).maximum($0, _this.subscript$get($1))))
 ----Swift.(file).SIMD.sum()
 let _this = this;
-return _this.indices.reduceInto(0, (($0$inout, $1, $info?) => ((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).$addAndAssign({get: () => $0, set: $val => $0 = $val}, _this.subscript$get($1))))
+return _this.indices.reduceSwiftInto(0, (($0$inout, $1, $info?) => ((function(){throw '!unclarifiedGeneric:Self.Scalar'})()).$addAndAssign({get: () => $0, set: $val => $0 = $val}, _this.subscript$get($1))))
 ----Swift.(file).SIMDMask..!prefix(_:SIMDMask<Storage>)
 let _this = this;
 return _create(SIMDMask, 'init', ((function(){throw '!unclarifiedGeneric:Storage'})()).$bitwiseNot(rhs._storage), {})
@@ -7156,6 +7156,8 @@ lhs$inout.set(lhs)
 return $result
 ----Swift.(file).any(_:SIMDMask<Storage>)
 return ((function(){throw '!unclarifiedGeneric:Storage.Scalar'})()).$lessThan(mask._storage.min( {}), 0)
+----Swift.(file).all(_:SIMDMask<Storage>)
+return ((function(){throw '!unclarifiedGeneric:Storage.Scalar'})()).$lessThan(mask._storage.max( {}), 0)
 ----Swift.(file).pointwiseMin(_:T,_:T)
 let result = _create(((function(){throw '!unclarifiedGeneric:T'})()), 'init', {});
 {
@@ -8207,11 +8209,11 @@ return _this.sortedBy(this.first[0].constructor.$lessThan)
 ----Swift.(file).Sequence.sorted(by:(Self.Element, Self.Element) throws -> Bool)
 let _this = this;
 let result = _create(ContiguousArray, 'initBuffer', _this, {});
-result.sortBy(areInIncreasingOrder, {$setThis: $val => result = $val});
+result.sortSwiftBy(areInIncreasingOrder, {$setThis: $val => result = $val});
 return _create(Array, 'initBuffer', result, {})
 ----Swift.(file).MutableCollection.sort()
 let _this = this;
-_this.sortBy(this.first[0].constructor.$lessThan, {$setThis: $val => $info.$setThis(_this = _cloneStruct($val))})
+_this.sortSwiftBy(this.first[0].constructor.$lessThan, {$setThis: $val => $info.$setThis(_this = _cloneStruct($val))})
 ----Swift.(file).MutableCollection.sort(by:(Self.Element, Self.Element) throws -> Bool)
 let _this = this;
 const didSortUnsafeBuffer = _this._withUnsafeMutableBufferPointerIfSupported(((buffer$inout, $info?) => _injectIntoOptional(buffer._stableSortImplBy(areInIncreasingOrder, {$setThis: $val => buffer = $val}))), {$setThis: $val => $info.$setThis(_this = _cloneStruct($val))});
@@ -8852,10 +8854,10 @@ return _cloneStruct(result);
 return
 ----Swift.(file).StringProtocol.hasPrefix(_:Prefix)
 let _this = this;
-return _this.startsWithSwift(prefix)
+return _this.startsWith(prefix)
 ----Swift.(file).StringProtocol.hasSuffix(_:Suffix)
 let _this = this;
-return _this.reversed( {}).startsWithSwift(suffix.reversed( {}))
+return _this.reversed( {}).startsWith(suffix.reversed( {}))
 ----Swift.(file).String.init(_:T,radix:Int,uppercase:Bool)
 let _this = this;
 return _cloneStruct(((function(){throw '!unclarifiedGeneric:T'})()).prototype._descriptionRadixUppercase.call(value, radix, uppercase));

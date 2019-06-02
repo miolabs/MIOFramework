@@ -3,6 +3,7 @@ import { NSBundle } from "mio-foundation-web";
 import { UIViewController } from "./UIViewController";
 import { MIOCoreBundleGetAppResource } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
+import { UINavigationItem } from "./UINavigationItem";
 
 export class UIStoryboard extends NSObject
 {
@@ -72,6 +73,22 @@ export function MUICoreStoryboardParseLayer(layer, object, owner){
                         let identifier = d.getAttribute("data-segue-identifier");
 
                         MUICoreStoryboardAddSegue(object, destination, kind, relationship, identifier);
+                    }
+                }
+            }
+            else if (subLayer.getAttribute("data-navigation-key") == "navigationItem"){
+                let title = subLayer.getAttribute("data-navigation-title");
+
+                owner.navigationItem = new UINavigationItem();
+                owner.navigationItem.initWithTitle(title);
+
+                for (let index2 = 0; index2 < subLayer.childNodes.length; index2++) {
+                    let d = subLayer.childNodes[index2] as HTMLElement;
+                    if (d.tagName != "DIV") continue;
+
+                    let key = d.getAttribute("data-bar-button-item-key");
+                    if (key == "rightBarButtonItem") {
+                        
                     }
                 }
             }

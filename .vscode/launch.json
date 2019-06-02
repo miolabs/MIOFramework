@@ -8,7 +8,11 @@
 			"type": "chrome",
 			"request": "launch",
 			"name": "Launch Chrome against localhost",
+<<<<<<< HEAD
 			"url": "http://localhost:80/ITests/Demo5/dist",
+=======
+			"url": "http://localhost:9090/ITests/Demo2App/dist",
+>>>>>>> af1ae05a986f0b49143d47593bfb2dad5a239447
 			"webRoot": "${workspaceFolder}"
 		}
 	]

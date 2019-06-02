@@ -1,6 +1,6 @@
 import { NSFormatter } from "mio-foundation-web";
 import { NSLocalizeString } from "mio-foundation-web";
-import "mio-foundation-web/extensions"
+import "./node_modules/mio-foundation-web/extensions"
 
 import { UIControl } from "./UIControl";
 import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";

@@ -4,10 +4,8 @@ import { _MUIHideViewController } from "./core/MUICore";
 import { _MUIShowViewController } from "./core/MUICore";
 import { MUIClassListForAnimationType } from "./core/MUICoreAnimation";
 import { MUIAnimationType } from "./core/MUICoreAnimation";
-import { NSClassFromString } from "mio-foundation-web";
-import { UIView } from "./UIView";
-import { MUICoreBundleGetClassesByDestination } from "./core/MUICoreNibParser";
 import { UIControlEvents } from "./UIControl";
+import { UINavigationBar } from "./UINavigationBar";
 
 /**
  * Created by godshadow on 9/4/16.
@@ -15,23 +13,28 @@ import { UIControlEvents } from "./UIControl";
 
 export class UINavigationController extends UIViewController
 {
-    rootViewController = null;
+    rootViewController:UIViewController = null;
     viewControllersStack = [];
     currentViewControllerIndex = -1;
+    
+    private _navigationBar:UINavigationBar = null;
+    get navigationBar():UINavigationBar {
+        return this._navigationBar;
+    }
 
     init(){
         super.init();
         this.view.layer.style.overflow = "hidden";        
     }
 
-    initWithRootViewController(vc:UIViewController){
+    initWithRootViewController(vc:UIViewController){        
         this.init();
-        this.setRootViewController(vc);
+        this.setRootViewController(vc);        
     }
 
     setRootViewController(vc:UIViewController){
-        //this.transitioningDelegate = this;
-        
+        //this.transitioningDelegate = this;                
+
         this.rootViewController = vc;
         this.view.addSubview(vc.view);
 
@@ -41,10 +44,19 @@ export class UINavigationController extends UIViewController
         this.rootViewController.navigationController = this;
 
         this.addChildViewController(vc);
+
         // if (this.presentationController != null) {
         //     var size = vc.preferredContentSize;
         //     this.contentSize = size;
         // }
+    }
+
+    protected _setViewLoaded(value) {
+        super._setViewLoaded(value);
+
+        this._navigationBar = this.view.subviews[0] as UINavigationBar;
+        let navItems = [this.rootViewController.navigationItem];
+        this._navigationBar.setItems(navItems, false);
     }
 
     viewWillAppear(animated?:boolean){
@@ -79,7 +91,7 @@ export class UINavigationController extends UIViewController
 
         vc.navigationController = this;
 
-        vc.onLoadView(this, function () {
+        vc.onLoadView(this, function (this:UINavigationController) {
 
             if (vc.navigationItem != null && vc.navigationItem.backBarButtonItem != null) {
                 vc.navigationItem.backBarButtonItem.addTarget(this, function(){

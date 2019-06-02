@@ -50,14 +50,6 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "navigationBar"){
 		pushNewElement(element, attributes);
 	}
-	else if (element == "navigationItem"){
-		let title = attributes["title"];
-		let key = attributes["key"];		
-		let div = '<div class="hidden" data-navigation-key="' +  key + '"';
-		if (title != null) div += ' data-navigation-title="' + title + '"';
-		div += "></div>";
-		currentElement["Content"] = currentElement["Content"] + div;
-	}
 	else if (element == "label"){
 		let item = pushNewElement(element, attributes);
 		parseTextAlignment(attributes["textAlignment"], item["Classes"]);

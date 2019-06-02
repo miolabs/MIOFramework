@@ -35,6 +35,9 @@ export * from './UITableViewCell'
 
 export * from './UIAlertController'
 
+export * from './UIBarItem'
+export * from './UIBarButtonItem'
+
 export * from './UINavigationBar'
 export * from './UINavigationItem'
 export * from './UINavigationController'

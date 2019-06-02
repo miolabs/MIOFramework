@@ -2,7 +2,7 @@
 import { NSObject } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
-import "mio-foundation-web/extensions"
+import "./node_modules/mio-foundation-web/extensions"
 
 import { UIWindow } from "./UIWindow";
 import { MUICoreLayerIDFromObject } from "./core/MUICoreLayer";

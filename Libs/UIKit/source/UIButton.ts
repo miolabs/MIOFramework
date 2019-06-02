@@ -1,11 +1,7 @@
 import { NSLocalizeString } from "mio-foundation-web";
 import { UIControl, UIControlEvents } from "./UIControl";
 import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
-import { MUICoreLayerRemoveStyle } from "./core/MUICoreLayer";
 import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
-import { NSClassFromString } from "mio-foundation-web";
-import { UIViewController } from "./UIViewController";
-import { MUICoreBundleGetClassesByDestination } from "./core/MUICoreNibParser";
 
 /**
  * Created by godshadow on 12/3/16.
