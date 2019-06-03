@@ -1,11 +1,11 @@
-export class NSPoint
+export class CGPoint
 {
     x = 0;
     y = 0;
 
     public static Zero()
     {
-        var p = new NSPoint(0, 0);
+        var p = new CGPoint(0, 0);
         return p;
     }
 

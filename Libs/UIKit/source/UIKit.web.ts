@@ -6,11 +6,12 @@ import { NSLocalizeString } from "mio-foundation-web";
 import { MIOCoreBundleGetContentsFromURLString } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
-import { NSRect } from "mio-foundation-web";
+import { CGRect } from "mio-foundation-web";
 import { NSFormatter } from "mio-foundation-web";
 import { NSSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
+import { NSRect } from "mio-foundation-web";
 import { MIOCoreIsMobile } from "mio-foundation-web";
 import { NSTimer } from "mio-foundation-web";
 import { MIOCoreGetPlatform } from "mio-foundation-web";
@@ -22,7 +23,7 @@ import { MIOCoreBundleGetAppResource } from "mio-foundation-web";
 import { NSURLRequest } from "mio-foundation-web";
 import { MIOCoreBundleDownloadResource } from "mio-foundation-web";
 import { NSURLConnection } from "mio-foundation-web";
-import { NSPropertyListSerialization } from "mio-foundation-web";
+import { PropertyListSerialization } from "mio-foundation-web";
 import { NSURL } from "mio-foundation-web";
 import { MIOCoreGetLanguages } from "mio-foundation-web";
 import { MIOCoreAddLanguage } from "mio-foundation-web";
@@ -952,6 +953,7 @@ export class UIPanGestureRecognizer extends UIGestureRecognizer
 
 
 
+
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -1031,7 +1033,7 @@ export class UIView extends NSObject {
         //this.layer.style.background = "rgb(255, 255, 255)";                
     }
 
-    initWithFrame(frame: NSRect) {
+    initFrameCGRect(frame: CGRect) {
         this.layer = MUICoreLayerCreate(this.layerID);
         this.layer.style.position = "absolute";
         this.setX(frame.origin.x);
@@ -1255,6 +1257,10 @@ export class UIView extends NSObject {
         this.setHidden(value);
     }
 
+    set backgroundColor(color: UIColor) {
+        this.layer.style.backgroundColor = "#" + color.hex;
+    }
+
     setBackgroundColor(color) {
         this.layer.style.backgroundColor = "#" + color;
     }
@@ -1393,11 +1399,11 @@ export class UIView extends NSObject {
     }
 
     get frame() {
-        return NSRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        return CGRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
     }
 
     public get bounds() {
-        return NSRect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
+        return CGRect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
     }
 
     //
@@ -1507,12 +1513,13 @@ export class UIView extends NSObject {
     private static animationsViews = null;
     private static animationTarget = null;
     private static animationCompletion = null;
-    static animateWithDuration(duration: number, target, animations, completion?) {
+    static animateWithDurationAnimations(duration: number, animations, completion?) {
         UIView.animationsChanges = [];
         UIView.animationsViews = [];
-        UIView.animationTarget = target;
+        //UIView.animationTarget = target;
         UIView.animationCompletion = completion;
-        animations.call(target);
+        //animations.call(target);
+        animations();
 
         for (let index = 0; index < UIView.animationsChanges.length; index++) {
             let anim = UIView.animationsChanges[index];
@@ -6098,7 +6105,7 @@ export class UIApplication {
         MIOCoreBundleDownloadResource("app", "plist", this, function(data){
             if (data == null) throw new Error("We couldn't download the app.plist");
                                     
-            let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);
+            let config = PropertyListSerialization.propertyListWithData(data, 0, 0, null);
             let mainStoryBoardFile = "layout/" + config["UIMainStoryboardFile"];
 
             // Get Main story board
@@ -6312,4 +6319,28 @@ export class UIApplication {
         //this.windowZIndexOffset += 10;
 
     }
+}
+
+
+
+/**
+ * Created by godshadow on 11/3/16.
+ */
+
+
+export class UIColor extends NSObject
+{
+  hex: string
+  
+  initDisplayP3RedCGFloatGreenCGFloatBlueCGFloatAlphaCGFloat(r: number, g: number, b: number, a: number) {
+    let rS = r.toString(16)
+    if(rS.length < 2) rS = '0' + rS
+    let gS = g.toString(16)
+    if(gS.length < 2) gS = '0' + gS
+    let bS = b.toString(16)
+    if(bS.length < 2) bS = '0' + bS
+    let aS = Math.floor(a * 255).toString(16)
+    if(aS.length < 2) aS = '0' + aS
+    this.hex = rS + gS + bS + aS
+  }
 }

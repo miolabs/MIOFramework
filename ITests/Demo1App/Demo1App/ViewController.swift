@@ -36,7 +36,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func segmentedClicked(sender: UISegmentedControl){
-        label.text = "Hello from segment " + String(sender.selectedSegmentIndex);
+        label.text = "Hello 2 from segment " + String(sender.selectedSegmentIndex);
     }
 
 

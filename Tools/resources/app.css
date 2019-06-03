@@ -161,13 +161,17 @@ input[type="checkbox"]:checked::after {
 }
 
 .navigation-bar .btn.system-add-icon {
-	background-image: url('../icons/manager-icon-add.png');
-	background-position: center;
-	background-position-y: 50%;
-	width: 15px;
-	height: 15px;
-	background-color: transparent;
-	border-radius: 0;
+	background-image: url(../icons/manager-icon-add.png);
+    background-size: cover;
+    width: 15px;
+    height: 15px;
+    background-color: transparent;
+    border-radius: 0;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+	transform: translateY(-50%);
+	cursor: pointer;
 }
 
 /* TABLE VIEW */
