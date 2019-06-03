@@ -22,7 +22,7 @@ import { MIOCoreBundleGetAppResource } from "mio-foundation-web";
 import { NSURLRequest } from "mio-foundation-web";
 import { MIOCoreBundleDownloadResource } from "mio-foundation-web";
 import { NSURLConnection } from "mio-foundation-web";
-import { NSPropertyListSerialization } from "mio-foundation-web";
+import { PropertyListSerialization } from "mio-foundation-web";
 import { NSURL } from "mio-foundation-web";
 import { MIOCoreGetLanguages } from "mio-foundation-web";
 import { MIOCoreAddLanguage } from "mio-foundation-web";
@@ -6038,7 +6038,7 @@ export class UIApplication {
         MIOCoreBundleDownloadResource("app", "plist", this, function(data){
             if (data == null) throw new Error("We couldn't download the app.plist");
                                     
-            let config = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);
+            let config = PropertyListSerialization.propertyListWithData(data, 0, 0, null);
             let mainStoryBoardFile = "layout/" + config["UIMainStoryboardFile"];
 
             // Get Main story board

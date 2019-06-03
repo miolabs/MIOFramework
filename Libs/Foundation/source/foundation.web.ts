@@ -1403,17 +1403,17 @@ export class NSError extends NSObject
  * Created by godshadow on 9/4/16.
  */
 
-export class NSBundle extends NSObject
+export class Bundle extends NSObject
 {
     url:NSURL = null;
 
     private static _mainBundle = null;
     
-    public static mainBundle():NSBundle{
+    public static mainBundle():Bundle{
         if (this._mainBundle == null){            
             let urlString = MIOCoreBundleGetMainURLString();
 
-            this._mainBundle = new NSBundle();
+            this._mainBundle = new Bundle();
             this._mainBundle.initWithURL(NSURL.urlWithString(urlString));
         }
 
@@ -1488,7 +1488,7 @@ export class NSKeyedUnarchiver extends NSCoder
 
     private objects = null;
     _parseData(data:string, error){
-        let items = NSPropertyListSerialization.propertyListWithData(data, 0, 0, null);
+        let items = PropertyListSerialization.propertyListWithData(data, 0, 0, null);
 
         this.objects = items["$objects"];
         let rootIndex = items["$top"]["$0"]["CF$UID"];
@@ -1595,7 +1595,7 @@ export class NSNumber extends NSObject
 
     static numberWithInteger(value):NSNumber{
         let n = new NSNumber();
-        n.initWithInteger(value);
+        n.initValueInt(value);
         return n;        
     }
 
@@ -1616,7 +1616,7 @@ export class NSNumber extends NSObject
         }
     }
 
-    initWithInteger(value){
+    initValueInt(value){
         if (isNaN(value) || value == null) {
             this.storeValue = 0;
         }
@@ -1632,6 +1632,10 @@ export class NSNumber extends NSObject
         else {
             this.storeValue = value;
         }
+    }
+
+    get floatValue(){
+        return this.storeValue;
     }
 
 }
@@ -2236,7 +2240,7 @@ export class NSPredicateItem {
             }
             
             if (lValue instanceof Date) {
-                let sdf = new NSISO8601DateFormatter();
+                let sdf = new ISO8601DateFormatter();
                 sdf.init();
                 lValue = sdf.stringFromDate(lValue);
             }
@@ -2914,15 +2918,15 @@ export class NSIndexPath extends NSObject
 
 var _NS_currentLocale;
 
-export class NSLocale extends NSObject
+export class Locale extends NSObject
 {
     languageIdentifier = "es";
     countryIdentifier = "ES";
 
     public static currentLocale(){
         if (_NS_currentLocale == null) {
-            _NS_currentLocale = new NSLocale();
-            _NS_currentLocale.initWithLocaleIdentifier("es_ES");
+            _NS_currentLocale = new Locale();
+            _NS_currentLocale.initIdentifierString("es_ES");
         }
         //return NSWebApplication.sharedInstance().currentLanguage;
 
@@ -2930,11 +2934,11 @@ export class NSLocale extends NSObject
     }
 
     public static _setCurrentLocale(localeIdentifier:string){
-        _NS_currentLocale = new NSLocale();
-        _NS_currentLocale.initWithLocaleIdentifier(localeIdentifier);
+        _NS_currentLocale = new Locale();
+        _NS_currentLocale.initIdentifierString(localeIdentifier);
     }
 
-    initWithLocaleIdentifier(identifer:string) {
+    initIdentifierString(identifer:string) {
 
         let array = identifer.split("_");
         if (array.length == 1) {
@@ -3057,7 +3061,7 @@ export class NSLocale extends NSObject
 
 
 
-export class NSFormatter extends NSObject {
+export class Formatter extends NSObject {
 
     stringForObjectValue(value) {
         return value;
@@ -3090,7 +3094,7 @@ export enum NSDateFormatterStyle {
     FullStyle
 }
 
-export class NSDateFormatter extends NSFormatter {
+export class DateFormatter extends Formatter {
 
     dateStyle = NSDateFormatterStyle.ShortStyle;
     timeStyle = NSDateFormatterStyle.ShortStyle;    
@@ -3442,10 +3446,10 @@ var _NSDateFormatterStringMonths = ["January", "February", "March", "April", "Ma
 
 
 
-export class NSISO8601DateFormatter extends NSDateFormatter {
+export class ISO8601DateFormatter extends DateFormatter {
 
-    static iso8601DateFormatter():NSISO8601DateFormatter {
-        var df = new NSISO8601DateFormatter();
+    static iso8601DateFormatter():ISO8601DateFormatter {
+        var df = new ISO8601DateFormatter();
         df.init();
 
         return df;
@@ -3501,13 +3505,6 @@ export class NSISO8601DateFormatter extends NSDateFormatter {
 
 
 
-export enum NSNumberFormatterStyle {
-    NoStyle,
-    DecimalStyle,
-    CurrencyStyle,
-    CurrencyISOCodeStyle,
-    PercentStyle,    
-}
 
 export enum _NSNumberFormatterType {
     
@@ -3515,10 +3512,10 @@ export enum _NSNumberFormatterType {
     Decimal
 }
 
-export class NSNumberFormatter extends NSFormatter {
+export class NumberFormatter extends Formatter {
 
-    numberStyle = NSNumberFormatterStyle.NoStyle;
-    locale:NSLocale = null;
+    numberStyle = NumberFormatter.Style.none;
+    locale:Locale = null;
     minimumFractionDigits = 0;
     maximumFractionDigits = 0;
     groupingSeparator = null;
@@ -3527,9 +3524,17 @@ export class NSNumberFormatter extends NSFormatter {
     private currencyHasSpaces = true;
     private currencyIsRight = true;
 
+    static Style = class {
+        static get none() {return Object.assign(new NumberFormatter.Style(), {rawValue: 0})}
+        static get decimal() {return Object.assign(new NumberFormatter.Style(), {rawValue: 1})}
+        static get currency() {return Object.assign(new NumberFormatter.Style(), {rawValue: 2})}
+        static get currencyISOCode() {return Object.assign(new NumberFormatter.Style(), {rawValue: 3})}
+        static get percent() {return Object.assign(new NumberFormatter.Style(), {rawValue: 4})}
+    }
+
     init(){
         super.init();
-        this.locale = NSLocale.currentLocale();
+        this.locale = Locale.currentLocale();
 
         this.groupingSeparator = this.locale.groupingSeparator;
         this.currencySymbol = this.locale.currencySymbol;
@@ -3565,15 +3570,15 @@ export class NSNumberFormatter extends NSFormatter {
         return null;
     }
 
-    stringFromNumber(number:number):string{
+    stringFrom(number:NSNumber):string{
         return this.stringForObjectValue(number);
     }
 
     stringForObjectValue(value):string {
         
-        let number = value as number;
-        if(!number) number = 0;
-        let str = number.toString();
+        let number = value as NSNumber;
+        if(number == null) number = NSNumber.numberWithFloat(0);
+        let str = number.floatValue.toString();
         let intValue = null;
         let floatValue = null;
         let array = str.split(".");
@@ -3640,7 +3645,7 @@ export class NSNumberFormatter extends NSFormatter {
             }
         }
                 
-        if (this.numberStyle == NSNumberFormatterStyle.PercentStyle) res += "%";
+        if (this.numberStyle.rawValue == NumberFormatter.Style.percent.rawValue) res += "%";
         res = this.stringByAppendingCurrencyString(res);
 
         return res;
@@ -3702,11 +3707,11 @@ export class NSNumberFormatter extends NSFormatter {
 
     private stringByAppendingCurrencyString(text:string):string {
         let currency = "";        
-        if (this.numberStyle == NSNumberFormatterStyle.CurrencyStyle) {
+        if (this.numberStyle.rawValue == NumberFormatter.Style.currency.rawValue) {
             currency = this.currencySymbol;
             if (currency.length == 0) currency = this.currencyCode; // If there's no symbol, add the code instead.
         }
-        else if (this.numberStyle == NSNumberFormatterStyle.CurrencyISOCodeStyle) currency = this.currencyCode;
+        else if (this.numberStyle.rawValue == NumberFormatter.Style.currencyISOCode.rawValue) currency = this.currencyCode;
         else {
             return text;
         }        
@@ -3757,7 +3762,7 @@ export class NSNumberFormatter extends NSFormatter {
                 minusSymbol = true;                
             }
             else if (ch == "%"
-                     && this.numberStyle == NSNumberFormatterStyle.PercentStyle
+                     && this.numberStyle.rawValue == NumberFormatter.Style.percent.rawValue
                      && percentSymbol == false){
                 
                 percentSymbol = true;
@@ -3783,7 +3788,7 @@ export class NSNumberFormatter extends NSFormatter {
  * Created by godshadow on 21/3/16.
  */
 
-export class NSTimer extends NSObject
+export class Timer extends NSObject
 {    
     private _timerInterval = 0;
     private _repeat = false;
@@ -3794,7 +3799,7 @@ export class NSTimer extends NSObject
 
     static scheduledTimerWithTimeInterval(timeInterval, repeat, target, completion)
     {
-        var timer = new NSTimer();
+        var timer = new Timer();
         timer.initWithTimeInterval(timeInterval, repeat, target, completion);
 
         timer.fire();
@@ -3861,23 +3866,23 @@ export class NSNotification
     }
 }
 
-export class NSNotificationCenter
+export class NotificationCenter
 {
-    private static _sharedInstance:NSNotificationCenter = new NSNotificationCenter();
+    private static _sharedInstance:NotificationCenter = new NotificationCenter();
     notificationNames = {};
 
     constructor()
     {
-        if (NSNotificationCenter._sharedInstance)
+        if (NotificationCenter._sharedInstance)
         {
             throw new Error("Error: Instantiation failed: Use defaultCenter() instead of new.");
         }
-        NSNotificationCenter._sharedInstance = this;
+        NotificationCenter._sharedInstance = this;
     }
 
-    public static defaultCenter():NSNotificationCenter
+    public static defaultCenter():NotificationCenter
     {
-        return NSNotificationCenter._sharedInstance;
+        return NotificationCenter._sharedInstance;
     }
 
     addObserver(obs, name, fn)
@@ -3943,19 +3948,19 @@ export class NSNotificationCenter
  * Created by godshadow on 29/09/2016.
  */
 
-export class NSUserDefaults
+export class UserDefaults
 {
-    private static _sharedInstance:NSUserDefaults = new NSUserDefaults();
+    private static _sharedInstance:UserDefaults = new UserDefaults();
 
     constructor(){
-        if (NSUserDefaults._sharedInstance){
+        if (UserDefaults._sharedInstance){
             throw new Error("Error: Instantiation failed: Use standardUserDefaults() instead of new.");
         }
-        NSUserDefaults._sharedInstance = this;
+        UserDefaults._sharedInstance = this;
     }
 
-    public static standardUserDefaults():NSUserDefaults{
-        return NSUserDefaults._sharedInstance;
+    public static standardUserDefaults():UserDefaults{
+        return UserDefaults._sharedInstance;
     }
 
     setBooleanForKey(key, value:boolean){
@@ -4300,18 +4305,18 @@ function _http_request_sync(urlString: string, headers, method, body, binary) {
 
 
 
-export interface NSXMLParserDelegate {
-    parserDidStartDocument?(parser:NSXMLParser);
-    parserDidEndDocument?(parser:NSXMLParser);
+export interface XMLParserDelegate {
+    parserDidStartDocument?(parser:XMLParser);
+    parserDidEndDocument?(parser:XMLParser);
     
-    parserDidStartElement?(parser:NSXMLParser, element:string, attributes);
-    parserDidEndElement?(parser:NSXMLParser, element:string);
+    parserDidStartElement?(parser:XMLParser, element:string, attributes);
+    parserDidEndElement?(parser:XMLParser, element:string);
 
-    parserFoundCharacters?(parser:NSXMLParser, characters:string);
-    parserFoundComment?(parser:NSXMLParser, comment:string);
+    parserFoundCharacters?(parser:XMLParser, characters:string);
+    parserFoundComment?(parser:XMLParser, comment:string);
 }
 
-export enum NSXMLTokenType{
+export enum XMLTokenType{
     Identifier,
     QuestionMark,
     ExclamationMark,
@@ -4323,22 +4328,22 @@ export enum NSXMLTokenType{
     End
 }
 
-export class NSXMLParser extends NSObject
+export class XMLParser extends NSObject
 {
     private str:string = null;
-    private delegate:NSXMLParserDelegate = null;
+    private delegate:XMLParserDelegate = null;
 
     private strIndex = 0;
 
     private elements = [];
     private attributes = null;
     private currentElement = null;
-    private currentTokenValue:NSXMLTokenType = null;
-    private lastTokenValue:NSXMLTokenType = null;
+    private currentTokenValue:XMLTokenType = null;
+    private lastTokenValue:XMLTokenType = null;
 
     private ignoreWhiteSpace = false;
 
-    initWithString(str:string, delegate:NSXMLParserDelegate){
+    initWithString(str:string, delegate:XMLParserDelegate){
         this.str = str;
         this.delegate = delegate;
     }
@@ -4399,40 +4404,40 @@ export class NSXMLParser extends NSObject
         return value;
     }    
 
-    private nextToken():[NSXMLTokenType, string]{
+    private nextToken():[XMLTokenType, string]{
         
         this.lastTokenValue = this.currentTokenValue;
 
         let exit = false;
-        let token = NSXMLTokenType.Identifier;
+        let token = XMLTokenType.Identifier;
         let value = this.readToken();                        
 
-        if (value == null) return [NSXMLTokenType.End, null];
+        if (value == null) return [XMLTokenType.End, null];
 
         switch(value){
 
             case "<":
-                token = NSXMLTokenType.OpenTag;
+                token = XMLTokenType.OpenTag;
                 break;
 
             case ">":
-                token = NSXMLTokenType.CloseTag;
+                token = XMLTokenType.CloseTag;
                 break;                
 
             case "/":
-                token = NSXMLTokenType.Slash;
+                token = XMLTokenType.Slash;
                 break;
 
             case "?":
-                token = NSXMLTokenType.QuestionMark;
+                token = XMLTokenType.QuestionMark;
                 break;
 
             case "!":
-                token = NSXMLTokenType.ExclamationMark;
+                token = XMLTokenType.ExclamationMark;
                 break;
             
             case " ":
-                token = NSXMLTokenType.WhiteSpace;
+                token = XMLTokenType.WhiteSpace;
                 break;
 
             default:
@@ -4444,7 +4449,7 @@ export class NSXMLParser extends NSObject
         return [token, value];
     }
 
-    private prevToken():NSXMLTokenType{
+    private prevToken():XMLTokenType{
         
         return this.lastTokenValue;
     }
@@ -4463,19 +4468,19 @@ export class NSXMLParser extends NSObject
         let token, value;
         [token, value] = this.nextToken();
                 
-        while(token != NSXMLTokenType.End){
+        while(token != XMLTokenType.End){
 
             switch(token) {
 
-                case NSXMLTokenType.OpenTag:
+                case XMLTokenType.OpenTag:
                     this.ignoreWhiteSpace = true;
                     this.openTag();
                     this.ignoreWhiteSpace = false;
                     break;
 
-                case NSXMLTokenType.Identifier:
-                case NSXMLTokenType.Slash:
-                case NSXMLTokenType.WhiteSpace:
+                case XMLTokenType.Identifier:
+                case XMLTokenType.Slash:
+                case XMLTokenType.WhiteSpace:
                     this.text(value);
                     break;                    
 
@@ -4503,19 +4508,19 @@ export class NSXMLParser extends NSObject
 
         switch(token){
 
-            case NSXMLTokenType.Identifier:
+            case XMLTokenType.Identifier:
                 this.beginElement(value);
                 break;                        
 
-            case NSXMLTokenType.QuestionMark:
+            case XMLTokenType.QuestionMark:
                 this.questionMark();
                 break;
 
-            case NSXMLTokenType.ExclamationMark:
+            case XMLTokenType.ExclamationMark:
                 this.exclamationMark();
                 break;
 
-            case NSXMLTokenType.Slash:
+            case XMLTokenType.Slash:
                 this.slash();
                 break;
 
@@ -4533,11 +4538,11 @@ export class NSXMLParser extends NSObject
 
         switch (token){
 
-            case NSXMLTokenType.Identifier:
+            case XMLTokenType.Identifier:
                 this.xmlOpenTag(val);
                 break;
 
-            case NSXMLTokenType.CloseTag:
+            case XMLTokenType.CloseTag:
                 this.xmlCloseTag();
                 break;   
                 
@@ -4588,11 +4593,11 @@ export class NSXMLParser extends NSObject
 
         switch (token){
 
-            case NSXMLTokenType.Identifier:
+            case XMLTokenType.Identifier:
                 this.attribute(val);
                 break;
 
-            case NSXMLTokenType.QuestionMark:
+            case XMLTokenType.QuestionMark:
                 this.questionMark();
                 break;
 
@@ -4618,15 +4623,15 @@ export class NSXMLParser extends NSObject
 
         switch (token){
 
-            case NSXMLTokenType.Identifier:
+            case XMLTokenType.Identifier:
                 this.attribute(val);
                 break;
 
-            case NSXMLTokenType.Slash:
+            case XMLTokenType.Slash:
                 this.slash();
                 break;
 
-            case NSXMLTokenType.CloseTag:
+            case XMLTokenType.CloseTag:
                 this.closeTag();
                 this.didStartElement();                                
                 break;
@@ -4649,7 +4654,7 @@ export class NSXMLParser extends NSObject
 
         switch (token){
 
-            case NSXMLTokenType.CloseTag:
+            case XMLTokenType.CloseTag:
                 this.closeTag();
                 this.didEndElement();
                 break;
@@ -4671,19 +4676,19 @@ export class NSXMLParser extends NSObject
 
         switch (token){
 
-            case NSXMLTokenType.Identifier:
+            case XMLTokenType.Identifier:
                 this.attribute(value);
                 break;
 
-            case NSXMLTokenType.Slash:
+            case XMLTokenType.Slash:
                 this.slash();
                 break;
 
-            case NSXMLTokenType.QuestionMark:
+            case XMLTokenType.QuestionMark:
                 this.questionMark();
                 break;
 
-            case NSXMLTokenType.CloseTag:
+            case XMLTokenType.CloseTag:
                 this.closeTag();
                 this.didStartElement();                
                 break;
@@ -4734,13 +4739,13 @@ export class NSXMLParser extends NSObject
 
         switch(token){
 
-            case NSXMLTokenType.CloseTag:                    
+            case XMLTokenType.CloseTag:                    
                 this.closeTag();
                 this.didStartElement();
                 this.didEndElement();                
                 break;            
 
-            case NSXMLTokenType.Identifier:
+            case XMLTokenType.Identifier:
                 this.endElement(value);
                 break;     
                 
@@ -4792,7 +4797,7 @@ export class NSXMLParser extends NSObject
 
 
 
-export class NSOperation extends NSObject {
+export class Operation extends NSObject {
 
     name:string = null;
     target = null;
@@ -4833,7 +4838,7 @@ export class NSOperation extends NSObject {
         return this._ready;
     }
 
-    addDependency(operation:NSOperation){
+    addDependency(operation:Operation){
         
         this._dependencies.push(operation);
         if (operation.isFinished == false) {
@@ -4867,7 +4872,7 @@ export class NSOperation extends NSObject {
         if (type != "did") return;
 
         if (keyPath == "isFinished") {
-            let op:NSOperation = object;
+            let op:Operation = object;
             if (op.isFinished == true){
                 object.removeObserver(this, "isFinished");
                 this.checkDependecies();
@@ -4888,7 +4893,7 @@ export class NSOperation extends NSObject {
     }
 }
 
-class NSBlockOperation extends NSOperation {
+class NSBlockOperation extends Operation {
     
     private executionBlocks = [];
 
@@ -4924,11 +4929,11 @@ class NSBlockOperation extends NSOperation {
 
 
 
-export class NSOperationQueue extends NSObject {
+export class OperationQueue extends NSObject {
 
     private _operations = [];
 
-    addOperation(operation: NSOperation) {
+    addOperation(operation: Operation) {
 
         if (operation.isFinished == true) {
             throw new Error("NSOperationQueue: Tying to add an operation already finished");
@@ -4949,7 +4954,7 @@ export class NSOperationQueue extends NSObject {
         }
     }
 
-    removeOperation(operation:NSOperation) {
+    removeOperation(operation:Operation) {
 
         let index = this._operations.indexOf(operation);
         if (index == -1) return;
@@ -4986,7 +4991,7 @@ export class NSOperationQueue extends NSObject {
 
         // This means we need to re-active every operation
         for(let index = 0; index < this.operations.length; index++){
-            let op:NSOperation = this.operations[index];
+            let op:Operation = this.operations[index];
             if (op.ready == true) op.start();
         }
     }
@@ -4996,7 +5001,7 @@ export class NSOperationQueue extends NSObject {
         if (type != "did") return;
 
         if (keyPath == "ready") {
-            let op:NSOperation = object; 
+            let op:Operation = object; 
             if (op.ready == true) {
                 op.removeObserver(this, "ready");
                 op.addObserver(this, "isFinished", null);
@@ -5004,7 +5009,7 @@ export class NSOperationQueue extends NSObject {
             }
         }
         else if (keyPath == "isFinished"){
-            let op:NSOperation = object; 
+            let op:Operation = object; 
             if (op.isFinished == true) {
                 op.removeObserver(this, "isFinished");
                 this.removeOperation(op);
@@ -5124,35 +5129,35 @@ function _NSSortDescriptorSortObjects2(a, b, sortDescriptors, index)
 
 
 
-export enum NSPropertyListFormat
+export enum PropertyListFormat
 {
     OpenStepFormat,
     XMLFormat_v1_0,
     BinaryFormat_v1_0,    
 }
 
-export enum NSPropertyListReadOptions
+export enum PropertyListReadOptions
 {
     None
 }
 
-export enum NSPropertyListWriteOptions
+export enum PropertyListWriteOptions
 {
     None
 }
 
-export class NSPropertyListSerialization extends NSObject
+export class PropertyListSerialization extends NSObject
 {            
-    static propertyListWithData(data:string, options:NSPropertyListReadOptions, format:NSPropertyListFormat, error:NSError){
-        let pl = new NSPropertyListSerialization();
+    static propertyListWithData(data:string, options:PropertyListReadOptions, format:PropertyListFormat, error:NSError){
+        let pl = new PropertyListSerialization();
         pl.initWithData(data, options, format);
 
         let item = pl.parseData(error);
         return item;
     }
 
-    static dataWithpropertyList(plist:any, format:NSPropertyListFormat, options:NSPropertyListReadOptions, error:NSError){
-        let pl = new NSPropertyListSerialization();
+    static dataWithpropertyList(plist:any, format:PropertyListFormat, options:PropertyListReadOptions, error:NSError){
+        let pl = new PropertyListSerialization();
         pl.initWithObject(plist, options, format);
 
         let data = pl.parsePList(error);
@@ -5161,13 +5166,13 @@ export class NSPropertyListSerialization extends NSObject
 
 
     private data:string = null;
-    private initWithData(data:string, options:NSPropertyListReadOptions, format:NSPropertyListFormat){
+    private initWithData(data:string, options:PropertyListReadOptions, format:PropertyListFormat){
         super.init();
         this.data = data;
     }
 
     private plist:any = null;
-    private initWithObject(plist:any, options:NSPropertyListReadOptions, format:NSPropertyListFormat){
+    private initWithObject(plist:any, options:PropertyListReadOptions, format:PropertyListFormat){
         super.init();
         this.plist = plist;
     }
@@ -5175,7 +5180,7 @@ export class NSPropertyListSerialization extends NSObject
     private rootItem = null;        
     private parseData(error:NSError){
         this.currentElement = null;
-        let parser = new NSXMLParser();
+        let parser = new XMLParser();
         parser.initWithString(this.data, this);
         parser.parse();
         
@@ -5191,7 +5196,7 @@ export class NSPropertyListSerialization extends NSObject
     private currentString:string = null;
     private itemStack = [];
     
-    parserDidStartElement(parser:NSXMLParser, element:string, attributes){
+    parserDidStartElement(parser:XMLParser, element:string, attributes){
         
         if (element == "dict"){            
             let item = {};
@@ -5228,11 +5233,11 @@ export class NSPropertyListSerialization extends NSObject
         this.currentString = "";
     }
     
-    parserFoundCharacters(parser:NSXMLParser, characters:string){
+    parserFoundCharacters(parser:XMLParser, characters:string){
         this.currentString += characters;
     }
 
-    parserDidEndElement(parser:NSXMLParser, element:string){
+    parserDidEndElement(parser:XMLParser, element:string){
                 
         if (element == "key") {
             this.currentKey = this.currentString;            
@@ -5262,7 +5267,7 @@ export class NSPropertyListSerialization extends NSObject
         }
     }    
     
-    parserDidEndDocument(parser:NSXMLParser){
+    parserDidEndDocument(parser:XMLParser){
 
     }
 

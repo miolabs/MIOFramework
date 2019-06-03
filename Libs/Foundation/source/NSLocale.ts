@@ -6,15 +6,15 @@ import { NSObject } from "./NSObject";
 
 var _NS_currentLocale;
 
-export class NSLocale extends NSObject
+export class Locale extends NSObject
 {
     languageIdentifier = "es";
     countryIdentifier = "ES";
 
     public static currentLocale(){
         if (_NS_currentLocale == null) {
-            _NS_currentLocale = new NSLocale();
-            _NS_currentLocale.initWithLocaleIdentifier("es_ES");
+            _NS_currentLocale = new Locale();
+            _NS_currentLocale.initIdentifierString("es_ES");
         }
         //return NSWebApplication.sharedInstance().currentLanguage;
 
@@ -22,11 +22,11 @@ export class NSLocale extends NSObject
     }
 
     public static _setCurrentLocale(localeIdentifier:string){
-        _NS_currentLocale = new NSLocale();
-        _NS_currentLocale.initWithLocaleIdentifier(localeIdentifier);
+        _NS_currentLocale = new Locale();
+        _NS_currentLocale.initIdentifierString(localeIdentifier);
     }
 
-    initWithLocaleIdentifier(identifer:string) {
+    initIdentifierString(identifer:string) {
 
         let array = identifer.split("_");
         if (array.length == 1) {
