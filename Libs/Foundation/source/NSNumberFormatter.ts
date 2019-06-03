@@ -1,13 +1,6 @@
 import { Formatter } from "./NSFormatter";
-import { NSLocale } from "./NSLocale";
-
-export enum NSNumberFormatterStyle {
-    NoStyle,
-    DecimalStyle,
-    CurrencyStyle,
-    CurrencyISOCodeStyle,
-    PercentStyle,    
-}
+import { Locale } from "./NSLocale";
+import { NSNumber } from "./NSNumber";
 
 export enum _NSNumberFormatterType {
     
@@ -17,8 +10,8 @@ export enum _NSNumberFormatterType {
 
 export class NumberFormatter extends Formatter {
 
-    numberStyle = NSNumberFormatterStyle.NoStyle;
-    locale:NSLocale = null;
+    numberStyle = NumberFormatter.Style.none;
+    locale:Locale = null;
     minimumFractionDigits = 0;
     maximumFractionDigits = 0;
     groupingSeparator = null;
@@ -27,9 +20,17 @@ export class NumberFormatter extends Formatter {
     private currencyHasSpaces = true;
     private currencyIsRight = true;
 
+    static Style = class {
+        static get none() {return Object.assign(new NumberFormatter.Style(), {rawValue: 0})}
+        static get decimal() {return Object.assign(new NumberFormatter.Style(), {rawValue: 1})}
+        static get currency() {return Object.assign(new NumberFormatter.Style(), {rawValue: 2})}
+        static get currencyISOCode() {return Object.assign(new NumberFormatter.Style(), {rawValue: 3})}
+        static get percent() {return Object.assign(new NumberFormatter.Style(), {rawValue: 4})}
+    }
+
     init(){
         super.init();
-        this.locale = NSLocale.currentLocale();
+        this.locale = Locale.currentLocale();
 
         this.groupingSeparator = this.locale.groupingSeparator;
         this.currencySymbol = this.locale.currencySymbol;
@@ -65,15 +66,15 @@ export class NumberFormatter extends Formatter {
         return null;
     }
 
-    stringFromNumber(number:number):string{
-        return this.stringForObjectValue(number);
+    stringFrom(number:NSNumber):string{
+        return _injectIntoOptional(this.stringForObjectValue(number));//TODO automatically refactor function results
     }
 
     stringForObjectValue(value):string {
         
-        let number = value as number;
-        if(!number) number = 0;
-        let str = number.toString();
+        let number = value as NSNumber;
+        if(number == null) number = NSNumber.numberWithFloat(0);
+        let str = number.floatValue.toString();
         let intValue = null;
         let floatValue = null;
         let array = str.split(".");
@@ -140,7 +141,7 @@ export class NumberFormatter extends Formatter {
             }
         }
                 
-        if (this.numberStyle == NSNumberFormatterStyle.PercentStyle) res += "%";
+        if (this.numberStyle.rawValue == NumberFormatter.Style.percent.rawValue) res += "%";
         res = this.stringByAppendingCurrencyString(res);
 
         return res;
@@ -202,11 +203,11 @@ export class NumberFormatter extends Formatter {
 
     private stringByAppendingCurrencyString(text:string):string {
         let currency = "";        
-        if (this.numberStyle == NSNumberFormatterStyle.CurrencyStyle) {
+        if (this.numberStyle.rawValue == NumberFormatter.Style.currency.rawValue) {
             currency = this.currencySymbol;
             if (currency.length == 0) currency = this.currencyCode; // If there's no symbol, add the code instead.
         }
-        else if (this.numberStyle == NSNumberFormatterStyle.CurrencyISOCodeStyle) currency = this.currencyCode;
+        else if (this.numberStyle.rawValue == NumberFormatter.Style.currencyISOCode.rawValue) currency = this.currencyCode;
         else {
             return text;
         }        
@@ -257,7 +258,7 @@ export class NumberFormatter extends Formatter {
                 minusSymbol = true;                
             }
             else if (ch == "%"
-                     && this.numberStyle == NSNumberFormatterStyle.PercentStyle
+                     && this.numberStyle.rawValue == NumberFormatter.Style.percent.rawValue
                      && percentSymbol == false){
                 
                 percentSymbol = true;

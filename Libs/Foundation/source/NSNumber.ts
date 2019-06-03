@@ -10,7 +10,7 @@ export class NSNumber extends NSObject
 
     static numberWithInteger(value):NSNumber{
         let n = new NSNumber();
-        n.initWithInteger(value);
+        n.initValueInt(value);
         return n;        
     }
 
@@ -31,7 +31,7 @@ export class NSNumber extends NSObject
         }
     }
 
-    initWithInteger(value){
+    initValueInt(value){
         if (isNaN(value) || value == null) {
             this.storeValue = 0;
         }
@@ -47,6 +47,10 @@ export class NSNumber extends NSObject
         else {
             this.storeValue = value;
         }
+    }
+
+    get floatValue(){
+        return this.storeValue;
     }
 
 }
