@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="/lib.js"></script>
     <script src="/mio-foundation-web.js"></script>
+    <script src="/mio-uikit-web.js"></script>
     <script src="/loader.js"></script>
     <script src="/typescriptServices.js"></script>
 </head>
@@ -19,6 +20,7 @@
     font-size: inherit;
     background: transparent;
     outline: none;
+    box-sizing: border-box;
     }
     article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
     display: block;
@@ -41,44 +43,38 @@
     color: #333;
     font-family: sans-serif;
     }
+    nav {
+    width: 100%;
+    border-bottom: 2px solid #ddd;
+    padding: 8px 12px;
+    }
+    nav::after {
+    content: '';
+    display: block;
+    clear: both;
+    }
     p {
     margin-bottom: 8px;
     }
-    h1 {
-    font-size: 32px;
-    font-weight: normal;
-    }
-    #wrapper {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    }
-    #info {
-    flex: 0 0 auto;
-    margin: 20px;
-    }
     #transpiler {
-    flex: 1 1 auto;
-    margin: 0 20px 20px 20px;
     position: relative;
+    height: calc(100% - 65px);
+    margin-top: 10px;
     }
-    .code-wrapper {
-    border: 2px solid #eee;
-    padding: 8px 12px;
-    border-radius: 12px;
-    position: absolute;
-    top: 0;
-    width: calc(50% - 83px);
-    height: calc(100% - 20px);
+    #transpiler > * {
+    width: calc(33% - 4px);
+    display: inline-block;
+    height: 100%;
+    padding: 0 12px;
+    vertical-align: top;
+    }
+    #transpiler > *:not(:last-child) {
+    border-right: 2px solid #ddd;
     }
     #transpiler textarea, #target-output {
     font-family: monospace;
     resize: none;
-    font-size: 15px;
+    font-size: 13px;
     line-height: 1.42857;
     }
     #source-code {
@@ -95,48 +91,28 @@
     #target-output-wrapper {
     width: 100%;
     height: 110px;
-    border-top: 2px solid #eee;
+    border-top: 2px solid #ddd;
     }
-    /*#target-output-headline {
-    padding: 8px 12px;
-    }*/
     #target-output {
     width: 100%;
     height: 90px;
     overflow: auto;
     padding-top: 10px;
     }
+    #visual-output {
+    position: relative;
+    }
     .transpile-btn {
-    position: absolute;
-    left: calc(50% - 55px);
-    width: 110px;
-    text-align: center;
-    color: #13ce66;
+    background-color: #13ce66;
+    color: white;
+    float: right;
+    border-radius: 5px;
+    padding: 3px 10px;
     cursor: pointer;
-    transition: color 0.2s linear;
-    }
-    .transpile-btn[data-language=ts] {
-    top: calc(50% - 27px);
-    }
-    .transpile-btn[data-language=java] {
-    top: calc(50% + 20px);
-    }
-    .transpile-btn::before {
-    content: '';
-    display: inline-block;
-    width: 0;
-    height: 0;
-    margin: 0 26px;
-    border-top: 14px solid transparent;
-    border-bottom: 14px solid transparent;
-    border-left: 27px solid #13ce66;
-    transition: border-left-color 0.2s linear;
+    transition: background-color 0.2s linear;
     }
     .transpile-btn:hover {
-    color: #28eb80;
-    }
-    .transpile-btn:hover::before {
-    border-left-color: #28eb80;
+    background-color: #28eb80;
     }
     .spinner {
     display: block;
@@ -198,17 +174,33 @@
     }
 </style>
 <body>
-<div id="wrapper">
-    <div id="info">
-        <h1>Swift to TypeScript Transpiler - Playground</h1>
-    </div>
+    <nav>
+        <button class="transpile-btn" data-language="ts" type="button">▶ Run the code</button>
+    </nav>
     <div id="transpiler">
             <textarea id="source-code" class="code-wrapper" spellcheck="false" autofocus>
+import Foundation
+import UIKit
+
+//Playground - noun: a place where people can play
+
+//Write some swift code, transpile and check the generated ts
+//Use print to see the console output
 var arr = [3, 1, 2]
 arr.sort(by: <)
 for el in arr {
   print(el)
-}</textarea>
+}
+
+//Create UIKit objects and see how they look on the web
+let view = UIView(frame: CGRect(x: 0, y: 0, width: 200, height: 50))
+view.backgroundColor = UIColor(displayP3Red: 255, green: 0, blue: 0, alpha: 1)
+
+UIView.animate(withDuration: 5) {
+  view.frame = CGRect(x: 100, y: 100, width: 200, height: 50)
+}
+
+Playground.addSubview(view)</textarea>
         <div id="target-code-wrapper" class="code-wrapper">
             <textarea id="target-code" spellcheck="false" readonly>
 let arr = _create(Array, 'initArrayLiteralArray', [3, 1, 2], {});
@@ -229,13 +221,19 @@ arr.sortBy(Int.$lessThan, { $setThis: $val => arr = $val });
 3</textarea>
             </div>
         </div>
-        <button class="transpile-btn" data-language="ts"   type="button">Transpile</button>
-        <!--<button class="transpile-btn" data-language="java" type="button">Transpile to Java</button>-->
-        <svg id="target-code-spinner" class="spinner" width="50" height="50"><circle cx="25" cy="25" r="20"/></svg>
+        <div id="visual-output"></div>
     </div>
-</div>
+    <svg id="target-code-spinner" class="spinner" width="50" height="50"><circle cx="25" cy="25" r="20"/></svg>
+
 
 <script>
+
+var visualOutputEl = document.getElementById("visual-output");
+function Playground() {}
+Playground.addSubview = function(view) {
+    visualOutputEl.appendChild(view.layer);
+}
+
 const TRANSPILE_URL = "/api/transpile";
 function formatAndTranspile(input, options) {
 
@@ -326,51 +324,58 @@ function formatAndTranspile(input, options) {
     }
     return {outputText, formatText};
 }
-(function(){
-    var sourceCodeEl = document.getElementById("source-code"),
-        targetCodeEl = document.getElementById("target-code"),
-        targetOutputEl = document.getElementById("target-output"),
-        transpileBtns = document.getElementsByClassName("transpile-btn"),
-        spinner = document.getElementById("target-code-spinner"),
-        lastSourceCode = sourceCodeEl.value,
-        lastLanguage = "ts",
-        isWaitingForTranspilation = false;
-    Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
-        transpileBtn.onclick = function() {
-            if(isWaitingForTranspilation) return;
-            var language = transpileBtn.getAttribute("data-language");
-            if(!sourceCodeEl.value || (sourceCodeEl.value === lastSourceCode && language === lastLanguage)) return;
-            isWaitingForTranspilation = true;
-            spinner.style.display = 'block';
-            targetCodeEl.style.color = '#aaa';
-            lastSourceCode = sourceCodeEl.value;
-            lastLanguage = language;
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", TRANSPILE_URL);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.onreadystatechange = function () {
-                if(xhr.readyState !== 4) return;
-                isWaitingForTranspilation = false;
-                spinner.style.display = 'none';
-                if(xhr.status === 200) {
-                    let {outputText, formatText} = formatAndTranspile(xhr.responseText, {})
-                    targetCodeEl.value = formatText;
-                    targetCodeEl.style.color = '';
-                    targetOutputEl.value = '';
-                    printSeparatorTerminator = function(text) { targetOutputEl.value += text + '\n' }
-                    eval('(function(){' + outputText + '})();')
-                }
-                else {
-                    let errorMessage = xhr.responseText || 'Transpilation failed :(';
-                    targetCodeEl.value = errorMessage;
-                    targetCodeEl.style.color = '#fc605e';
-                    targetOutputEl.value = '';
-                }
-            };
-            xhr.send(JSON.stringify({code: sourceCodeEl.value, language: language}));
+var sourceCodeEl = document.getElementById("source-code"),
+    targetCodeEl = document.getElementById("target-code"),
+    targetOutputEl = document.getElementById("target-output"),
+    transpileBtns = document.getElementsByClassName("transpile-btn"),
+    spinner = document.getElementById("target-code-spinner"),
+    lastSourceCode = sourceCodeEl.value,
+    lastLanguage = "ts",
+    isWaitingForTranspilation = false;
+Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
+    transpileBtn.onclick = function() {
+        if(isWaitingForTranspilation) return;
+        var language = transpileBtn.getAttribute("data-language");
+        if(!sourceCodeEl.value || (sourceCodeEl.value === lastSourceCode && language === lastLanguage)) return;
+        isWaitingForTranspilation = true;
+        spinner.style.display = 'block';
+        targetCodeEl.style.color = '#aaa';
+        lastSourceCode = sourceCodeEl.value;
+        lastLanguage = language;
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", TRANSPILE_URL);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.onreadystatechange = function () {
+            if(xhr.readyState !== 4) return;
+            isWaitingForTranspilation = false;
+            spinner.style.display = 'none';
+            if(xhr.status === 200) {
+                let {outputText, formatText} = formatAndTranspile(xhr.responseText, {})
+                targetCodeEl.value = formatText;
+                targetCodeEl.style.color = '';
+                targetOutputEl.value = '';
+                visualOutputEl.innerHTML = '';
+                printSeparatorTerminator = function(text) { targetOutputEl.value += text + '\n' }
+                outputText = outputText.slice(outputText.indexOf('}());') + '}());'.length)//to remove Playground duplication
+                eval('(function(){' + outputText + '})();')
+            }
+            else {
+                let errorMessage = xhr.responseText || 'Transpilation failed :(';
+                targetCodeEl.value = errorMessage;
+                targetCodeEl.style.color = '#fc605e';
+                targetOutputEl.value = '';
+            }
+        };
+        let code = sourceCodeEl.value;
+        code = `
+        import UIKit
+        class Playground {
+            static func addSubview(_ el: UIView) {}
         }
-    });
-})();
+        ` + code;
+        xhr.send(JSON.stringify({code: code, language: language}));
+    }
+});
 </script>
 </body>
 </html>

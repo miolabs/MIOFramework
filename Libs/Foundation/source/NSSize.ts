@@ -1,12 +1,12 @@
 
-export class NSSize
+export class CGSize
 {
     width = 0;
     height = 0;
 
-    public static Zero():NSSize
+    public static Zero():CGSize
     {
-        var s = new NSSize(0, 0);
+        var s = new CGSize(0, 0);
         return s;
     }
 

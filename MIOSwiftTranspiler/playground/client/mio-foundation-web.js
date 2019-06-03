@@ -968,18 +968,18 @@ var MIOCoreBundle_web = /** @class */ (function (_super) {
     return MIOCoreBundle_web;
 }(MIOCoreBundle));
  
-var NSPoint = /** @class */ (function () {
-    function NSPoint(x, y) {
+var CGPoint = /** @class */ (function () {
+    function CGPoint(x, y) {
         this.x = 0;
         this.y = 0;
         this.x = x;
         this.y = y;
     }
-    NSPoint.Zero = function () {
-        var p = new NSPoint(0, 0);
+    CGPoint.Zero = function () {
+        var p = new CGPoint(0, 0);
         return p;
     };
-    return NSPoint;
+    return CGPoint;
 }());
  
 var NSRange = /** @class */ (function () {
@@ -1035,24 +1035,22 @@ function NSUnionRange(range1, range2) {
     return result;
 }
  
-var NSRect = /** @class */ (function () {
-    function NSRect(p, s) {
+var CGRect = /** @class */ (function () {
+    function CGRect(p, s) {
         this.origin = null;
         this.size = null;
         this.origin = p;
         this.size = s;
     }
-    NSRect.Zero = function () {
-        var f = new NSRect(NSPoint.Zero(), NSSize.Zero());
+    CGRect.Zero = function () {
+        var f = new CGRect(CGPoint.Zero(), CGSize.Zero());
         return f;
     };
-    NSRect.rectWithValues = function (x, y, w, h) {
-        var p = new NSPoint(x, y);
-        var s = new NSSize(w, h);
-        var f = new NSRect(p, s);
-        return f;
+    CGRect.prototype.init2XYWidthHeight = function (x, y, w, h) {
+        this.origin = new CGPoint(x, y);
+        this.size = new CGSize(w, h);
     };
-    return NSRect;
+    return CGRect;
 }());
  
 function NSRectMaxY(rect) {
@@ -1061,24 +1059,24 @@ function NSRectMaxY(rect) {
 function NSRectMinY(rect) {
     return rect.origin.y + rect.size.height;
 }
-var NSSize = /** @class */ (function () {
-    function NSSize(w, h) {
+var CGSize = /** @class */ (function () {
+    function CGSize(w, h) {
         this.width = 0;
         this.height = 0;
         this.width = w;
         this.height = h;
     }
-    NSSize.Zero = function () {
-        var s = new NSSize(0, 0);
+    CGSize.Zero = function () {
+        var s = new CGSize(0, 0);
         return s;
     };
-    NSSize.prototype.isEqualTo = function (size) {
+    CGSize.prototype.isEqualTo = function (size) {
         if (this.width == size.width
             && this.height == size.height)
             return true;
         return false;
     };
-    return NSSize;
+    return CGSize;
 }());
  
 /**
@@ -3115,7 +3113,7 @@ var NumberFormatter = /** @class */ (function (_super) {
         return null;
     };
     NumberFormatter.prototype.stringFrom = function (number) {
-        return _injectIntoOptional(this.stringForObjectValue(number));
+        return _injectIntoOptional(this.stringForObjectValue(number)); //TODO automatically refactor function results
     };
     NumberFormatter.prototype.stringForObjectValue = function (value) {
         var _a;
