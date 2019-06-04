@@ -357,6 +357,7 @@ Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
                 visualOutputEl.innerHTML = '';
                 printSeparatorTerminator = function(text) { targetOutputEl.value += text + '\n' }
                 outputText = outputText.slice(outputText.indexOf('}());') + '}());'.length)//to remove Playground duplication
+                outputText = outputText.replace(/init[0-9]+XYWidthHeight/g, "initXYWidthHeight")//TODO temporary fix until CoreData isNative in transpiler
                 eval('(function(){' + outputText + '})();')
             }
             else {
