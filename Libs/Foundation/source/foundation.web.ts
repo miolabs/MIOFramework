@@ -3571,7 +3571,7 @@ export class NumberFormatter extends Formatter {
     }
 
     stringFrom(number:NSNumber):string{
-        return this.stringForObjectValue(number);
+        return _injectIntoOptional(this.stringForObjectValue(number));//TODO automatically refactor function results
     }
 
     stringForObjectValue(value):string {
