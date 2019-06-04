@@ -1,5 +1,5 @@
 import { NSObject } from "mio-foundation-web";
-import { NSSize } from "mio-foundation-web";
+import { CGSize } from "mio-foundation-web";
 import { NSIndexPath } from "mio-foundation-web";
 import { UITextField } from "./UITextField";
 import { UIViewController } from "./UIViewController";
@@ -106,7 +106,7 @@ export class UIAlertController extends UIViewController
 
     private _headerCell = null;
 
-    private _alertViewSize = new NSSize(320, 50);
+    private _alertViewSize = new CGSize(320, 50);
 
     static Style = class {
         static get actionSheet() {return Object.assign(new UIAlertController.Style(), {rawValue: 0})}
@@ -196,7 +196,7 @@ export class UIAlertController extends UIViewController
 
     private _calculateContentSize(){
         let h = 80 + (this._items.length * 50) + 1;
-        this._alertViewSize = new NSSize(320, h);
+        this._alertViewSize = new CGSize(320, h);
     }
 
     numberOfSectionsIn(tableview:UITableView){

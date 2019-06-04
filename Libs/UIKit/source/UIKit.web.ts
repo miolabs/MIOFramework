@@ -8,7 +8,7 @@ import { NSClassFromString } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
 import { CGRect } from "mio-foundation-web";
 import { NSFormatter } from "mio-foundation-web";
-import { NSSize } from "mio-foundation-web";
+import { CGSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
@@ -18,6 +18,7 @@ import { MIOCoreGetPlatform } from "mio-foundation-web";
 import { MIOCorePlatformType } from "mio-foundation-web";
 import { NSIndexPath } from "mio-foundation-web";
 import "mio-foundation-web/extensions"
+import { NSSize } from "mio-foundation-web";
 import { NSBundle } from "mio-foundation-web";
 import { MIOCoreBundleGetAppResource } from "mio-foundation-web";
 import { NSURLRequest } from "mio-foundation-web";
@@ -2423,7 +2424,7 @@ export class UIViewController extends NSObject {
     modalTransitionStyle = UIModalTransitionStyle.CoverVertical;
     transitioningDelegate = null;
 
-    protected _contentSize = new NSSize(320, 200);
+    protected _contentSize = new CGSize(320, 200);
     protected _preferredContentSize = null;
 
     constructor(layerID?) {
@@ -2992,7 +2993,7 @@ export class UIPresentationController extends NSObject
             let ws = MUIWindowSize();
 
             let size = toVC.preferredContentSize;
-            if (size == null) size = new NSSize(320, 200);
+            if (size == null) size = new CGSize(320, 200);
 
             let w = size.width;
             let h = size.height;
@@ -3009,7 +3010,7 @@ export class UIPresentationController extends NSObject
             let ws = MUIWindowSize();
 
             let size = toVC.preferredContentSize;
-            if (size == null) size = new NSSize(320, 200);
+            if (size == null) size = new CGSize(320, 200);
 
             let w = size.width;
             let h = size.height;
@@ -3024,7 +3025,7 @@ export class UIPresentationController extends NSObject
         else
         {
             let size = toVC.preferredContentSize;
-            if (size == null) size = new NSSize(320, 200);
+            if (size == null) size = new CGSize(320, 200);
             let w = size.width;
             let h = size.height;
 
@@ -3556,7 +3557,7 @@ export class UIScrollView extends UIView {
         this.contentView.addSubview(view, index);
     }
 
-    set contentSize(size: NSSize) {
+    set contentSize(size: CGSize) {
         if (size.width > 0) {
             this.contentView.setWidth(size.width);
         }
@@ -4409,7 +4410,7 @@ export class UIAlertController extends UIViewController
 
     private _headerCell = null;
 
-    private _alertViewSize = new NSSize(320, 50);
+    private _alertViewSize = new CGSize(320, 50);
 
     static Style = class {
         static get actionSheet() {return Object.assign(new UIAlertController.Style(), {rawValue: 0})}
@@ -4499,7 +4500,7 @@ export class UIAlertController extends UIViewController
 
     private _calculateContentSize(){
         let h = 80 + (this._items.length * 50) + 1;
-        this._alertViewSize = new NSSize(320, h);
+        this._alertViewSize = new CGSize(320, h);
     }
 
     numberOfSectionsIn(tableview:UITableView){

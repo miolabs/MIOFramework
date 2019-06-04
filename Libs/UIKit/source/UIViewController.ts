@@ -1,5 +1,5 @@
 import { NSObject } from "mio-foundation-web";
-import { NSSize } from "mio-foundation-web";
+import { CGSize } from "mio-foundation-web";
 import { NSLocalizeString } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
@@ -60,7 +60,7 @@ export class UIViewController extends NSObject {
     modalTransitionStyle = UIModalTransitionStyle.CoverVertical;
     transitioningDelegate = null;
 
-    protected _contentSize = new NSSize(320, 200);
+    protected _contentSize = new CGSize(320, 200);
     protected _preferredContentSize = null;
 
     constructor(layerID?) {

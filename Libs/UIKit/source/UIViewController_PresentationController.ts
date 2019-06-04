@@ -1,6 +1,6 @@
 import { NSObject } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
-import { NSSize } from "mio-foundation-web";
+import { CGSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
 import { MIOCoreIsMobile } from "mio-foundation-web";
 
@@ -124,7 +124,7 @@ export class UIPresentationController extends NSObject
             let ws = MUIWindowSize();
 
             let size = toVC.preferredContentSize;
-            if (size == null) size = new NSSize(320, 200);
+            if (size == null) size = new CGSize(320, 200);
 
             let w = size.width;
             let h = size.height;
@@ -141,7 +141,7 @@ export class UIPresentationController extends NSObject
             let ws = MUIWindowSize();
 
             let size = toVC.preferredContentSize;
-            if (size == null) size = new NSSize(320, 200);
+            if (size == null) size = new CGSize(320, 200);
 
             let w = size.width;
             let h = size.height;
@@ -156,7 +156,7 @@ export class UIPresentationController extends NSObject
         else
         {
             let size = toVC.preferredContentSize;
-            if (size == null) size = new NSSize(320, 200);
+            if (size == null) size = new CGSize(320, 200);
             let w = size.width;
             let h = size.height;
 

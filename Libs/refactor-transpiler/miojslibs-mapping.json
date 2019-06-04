@@ -125,9 +125,5 @@
     "setBoolForKey": "setBooleanForKey",
     "setForKey": "setValueForKey",
     "removeObjectForKey": "removeValueForKey"
-  },
-  "XMLParserDelegate": {
-    "parserDidStartElementNamespaceURIQualifiedNameAttributes": "parserDidStartElement",
-    "parserDidEndElementNamespaceURIQualifiedName": "parserDidEndElement"
   }
 }
