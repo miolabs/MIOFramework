@@ -1046,7 +1046,7 @@ var CGRect = /** @class */ (function () {
         var f = new CGRect(CGPoint.Zero(), CGSize.Zero());
         return f;
     };
-    CGRect.prototype.initXYWidthHeight = function (x, y, w, h) {
+    CGRect.prototype.initXIntYIntWidthIntHeightInt = function (x, y, w, h) {
         this.origin = new CGPoint(x, y);
         this.size = new CGSize(w, h);
     };
@@ -1467,7 +1467,7 @@ var NSDecimalNumber = /** @class */ (function (_super) {
     }
     NSDecimalNumber.decimalNumberWithString = function (str) {
         var dn = new NSDecimalNumber();
-        dn.initStringOptional(str);
+        dn.initStringOptional(_injectIntoOptional(str));
         return dn;
     };
     NSDecimalNumber.one = function () {
@@ -2747,7 +2747,7 @@ var DateFormatter = /** @class */ (function (_super) {
         return null;
     };
     DateFormatter.prototype.stringFromDate = function (date) {
-        return this.stringForObjectValue(date);
+        return this.stringForObjectValue(_injectIntoOptional(date));
     };
     DateFormatter.prototype.stringForObjectValue = function (value) {
         var date = value;
@@ -2771,7 +2771,7 @@ var DateFormatter = /** @class */ (function (_super) {
         }
         return str;
     };
-    DateFormatter.prototype.isPartialStringValidationEnabledNewEditingStringErrorDescription = function (str) {
+    DateFormatter.prototype.isPartialStringValidNewEditingStringErrorDescriptionationEnabled = function (str) {
         var _a;
         if (str.length == 0)
             return [true, str];
@@ -3113,7 +3113,7 @@ var NumberFormatter = /** @class */ (function (_super) {
         return null;
     };
     NumberFormatter.prototype.stringFrom = function (number) {
-        return _injectIntoOptional(this.stringForObjectValue(number)); //TODO automatically refactor function results
+        return _injectIntoOptional(this.stringForObjectValue(_injectIntoOptional(number))); //TODO automatically refactor function results
     };
     NumberFormatter.prototype.stringForObjectValue = function (value) {
         var _a;
@@ -3257,7 +3257,7 @@ var NumberFormatter = /** @class */ (function (_super) {
         }
         return result;
     };
-    NumberFormatter.prototype.isPartialStringValidationEnabledNewEditingStringErrorDescription = function (str) {
+    NumberFormatter.prototype.isPartialStringValidNewEditingStringErrorDescriptionationEnabled = function (str) {
         var _a;
         if (str.length == 0)
             return [true, str];
@@ -3473,7 +3473,7 @@ var UserDefaults = /** @class */ (function () {
     };
     UserDefaults.prototype.setBoolForKey = function (key, value) {
         var v = value ? "1" : "0";
-        this.setForKey(key, v);
+        this.setForKey(_injectIntoOptional(key), v);
     };
     UserDefaults.prototype.booleanForKey = function (key) {
         var v = this.valueForKey(key);
@@ -4113,16 +4113,16 @@ var XMLParser = /** @class */ (function (_super) {
     XMLParser.prototype.didStartElement = function () {
         var element = this.currentElement;
         //console.log("Start Element: " + element);
-        if (typeof this.delegate[0].parserDidStartElementNamespaceURIQualifiedNameAttributes === "function")
-            this.delegate[0].parserDidStartElementNamespaceURIQualifiedNameAttributes(this, element, this.attributes);
+        if (typeof this.delegate[0].parserDidStartElement === "function")
+            this.delegate[0].parserDidStartElement(this, element, this.attributes);
         this.currentElement = null;
         this.attributes = {};
     };
     XMLParser.prototype.didEndElement = function () {
         var element = this.elements.pop();
         //console.log("End Element " + element);        
-        if (typeof this.delegate[0].parserDidEndElementNamespaceURIQualifiedName === "function")
-            this.delegate[0].parserDidEndElementNamespaceURIQualifiedName(this, element);
+        if (typeof this.delegate[0].parserDidEndElement === "function")
+            this.delegate[0].parserDidEndElement(this, element);
     };
     XMLParser.prototype.text = function (value) {
         //console.log("Text: " + value);
@@ -4384,7 +4384,7 @@ var NSSortDescriptor = /** @class */ (function (_super) {
     }
     NSSortDescriptor.sortDescriptorWithKey = function (key, ascending) {
         var sd = new NSSortDescriptor();
-        sd.initKeyOptionalAscendingBool(key, ascending);
+        sd.initKeyOptionalAscendingBool(_injectIntoOptional(key), ascending);
         return sd;
     };
     NSSortDescriptor.prototype.initKeyOptionalAscendingBool = function (key, ascending) {

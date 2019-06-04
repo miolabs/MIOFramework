@@ -76,7 +76,7 @@ export class UIBarButtonItem extends UIBarItem
                     this.target = owner;
                     this.action = owner[action];
 
-                    button.addTarget(this.target, this.action, UIControlEvents.TouchUpInside);
+                    button.addTarget(this.target, this.action, UIControl.Event.TouchUpInside);
                 }
             }
         }

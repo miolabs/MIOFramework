@@ -40,6 +40,7 @@ var __extends = (this && this.__extends) || (function () {
 
 
 
+
  
 function MUICoreLayerIDFromObject(object) {
     var classname = object.constructor.name;
@@ -1427,34 +1428,11 @@ var UILabel = /** @class */ (function (_super) {
 /**
  * Created by godshadow on 12/3/16.
  */
-var UIControlEvents;
-(function (UIControlEvents) {
-    UIControlEvents[UIControlEvents["TouchDown"] = 1] = "TouchDown";
-    UIControlEvents[UIControlEvents["TouchDownRepeat"] = 2] = "TouchDownRepeat";
-    UIControlEvents[UIControlEvents["TouchDragInside"] = 4] = "TouchDragInside";
-    UIControlEvents[UIControlEvents["TouchDragOutside"] = 8] = "TouchDragOutside";
-    UIControlEvents[UIControlEvents["TouchDragEnter"] = 16] = "TouchDragEnter";
-    UIControlEvents[UIControlEvents["TouchDragExit"] = 32] = "TouchDragExit";
-    UIControlEvents[UIControlEvents["TouchUpInside"] = 64] = "TouchUpInside";
-    UIControlEvents[UIControlEvents["TouchUpOutside"] = 128] = "TouchUpOutside";
-    UIControlEvents[UIControlEvents["TouchCancel"] = 256] = "TouchCancel";
-    UIControlEvents[UIControlEvents["ValueChanged"] = 4096] = "ValueChanged";
-    UIControlEvents[UIControlEvents["PrimaryActionTriggered"] = 8192] = "PrimaryActionTriggered";
-    UIControlEvents[UIControlEvents["EditingDidBegin"] = 65536] = "EditingDidBegin";
-    UIControlEvents[UIControlEvents["EditingChanged"] = 131072] = "EditingChanged";
-    UIControlEvents[UIControlEvents["EditingDidEnd"] = 262144] = "EditingDidEnd";
-    UIControlEvents[UIControlEvents["EditingDidEndOnExit"] = 524288] = "EditingDidEndOnExit";
-    UIControlEvents[UIControlEvents["AllTouchEvents"] = 4095] = "AllTouchEvents";
-    UIControlEvents[UIControlEvents["EditingEvents"] = 983040] = "EditingEvents";
-    UIControlEvents[UIControlEvents["ApplicationReserved"] = 251658240] = "ApplicationReserved";
-    UIControlEvents[UIControlEvents["SystemReserved"] = 4026531840] = "SystemReserved";
-    UIControlEvents[UIControlEvents["AllEvents"] = 4294967295] = "AllEvents";
-})(UIControlEvents || (UIControlEvents = {}));
 function MUICoreControlParseEventTypeString(eventTypeString) {
     if (eventTypeString == null)
-        return UIControlEvents.AllEvents;
+        return UIControl.Event.allEvents;
     var value = eventTypeString[0].toUpperCase() + eventTypeString.substr(1);
-    return UIControlEvents[value];
+    return UIControl.Event[value];
 }
 var UIControl = /** @class */ (function (_super) {
     __extends(UIControl, _super);
@@ -1482,7 +1460,7 @@ var UIControl = /** @class */ (function (_super) {
                 var actionSelector = subLayer.getAttribute("data-action-selector");
                 var eventType = MUICoreControlParseEventTypeString(subLayer.getAttribute("data-event-type"));
                 if (actionSelector != null) {
-                    this.addTargetActionFor(owner, owner[actionSelector], eventType);
+                    this.addTargetActionFor(_injectIntoOptional(owner), owner[actionSelector], eventType);
                 }
             }
         }
@@ -1501,22 +1479,22 @@ var UIControl = /** @class */ (function (_super) {
                 var identifier = s["Identifier"];
                 if (identifier != null)
                     this.actionSegue["Identifier"] = identifier;
-                this.addTargetActionFor(this, function () {
+                this.addTargetActionFor(_injectIntoOptional(this), function () {
                     var fromVC = this.actionSegue["VC"];
                     var destination = this.actionSegue["Destination"];
                     var identifier = this.actionSegue["Identifier"];
                     var toVC = fromVC.storyboard[0]._instantiateViewControllerWithDestination(destination);
                     var segue = new UIStoryboardSegue();
-                    segue.initIdentifierOptionalSourceUIViewControllerDestinationUIViewControllerPerformHandlerfunction_type(identifier, fromVC, toVC, function () {
+                    segue.initIdentifierOptionalSourceUIViewControllerDestinationUIViewControllerPerformHandlerfunction_type(_injectIntoOptional(identifier), fromVC, toVC, function () {
                         fromVC.navigationController[0].pushViewControllerAnimated(toVC);
                     });
                     segue._sender = this;
                     segue.perform();
-                }, UIControlEvents.AllEvents);
+                }, UIControl.Event.allEvents);
             }
         }
     };
-    UIControl.prototype.addTargetActionFor = function (target, action, controlEvents) {
+    UIControl.prototype.addTargetActionFor = function (target, action, controlEvents /*UIControl.Event*/) {
         if (action == null)
             throw new Error("UIControl: Can't add null action");
         var item = {};
@@ -1525,7 +1503,7 @@ var UIControl = /** @class */ (function (_super) {
         item["EventType"] = controlEvents;
         this.actions.push(item);
     };
-    UIControl.prototype._performActionsForEvents = function (events) {
+    UIControl.prototype._performActionsForEvents = function (events /*UIControl.Event*/) {
         for (var index = 0; index < this.actions.length; index++) {
             var action = this.actions[index];
             var target = action["Target"];
@@ -1588,6 +1566,46 @@ var UIControl = /** @class */ (function (_super) {
                 instance.mouseOutAction.call(target);
         };
     };
+    var _a, _b;
+    UIControl.State = (_a = /** @class */ (function () {
+            function class_1() {
+            }
+            return class_1;
+        }()),
+        _a.normal = 0,
+        _a.highlighted = 1,
+        _a.disabled = 2,
+        _a.selected = 3,
+        _a.focused = 4,
+        _a.application = 5,
+        _a.reserved = 6,
+        _a);
+    UIControl.Event = (_b = /** @class */ (function () {
+            function class_2() {
+            }
+            return class_2;
+        }()),
+        _b.touchDown = 1 << 0,
+        _b.touchDownRepeat = 1 << 1,
+        _b.touchDragInside = 1 << 2,
+        _b.touchDragOutside = 1 << 3,
+        _b.touchDragEnter = 1 << 4,
+        _b.touchDragExit = 1 << 5,
+        _b.touchUpInside = 1 << 6,
+        _b.touchUpOutside = 1 << 7,
+        _b.touchCancel = 1 << 8,
+        _b.valueChanged = 1 << 12,
+        _b.primaryActionTriggered = 1 << 13,
+        _b.editingDidBegin = 1 << 16,
+        _b.editingChanged = 1 << 17,
+        _b.editingDidEnd = 1 << 18,
+        _b.editingDidEndOnExit = 1 << 19,
+        _b.allTouchEvents = 0x00000FFF,
+        _b.editingEvents = 0x000F0000,
+        _b.applicationReserved = 0x0F000000,
+        _b.systemReserved = 0xF0000000,
+        _b.allEvents = 0xFFFFFFFF,
+        _b);
     return UIControl;
 }(UIView));
  
@@ -1614,6 +1632,11 @@ var UIButton = /** @class */ (function (_super) {
     }
     UIButton.prototype.init = function () {
         _super.prototype.init.call(this);
+        MUICoreLayerAddStyle(this.layer, "btn");
+        this.setupLayers();
+    };
+    UIButton.prototype.initFrameCGRect = function (frame) {
+        _super.prototype.initFrameCGRect.call(this, frame);
         MUICoreLayerAddStyle(this.layer, "btn");
         this.setupLayers();
     };
@@ -1647,7 +1670,7 @@ var UIButton = /** @class */ (function (_super) {
         }
         var key = this.layer.getAttribute("data-title");
         if (key != null)
-            this.setTitle(NSLocalizeString(key, key));
+            this.setTitleFor(_injectIntoOptional(NSLocalizeString(key, key)));
         // Prevent click
         this.layer.addEventListener("click", function (e) {
             e.stopPropagation();
@@ -1672,20 +1695,20 @@ var UIButton = /** @class */ (function (_super) {
                 return;
             if (this.type == UIButtonType.MomentaryPushIn)
                 this.setSelected(false);
-            this._performActionsForEvents(UIControlEvents.TouchUpInside);
+            this._performActionsForEvents(UIControl.Event.touchUpInside);
             // if (this.action != null && this.target != null)
             //     this.action.call(this.target, this);
         }.bind(this));
     };
-    UIButton.prototype.setTitle = function (title) {
-        this._titleLayer.innerHTML = title;
+    UIButton.prototype.setTitleFor = function (title) {
+        this._titleLayer.innerHTML = title[0];
     };
     Object.defineProperty(UIButton.prototype, "title", {
         get: function () {
             return this._titleLayer.innerHTML;
         },
         set: function (title) {
-            this.setTitle(title);
+            this.setTitleFor(_injectIntoOptional(title));
         },
         enumerable: true,
         configurable: true
@@ -1955,7 +1978,7 @@ var UISegmentedControl = /** @class */ (function (_super) {
     };
     UISegmentedControl.prototype._addSegmentedItem = function (item) {
         this.segmentedItems.push(item);
-        item.addTargetActionFor(this, this._didClickSegmentedButton, UIControlEvents.AllTouchEvents);
+        item.addTargetActionFor(_injectIntoOptional(this), this._didClickSegmentedButton, UIControl.Event.allTouchEvents);
     };
     UISegmentedControl.prototype._didClickSegmentedButton = function (button) {
         var index = this.segmentedItems.indexOf(button);
@@ -1973,7 +1996,7 @@ var UISegmentedControl = /** @class */ (function (_super) {
         this.selectedSegmentIndex = index;
         var item = this.segmentedItems[this.selectedSegmentIndex];
         item.setSelected(true);
-        this._performActionsForEvents(UIControlEvents.ValueChanged);
+        this._performActionsForEvents(UIControl.Event.valueChanged);
     };
     return UISegmentedControl;
 }(UIControl));
@@ -2019,7 +2042,7 @@ var UISwitch = /** @class */ (function (_super) {
             return;
         this._inputLayer.checked = value;
         this._on = value;
-        this._performActionsForEvents(UIControlEvents.ValueChanged);
+        this._performActionsForEvents(UIControl.Event.valueChanged);
     };
     UISwitch.prototype._toggleValue = function () {
         this.isOn = !this.isOn;
@@ -2055,7 +2078,7 @@ var UIViewController = /** @class */ (function (_super) {
         _this.modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
         _this.modalTransitionStyle = UIModalTransitionStyle.CoverVertical;
         _this.transitioningDelegate = null;
-        _this._contentSize = new NSSize(320, 200);
+        _this._contentSize = new CGSize(320, 200);
         _this._preferredContentSize = null;
         // removeFromParentViewController()
         // {
@@ -2164,6 +2187,10 @@ var UIViewController = /** @class */ (function (_super) {
             this._onLoadLayerAction = null;
         }
         if (this._onViewLoadedAction != null && this._onViewLoadedTarget != null) {
+            this.viewDidLoad();
+            this._loadChildControllers();
+        }
+        else if (this._htmlResourcePath == null) {
             this.viewDidLoad();
             this._loadChildControllers();
         }
@@ -2537,7 +2564,7 @@ var UIPresentationController = /** @class */ (function (_super) {
             var ws = MUIWindowSize();
             var size = toVC.preferredContentSize;
             if (size == null)
-                size = new NSSize(320, 200);
+                size = new CGSize(320, 200);
             var w = size.width;
             var h = size.height;
             var x = (ws.width - w) / 2;
@@ -2550,7 +2577,7 @@ var UIPresentationController = /** @class */ (function (_super) {
             var ws = MUIWindowSize();
             var size = toVC.preferredContentSize;
             if (size == null)
-                size = new NSSize(320, 200);
+                size = new CGSize(320, 200);
             var w = size.width;
             var h = size.height;
             var x = (ws.width - w) / 2;
@@ -2562,7 +2589,7 @@ var UIPresentationController = /** @class */ (function (_super) {
         else {
             var size = toVC.preferredContentSize;
             if (size == null)
-                size = new NSSize(320, 200);
+                size = new CGSize(320, 200);
             var w = size.width;
             var h = size.height;
             view.setFrame(NSRect.rectWithValues(0, 0, w, h));
@@ -3735,7 +3762,7 @@ var UIAlertAction = /** @class */ (function (_super) {
     }
     UIAlertAction.alertActionWithTitle = function (title, style /*UIAlertAction.Style*/, target, completion) {
         var action = new UIAlertAction();
-        action.initTitleOptionalStyleUIAlertActionStyleHandlerOptional(title, style);
+        action.initTitleOptionalStyleUIAlertActionStyleHandlerOptional(_injectIntoOptional(title), style);
         action.target = target;
         action.completion = completion;
         return action;
@@ -3746,24 +3773,24 @@ var UIAlertAction = /** @class */ (function (_super) {
         this.style = style;
     };
     UIAlertAction.Style = /** @class */ (function () {
-        function class_1() {
+        function class_3() {
         }
-        Object.defineProperty(class_1, "_default", {
+        Object.defineProperty(class_3, "_default", {
             get: function () { return Object.assign(new UIAlertAction.Style(), { rawValue: 0 }); },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(class_1, "cancel", {
+        Object.defineProperty(class_3, "cancel", {
             get: function () { return Object.assign(new UIAlertAction.Style(), { rawValue: 1 }); },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(class_1, "destructive", {
+        Object.defineProperty(class_3, "destructive", {
             get: function () { return Object.assign(new UIAlertAction.Style(), { rawValue: 2 }); },
             enumerable: true,
             configurable: true
         });
-        return class_1;
+        return class_3;
     }());
     return UIAlertAction;
 }(UIAlertItem));
@@ -3783,7 +3810,7 @@ var UIAlertController = /** @class */ (function (_super) {
         _this._backgroundView = null;
         _this.tableView = null;
         _this._headerCell = null;
-        _this._alertViewSize = new NSSize(320, 50);
+        _this._alertViewSize = new CGSize(320, 50);
         // Transitioning delegate
         _this._fadeInAnimationController = null;
         _this._fadeOutAnimationController = null;
@@ -3858,7 +3885,7 @@ var UIAlertController = /** @class */ (function (_super) {
     };
     UIAlertController.prototype._calculateContentSize = function () {
         var h = 80 + (this._items.length * 50) + 1;
-        this._alertViewSize = new NSSize(320, h);
+        this._alertViewSize = new CGSize(320, h);
     };
     UIAlertController.prototype.numberOfSectionsIn = function (tableview) {
         return 1;
@@ -3996,19 +4023,19 @@ var UIAlertController = /** @class */ (function (_super) {
         return this._fadeOutAnimationController;
     };
     UIAlertController.Style = /** @class */ (function () {
-        function class_2() {
+        function class_4() {
         }
-        Object.defineProperty(class_2, "actionSheet", {
+        Object.defineProperty(class_4, "actionSheet", {
             get: function () { return Object.assign(new UIAlertController.Style(), { rawValue: 0 }); },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(class_2, "alert", {
+        Object.defineProperty(class_4, "alert", {
             get: function () { return Object.assign(new UIAlertController.Style(), { rawValue: 1 }); },
             enumerable: true,
             configurable: true
         });
-        return class_2;
+        return class_4;
     }());
     return UIAlertController;
 }(UIViewController));
@@ -4129,7 +4156,7 @@ var UIBarButtonItem = /** @class */ (function (_super) {
                     var action = subLayer.getAttribute("data-action-selector");
                     this.target = owner;
                     this.action = _injectIntoOptional(owner[action]);
-                    button.addTargetActionFor(this.target, this.action[0], UIControlEvents.TouchUpInside);
+                    button.addTargetActionFor(_injectIntoOptional(this.target), this.action[0], UIControl.Event.TouchUpInside);
                 }
             }
         }
@@ -4327,7 +4354,7 @@ var UINavigationController = /** @class */ (function (_super) {
         _super.prototype._setViewLoaded.call(this, value);
         this._navigationBar = this.view[0].subviews[0];
         var navItems = [this.rootViewController.navigationItem];
-        this._navigationBar.setItemsAnimated(navItems, false);
+        this._navigationBar.setItemsAnimated(_injectIntoOptional(navItems), false);
     };
     UINavigationController.prototype.viewWillAppear = function (animated) {
         if (this.currentViewControllerIndex < 0)
@@ -4365,11 +4392,11 @@ var UINavigationController = /** @class */ (function (_super) {
             }
             var backButton = new UIButton();
             backButton.init();
-            backButton.setTitle(NSLocalizeString("Back", "BACK"));
+            backButton.setTitleFor(_injectIntoOptional(NSLocalizeString("Back", "BACK")));
             MUICoreLayerAddStyle(backButton.layer, "system-back-icon");
-            backButton.addTargetActionFor(vc, function () {
+            backButton.addTargetActionFor(_injectIntoOptional(vc), function () {
                 this.navigationController[0].popViewControllerAnimated(true);
-            }, UIControlEvents.TouchUpInside);
+            }, UIControl.Event.touchUpInside);
             var backBarButtonItem = new UIBarButtonItem();
             backBarButtonItem.initWithCustomView(backButton);
             backBarButtonItem.target = vc;
@@ -5076,10 +5103,10 @@ var UIStoryboardSegue = /** @class */ (function (_super) {
         this.performHandler = performHandler;
     };
     UIStoryboardSegue.prototype.perform = function () {
-        var canPerfom = this.source.shouldPerformSegueWithIdentifierSender(this.identifier[0], this._sender);
+        var canPerfom = this.source.shouldPerformSegueWithIdentifierSender(this.identifier[0], _injectIntoOptional(this._sender));
         if (canPerfom == false)
             return;
-        this.source.prepareForSegueSender(this, this._sender);
+        this.source.prepareForSegueSender(this, _injectIntoOptional(this._sender));
         if (this.performHandler != null)
             this.performHandler.call(this.source);
     };

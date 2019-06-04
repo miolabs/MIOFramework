@@ -12,7 +12,7 @@ export class CGRect
         return f;
     }
 
-    public initXYWidthHeight(x, y, w, h)
+    public initXIntYIntWidthIntHeightInt(x, y, w, h)
     {
         this.origin = new CGPoint(x, y);
         this.size = new CGSize(w, h);

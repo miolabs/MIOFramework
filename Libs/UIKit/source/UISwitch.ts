@@ -1,5 +1,5 @@
 import { UIControl } from "./UIControl";
-import { UIControlEvents } from "./UIControl";
+import { UIControl.Event } from "./UIControl";
 import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
 
 /**
@@ -42,7 +42,7 @@ export class UISwitch extends UIControl
         this._inputLayer.checked = value;
         this._on = value;
 
-        this._performActionsForEvents(UIControlEvents.ValueChanged);
+        this._performActionsForEvents(UIControl.Event.valueChanged);
     }
 
     private _toggleValue(){

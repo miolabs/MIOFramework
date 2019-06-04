@@ -21,6 +21,9 @@
     "prepareForSegueSender": "prepareForSegue",
     "performSegueWithIdentifierSender": "performSegueWithIdentifier"
   },
+  "UIButton": {
+    "setTitleFor": "setTitle"
+  },
   "UIControl": {
     "addTargetActionForControlEvents": "addTarget",
     "addTargetActionFor": "addTarget"
