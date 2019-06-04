@@ -408,7 +408,7 @@ export class UIViewController extends NSObject {
         });
     }
 
-    transitionFromViewControllerToViewController(fromVC, toVC, duration, animationType, target?, completion?) {
+    transitionFromViewControllerToViewController(fromVC, toVC, duration, options, animations?, completion?) {
         //TODO
     }
 
