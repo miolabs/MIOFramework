@@ -11,14 +11,12 @@ import { NSFormatter } from "mio-foundation-web";
 import { CGSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
-import { NSRect } from "mio-foundation-web";
 import { MIOCoreIsMobile } from "mio-foundation-web";
 import { NSTimer } from "mio-foundation-web";
 import { MIOCoreGetPlatform } from "mio-foundation-web";
 import { MIOCorePlatformType } from "mio-foundation-web";
 import { NSIndexPath } from "mio-foundation-web";
 import "mio-foundation-web/extensions"
-import { NSSize } from "mio-foundation-web";
 import { NSBundle } from "mio-foundation-web";
 import { MIOCoreBundleGetAppResource } from "mio-foundation-web";
 import { NSURLRequest } from "mio-foundation-web";
@@ -1391,7 +1389,7 @@ export class UIView extends NSObject {
     }
 
     get frame() {
-        return CGRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        return _create(CGRect, 'initXIntYIntWidthIntHeightInt', this.getX(), this.getY(), this.getWidth(), this.getHeight());
     }
 
     set frame(frame:CGRect){
@@ -1399,7 +1397,7 @@ export class UIView extends NSObject {
     }
 
     public get bounds() {
-        return CGRect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
+        return _create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, this.getWidth(), this.getHeight());
     }
 
     //
@@ -3004,7 +3002,7 @@ export class UIPresentationController extends NSObject
             let w = fromVC.view.getWidth();
             let h = fromVC.view.getHeight();
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
         }
         else if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet)
         {
@@ -3018,8 +3016,8 @@ export class UIPresentationController extends NSObject
             let h = size.height;
             let x = (ws.width - w) / 2;
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-            this.window.setFrame(NSRect.rectWithValues(x, 0, w, h))
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+            this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, 0, w, h))
 
             view.layer.classList.add("modal");
         }
@@ -3036,8 +3034,8 @@ export class UIPresentationController extends NSObject
             let x = (ws.width - w) / 2;
             let y = (ws.height - h) / 2;
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-            this.window.setFrame(NSRect.rectWithValues(x, y, w, h))
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+            this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, y, w, h))
 
             view.layer.classList.add("modal");
         }
@@ -3048,7 +3046,7 @@ export class UIPresentationController extends NSObject
             let w = size.width;
             let h = size.height;
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
         }        
     }
 
@@ -3226,7 +3224,7 @@ export class UIPopoverPresentationController extends UIPresentationController
     permittedArrowDirections = UIPopoverArrowDirection.Any;
 
     sourceView = null;
-    sourceRect = NSRect.Zero();
+    sourceRect = CGRect.Zero();
 
     delegate = null;
 
@@ -3293,8 +3291,8 @@ export class UIPopoverPresentationController extends UIPresentationController
                 x = v.layer.getBoundingClientRect().left - w - 10;
         }
 
-        view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-        this.window.setFrame(NSRect.rectWithValues(x, y, w, h))
+        view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+        this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, y, w, h))
     }
 
     private _drawRoundRect(x, y, width, height, radius) {
@@ -3567,9 +3565,9 @@ export class UIScrollView extends UIView {
         return p;
     }
 
-    get bounds():NSRect{
+    get bounds():CGRect{
         let p = this.contentOffset;
-        return NSRect.rectWithValues(p.x, p.y, this.getWidth(), this.getHeight());
+        return _create(CGRect, 'initXIntYIntWidthIntHeightInt', p.x, p.y, this.getWidth(), this.getHeight());
     }
 
     addSubview(view:UIView, index?) {
@@ -5552,7 +5550,7 @@ export function MUIWindowSize()
     //var h = document.body.clientHeight;window.innerHeight
     var h = window.innerHeight;
 
-    return new NSSize(w, h);
+    return new CGSize(w, h);
 }
 
 export function _MUIShowViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, animated:boolean, target?, completion?)

@@ -39,8 +39,6 @@ var __extends = (this && this.__extends) || (function () {
 
 
 
-
-
  
 function MUICoreLayerIDFromObject(object) {
     var classname = object.constructor.name;
@@ -1180,7 +1178,7 @@ var UIView = /** @class */ (function (_super) {
     };
     Object.defineProperty(UIView.prototype, "frame", {
         get: function () {
-            return CGRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            return _create(CGRect, 'initXIntYIntWidthIntHeightInt', this.getX(), this.getY(), this.getWidth(), this.getHeight());
         },
         set: function (frame) {
             this.setFrame(frame);
@@ -1190,7 +1188,7 @@ var UIView = /** @class */ (function (_super) {
     });
     Object.defineProperty(UIView.prototype, "bounds", {
         get: function () {
-            return CGRect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
+            return _create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, this.getWidth(), this.getHeight());
         },
         enumerable: true,
         configurable: true
@@ -2557,7 +2555,7 @@ var UIPresentationController = /** @class */ (function (_super) {
         else if (toVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
             var w = fromVC.view.getWidth();
             var h = fromVC.view.getHeight();
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
         }
         else if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet) {
             // Present like desktop sheet window
@@ -2568,8 +2566,8 @@ var UIPresentationController = /** @class */ (function (_super) {
             var w = size.width;
             var h = size.height;
             var x = (ws.width - w) / 2;
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-            this.window.setFrame(NSRect.rectWithValues(x, 0, w, h));
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+            this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, 0, w, h));
             view.layer.classList.add("modal");
         }
         else if (toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet) {
@@ -2582,8 +2580,8 @@ var UIPresentationController = /** @class */ (function (_super) {
             var h = size.height;
             var x = (ws.width - w) / 2;
             var y = (ws.height - h) / 2;
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-            this.window.setFrame(NSRect.rectWithValues(x, y, w, h));
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+            this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, y, w, h));
             view.layer.classList.add("modal");
         }
         else {
@@ -2592,7 +2590,7 @@ var UIPresentationController = /** @class */ (function (_super) {
                 size = new CGSize(320, 200);
             var w = size.width;
             var h = size.height;
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
         }
     };
     Object.defineProperty(UIPresentationController.prototype, "window", {
@@ -2747,7 +2745,7 @@ var UIPopoverPresentationController = /** @class */ (function (_super) {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.permittedArrowDirections = UIPopoverArrowDirection.Any;
         _this.sourceView = _injectIntoOptional(null);
-        _this.sourceRect = NSRect.Zero();
+        _this.sourceRect = CGRect.Zero();
         _this.delegate = null;
         _this._contentSize = null;
         _this._canvasLayer = null;
@@ -2805,8 +2803,8 @@ var UIPopoverPresentationController = /** @class */ (function (_super) {
             if ((x + w) > window.innerWidth)
                 x = v.layer.getBoundingClientRect().left - w - 10;
         }
-        view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-        this.window.setFrame(NSRect.rectWithValues(x, y, w, h));
+        view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+        this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, y, w, h));
     };
     UIPopoverPresentationController.prototype._drawRoundRect = function (x, y, width, height, radius) {
         var ctx = this._canvasLayer.getContext('2d');
@@ -3048,7 +3046,7 @@ var UIScrollView = /** @class */ (function (_super) {
     Object.defineProperty(UIScrollView.prototype, "bounds", {
         get: function () {
             var p = this.contentOffset;
-            return NSRect.rectWithValues(p.x, p.y, this.getWidth(), this.getHeight());
+            return _create(CGRect, 'initXIntYIntWidthIntHeightInt', p.x, p.y, this.getWidth(), this.getHeight());
         },
         enumerable: true,
         configurable: true
@@ -4772,7 +4770,7 @@ function MUIWindowSize() {
     var w = document.body.clientWidth;
     //var h = document.body.clientHeight;window.innerHeight
     var h = window.innerHeight;
-    return new NSSize(w, h);
+    return new CGSize(w, h);
 }
  
 function _MUIShowViewController(fromVC, toVC, sourceVC, animated, target, completion) {

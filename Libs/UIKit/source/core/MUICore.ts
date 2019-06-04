@@ -1,6 +1,6 @@
 
 import { NSClassFromString } from "mio-foundation-web";
-import { NSSize } from "mio-foundation-web";
+import { CGSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
 import { UIView } from "../UIView";
 import { UIViewController } from "../UIViewController";
@@ -70,7 +70,7 @@ export function MUIWindowSize()
     //var h = document.body.clientHeight;window.innerHeight
     var h = window.innerHeight;
 
-    return new NSSize(w, h);
+    return new CGSize(w, h);
 }
 
 export function _MUIShowViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, animated:boolean, target?, completion?)

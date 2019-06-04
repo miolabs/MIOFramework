@@ -1,5 +1,5 @@
 import { NSObject } from "mio-foundation-web";
-import { NSRect } from "mio-foundation-web";
+import { CGRect } from "mio-foundation-web";
 import { CGSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
 import { MIOCoreIsMobile } from "mio-foundation-web";
@@ -116,7 +116,7 @@ export class UIPresentationController extends NSObject
             let w = fromVC.view.getWidth();
             let h = fromVC.view.getHeight();
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
         }
         else if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet)
         {
@@ -130,8 +130,8 @@ export class UIPresentationController extends NSObject
             let h = size.height;
             let x = (ws.width - w) / 2;
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-            this.window.setFrame(NSRect.rectWithValues(x, 0, w, h))
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+            this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, 0, w, h))
 
             view.layer.classList.add("modal");
         }
@@ -148,8 +148,8 @@ export class UIPresentationController extends NSObject
             let x = (ws.width - w) / 2;
             let y = (ws.height - h) / 2;
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-            this.window.setFrame(NSRect.rectWithValues(x, y, w, h))
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+            this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, y, w, h))
 
             view.layer.classList.add("modal");
         }
@@ -160,7 +160,7 @@ export class UIPresentationController extends NSObject
             let w = size.width;
             let h = size.height;
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
         }        
     }
 

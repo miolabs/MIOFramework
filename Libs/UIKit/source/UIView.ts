@@ -459,7 +459,7 @@ export class UIView extends NSObject {
     }
 
     get frame() {
-        return CGRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        return _create(CGRect, 'initXIntYIntWidthIntHeightInt', this.getX(), this.getY(), this.getWidth(), this.getHeight());
     }
 
     set frame(frame:CGRect){
@@ -467,7 +467,7 @@ export class UIView extends NSObject {
     }
 
     public get bounds() {
-        return CGRect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
+        return _create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, this.getWidth(), this.getHeight());
     }
 
     //

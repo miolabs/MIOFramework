@@ -102,8 +102,7 @@
     "evaluateWithObjectSubstitutionVariables": "evaluateObject"
   },
   "NSSet": {
-    "filteredSetUsingPredicate": "filterWithPredicate",
-    "addObserverForKeyPathOptionsContext": "addObserver"
+    "filteredSetUsingPredicate": "filterWithPredicate"
   },
   "NSURL": {
     "initSchemeStringHostOptionalPathString": "initWithScheme",
@@ -114,9 +113,6 @@
   },
   "NSURLRequest": {
     "initUrlURL": "initWithURL"
-  },
-  "NotificationCenter": {
-    "addObserverForNameObjectQueueUsingBlock": "addObserver"
   },
   "NumberFormatter": {
     "isPartialStringValidationEnabled": "isPartialStringValid"

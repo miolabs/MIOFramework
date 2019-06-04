@@ -1159,7 +1159,7 @@ var NSObject = /** @class */ (function () {
         var offset = keypath.substring(index + 1);
         return [key, offset];
     };
-    NSObject.prototype.addObserverForKeyPathOptionsContext = function (obs, keypath, context) {
+    NSObject.prototype.addObserver = function (obs, keypath, context) {
         var _a;
         var _b = this._keyFromKeypath(keypath), key = _b[0], offset = _b[1];
         if (offset == null) {
@@ -2487,10 +2487,10 @@ var NSSet = /** @class */ (function (_super) {
         return objs;
     };
     // Prevent KVO on special properties
-    NSSet.prototype.addObserverForKeyPathOptionsContext = function (obs, keypath, context) {
+    NSSet.prototype.addObserver = function (obs, keypath, context) {
         if (keypath == "count" || keypath == "length")
             throw new Error("NSSet: Can't observe count. It's not KVO Compilant");
-        _super.prototype.addObserverForKeyPathOptionsContext.call(this, obs, keypath, context);
+        _super.prototype.addObserver.call(this, obs, keypath, context);
     };
     return NSSet;
 }(NSObject));
@@ -2702,7 +2702,7 @@ var Formatter = /** @class */ (function (_super) {
     };
     Formatter.prototype.editingStringForObjectValue = function (value) {
     };
-    Formatter.prototype.isPartialStringValidationEnabledNewEditingStringErrorDescription = function (str) {
+    Formatter.prototype.isPartialStringValidNewEditingStringErrorDescriptionationEnabled = function (str) {
         var newStr = "";
         return [false, newStr];
     };
@@ -2771,7 +2771,7 @@ var DateFormatter = /** @class */ (function (_super) {
         }
         return str;
     };
-    DateFormatter.prototype.isPartialStringValidNewEditingStringErrorDescriptionationEnabled = function (str) {
+    DateFormatter.prototype.isPartialStringValidationEnabledNewEditingStringErrorDescription = function (str) {
         var _a;
         if (str.length == 0)
             return [true, str];
@@ -3257,7 +3257,7 @@ var NumberFormatter = /** @class */ (function (_super) {
         }
         return result;
     };
-    NumberFormatter.prototype.isPartialStringValidNewEditingStringErrorDescriptionationEnabled = function (str) {
+    NumberFormatter.prototype.isPartialStringValidationEnabledNewEditingStringErrorDescription = function (str) {
         var _a;
         if (str.length == 0)
             return [true, str];
@@ -3415,14 +3415,14 @@ var NotificationCenter = /** @class */ (function () {
     NotificationCenter.defaultCenter = function () {
         return NotificationCenter._sharedInstance;
     };
-    NotificationCenter.prototype.addObserverForNameObjectQueueUsingBlock = function (obs, name, fn) {
-        var notes = this.notificationNames[name[0]];
+    NotificationCenter.prototype.addObserver = function (obs, name, fn) {
+        var notes = this.notificationNames[name];
         if (notes == null) {
             notes = [];
         }
-        var item = { "observer": obs[0], "function": fn[0] };
+        var item = { "observer": obs, "function": fn };
         notes.push(item);
-        this.notificationNames[name[0]] = notes;
+        this.notificationNames[name] = notes;
     };
     ;
     NotificationCenter.prototype.removeObserver = function (obs, name) {
@@ -4198,7 +4198,7 @@ var Operation = /** @class */ (function (_super) {
     Operation.prototype.addDependency = function (operation) {
         this._dependencies.push(operation);
         if (operation.isFinished == false) {
-            operation.addObserverForKeyPathOptionsContext(this, "isFinished");
+            operation.addObserver(this, "isFinished");
             this.setReady(false);
         }
     };
@@ -4286,10 +4286,10 @@ var OperationQueue = /** @class */ (function (_super) {
         this.didChangeValue("operationCount");
         this.didChangeValue("operations");
         if (operation.ready == false) {
-            operation.addObserverForKeyPathOptionsContext(this, "ready", null);
+            operation.addObserver(this, "ready", null);
         }
         else {
-            operation.addObserverForKeyPathOptionsContext(this, "isFinished", null);
+            operation.addObserver(this, "isFinished", null);
             if (this.suspended == false)
                 operation.start();
         }
@@ -4349,7 +4349,7 @@ var OperationQueue = /** @class */ (function (_super) {
             var op = object;
             if (op.ready == true) {
                 op.removeObserver(this, "ready");
-                op.addObserverForKeyPathOptionsContext(this, "isFinished", null);
+                op.addObserver(this, "isFinished", null);
                 if (this.suspended == false)
                     op.start();
             }

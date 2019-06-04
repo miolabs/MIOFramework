@@ -2,7 +2,8 @@
   "name": "transpiler-web-playground",
   "version": "0.0.0",
   "scripts": {
-    "start": "node ./www.js"
+    "start": "node ./www.js",
+    "copyScripts": "cp ../../Libs/Foundation/packages/mio-foundation-web-dev/mio-foundation-web.js ./client/mio-foundation-web.js && cp ../../Libs/UIKit/packages/mio-uikit-web-dev/mio-uikit-web.js ./client/mio-uikit-web.js"
   },
   "dependencies": {
     "async": "*",
