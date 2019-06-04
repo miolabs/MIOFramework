@@ -20,6 +20,7 @@ export class UINavigationBar extends UIView
     private rigthView:UIView = null;
     private setup(){
         MUICoreLayerAddStyle(this.layer, "navigation-bar");
+        this.layer.style.width = "100%";
 
         this.leftView = new UIView();
         this.leftView.init();
