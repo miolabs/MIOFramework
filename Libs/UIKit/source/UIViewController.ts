@@ -192,6 +192,10 @@ export class UIViewController extends NSObject {
             this.viewDidLoad();
             this._loadChildControllers();
         }
+        else if (this._htmlResourcePath == null){
+            this.viewDidLoad();
+            this._loadChildControllers();
+        }
     }
 
     protected _loadChildControllers() {

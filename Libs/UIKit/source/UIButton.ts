@@ -32,6 +32,12 @@ export class UIButton extends UIControl
         this.setupLayers();
     }
 
+    initFrameCGRect(frame: CGRect) {
+        super.initFrameCGRect(frame);
+        MUICoreLayerAddStyle(this.layer, "btn");
+        this.setupLayers();
+    }
+
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
 

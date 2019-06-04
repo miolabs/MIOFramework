@@ -1847,6 +1847,16 @@ export class UIControl extends UIView
                  instance.mouseOutAction.call(target);
          }
     }
+
+    static State = class {
+        static normal = 0
+        static highlighted = 1
+        static disabled = 2
+        static selected = 3
+        static focused = 4
+        static application = 5
+        static reserved = 6
+    }
 }
 
 
@@ -1880,6 +1890,12 @@ export class UIButton extends UIControl
 
     init(){
         super.init();
+        MUICoreLayerAddStyle(this.layer, "btn");
+        this.setupLayers();
+    }
+
+    initFrameCGRect(frame: CGRect) {
+        super.initFrameCGRect(frame);
         MUICoreLayerAddStyle(this.layer, "btn");
         this.setupLayers();
     }
@@ -2553,6 +2569,10 @@ export class UIViewController extends NSObject {
         }
 
         if (this._onViewLoadedAction != null && this._onViewLoadedTarget != null) {
+            this.viewDidLoad();
+            this._loadChildControllers();
+        }
+        else if (this._htmlResourcePath == null){
             this.viewDidLoad();
             this._loadChildControllers();
         }

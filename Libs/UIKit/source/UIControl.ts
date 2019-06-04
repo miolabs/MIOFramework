@@ -191,5 +191,15 @@ export class UIControl extends UIView
                  instance.mouseOutAction.call(target);
          }
     }
+
+    static State = class {
+        static normal = 0
+        static highlighted = 1
+        static disabled = 2
+        static selected = 3
+        static focused = 4
+        static application = 5
+        static reserved = 6
+    }
 }
 
