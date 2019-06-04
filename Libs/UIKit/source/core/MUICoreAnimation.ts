@@ -143,12 +143,10 @@ export function _MUIRemoveAnimations(layer, animations)
         layer.classList.remove(animations[index]);
 }
 
-export function _MUIAnimationStart(layer, animationController, animationContext, target?, completion?)
+export function _MUIAnimationStart(layer, animationController, animationContext, completion?)
 {
-    if (animationController == null)
-    {
-        if (target != null && completion != null)
-                completion.call(target);        
+    if (animationController == null){
+        if (completion != null) completion();        
         return;
     }
 
@@ -157,14 +155,11 @@ export function _MUIAnimationStart(layer, animationController, animationContext,
 
     animationController.animateTransition(animationContext);
 
-    if (duration == 0 || animations == null)
-    {
+    if (duration == 0 || animations == null){
         // NO animation
         animationController.animationEnded(true);
 
-        if (target != null && completion != null)
-            completion.call(target);
-
+        if (completion != null) completion();
         return;
     }
 
@@ -175,8 +170,6 @@ export function _MUIAnimationStart(layer, animationController, animationContext,
     layer.animationParams["animationController"] = animationController;
     layer.animationParams["animations"] = animations;
 
-    if (target != null)
-        layer.animationParams["target"] = target;
     if (completion != null)
         layer.animationParams["completion"] = completion;
 
@@ -186,8 +179,7 @@ export function _MUIAnimationStart(layer, animationController, animationContext,
 export function _UIAnimationDidFinish(event)
 {
     let animationController = event.target.animationParams["animationController"];
-    let animations = event.target.animationParams["animations"];
-    let target = event.target.animationParams["target"];
+    let animations = event.target.animationParams["animations"];    
     let completion = event.target.animationParams["completion"];
     let layer = event.target;
 
@@ -195,6 +187,5 @@ export function _UIAnimationDidFinish(event)
     layer.removeEventListener("animationend", _UIAnimationDidFinish);
     animationController.animationEnded(true);
 
-    if (target != null && completion != null)
-        completion.call(target);
+    if (completion != null) completion();
 }

@@ -70,9 +70,8 @@ export class UIAlertAction extends UIAlertItem
         static get destructive() {return Object.assign(new UIAlertAction.Style(), {rawValue: 2})}
     }
 
-    static alertActionWithTitle(title:string, style:any/*UIAlertAction.Style*/, target, completion):UIAlertAction
-    {
-        var action = new UIAlertAction();
+    static alertActionWithTitle(title:string, style:any/*UIAlertAction.Style*/, target, completion):UIAlertAction{
+        let action = new UIAlertAction();
         action.initWithTitle(title, style);
         action.target = target;
         action.completion = completion;
@@ -80,8 +79,7 @@ export class UIAlertAction extends UIAlertItem
         return action;
     }
 
-    initWithTitle(title, style)
-    {
+    initWithTitle(title, style){
         super.initWithType(UIAlertItemType.Action);
 
         this.title = title;
@@ -201,15 +199,15 @@ export class UIAlertController extends UIViewController
         this._alertViewSize = new NSSize(320, h);
     }
 
-    numberOfSections(tableview){
+    numberOfSectionsIn(tableview:UITableView){
         return 1;
     }
 
-    numberOfRowsInSection(tableview, section){
+    tableViewNumberOfRowsInSection(tableview:UITableView, section:number){
         return this._items.length + 1;
     }
 
-    cellAtIndexPath(tableview, indexPath:NSIndexPath){
+    tableViewCellForRowAt(tableview, indexPath:NSIndexPath){
         let cell:UITableViewCell = null;
         if (indexPath.row == 0){
             cell = this._createHeaderCell();

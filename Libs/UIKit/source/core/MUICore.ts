@@ -123,7 +123,7 @@ export function _MUIShowViewController(fromVC:UIViewController, toVC:UIViewContr
 
     let layer = view.layer;
             
-    _MUIAnimationStart(layer, ac, animationContext, this, function () {
+    _MUIAnimationStart(layer, ac, animationContext, function () {
         _MUIAnimationDidStart(fromVC, toVC, pc, target, completion);
     });
 
@@ -192,7 +192,7 @@ export function _MUIHideViewController(fromVC:UIViewController, toVC:UIViewContr
     if (pc != null)
         pc.dismissalTransitionWillBegin();
 
-    _MUIAnimationStart(layer, ac, animationContext, this, function () {
+    _MUIAnimationStart(layer, ac, animationContext, function () {
 
         if (fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
             || fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
