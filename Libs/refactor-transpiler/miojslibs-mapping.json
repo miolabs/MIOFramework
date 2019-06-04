@@ -51,8 +51,6 @@
   },
   "UISplitViewController": {
     "showDetailViewControllerSender": "showDetailViewController",
-    "displayMode": "displayModeButtonItemAction",
-    "displayModeButtonItem": "displayModeButtonItemAction",
     "initNameStringBundleOptional": "initWithName"
   },
   "UIStoryboardSegue": {
@@ -69,8 +67,7 @@
     "setEditingAnimated": "setEditing"
   },
   "Bundle": {
-    "initUrlURL": "initWithURL",
-    "initURLURL": "initUrlURL"
+    "initUrlURL": "initWithURL"
   },
   "Formatter": {
     "getObjectValueForStringErrorDescription": "getObjectValueForString",
@@ -113,8 +110,7 @@
     "initRequestURLRequestDelegateOptional": "NSURLConnection"
   },
   "NSURLRequest": {
-    "initUrlURL": "initWithURL",
-    "initURLURL": "initWithURL"
+    "initUrlURL": "initWithURL"
   },
   "NotificationCenter": {
     "addObserverForNameObjectQueueUsingBlock": "addObserver"
@@ -123,7 +119,7 @@
     "isPartialStringValidationEnabled": "isPartialStringValid"
   },
   "Timer": {
-    "initTimeIntervalTimeIntervalRepeatsBoolBlockfunction_type": "initWithTimeInterval",
+    "initTimeIntervalTimeIntervalRepeatsBoolBlockfunction_type": "initWithTimeInterval"
   },
   "UserDefaults": {
     "setBoolForKey": "setBooleanForKey",

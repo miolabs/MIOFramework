@@ -1295,7 +1295,7 @@ export class UIView extends NSObject {
         this.didChangeValue("frame");
 
         if (UIView.animationsChanges != null) {
-            let animation = { "View": this, "Key": "left", "EndValue": x + "px" };
+            let animation = { "View": this, "Key": "x", "EndValue": x + "px" };
             UIView.animationsChanges.addObject(animation);
         }
         else {
@@ -1315,7 +1315,7 @@ export class UIView extends NSObject {
         this.didChangeValue("frame");
 
         if (UIView.animationsChanges != null) {
-            let animation = { "View": this, "Key": "top", "EndValue": y + "px" };
+            let animation = { "View": this, "Key": "y", "EndValue": y + "px" };
             UIView.animationsChanges.addObject(animation);
         }
         else {
@@ -1383,7 +1383,7 @@ export class UIView extends NSObject {
         this.setHeight(h);
     }
 
-    setFrame(frame) {
+    setFrame(frame:CGRect) {
         this.willChangeValue("frame");
         this.setFrameComponents(frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
         this.didChangeValue("frame");
@@ -1391,6 +1391,10 @@ export class UIView extends NSObject {
 
     get frame() {
         return CGRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    }
+
+    set frame(frame:CGRect){
+        this.setFrame(frame);
     }
 
     public get bounds() {
@@ -1518,28 +1522,13 @@ export class UIView extends NSObject {
             let key = anim["Key"];
             let value = anim["EndValue"];
 
-            view.layer.style.transition = key + " " + duration + "s";
-            switch (key) {
-                case "opacity":
-                    view.layer.style.opacity = value;
-                    break;
+            let cssProp =
+                key === 'x' ? 'left' :
+                key === 'y' ? 'top' :
+                key
 
-                case "x":
-                    view.layer.style.left = value;
-                    break;
-
-                case "y":
-                    view.layer.style.top = value;
-                    break;
-
-                case "width":
-                    view.layer.style.width = value;
-                    break;
-
-                case "height":
-                    view.layer.style.height = value;
-                    break;
-            }
+            view.layer.style.transition = (view.layer.style.transition ? view.layer.style.transition + ", " : "") + cssProp + " " + duration + "s";
+            setTimeout(() => view.layer.style[cssProp] = value)
 
             UIView.addTrackingAnimationView(view);
         }
@@ -2782,7 +2771,7 @@ export class UIViewController extends NSObject {
         });
     }
 
-    transitionFromViewControllerToViewController(fromVC, toVC, duration, animationType, target?, completion?) {
+    transitionFromViewControllerToViewController(fromVC, toVC, duration, options, animations?, completion?) {
         //TODO
     }
 
@@ -4547,19 +4536,17 @@ export class UIAlertController extends UIViewController
         return h;
     }
 
-    canSelectCellAtIndexPath(tableview, indexPath:NSIndexPath)
-    {
+    canSelectCellAtIndexPath(tableview, indexPath:NSIndexPath){
         if (indexPath.row == 0) return false;
 
-        var item = this._items[indexPath.row - 1];
+        let item = this._items[indexPath.row - 1];
         if (item.type == UIAlertItemType.Action) return true;
 
         return false;
     }
 
-    didSelectCellAtIndexPath(tableView, indexPath:NSIndexPath)
-    {
-        var item = this._items[indexPath.row - 1];
+    didSelectCellAtIndexPath(tableView, indexPath:NSIndexPath){
+        let item = this._items[indexPath.row - 1];
         if (item.type == UIAlertItemType.Action) {
             
             if (item.target != null && item.completion != null)
@@ -4629,15 +4616,16 @@ export class UIAlertController extends UIViewController
 
         switch(style.rawValue){
 
-            case UIAlertAction.Style._default.rawValue:                                
+            case UIAlertAction.Style._default.rawValue:
+                MUICoreLayerAddStyle(buttonLabel.layer, "default");
                 break;
 
             case UIAlertAction.Style.cancel.rawValue:                
-                buttonLabel.layer.classList.add("alert");                
+                MUICoreLayerAddStyle(buttonLabel.layer, "cancel");
                 break;
 
             case UIAlertAction.Style.destructive.rawValue:                
-                buttonLabel.layer.classList.add("alert");                
+                MUICoreLayerAddStyle(buttonLabel.layer, "destructive");
                 break;
         }
 
@@ -4847,6 +4835,7 @@ export class UINavigationBar extends UIView
     private rigthView:UIView = null;
     private setup(){
         MUICoreLayerAddStyle(this.layer, "navigation-bar");
+        this.layer.style.width = "100%";
 
         this.leftView = new UIView();
         this.leftView.init();

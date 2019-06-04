@@ -133,7 +133,10 @@ for(let optional of optionals) {
   }
 }
 
+let iteratedRenames = {}
 for(let rename of renames) {
+  if(iteratedRenames[JSON.stringify(rename.chain)]) continue
+  iteratedRenames[JSON.stringify(rename.chain)] = true
   for(const referencedSymbol of getReferences(rename.chain)) {
     for(let reference of referencedSymbol.getReferences()) {
       replacements.push({
@@ -147,13 +150,15 @@ for(let rename of renames) {
 
 replacements.sort((a, b) => a.range[0] < b.range[1] ? 1 : -1)
 
-//console.log(replacements)
+//console.dir(replacements, {'maxArrayLength': null})
 
 for(let replacement of replacements) {
   let file = project.getSourceFile(replacement.file)
 
   file.replaceText(replacement.range, replacement.text)
 }
+
+//console.log('!!!', project.getSourceFile("foundation.web.ts").getText())
 
 /*for(let sourceFile of project.getSourceFiles()) {
   let path = sourceFile.getFilePath()
