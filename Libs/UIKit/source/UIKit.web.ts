@@ -1529,8 +1529,7 @@ export class UIView extends NSObject {
                 key
 
             view.layer.style.transition = (view.layer.style.transition ? view.layer.style.transition + ", " : "") + cssProp + " " + duration + "s";
-            //setTimeout(() => view.layer.style[cssProp] = value)
-            view.layer.style[cssProp] = value
+            setTimeout(() => view.layer.style[cssProp] = value)
 
             UIView.addTrackingAnimationView(view);
         }

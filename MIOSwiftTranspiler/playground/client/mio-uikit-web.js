@@ -1301,8 +1301,7 @@ var UIView = /** @class */ (function (_super) {
                 key === 'y' ? 'top' :
                     key;
             view.layer.style.transition = (view.layer.style.transition ? view.layer.style.transition + ", " : "") + cssProp + " " + duration + "s";
-            //setTimeout(function () { return view.layer.style[cssProp] = value; });
-            view.layer.style[cssProp] = value;
+            setTimeout(function () { return view.layer.style[cssProp] = value; });
             UIView.addTrackingAnimationView(view);
         };
         for (var index = 0; index < UIView.animationsChanges.length; index++) {

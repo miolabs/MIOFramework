@@ -352,9 +352,9 @@ Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
             if(xhr.status === 200) {
                 let code = xhr.responseText
                 code = code.slice(code.indexOf('}\n}\n') + '}\n}\n'.length)//to remove Playground duplication
-                code = code.replace(/init[0-9]+XYWidthHeight/g, "initXYWidthHeight")//TODO temporary fix until CoreData isNative in transpiler
-                code = code.replace(/_frame/g, "frame")//TODO temporary fix until frame is not prefixed with _
-                code = code.replace(/\(objc_selector_expr[\s\S]+buttonActionSender\)/, "_this.buttonActionSender")//TODO temporary fix
+                //code = code.replace(/init[0-9]+XYWidthHeight/g, "initXYWidthHeight")//TODO temporary fix until CoreData isNative in transpiler
+                //code = code.replace(/_frame/g, "frame")//TODO temporary fix until frame is not prefixed with _
+                //code = code.replace(/\(objc_selector_expr[\s\S]+buttonActionSender\)/, "_this.buttonActionSender")//TODO temporary fix
                 let {outputText, formatText} = formatAndTranspile(code, {})
                 targetCodeEl.value = formatText;
                 targetCodeEl.style.color = '';
