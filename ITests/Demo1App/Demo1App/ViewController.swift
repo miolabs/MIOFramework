@@ -17,6 +17,13 @@ class ViewController: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: 200, height: 50))
+        view.backgroundColor = UIColor(displayP3Red: 255, green: 0, blue: 0, alpha: 1)                
+        
+        UIView.animate(withDuration: 5) {
+            view.frame = CGRect(x: 100, y: 100, width: 200, height: 50)
+        }
     }
     
     @IBAction func buttonClicked(sender: UIButton){

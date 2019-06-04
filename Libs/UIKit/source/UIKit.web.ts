@@ -4743,6 +4743,34 @@ export class UIBarItem extends NSObject
 
 
 
+
+export enum UIBarButtonSystemItem 
+{
+    Done,
+    Cancel,
+    Edit,
+    Save,
+    Add,
+    FlexibleSpace,
+    FixedSpace,
+    Compose,
+    Reply,
+    Action,
+    Organize,
+    Bookmarks,
+    Search,
+    Refresh,
+    Stop,
+    Camera,
+    Trash,
+    Play,
+    Pause,
+    Rewind,
+    FastForward,
+    Undo,
+    Redo    
+}
+
 export class UIBarButtonItem extends UIBarItem
 {
     target:any;
@@ -4753,14 +4781,30 @@ export class UIBarButtonItem extends UIBarItem
 
     customView:UIView = null;
 
+    initWithCustomView(view:UIView){
+        super.init();
+        this.customView = view;
+    }
+
+    initWithBarButtonSystemItem(systemItem:UIBarButtonSystemItem, target, action){
+        super.init();
+
+        let button = new UIButton();
+        button.init();
+        MUICoreLayerAddStyle(button.layer, "system-" + UIBarButtonSystemItem[systemItem] + "-icon");
+
+        this.customView = button;
+    }
+
     initWithLayer(layer, owner){
+        super.init();
         this.layer = layer;
         this.owner = owner;
 
         let button = new UIButton();
         button.init();
         let systemStyle = layer.getAttribute("data-bar-button-item-system");
-        if (systemStyle != null) MUICoreLayerAddStyle(button.layer, systemStyle);
+        if (systemStyle != null) MUICoreLayerAddStyle(button.layer, "system-" + systemStyle + "-icon");
 
         if (layer.childNodes.length > 0) {
             for (let index = 0; index < layer.childNodes.length; index++) {
@@ -4944,6 +4988,10 @@ export class UINavigationItem extends NSObject
 
 
 
+
+
+
+
 /**
  * Created by godshadow on 9/4/16.
  */
@@ -5030,11 +5078,23 @@ export class UINavigationController extends UIViewController
 
         vc.onLoadView(this, function (this:UINavigationController) {
 
-            if (vc.navigationItem != null && vc.navigationItem.backBarButtonItem != null) {
-                vc.navigationItem.backBarButtonItem.addTarget(this, function(){
-                    vc.navigationController.popViewController();
-                }, UIControlEvents.AllTouchEvents);
+            if (vc.navigationItem == null) {
+                vc.navigationItem = new UINavigationItem();
+                vc.navigationItem.init();
             }
+
+            let backButton = new UIButton();
+            backButton.init();    
+            backButton.setTitle(NSLocalizeString("Back", "BACK"));
+            MUICoreLayerAddStyle(backButton.layer, "system-back-icon");
+            backButton.addTarget(vc, function(this:UIViewController){
+                this.navigationController.popViewController(true);
+            }, UIControlEvents.TouchUpInside);
+
+            let backBarButtonItem = new UIBarButtonItem();
+            backBarButtonItem.initWithCustomView(backButton);
+            backBarButtonItem.target = vc;
+            backBarButtonItem.action = vc.navigationController.popViewController();
 
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);

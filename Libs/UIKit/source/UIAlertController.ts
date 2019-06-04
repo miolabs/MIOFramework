@@ -233,19 +233,17 @@ export class UIAlertController extends UIViewController
         return h;
     }
 
-    canSelectCellAtIndexPath(tableview, indexPath:NSIndexPath)
-    {
+    canSelectCellAtIndexPath(tableview, indexPath:NSIndexPath){
         if (indexPath.row == 0) return false;
 
-        var item = this._items[indexPath.row - 1];
+        let item = this._items[indexPath.row - 1];
         if (item.type == UIAlertItemType.Action) return true;
 
         return false;
     }
 
-    didSelectCellAtIndexPath(tableView, indexPath:NSIndexPath)
-    {
-        var item = this._items[indexPath.row - 1];
+    didSelectCellAtIndexPath(tableView, indexPath:NSIndexPath){
+        let item = this._items[indexPath.row - 1];
         if (item.type == UIAlertItemType.Action) {
             
             if (item.target != null && item.completion != null)
@@ -315,15 +313,16 @@ export class UIAlertController extends UIViewController
 
         switch(style.rawValue){
 
-            case UIAlertAction.Style._default.rawValue:                                
+            case UIAlertAction.Style._default.rawValue:
+                MUICoreLayerAddStyle(buttonLabel.layer, "default");
                 break;
 
             case UIAlertAction.Style.cancel.rawValue:                
-                buttonLabel.layer.classList.add("alert");                
+                MUICoreLayerAddStyle(buttonLabel.layer, "cancel");
                 break;
 
             case UIAlertAction.Style.destructive.rawValue:                
-                buttonLabel.layer.classList.add("alert");                
+                MUICoreLayerAddStyle(buttonLabel.layer, "destructive");
                 break;
         }
 

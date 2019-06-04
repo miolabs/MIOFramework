@@ -66,9 +66,8 @@ function parserDidStartElement(parser, element, attributes){
 		item["ExtraAttributes"].push('data-bar-button-item-key="' +  key + '"');		
 
 		let systemItem = attributes["systemItem"];
-		if (systemItem != null) {
-			let si = "system-" + systemItem + "-icon";
-			item["ExtraAttributes"].push('data-bar-button-item-system="' + si + '"');
+		if (systemItem != null) {			
+			item["ExtraAttributes"].push('data-bar-button-item-system="' + systemItem + '"');
 		}		
 	}
 	else if (element == "label"){
