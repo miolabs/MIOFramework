@@ -3,7 +3,7 @@ import { MIOCoreGetPlatform } from "mio-foundation-web";
 import { MIOCorePlatformType } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
 import { NSRect } from "mio-foundation-web";
-import { NSSize } from "mio-foundation-web";
+import { CGSize } from "mio-foundation-web";
 import { UIView } from "./UIView";
 import { MUICoreLayerCreate } from "./core/MUICoreLayer";
 import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
@@ -167,7 +167,7 @@ export class UIScrollView extends UIView {
         this.contentView.addSubview(view, index);
     }
 
-    set contentSize(size: NSSize) {
+    set contentSize(size: CGSize) {
         if (size.width > 0) {
             this.contentView.setWidth(size.width);
         }
