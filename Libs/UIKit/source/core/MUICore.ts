@@ -78,8 +78,8 @@ export function _MUIShowViewController(fromVC:UIViewController, toVC:UIViewContr
     toVC.viewWillAppear();
     //toVC._childControllersWillAppear();
 
-    if (toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
-        || toVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+    if (toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
+        || toVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
 
         fromVC.viewWillDisappear();
         //fromVC._childControllersWillDisappear();
@@ -132,8 +132,8 @@ export function _MUIAnimationDidStart(fromVC:UIViewController, toVC:UIViewContro
     toVC.viewDidAppear();
     //toVC._childControllersDidAppear();
 
-    if (toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
-        || toVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+    if (toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
+        || toVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
 
         fromVC.viewDidDisappear();
         //fromVC._childControllersDidDisappear();
@@ -150,8 +150,8 @@ export function _MUIAnimationDidStart(fromVC:UIViewController, toVC:UIViewContro
 
 export function _MUIHideViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, target?, completion?)
 {
-    if (fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
-        || fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext
+    if (fromVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
+        || fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext
         || MIOCoreIsPhone() == true) {
 
         toVC.viewWillAppear();
@@ -194,8 +194,8 @@ export function _MUIHideViewController(fromVC:UIViewController, toVC:UIViewContr
 
     _MUIAnimationStart(layer, ac, animationContext, function () {
 
-        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
-            || fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
+            || fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
 
             toVC.viewDidAppear();
             //toVC._childControllersDidAppear();

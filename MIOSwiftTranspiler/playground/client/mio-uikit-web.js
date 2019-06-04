@@ -2076,7 +2076,7 @@ var UIViewController = /** @class */ (function (_super) {
         _this.navigationItem = null;
         _this.splitViewController = _injectIntoOptional(null);
         _this.tabBarController /*TODO: UITabBarController*/ = _injectIntoOptional(null);
-        _this.modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
+        _this.modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.fullScreen : UIModalPresentationStyle.pageSheet;
         _this.modalTransitionStyle = UIModalTransitionStyle.CoverVertical;
         _this.transitioningDelegate = null;
         _this._contentSize = new CGSize(320, 200);
@@ -2306,7 +2306,7 @@ var UIViewController = /** @class */ (function (_super) {
     });
     UIViewController.prototype.showViewController = function (vc, animated) {
         vc.onLoadView(this, function () {
-            this.view.addSubview(vc.view);
+            this.view[0].addSubview(vc.view);
             this.addChildViewController(vc);
             _MUIShowViewController(this, vc, this, animated);
         });
@@ -2336,8 +2336,8 @@ var UIViewController = /** @class */ (function (_super) {
         //     && vc.modalPresentationStyle != UIModalPresentationStyle.Custom)
         //     vc.modalPresentationStyle = UIModalPresentationStyle.PageSheet;
         vc.onLoadView(this, function () {
-            if (vc.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
-                this.view.addSubview(vc.presentationController[0].presentedView[0]);
+            if (vc.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
+                this.view[0].addSubview(vc.presentationController[0].presentedView[0]);
                 this.addChildViewController(vc);
                 _MUIShowViewController(this, vc, null, animated, this, function () {
                 });
@@ -2373,7 +2373,7 @@ var UIViewController = /** @class */ (function (_super) {
         var fromVC = pc.presentedViewController;
         var fromView = pc.presentedView[0];
         _MUIHideViewController(fromVC, toVC, null, this, function () {
-            if (fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+            if (fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
                 toVC.removeChildViewController(fromVC);
                 var pc1 = fromVC.presentationController[0];
                 var view = pc1.presentedView[0];
@@ -2468,15 +2468,15 @@ var UIViewController = /** @class */ (function (_super) {
  */
 var UIModalPresentationStyle;
 (function (UIModalPresentationStyle) {
-    UIModalPresentationStyle[UIModalPresentationStyle["FullScreen"] = 0] = "FullScreen";
-    UIModalPresentationStyle[UIModalPresentationStyle["PageSheet"] = 1] = "PageSheet";
-    UIModalPresentationStyle[UIModalPresentationStyle["FormSheet"] = 2] = "FormSheet";
-    UIModalPresentationStyle[UIModalPresentationStyle["CurrentContext"] = 3] = "CurrentContext";
-    UIModalPresentationStyle[UIModalPresentationStyle["Custom"] = 4] = "Custom";
-    UIModalPresentationStyle[UIModalPresentationStyle["OverFullScreen"] = 5] = "OverFullScreen";
-    UIModalPresentationStyle[UIModalPresentationStyle["OverCurrentContext"] = 6] = "OverCurrentContext";
-    UIModalPresentationStyle[UIModalPresentationStyle["Popover"] = 7] = "Popover";
-    UIModalPresentationStyle[UIModalPresentationStyle["None"] = 8] = "None";
+    UIModalPresentationStyle[UIModalPresentationStyle["fullScreen"] = 0] = "fullScreen";
+    UIModalPresentationStyle[UIModalPresentationStyle["pageSheet"] = 1] = "pageSheet";
+    UIModalPresentationStyle[UIModalPresentationStyle["formSheet"] = 2] = "formSheet";
+    UIModalPresentationStyle[UIModalPresentationStyle["currentContext"] = 3] = "currentContext";
+    UIModalPresentationStyle[UIModalPresentationStyle["custom"] = 4] = "custom";
+    UIModalPresentationStyle[UIModalPresentationStyle["overFullScreen"] = 5] = "overFullScreen";
+    UIModalPresentationStyle[UIModalPresentationStyle["overCurrentContext"] = 6] = "overCurrentContext";
+    UIModalPresentationStyle[UIModalPresentationStyle["popover"] = 7] = "popover";
+    UIModalPresentationStyle[UIModalPresentationStyle["none"] = 8] = "none";
 })(UIModalPresentationStyle || (UIModalPresentationStyle = {}));
 var UIModalTransitionStyle;
 (function (UIModalTransitionStyle) {
@@ -2488,7 +2488,7 @@ var UIPresentationController = /** @class */ (function (_super) {
     __extends(UIPresentationController, _super);
     function UIPresentationController() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.presentationStyle = UIModalPresentationStyle.PageSheet;
+        _this.presentationStyle = UIModalPresentationStyle.pageSheet;
         _this.shouldPresentInFullscreen = false;
         _this._presentedViewController = null; //ToVC
         _this.presentingViewController = null; //FromVC
@@ -2532,9 +2532,9 @@ var UIPresentationController = /** @class */ (function (_super) {
         var toVC = this.presentedViewController;
         var view = this.presentedView[0];
         this._calculateFrame();
-        if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet
-            || toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
-            || toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.pageSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.formSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
             || MIOCoreIsPhone() == true) {
             MUICoreLayerAddStyle(view.layer, "modal_window");
         }
@@ -2549,18 +2549,18 @@ var UIPresentationController = /** @class */ (function (_super) {
         var fromVC = this.presentingViewController;
         var toVC = this.presentedViewController;
         var view = this.presentedView[0];
-        if (toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen) {
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen) {
             view.layer.style.left = "0px";
             view.layer.style.top = "0px";
             view.layer.style.width = "100%";
             view.layer.style.height = "100%";
         }
-        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
-            var w = fromVC.view.getWidth();
-            var h = fromVC.view.getHeight();
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
+            var w = fromVC.view[0].getWidth();
+            var h = fromVC.view[0].getHeight();
             view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
         }
-        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet) {
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.pageSheet) {
             // Present like desktop sheet window
             var ws = MUIWindowSize();
             var size = toVC.preferredContentSize;
@@ -2573,7 +2573,7 @@ var UIPresentationController = /** @class */ (function (_super) {
             this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, 0, w, h));
             view.layer.classList.add("modal");
         }
-        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet) {
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.formSheet) {
             // Present at the center of the screen
             var ws = MUIWindowSize();
             var size = toVC.preferredContentSize;
@@ -2604,7 +2604,7 @@ var UIPresentationController = /** @class */ (function (_super) {
             var vc = this.presentedViewController;
             this._window = window;
             // Track view frame changes
-            if (MIOCoreIsMobile() == false && vc.modalPresentationStyle != UIModalPresentationStyle.CurrentContext) {
+            if (MIOCoreIsMobile() == false && vc.modalPresentationStyle != UIModalPresentationStyle.currentContext) {
                 vc.addObserver(this, "preferredContentSize");
             }
         },
@@ -2687,9 +2687,9 @@ var UIModalPresentAnimationController = /** @class */ (function (_super) {
     UIModalPresentAnimationController.prototype.animations = function (transitionContext) {
         var animations = null;
         var toVC = transitionContext.presentedViewController;
-        if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet
-            || toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
-            || toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen) {
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.pageSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.formSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen) {
             if (MIOCoreIsPhone() == true)
                 animations = MUIClassListForAnimationType(MUIAnimationType.SlideInUp);
             else
@@ -2718,9 +2718,9 @@ var UIModalDismissAnimationController = /** @class */ (function (_super) {
     UIModalDismissAnimationController.prototype.animations = function (transitionContext) {
         var animations = null;
         var fromVC = transitionContext.presentingViewController;
-        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet
-            || fromVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
-            || fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen) {
+        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.pageSheet
+            || fromVC.modalPresentationStyle == UIModalPresentationStyle.formSheet
+            || fromVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen) {
             if (MIOCoreIsPhone() == true)
                 animations = MUIClassListForAnimationType(MUIAnimationType.SlideOutDown);
             else
@@ -3819,7 +3819,7 @@ var UIAlertController = /** @class */ (function (_super) {
     }
     UIAlertController.prototype.initTitleOptionalMessageOptionalPreferredStyleUIAlertControllerStyle = function (title, message, style) {
         _super.prototype.init.call(this);
-        this.modalPresentationStyle = UIModalPresentationStyle.FormSheet;
+        this.modalPresentationStyle = UIModalPresentationStyle.formSheet;
         this._title = title[0];
         this._message = message[0];
         this._style = style;
@@ -3902,7 +3902,7 @@ var UIAlertController = /** @class */ (function (_super) {
         else {
             var item = this._items[indexPath.row - 1];
             if (item.type == UIAlertItemType.Action) {
-                cell = this._createActionCellWithTitle(item.title, item.style);
+                cell = this._createActionCellWithTitle(item.title[0], item.style);
             }
             else if (item.type == UIAlertItemType.TextField) {
                 cell = this._createTextFieldCell(item.textField);
@@ -4677,7 +4677,7 @@ var UISplitViewController = /** @class */ (function (_super) {
         var oldVC = this._masterViewController;
         //if (vc.transitioningDelegate == null) vc.transitioningDelegate = this;
         vc.onLoadView(this, function () {
-            this.view.addSubview(vc.view[0]);
+            this.view[0].addSubview(vc.view[0]);
             this.addChildViewController(vc);
             this._detailViewController = vc;
             if (vc.preferredContentSize != null)
@@ -4779,8 +4779,8 @@ function MUIWindowSize() {
 function _MUIShowViewController(fromVC, toVC, sourceVC, animated, target, completion) {
     toVC.viewWillAppear();
     //toVC._childControllersWillAppear();
-    if (toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
-        || toVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+    if (toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
+        || toVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
         fromVC.viewWillDisappear();
         //fromVC._childControllersWillDisappear();
     }
@@ -4821,8 +4821,8 @@ function _MUIShowViewController(fromVC, toVC, sourceVC, animated, target, comple
 function _MUIAnimationDidStart(fromVC, toVC, pc, target, completion) {
     toVC.viewDidAppear();
     //toVC._childControllersDidAppear();
-    if (toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
-        || toVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+    if (toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
+        || toVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
         fromVC.viewDidDisappear();
         //fromVC._childControllersDidDisappear();
     }
@@ -4835,8 +4835,8 @@ function _MUIAnimationDidStart(fromVC, toVC, pc, target, completion) {
 }
  
 function _MUIHideViewController(fromVC, toVC, sourceVC, target, completion) {
-    if (fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
-        || fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext
+    if (fromVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
+        || fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext
         || MIOCoreIsPhone() == true) {
         toVC.viewWillAppear();
         //toVC._childControllersWillAppear();
@@ -4868,8 +4868,8 @@ function _MUIHideViewController(fromVC, toVC, sourceVC, target, completion) {
     if (pc != null)
         pc.dismissalTransitionWillBegin();
     _MUIAnimationStart(layer, ac, animationContext, function () {
-        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
-            || fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
+            || fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
             toVC.viewDidAppear();
             //toVC._childControllersDidAppear();
         }

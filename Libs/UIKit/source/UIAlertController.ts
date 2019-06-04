@@ -116,7 +116,7 @@ export class UIAlertController extends UIViewController
     initWithTitle(title:string, message:string, style:UIAlertViewStyle){
         super.init();
 
-        this.modalPresentationStyle = UIModalPresentationStyle.FormSheet;
+        this.modalPresentationStyle = UIModalPresentationStyle.formSheet;
 
         this._title = title;
         this._message = message;
@@ -215,10 +215,10 @@ export class UIAlertController extends UIViewController
         else{
             let item = this._items[indexPath.row - 1];
             if (item.type == UIAlertItemType.Action) {
-                cell = this._createActionCellWithTitle(item.title, item.style);
+                cell = this._createActionCellWithTitle((item as UIAlertAction).title, (item as UIAlertAction).style);
             }
             else if (item.type == UIAlertItemType.TextField) {
-                cell = this._createTextFieldCell(item.textField);
+                cell = this._createTextFieldCell((item as UIAlertTextField).textField);
             }
         }
 

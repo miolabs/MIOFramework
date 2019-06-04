@@ -56,7 +56,7 @@ export class UIViewController extends NSObject {
     splitViewController: UISplitViewController = null;
     tabBarController/*TODO: UITabBarController*/ = null;
 
-    modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
+    modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.fullScreen : UIModalPresentationStyle.pageSheet;
     modalTransitionStyle = UIModalTransitionStyle.CoverVertical;
     transitioningDelegate = null;
 
@@ -210,7 +210,7 @@ export class UIViewController extends NSObject {
     protected _loadChildViewController(index, max) {
         if (index < max) {
             let vc = this._childViewControllers[index];
-            vc.onLoadView(this, function () {
+            vc.onLoadView(this, function (this: UIViewController) {
 
                 let newIndex = index + 1;
                 this._loadChildViewController(newIndex, max);
@@ -316,7 +316,7 @@ export class UIViewController extends NSObject {
     }
 
     showViewController(vc, animated) {
-        vc.onLoadView(this, function () {
+        vc.onLoadView(this, function (this: UIViewController) {
 
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);
@@ -355,9 +355,9 @@ export class UIViewController extends NSObject {
         //     && vc.modalPresentationStyle != UIModalPresentationStyle.Custom)
         //     vc.modalPresentationStyle = UIModalPresentationStyle.PageSheet;
 
-        vc.onLoadView(this, function () {
+        vc.onLoadView(this, function (this: UIViewController) {
 
-            if (vc.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+            if (vc.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
                 this.view.addSubview(vc.presentationController.presentedView);
                 this.addChildViewController(vc);
                 _MUIShowViewController(this, vc, null, animated, this, function () {
@@ -397,7 +397,7 @@ export class UIViewController extends NSObject {
 
         _MUIHideViewController(fromVC, toVC, null, this, function () {
 
-            if (fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+            if (fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
                 toVC.removeChildViewController(fromVC);
                 let pc1 = fromVC.presentationController;
                 let view = pc1.presentedView;
