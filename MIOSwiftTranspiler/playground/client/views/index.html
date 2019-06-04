@@ -350,14 +350,16 @@ Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
             isWaitingForTranspilation = false;
             spinner.style.display = 'none';
             if(xhr.status === 200) {
-                let {outputText, formatText} = formatAndTranspile(xhr.responseText, {})
+                let code = xhr.responseText
+                code = code.slice(code.indexOf('}\n}\n') + '}\n}\n'.length)//to remove Playground duplication
+                code = code.replace(/init[0-9]+XYWidthHeight/g, "initXYWidthHeight")//TODO temporary fix until CoreData isNative in transpiler
+                code = code.replace(/_frame/g, "frame")//TODO temporary fix until frame is not prefixed with _
+                let {outputText, formatText} = formatAndTranspile(code, {})
                 targetCodeEl.value = formatText;
                 targetCodeEl.style.color = '';
                 targetOutputEl.value = '';
                 visualOutputEl.innerHTML = '';
                 printSeparatorTerminator = function(text) { targetOutputEl.value += text + '\n' }
-                outputText = outputText.slice(outputText.indexOf('}());') + '}());'.length)//to remove Playground duplication
-                outputText = outputText.replace(/init[0-9]+XYWidthHeight/g, "initXYWidthHeight")//TODO temporary fix until CoreData isNative in transpiler
                 eval('(function(){' + outputText + '})();')
             }
             else {
