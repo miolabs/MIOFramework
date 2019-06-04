@@ -1529,7 +1529,8 @@ export class UIView extends NSObject {
                 key
 
             view.layer.style.transition = (view.layer.style.transition ? view.layer.style.transition + ", " : "") + cssProp + " " + duration + "s";
-            setTimeout(() => view.layer.style[cssProp] = value)
+            //setTimeout(() => view.layer.style[cssProp] = value)
+            view.layer.style[cssProp] = value
 
             UIView.addTrackingAnimationView(view);
         }
@@ -1664,36 +1665,12 @@ export class UILabel extends UIView
  * Created by godshadow on 12/3/16.
  */
 
- export enum UIControlEvents
- {
-     TouchDown = 1 <<  0,
-     TouchDownRepeat = 1 <<  1,
-     TouchDragInside = 1 <<  2,
-     TouchDragOutside = 1 <<  3,
-     TouchDragEnter = 1 <<  4,
-     TouchDragExit = 1 <<  5,
-     TouchUpInside = 1 <<  6,
-     TouchUpOutside = 1 <<  7,
-     TouchCancel = 1 <<  8,
-     ValueChanged = 1 << 12,
-     PrimaryActionTriggered = 1 << 13,
-     EditingDidBegin = 1 << 16,
-     EditingChanged = 1 << 17,
-     EditingDidEnd = 1 << 18,
-     EditingDidEndOnExit = 1 << 19,
-     AllTouchEvents = 0x00000FFF,
-     EditingEvents = 0x000F0000,
-     ApplicationReserved = 0x0F000000,
-     SystemReserved = 0xF0000000,
-     AllEvents = 0xFFFFFFFF
- }
-
 function MUICoreControlParseEventTypeString(eventTypeString:string){
 
-    if (eventTypeString == null) return UIControlEvents.AllEvents;
+    if (eventTypeString == null) return UIControl.Event.allEvents;
 
     let value = eventTypeString[0].toUpperCase() + eventTypeString.substr(1);
-    return UIControlEvents[value];
+    return UIControl.Event[value];
 }
 
 export class UIControl extends UIView
@@ -1751,13 +1728,13 @@ export class UIControl extends UIView
                     segue._sender = this;
                     segue.perform();
 
-                }, UIControlEvents.AllEvents);                
+                }, UIControl.Event.allEvents);                
             }    
         }        
     }
 
     private actions = [];    
-    addTarget(target, action, controlEvents:UIControlEvents){
+    addTarget(target, action, controlEvents:any/*UIControl.Event*/){
         
         if (action == null) throw new Error("UIControl: Can't add null action");
 
@@ -1769,7 +1746,7 @@ export class UIControl extends UIView
         this.actions.push(item);
     }
 
-    protected _performActionsForEvents(events:UIControlEvents){
+    protected _performActionsForEvents(events:any/*UIControl.Event*/){
 
         for (let index = 0; index < this.actions.length; index++){
             let action = this.actions[index];
@@ -1856,6 +1833,29 @@ export class UIControl extends UIView
         static focused = 4
         static application = 5
         static reserved = 6
+    }
+
+    static Event = class {
+        static touchDown = 1 <<  0
+        static touchDownRepeat = 1 <<  1
+        static touchDragInside = 1 <<  2
+        static touchDragOutside = 1 <<  3
+        static touchDragEnter = 1 <<  4
+        static touchDragExit = 1 <<  5
+        static touchUpInside = 1 <<  6
+        static touchUpOutside = 1 <<  7
+        static touchCancel = 1 <<  8
+        static valueChanged = 1 << 12
+        static primaryActionTriggered = 1 << 13
+        static editingDidBegin = 1 << 16
+        static editingChanged = 1 << 17
+        static editingDidEnd = 1 << 18
+        static editingDidEndOnExit = 1 << 19
+        static allTouchEvents = 0x00000FFF
+        static editingEvents = 0x000F0000
+        static applicationReserved = 0x0F000000
+        static systemReserved = 0xF0000000
+        static allEvents = 0xFFFFFFFF
     }
 }
 
@@ -1966,7 +1966,7 @@ export class UIButton extends UIControl
             if (this.enabled == false) return;            
             if (this.type == UIButtonType.MomentaryPushIn) this.setSelected(false);
 
-            this._performActionsForEvents(UIControlEvents.TouchUpInside);
+            this._performActionsForEvents(UIControl.Event.touchUpInside);
 
             // if (this.action != null && this.target != null)
             //     this.action.call(this.target, this);
@@ -2299,7 +2299,7 @@ export class UISegmentedControl extends UIControl
 
     private _addSegmentedItem(item:UIButton){
         this.segmentedItems.push(item);
-        item.addTarget(this, this._didClickSegmentedButton, UIControlEvents.AllTouchEvents);
+        item.addTarget(this, this._didClickSegmentedButton, UIControl.Event.allTouchEvents);
     }
 
     private _didClickSegmentedButton(button){
@@ -2323,7 +2323,7 @@ export class UISegmentedControl extends UIControl
         let item = this.segmentedItems[this.selectedSegmentIndex];
         item.setSelected(true);
 
-        this._performActionsForEvents(UIControlEvents.ValueChanged);
+        this._performActionsForEvents(UIControl.Event.valueChanged);
     }
 }
 
@@ -2370,7 +2370,7 @@ export class UISwitch extends UIControl
         this._inputLayer.checked = value;
         this._on = value;
 
-        this._performActionsForEvents(UIControlEvents.ValueChanged);
+        this._performActionsForEvents(UIControl.Event.valueChanged);
     }
 
     private _toggleValue(){
@@ -4826,7 +4826,7 @@ export class UIBarButtonItem extends UIBarItem
                     this.target = owner;
                     this.action = owner[action];
 
-                    button.addTarget(this.target, this.action, UIControlEvents.TouchUpInside);
+                    button.addTarget(this.target, this.action, UIControl.Event.TouchUpInside);
                 }
             }
         }
@@ -5099,7 +5099,7 @@ export class UINavigationController extends UIViewController
             MUICoreLayerAddStyle(backButton.layer, "system-back-icon");
             backButton.addTarget(vc, function(this:UIViewController){
                 this.navigationController.popViewController(true);
-            }, UIControlEvents.TouchUpInside);
+            }, UIControl.Event.touchUpInside);
 
             let backBarButtonItem = new UIBarButtonItem();
             backBarButtonItem.initWithCustomView(backButton);

@@ -8,36 +8,12 @@ import { MUICoreLayerRemoveStyle } from "./core/MUICoreLayer";
  * Created by godshadow on 12/3/16.
  */
 
- export enum UIControlEvents
- {
-     TouchDown = 1 <<  0,
-     TouchDownRepeat = 1 <<  1,
-     TouchDragInside = 1 <<  2,
-     TouchDragOutside = 1 <<  3,
-     TouchDragEnter = 1 <<  4,
-     TouchDragExit = 1 <<  5,
-     TouchUpInside = 1 <<  6,
-     TouchUpOutside = 1 <<  7,
-     TouchCancel = 1 <<  8,
-     ValueChanged = 1 << 12,
-     PrimaryActionTriggered = 1 << 13,
-     EditingDidBegin = 1 << 16,
-     EditingChanged = 1 << 17,
-     EditingDidEnd = 1 << 18,
-     EditingDidEndOnExit = 1 << 19,
-     AllTouchEvents = 0x00000FFF,
-     EditingEvents = 0x000F0000,
-     ApplicationReserved = 0x0F000000,
-     SystemReserved = 0xF0000000,
-     AllEvents = 0xFFFFFFFF
- }
-
 function MUICoreControlParseEventTypeString(eventTypeString:string){
 
-    if (eventTypeString == null) return UIControlEvents.AllEvents;
+    if (eventTypeString == null) return UIControl.Event.allEvents;
 
     let value = eventTypeString[0].toUpperCase() + eventTypeString.substr(1);
-    return UIControlEvents[value];
+    return UIControl.Event[value];
 }
 
 export class UIControl extends UIView
@@ -95,13 +71,13 @@ export class UIControl extends UIView
                     segue._sender = this;
                     segue.perform();
 
-                }, UIControlEvents.AllEvents);                
+                }, UIControl.Event.allEvents);                
             }    
         }        
     }
 
     private actions = [];    
-    addTarget(target, action, controlEvents:UIControlEvents){
+    addTarget(target, action, controlEvents:any/*UIControl.Event*/){
         
         if (action == null) throw new Error("UIControl: Can't add null action");
 
@@ -113,7 +89,7 @@ export class UIControl extends UIView
         this.actions.push(item);
     }
 
-    protected _performActionsForEvents(events:UIControlEvents){
+    protected _performActionsForEvents(events:any/*UIControl.Event*/){
 
         for (let index = 0; index < this.actions.length; index++){
             let action = this.actions[index];
@@ -200,6 +176,29 @@ export class UIControl extends UIView
         static focused = 4
         static application = 5
         static reserved = 6
+    }
+
+    static Event = class {
+        static touchDown = 1 <<  0
+        static touchDownRepeat = 1 <<  1
+        static touchDragInside = 1 <<  2
+        static touchDragOutside = 1 <<  3
+        static touchDragEnter = 1 <<  4
+        static touchDragExit = 1 <<  5
+        static touchUpInside = 1 <<  6
+        static touchUpOutside = 1 <<  7
+        static touchCancel = 1 <<  8
+        static valueChanged = 1 << 12
+        static primaryActionTriggered = 1 << 13
+        static editingDidBegin = 1 << 16
+        static editingChanged = 1 << 17
+        static editingDidEnd = 1 << 18
+        static editingDidEndOnExit = 1 << 19
+        static allTouchEvents = 0x00000FFF
+        static editingEvents = 0x000F0000
+        static applicationReserved = 0x0F000000
+        static systemReserved = 0xF0000000
+        static allEvents = 0xFFFFFFFF
     }
 }
 

@@ -5,7 +5,7 @@ import { _MUIHideViewController } from "./core/MUICore";
 import { _MUIShowViewController } from "./core/MUICore";
 import { MUIClassListForAnimationType } from "./core/MUICoreAnimation";
 import { MUIAnimationType } from "./core/MUICoreAnimation";
-import { UIControlEvents } from "./UIControl";
+import { UIControl.Event } from "./UIControl";
 import { UINavigationBar } from "./UINavigationBar";
 import { UIBarButtonSystemItem } from "./UIBarButtonItem";
 import { UINavigationItem } from "./UINavigationItem";
@@ -108,7 +108,7 @@ export class UINavigationController extends UIViewController
             MUICoreLayerAddStyle(backButton.layer, "system-back-icon");
             backButton.addTarget(vc, function(this:UIViewController){
                 this.navigationController.popViewController(true);
-            }, UIControlEvents.TouchUpInside);
+            }, UIControl.Event.touchUpInside);
 
             let backBarButtonItem = new UIBarButtonItem();
             backBarButtonItem.initWithCustomView(backButton);
