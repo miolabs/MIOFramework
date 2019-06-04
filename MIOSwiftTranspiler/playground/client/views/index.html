@@ -330,20 +330,16 @@ var sourceCodeEl = document.getElementById("source-code"),
     targetOutputEl = document.getElementById("target-output"),
     transpileBtns = document.getElementsByClassName("transpile-btn"),
     spinner = document.getElementById("target-code-spinner"),
-    lastSourceCode = sourceCodeEl.value,
-    lastLanguage = "ts",
     isWaitingForTranspilation = false;
 Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
     transpileBtn.onclick = function() {
         if(isWaitingForTranspilation) return;
         var language = transpileBtn.getAttribute("data-language");
-        if(!sourceCodeEl.value || (sourceCodeEl.value === lastSourceCode && language === lastLanguage)) return;
+        if(!sourceCodeEl.value) return;
         isWaitingForTranspilation = true;
         spinner.style.display = 'block';
         targetCodeEl.style.opacity = .3;
         visualOutputEl.style.opacity = .3;
-        lastSourceCode = sourceCodeEl.value;
-        lastLanguage = language;
         var xhr = new XMLHttpRequest();
         xhr.open("POST", TRANSPILE_URL);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
