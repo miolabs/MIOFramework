@@ -1711,6 +1711,9 @@ var UIButton = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
+    UIButton.prototype.setTitleColorFor = function (color) {
+        this._titleLayer.style.color = "#" + color[0].hex;
+    };
     UIButton.prototype.setImageURL = function (urlString) {
         if (urlString != null) {
             this._imageLayer.setAttribute("src", urlString);

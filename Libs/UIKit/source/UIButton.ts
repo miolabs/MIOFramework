@@ -2,6 +2,7 @@ import { NSLocalizeString } from "mio-foundation-web";
 import { UIControl, UIControl.Event } from "./UIControl";
 import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
 import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
+import { UIColor } from "./UIColor";
 
 /**
  * Created by godshadow on 12/3/16.
@@ -122,6 +123,10 @@ export class UIButton extends UIControl
 
     get title(){
         return this._titleLayer.innerHTML;
+    }
+
+    setTitleColorFor(color: UIColor) {
+        this._titleLayer.style.color = "#" + color.hex;
     }
 
     setImageURL(urlString:string){

@@ -1862,6 +1862,7 @@ export class UIControl extends UIView
 
 
 
+
 /**
  * Created by godshadow on 12/3/16.
  */
@@ -1981,6 +1982,10 @@ export class UIButton extends UIControl
 
     get title(){
         return this._titleLayer.innerHTML;
+    }
+
+    setTitleColorFor(color: UIColor) {
+        this._titleLayer.style.color = "#" + color.hex;
     }
 
     setImageURL(urlString:string){
