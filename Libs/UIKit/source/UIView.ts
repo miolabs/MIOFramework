@@ -1,6 +1,6 @@
 
 import { NSObject } from "mio-foundation-web";
-import { NSRect } from "mio-foundation-web";
+import { CGRect } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 import "./node_modules/mio-foundation-web/extensions"
 
@@ -11,6 +11,7 @@ import { UIGestureRecognizer } from "./UIGestureRecognizer";
 import { UIEvent } from "./UIEvent";
 import { MUICoreLayerSearchElementByID } from "./core/MUICoreLayer";
 import { MUICoreStoryboardParseLayer } from "./UIStoryboard";
+import { UIColor } from "./UIColor";
 
 
 /**
@@ -92,7 +93,7 @@ export class UIView extends NSObject {
         //this.layer.style.background = "rgb(255, 255, 255)";                
     }
 
-    initWithFrame(frame: NSRect) {
+    initFrameCGRect(frame: CGRect) {
         this.layer = MUICoreLayerCreate(this.layerID);
         this.layer.style.position = "absolute";
         this.setX(frame.origin.x);
@@ -316,6 +317,10 @@ export class UIView extends NSObject {
         this.setHidden(value);
     }
 
+    set backgroundColor(color: UIColor) {
+        this.layer.style.backgroundColor = "#" + color.hex;
+    }
+
     setBackgroundColor(color) {
         this.layer.style.backgroundColor = "#" + color;
     }
@@ -454,11 +459,11 @@ export class UIView extends NSObject {
     }
 
     get frame() {
-        return NSRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        return CGRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
     }
 
     public get bounds() {
-        return NSRect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
+        return CGRect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
     }
 
     //
@@ -568,12 +573,13 @@ export class UIView extends NSObject {
     private static animationsViews = null;
     private static animationTarget = null;
     private static animationCompletion = null;
-    static animateWithDuration(duration: number, target, animations, completion?) {
+    static animateWithDurationAnimations(duration: number, animations, completion?) {
         UIView.animationsChanges = [];
         UIView.animationsViews = [];
-        UIView.animationTarget = target;
+        //UIView.animationTarget = target;
         UIView.animationCompletion = completion;
-        animations.call(target);
+        //animations.call(target);
+        animations();
 
         for (let index = 0; index < UIView.animationsChanges.length; index++) {
             let anim = UIView.animationsChanges[index];

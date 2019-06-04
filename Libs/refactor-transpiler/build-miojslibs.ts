@@ -42,9 +42,6 @@ for(let className in swiftModule) {
         let isOptional = swift[i + 1]
         let optionalParams = swift[i + 2]
 
-        if(iteratedPropNames[propName]) continue
-        iteratedPropNames[propName] = true
-
         //console.log(propName, isOptional)
 
         if(classMapping && classMapping[propName]) {
@@ -52,12 +49,24 @@ for(let className in swiftModule) {
             propName = classMapping[propName]
         }
 
+        if(iteratedPropNames[propName]) continue
+        iteratedPropNames[propName] = true
+
         if(isOptional) optionals.push(["getSourceFile", foundClass.file, foundClass.getter, className, foundClass.getter === "getInterface" ? "getProperty" : "getInstanceProperty", propName])
         else for(let opI = 0; opI < optionalParams.length; opI++) {
             if(!optionalParams[opI]) continue
             optionals.push(["getSourceFile", className + ".ts", foundClass.getter, className, foundClass.getter === "getInterface" ? "getMethod" : "getInstanceMethod", propName, "getParameters", "", opI, null])
         }
     }
+
+    /*let methods = foundClass.getter === "getInterface" ? foundClass.c.getMethods() : (foundClass.c as ClassDeclaration).getInstanceMethods()
+    for(let method of methods) {
+      let name = method.getName()
+      if(iteratedPropNames[name]) continue
+      console.log('-------', name, method.getParameters().map(parameter => parameter.getName()))
+      let shortName = name.includes('With') ? name.slice(0, name.indexOf('With')) : name.match(/[A-Z]/) ? name.slice(0, name.indexOf(name.match(/[A-Z]/)[0])) : name
+      for(let iteratedName in iteratedPropNames) if(iteratedName.startsWith(shortName)) console.log(iteratedName)
+    }*/
 }
 
 fs.writeFileSync(`${__dirname}/miojslibs-optionals-${module}.json`, JSON.stringify(optionals))

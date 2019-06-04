@@ -1049,14 +1049,14 @@ export class MIOCoreBundle_web extends MIOCoreBundle
 }
 
 
-export class NSPoint
+export class CGPoint
 {
     x = 0;
     y = 0;
 
     public static Zero()
     {
-        var p = new NSPoint(0, 0);
+        var p = new CGPoint(0, 0);
         return p;
     }
 
@@ -1131,24 +1131,21 @@ export function NSUnionRange(range1:NSRange, range2:NSRange):NSRange{
 
 
 
-export class NSRect
+export class CGRect
 {
-    origin:NSPoint = null;
-    size:NSSize = null;
+    origin:CGPoint = null;
+    size:CGSize = null;
 
     public static Zero()
     {
-        var f = new NSRect(NSPoint.Zero(), NSSize.Zero());
+        var f = new CGRect(CGPoint.Zero(), CGSize.Zero());
         return f;
     }
 
-    public static rectWithValues(x, y, w, h)
+    public init1XYWidthHeight(x, y, w, h)
     {
-        var p = new NSPoint(x, y);
-        var s = new NSSize(w, h);
-        var f = new NSRect(p, s);
-
-        return f;
+        this.origin = new CGPoint(x, y);
+        this.size = new CGSize(w, h);
     }
     constructor(p, s)
     {
@@ -1157,23 +1154,23 @@ export class NSRect
     }
 }
 
-function NSRectMaxY(rect:NSRect) {
+function NSRectMaxY(rect:CGRect) {
     return rect.origin.y;
 }
 
-function NSRectMinY(rect:NSRect) {
+function NSRectMinY(rect:CGRect) {
     return rect.origin.y + rect.size.height;
 }
 
 
-export class NSSize
+export class CGSize
 {
     width = 0;
     height = 0;
 
-    public static Zero():NSSize
+    public static Zero():CGSize
     {
-        var s = new NSSize(0, 0);
+        var s = new CGSize(0, 0);
         return s;
     }
 

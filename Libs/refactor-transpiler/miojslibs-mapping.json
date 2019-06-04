@@ -1,5 +1,5 @@
 {
-  "MUIView": {
+  "UIView": {
     "initFrameCGRect": "initWithFrame"
   },
   "NSSortDescriptor": {
@@ -13,6 +13,125 @@
     "initTitleOptionalStyleUIAlertActionStyleHandlerOptional": "initWithTitle"
   },
   "UIViewController": {
-    "presentAnimatedCompletion": "presentViewController"
+    "presentAnimatedCompletion": "presentViewController",
+    "initCoderNSCoder": "initWithCoder",
+    "dismissViewControllerAnimatedCompletion": "dismissViewController",
+    "transitionFromViewControllerToViewControllerDurationOptionsAnimationsCompletion": "transitionFromViewControllerToViewController",
+    "shouldPerformSegueWithIdentifierSender": "shouldPerformSegueWithIdentifier",
+    "prepareForSegueSender": "prepareForSegue",
+    "performSegueWithIdentifierSender": "performSegueWithIdentifier"
+  },
+  "UIControl": {
+    "addTargetActionForControlEvents": "addTarget",
+    "addTargetActionFor": "addTarget"
+  },
+  "UIGestureRecognizer": {
+    "initTargetOptionalActionOptional": "initWithTarget"
+  },
+  "UINavigationBar": {
+    "setItemsAnimated": "setItems",
+    "pushNavigationItemAnimated": "pushNavigationItem",
+    "popNavigationItemAnimated": "popNavigationItem"
+  },
+  "UINavigationController": {
+    "initRootViewControllerUIViewController": "initWithRootViewController",
+    "pushViewControllerAnimated": "pushViewController",
+    "popViewControllerAnimated": "popViewController",
+    "popToRootViewControllerAnimated": "popToRootViewController"
+  },
+  "UINavigationItem": {
+    "initTitleString": "initWithTitle"
+  },
+  "UIPresentationController": {
+    "initPresentedViewControllerUIViewControllerPresentingViewControllerOptional": "initWithPresentedViewControllerAndPresentingViewController",
+    "scrollRectToVisibleAnimated": "scrollRectToVisible"
+  },
+  "UISegmentedControl": {
+    "selectedSegmentIndex": "selectSegmentedAtIndex"
+  },
+  "UISplitViewController": {
+    "showDetailViewControllerSender": "showDetailViewController",
+    "displayMode": "displayModeButtonItemAction",
+    "displayModeButtonItem": "displayModeButtonItemAction",
+    "initNameStringBundleOptional": "initWithName"
+  },
+  "UIStoryboardSegue": {
+    "initIdentifierOptionalSourceUIViewControllerDestinationUIViewController": "initWithIdentifierAndPerformHandler",
+    "initIdentifierOptionalSourceUIViewControllerDestinationUIViewControllerPerformHandlerfunction_type": "initWithIdentifierAndPerformHandler"
+  },
+  "UITableView": {
+    "insertRowsAtIndexPathsWithRowAnimation": "insertRowsAtIndexPaths",
+    "deleteRowsAtIndexPathsWithRowAnimation": "deleteRowsAtIndexPaths",
+    "cellForRowAtIndexPath": "cellAtIndexPath"
+  },
+  "UITableViewCell": {
+    "initStyleUITableViewCellCellStyleReuseIdentifierOptional": "initWithStyle",
+    "setEditingAnimated": "setEditing"
+  },
+  "Bundle": {
+    "initUrlURL": "initWithURL",
+    "initURLURL": "initUrlURL"
+  },
+  "Formatter": {
+    "getObjectValueForStringErrorDescription": "getObjectValueForString",
+    "isPartialStringValidNewEditingStringErrorDescription": "isPartialStringValid",
+    "isPartialStringValidProposedSelectedRangeOriginalStringOriginalSelectedRangeErrorDescription": "isPartialStringValid"
+  },
+  "NSCoding": {
+    "initCoderNSCoder": "initWithCoder"
+  },
+  "NSDecimalNumber": {
+    "initStringOptional": "initWithString",
+    "initDecimalDecimal": "initWithDecimal"
+  },
+  "NSLocale": {
+    "initLocaleIdentifierString": "initWithLocaleIdentifier"
+  },
+  "NSNumber": {
+    "initBoolBool": "initWithBool",
+    "initValueBool": "initWithBool",
+    "initIntegerInt": "initWithInteger",
+    "initValueInt": "initWithInteger",
+    "initFloatFloat": "initWithFloat",
+    "initValueFloat": "initWithFloat"
+  },
+  "NSPredicate": {
+    "initFormatStringArgumentArrayOptional": "initWithFormat",
+    "initFormatStringArgumentsCVaListPointer": "initWithFormat",
+    "evaluateWithObject": "evaluateObject",
+    "evaluateWithObjectSubstitutionVariables": "evaluateObject"
+  },
+  "NSSet": {
+    "filteredSetUsingPredicate": "filterWithPredicate",
+    "addObserverForKeyPathOptionsContext": "addObserver"
+  },
+  "NSURL": {
+    "initSchemeStringHostOptionalPathString": "initWithScheme",
+    "initStringString": "initWithURLString"
+  },
+  "NSURLConnection": {
+    "initRequestURLRequestDelegateOptional": "NSURLConnection"
+  },
+  "NSURLRequest": {
+    "initUrlURL": "initWithURL",
+    "initURLURL": "initWithURL"
+  },
+  "NotificationCenter": {
+    "addObserverForNameObjectQueueUsingBlock": "addObserver"
+  },
+  "NumberFormatter": {
+    "isPartialStringValidationEnabled": "isPartialStringValid"
+  },
+  "Timer": {
+    "initTimeIntervalTimeIntervalRepeatsBoolBlockfunction_type": "initWithTimeInterval",
+  },
+  "UserDefaults": {
+    "setBoolForKey": "setBooleanForKey",
+    "setForKey": "setValueForKey",
+    "removeObjectForKey": "removeValueForKey"
+  },
+  "XMLParserDelegate": {
+    "parserDidStartElementNamespaceURIQualifiedNameAttributes": "parserDidStartElement",
+    "parserDidEndElementNamespaceURIQualifiedName": "parserDidEndElement"
   }
 }

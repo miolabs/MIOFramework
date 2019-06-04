@@ -76,10 +76,11 @@ for(let optional of optionals) {
       if(isSetAccessor) {
         let setAccessor = reference.getNode().getParent() as SetAccessorDeclaration
         let arg = setAccessor.getParameters()[0].getText()
+        if(arg.includes(':')) arg = arg.slice(0, arg.indexOf(':'))
         replacements.push({
           file: reference.getSourceFile().getFilePath(),
-          range: [setAccessor.getBody().getStart() + 1, setAccessor.getBody().getEnd() - 1],
-          text: `${arg} = ${arg}[0]\n` + setAccessor.getBody().getText().slice(1, setAccessor.getBody().getText().length - 1)
+          range: [setAccessor.getBody().getStart() + 1, setAccessor.getBody().getStart() + 1],
+          text: `${arg} = ${arg}[0]\n`
         })
         continue
       }

@@ -1,24 +1,21 @@
-import { NSPoint } from "./NSPoint";
-import { NSSize } from "./NSSize";
+import { CGPoint } from "./NSPoint";
+import { CGSize } from "./NSSize";
 
-export class NSRect
+export class CGRect
 {
-    origin:NSPoint = null;
-    size:NSSize = null;
+    origin:CGPoint = null;
+    size:CGSize = null;
 
     public static Zero()
     {
-        var f = new NSRect(NSPoint.Zero(), NSSize.Zero());
+        var f = new CGRect(CGPoint.Zero(), CGSize.Zero());
         return f;
     }
 
-    public static rectWithValues(x, y, w, h)
+    public initXYWidthHeight(x, y, w, h)
     {
-        var p = new NSPoint(x, y);
-        var s = new NSSize(w, h);
-        var f = new NSRect(p, s);
-
-        return f;
+        this.origin = new CGPoint(x, y);
+        this.size = new CGSize(w, h);
     }
     constructor(p, s)
     {
@@ -27,10 +24,10 @@ export class NSRect
     }
 }
 
-function NSRectMaxY(rect:NSRect) {
+function NSRectMaxY(rect:CGRect) {
     return rect.origin.y;
 }
 
-function NSRectMinY(rect:NSRect) {
+function NSRectMinY(rect:CGRect) {
     return rect.origin.y + rect.size.height;
 }
