@@ -42,7 +42,6 @@ class ViewController: UIViewController {
   
   @objc func alertButtonAction(sender: UIButton){
     let avc = UIAlertController(title: "Alert", message: "Add a new movie", preferredStyle: .alert)
-    avc.modalPresentationStyle = .currentContext
     
     avc.addTextField { (textField:UITextField) in
       textField.placeholder = "Name"
