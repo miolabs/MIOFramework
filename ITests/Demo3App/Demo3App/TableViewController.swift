@@ -20,6 +20,16 @@ class TableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 200, height: 50))
+        button.setTitle("Press", for: .normal)
+        
+        button.addTarget(self, action: #selector(buttonAction(sender:)), for: .touchUpInside)
+    }
+    
+    private var view:UIView!
+    func buttonAction(sender:UIButton){
+        
     }
 
     // MARK: - Table view data source
