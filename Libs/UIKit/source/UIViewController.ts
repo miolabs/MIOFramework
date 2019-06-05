@@ -126,11 +126,12 @@ export class UIViewController extends NSObject {
             return;
         }
 
-        this.view = new UIView(this.layerID);
+        this.view = new UIView(this.layerID);        
 
         if (this._htmlResourcePath == null) {
             this.view.init();
             MUICoreLayerAddStyle(this.view.layer, "view-controller");
+            //this.view.layer.style.height = "100%";
             this._didLoadView();
             return;
         }
@@ -358,7 +359,12 @@ export class UIViewController extends NSObject {
         vc.onLoadView(this, function (this: UIViewController) {
 
             if (vc.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
-                this.view.addSubview(vc.presentationController.presentedView);
+                let wv = new UIView();
+                wv.init();
+                MUICoreLayerAddStyle(wv.layer, "window");
+                MUICoreLayerAddStyle(wv.layer, "alert");
+                this.view.addSubview(wv);
+                wv.addSubview(vc.presentationController.presentedView);
                 this.addChildViewController(vc);
                 _MUIShowViewController(this, vc, null, animated, this, function () {
                 });

@@ -217,13 +217,18 @@ export class UITableViewCell extends UIView {
     private _setupLayer() {
         //this.layer.style.position = "absolute";        
 
+        this.layer.addEventListener("click", function(e) {
+            e.stopPropagation();            
+            this._onClickFn.call(this._target, this);
+        }.bind(this));
+
         let instance = this;
-        this.layer.onclick = function (e) {
-            if (instance._onClickFn != null) {
-                e.stopPropagation();
-                instance._onClickFn.call(instance._target, instance);
-            }
-        };
+        // this.layer.onclick = function (e) {
+        //     if (instance._onClickFn != null) {
+        //         e.stopPropagation();
+        //         instance._onClickFn.call(instance._target, instance);
+        //     }
+        // };
 
         this.layer.ondblclick = function (e) {
             if (instance._onDblClickFn != null) {

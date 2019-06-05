@@ -2508,11 +2508,12 @@ export class UIViewController extends NSObject {
             return;
         }
 
-        this.view = new UIView(this.layerID);
+        this.view = new UIView(this.layerID);        
 
         if (this._htmlResourcePath == null) {
             this.view.init();
             MUICoreLayerAddStyle(this.view.layer, "view-controller");
+            //this.view.layer.style.height = "100%";
             this._didLoadView();
             return;
         }
@@ -2740,7 +2741,12 @@ export class UIViewController extends NSObject {
         vc.onLoadView(this, function (this: UIViewController) {
 
             if (vc.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
-                this.view.addSubview(vc.presentationController.presentedView);
+                let wv = new UIView();
+                wv.init();
+                MUICoreLayerAddStyle(wv.layer, "window");
+                MUICoreLayerAddStyle(wv.layer, "alert");
+                this.view.addSubview(wv);
+                wv.addSubview(vc.presentationController.presentedView);
                 this.addChildViewController(vc);
                 _MUIShowViewController(this, vc, null, animated, this, function () {
                 });
@@ -3716,11 +3722,11 @@ export class UITableView extends UIView
         // tapGesture.initWithTarget(this, this.cellDidTap);
         // cell.addGestureRecognizer(tapGesture);
 
-        cell._target = this;
-        cell._onClickFn = this.cellOnClickFn;
+        // cell._target = this;
+        // cell._onClickFn = this.cellOnClickFn;
         //cell._onDblClickFn = this.cellOnDblClickFn;
         //cell._onAccessoryClickFn = this.cellOnAccessoryClickFn;
-        cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
+        // cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
 
         return cell;
     }
@@ -3769,6 +3775,11 @@ export class UITableView extends UIView
             section.addObject(cell);
         }        
 
+        cell._target = this;
+        cell._onClickFn = this.cellOnClickFn;
+        //cell._onDblClickFn = this.cellOnDblClickFn;
+        //cell._onAccessoryClickFn = this.cellOnAccessoryClickFn;
+        cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
     }
 
     private removeCell(indexPath){        
@@ -4183,13 +4194,18 @@ export class UITableViewCell extends UIView {
     private _setupLayer() {
         //this.layer.style.position = "absolute";        
 
+        this.layer.addEventListener("click", function(e) {
+            e.stopPropagation();            
+            this._onClickFn.call(this._target, this);
+        }.bind(this));
+
         let instance = this;
-        this.layer.onclick = function (e) {
-            if (instance._onClickFn != null) {
-                e.stopPropagation();
-                instance._onClickFn.call(instance._target, instance);
-            }
-        };
+        // this.layer.onclick = function (e) {
+        //     if (instance._onClickFn != null) {
+        //         e.stopPropagation();
+        //         instance._onClickFn.call(instance._target, instance);
+        //     }
+        // };
 
         this.layer.ondblclick = function (e) {
             if (instance._onDblClickFn != null) {
@@ -4398,13 +4414,9 @@ export class UIAlertAction extends UIAlertItem
         static get destructive() {return Object.assign(new UIAlertAction.Style(), {rawValue: 2})}
     }
 
-    static alertActionWithTitle(title:string, style:any/*UIAlertAction.Style*/, target, completion):UIAlertAction{
-        let action = new UIAlertAction();
-        action.initWithTitle(title, style);
-        action.target = target;
-        action.completion = completion;
-
-        return action;
+    initTitleOptionalStyleUIAlertActionStyleHandlerOptional(title:string, style:any/*UIAlertAction.Style*/, completion){
+        this.initWithTitle(title, style);
+        this.completion = completion;
     }
 
     initWithTitle(title, style){
@@ -4574,9 +4586,7 @@ export class UIAlertController extends UIViewController
         let item = this._items[indexPath.row - 1];
         if (item.type == UIAlertItemType.Action) {
             
-            if (item.target != null && item.completion != null)
-                item.completion.call(item.target);
-            
+            if (item.completion != null) item.completion();            
             this.dismissViewController(true);
         }
     }

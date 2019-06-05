@@ -95,11 +95,11 @@ export class UITableView extends UIView
         // tapGesture.initWithTarget(this, this.cellDidTap);
         // cell.addGestureRecognizer(tapGesture);
 
-        cell._target = this;
-        cell._onClickFn = this.cellOnClickFn;
+        // cell._target = this;
+        // cell._onClickFn = this.cellOnClickFn;
         //cell._onDblClickFn = this.cellOnDblClickFn;
         //cell._onAccessoryClickFn = this.cellOnAccessoryClickFn;
-        cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
+        // cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
 
         return cell;
     }
@@ -148,6 +148,11 @@ export class UITableView extends UIView
             section.addObject(cell);
         }        
 
+        cell._target = this;
+        cell._onClickFn = this.cellOnClickFn;
+        //cell._onDblClickFn = this.cellOnDblClickFn;
+        //cell._onAccessoryClickFn = this.cellOnAccessoryClickFn;
+        cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
     }
 
     private removeCell(indexPath){        

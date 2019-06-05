@@ -2144,6 +2144,7 @@ var UIViewController = /** @class */ (function (_super) {
         if (this._htmlResourcePath == null) {
             this.view[0].init();
             MUICoreLayerAddStyle(this.view[0].layer, "view-controller");
+            //this.view.layer.style.height = "100%";
             this._didLoadView();
             return;
         }
@@ -2337,7 +2338,12 @@ var UIViewController = /** @class */ (function (_super) {
         //     vc.modalPresentationStyle = UIModalPresentationStyle.PageSheet;
         vc.onLoadView(this, function () {
             if (vc.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
-                this.view[0].addSubview(vc.presentationController[0].presentedView[0]);
+                var wv = new UIView();
+                wv.init();
+                MUICoreLayerAddStyle(wv.layer, "window");
+                MUICoreLayerAddStyle(wv.layer, "alert");
+                this.view[0].addSubview(wv);
+                wv.addSubview(vc.presentationController[0].presentedView[0]);
                 this.addChildViewController(vc);
                 _MUIShowViewController(this, vc, null, animated, this, function () {
                 });
@@ -3176,11 +3182,11 @@ var UITableView = /** @class */ (function (_super) {
         // let tapGesture = new MUITapGestureRecognizer();
         // tapGesture.initWithTarget(this, this.cellDidTap);
         // cell.addGestureRecognizer(tapGesture);
-        cell._target = this;
-        cell._onClickFn = this.cellOnClickFn;
+        // cell._target = this;
+        // cell._onClickFn = this.cellOnClickFn;
         //cell._onDblClickFn = this.cellOnDblClickFn;
         //cell._onAccessoryClickFn = this.cellOnAccessoryClickFn;
-        cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
+        // cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
         return cell;
     };
     UITableView.prototype.addSectionHeader = function (section) {
@@ -3220,6 +3226,11 @@ var UITableView = /** @class */ (function (_super) {
         else {
             section.addObject(cell);
         }
+        cell._target = this;
+        cell._onClickFn = this.cellOnClickFn;
+        //cell._onDblClickFn = this.cellOnDblClickFn;
+        //cell._onAccessoryClickFn = this.cellOnAccessoryClickFn;
+        cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
     };
     UITableView.prototype.removeCell = function (indexPath) {
         var section = this.sections[indexPath.section];
@@ -3575,13 +3586,17 @@ var UITableViewCell = /** @class */ (function (_super) {
     };
     UITableViewCell.prototype._setupLayer = function () {
         //this.layer.style.position = "absolute";        
+        this.layer.addEventListener("click", function (e) {
+            e.stopPropagation();
+            this._onClickFn.call(this._target, this);
+        }.bind(this));
         var instance = this;
-        this.layer.onclick = function (e) {
-            if (instance._onClickFn != null) {
-                e.stopPropagation();
-                instance._onClickFn.call(instance._target, instance);
-            }
-        };
+        // this.layer.onclick = function (e) {
+        //     if (instance._onClickFn != null) {
+        //         e.stopPropagation();
+        //         instance._onClickFn.call(instance._target, instance);
+        //     }
+        // };
         this.layer.ondblclick = function (e) {
             if (instance._onDblClickFn != null) {
                 e.stopPropagation();
@@ -3761,16 +3776,13 @@ var UIAlertAction = /** @class */ (function (_super) {
         _this.completion = null;
         return _this;
     }
-    UIAlertAction.alertActionWithTitle = function (title, style /*UIAlertAction.Style*/, target, completion) {
-        var action = new UIAlertAction();
-        action.initTitleOptionalStyleUIAlertActionStyleHandlerOptional(_injectIntoOptional(title), style);
-        action.target = target;
-        action.completion = completion;
-        return action;
+    UIAlertAction.prototype.initTitleOptionalStyleUIAlertActionStyleHandlerOptional = function (title, style /*UIAlertAction.Style*/, completion) {
+        this.initWithTitle(title[0], style);
+        this.completion = completion[0];
     };
-    UIAlertAction.prototype.initTitleOptionalStyleUIAlertActionStyleHandlerOptional = function (title, style) {
+    UIAlertAction.prototype.initWithTitle = function (title, style) {
         _super.prototype.initWithType.call(this, UIAlertItemType.Action);
-        this.title = _injectIntoOptional(title[0]);
+        this.title = _injectIntoOptional(title);
         this.style = style;
     };
     UIAlertAction.Style = /** @class */ (function () {
@@ -3928,8 +3940,8 @@ var UIAlertController = /** @class */ (function (_super) {
     UIAlertController.prototype.didSelectCellAtIndexPath = function (tableView, indexPath) {
         var item = this._items[indexPath.row - 1];
         if (item.type == UIAlertItemType.Action) {
-            if (item.target != null && item.completion != null)
-                item.completion.call(item.target);
+            if (item.completion != null)
+                item.completion();
             this.dismissViewControllerAnimatedCompletion(true);
         }
     };

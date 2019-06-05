@@ -70,13 +70,9 @@ export class UIAlertAction extends UIAlertItem
         static get destructive() {return Object.assign(new UIAlertAction.Style(), {rawValue: 2})}
     }
 
-    static alertActionWithTitle(title:string, style:any/*UIAlertAction.Style*/, target, completion):UIAlertAction{
-        let action = new UIAlertAction();
-        action.initWithTitle(title, style);
-        action.target = target;
-        action.completion = completion;
-
-        return action;
+    initTitleOptionalStyleUIAlertActionStyleHandlerOptional(title:string, style:any/*UIAlertAction.Style*/, completion){
+        this.initWithTitle(title, style);
+        this.completion = completion;
     }
 
     initWithTitle(title, style){
@@ -246,9 +242,7 @@ export class UIAlertController extends UIViewController
         let item = this._items[indexPath.row - 1];
         if (item.type == UIAlertItemType.Action) {
             
-            if (item.target != null && item.completion != null)
-                item.completion.call(item.target);
-            
+            if (item.completion != null) item.completion();            
             this.dismissViewController(true);
         }
     }
