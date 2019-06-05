@@ -1,14 +1,16 @@
 import { NSObject } from "mio-foundation-web";
-import { NSRect } from "mio-foundation-web";
-import { NSSize } from "mio-foundation-web";
+import { CGRect } from "mio-foundation-web";
+import { CGSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
 import { MIOCoreIsMobile } from "mio-foundation-web";
 
 import { UIViewController } from "./UIViewController";
 import { MUIWindowSize } from "./core/MUICore";
 import { UIWindow } from "./UIWindow";
-import { MUIClassListForAnimationType, MUIAnimationType } from "./core/MUICoreAnimation";
+import { MUIClassListForAnimationType } from "./core/MUICoreAnimation";
+import { MUIAnimationType } from "./core/MUICoreAnimation";
 import { MUICoreLayerAddStyle } from ".";
+import { UIView } from "./UIView";
 
 /**
  * Created by godshadow on 06/12/2016.
@@ -16,15 +18,15 @@ import { MUICoreLayerAddStyle } from ".";
 
 export enum UIModalPresentationStyle
 {
-    FullScreen,
-    PageSheet, // normal modal sheet in osx
-    FormSheet, // normal modal like floating window but horizontal and vertically centered
-    CurrentContext,
-    Custom,
-    OverFullScreen,     // Similar to FullScreen but the view beneath doesnpt dissappear
-    OverCurrentContext, // Similuar like previus, but in current context
-    Popover, // the popover, almost like FormSheet but no centered
-    None
+    fullScreen,
+    pageSheet, // normal modal sheet in osx
+    formSheet, // normal modal like floating window but horizontal and vertically centered
+    currentContext,
+    custom,
+    overFullScreen,     // Similar to FullScreen but the view beneath doesnpt dissappear
+    overCurrentContext, // Similuar like previus, but in current context
+    popover, // the popover, almost like FormSheet but no centered
+    none
 }
 
 export enum UIModalTransitionStyle
@@ -36,7 +38,7 @@ export enum UIModalTransitionStyle
 
 export class UIPresentationController extends NSObject
 {
-    presentationStyle = UIModalPresentationStyle.PageSheet;
+    presentationStyle = UIModalPresentationStyle.pageSheet;
     shouldPresentInFullscreen = false;
 
     protected _presentedViewController:UIViewController = null; //ToVC
@@ -83,9 +85,9 @@ export class UIPresentationController extends NSObject
 
         this._calculateFrame();
 
-        if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet 
-            || toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
-            || toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.pageSheet 
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.formSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
             || MIOCoreIsPhone() == true){
             MUICoreLayerAddStyle(view.layer, "modal_window");
         }       
@@ -101,66 +103,66 @@ export class UIPresentationController extends NSObject
     }
 
     _calculateFrame(){
-        let fromVC = this.presentingViewController;
-        let toVC = this.presentedViewController;
-        let view = this.presentedView;
+        let fromVC: UIViewController = this.presentingViewController;
+        let toVC: UIViewController = this.presentedViewController;
+        let view: UIView = this.presentedView;
 
-        if (toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen){
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen){
             view.layer.style.left = "0px";
             view.layer.style.top = "0px";
             view.layer.style.width = "100%";
             view.layer.style.height = "100%";
         }
-        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext)
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.currentContext)
         {
             let w = fromVC.view.getWidth();
             let h = fromVC.view.getHeight();
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
         }
-        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet)
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.pageSheet)
         {
             // Present like desktop sheet window
             let ws = MUIWindowSize();
 
             let size = toVC.preferredContentSize;
-            if (size == null) size = new NSSize(320, 200);
+            if (size == null) size = new CGSize(320, 200);
 
             let w = size.width;
             let h = size.height;
             let x = (ws.width - w) / 2;
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-            this.window.setFrame(NSRect.rectWithValues(x, 0, w, h))
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+            this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, 0, w, h))
 
             view.layer.classList.add("modal");
         }
-        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet)
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.formSheet)
         {
             // Present at the center of the screen
             let ws = MUIWindowSize();
 
             let size = toVC.preferredContentSize;
-            if (size == null) size = new NSSize(320, 200);
+            if (size == null) size = new CGSize(320, 200);
 
             let w = size.width;
             let h = size.height;
             let x = (ws.width - w) / 2;
             let y = (ws.height - h) / 2;
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-            this.window.setFrame(NSRect.rectWithValues(x, y, w, h))
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+            this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, y, w, h))
 
             view.layer.classList.add("modal");
         }
         else
         {
             let size = toVC.preferredContentSize;
-            if (size == null) size = new NSSize(320, 200);
+            if (size == null) size = new CGSize(320, 200);
             let w = size.width;
             let h = size.height;
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
         }        
     }
 
@@ -173,7 +175,7 @@ export class UIPresentationController extends NSObject
         this._window = window;
         
         // Track view frame changes
-        if (MIOCoreIsMobile() == false && vc.modalPresentationStyle != UIModalPresentationStyle.CurrentContext){
+        if (MIOCoreIsMobile() == false && vc.modalPresentationStyle != UIModalPresentationStyle.currentContext){
             vc.addObserver(this, "preferredContentSize");
         }
     }
@@ -259,9 +261,9 @@ export class UIModalPresentAnimationController extends NSObject
 
         let toVC = transitionContext.presentedViewController;
 
-        if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet 
-            || toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
-            || toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen){
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.pageSheet 
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.formSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen){
             
             if (MIOCoreIsPhone() == true)
                 animations = MUIClassListForAnimationType(MUIAnimationType.SlideInUp);
@@ -293,9 +295,9 @@ export class UIModalDismissAnimationController extends NSObject
 
         let fromVC = transitionContext.presentingViewController;
 
-        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet 
-            || fromVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
-            || fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen){
+        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.pageSheet 
+            || fromVC.modalPresentationStyle == UIModalPresentationStyle.formSheet
+            || fromVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen){
             
             if (MIOCoreIsPhone() == true)                        
                 animations = MUIClassListForAnimationType(MUIAnimationType.SlideOutDown);

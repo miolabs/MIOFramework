@@ -1,5 +1,5 @@
 
-import { NSRect } from "mio-foundation-web";
+import { CGRect } from "mio-foundation-web";
 import { NSObject } from "mio-foundation-web";
 import { UIPresentationController } from "./UIViewController_PresentationController";
 import { MUIClassListForAnimationType } from "./core/MUICoreAnimation";
@@ -29,7 +29,7 @@ export class UIPopoverPresentationController extends UIPresentationController
     permittedArrowDirections = UIPopoverArrowDirection.Any;
 
     sourceView = null;
-    sourceRect = NSRect.Zero();
+    sourceRect = CGRect.Zero();
 
     delegate = null;
 
@@ -96,8 +96,8 @@ export class UIPopoverPresentationController extends UIPresentationController
                 x = v.layer.getBoundingClientRect().left - w - 10;
         }
 
-        view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-        this.window.setFrame(NSRect.rectWithValues(x, y, w, h))
+        view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+        this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, y, w, h))
     }
 
     private _drawRoundRect(x, y, width, height, radius) {

@@ -1,7 +1,8 @@
 import { NSLocalizeString } from "mio-foundation-web";
-import { UIControl, UIControlEvents } from "./UIControl";
+import { UIControl, UIControl.Event } from "./UIControl";
 import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
 import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
+import { UIColor } from "./UIColor";
 
 /**
  * Created by godshadow on 12/3/16.
@@ -28,6 +29,12 @@ export class UIButton extends UIControl
 
     init(){
         super.init();
+        MUICoreLayerAddStyle(this.layer, "btn");
+        this.setupLayers();
+    }
+
+    initFrameCGRect(frame: CGRect) {
+        super.initFrameCGRect(frame);
         MUICoreLayerAddStyle(this.layer, "btn");
         this.setupLayers();
     }
@@ -98,7 +105,7 @@ export class UIButton extends UIControl
             if (this.enabled == false) return;            
             if (this.type == UIButtonType.MomentaryPushIn) this.setSelected(false);
 
-            this._performActionsForEvents(UIControlEvents.TouchUpInside);
+            this._performActionsForEvents(UIControl.Event.touchUpInside);
 
             // if (this.action != null && this.target != null)
             //     this.action.call(this.target, this);
@@ -116,6 +123,10 @@ export class UIButton extends UIControl
 
     get title(){
         return this._titleLayer.innerHTML;
+    }
+
+    setTitleColorFor(color: UIColor) {
+        this._titleLayer.style.color = "#" + color.hex;
     }
 
     setImageURL(urlString:string){

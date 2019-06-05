@@ -148,7 +148,7 @@ export class UISplitViewController extends UIViewController
 
         //if (vc.transitioningDelegate == null) vc.transitioningDelegate = this;
 
-        vc.onLoadView(this, function () {
+        vc.onLoadView(this, function (this: UISplitViewController) {
 
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);

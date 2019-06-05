@@ -2,8 +2,8 @@ import { NSTimer } from "mio-foundation-web";
 import { MIOCoreGetPlatform } from "mio-foundation-web";
 import { MIOCorePlatformType } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
-import { NSRect } from "mio-foundation-web";
-import { NSSize } from "mio-foundation-web";
+import { CGRect } from "mio-foundation-web";
+import { CGSize } from "mio-foundation-web";
 import { UIView } from "./UIView";
 import { MUICoreLayerCreate } from "./core/MUICoreLayer";
 import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
@@ -158,16 +158,16 @@ export class UIScrollView extends UIView {
         return p;
     }
 
-    get bounds():NSRect{
+    get bounds():CGRect{
         let p = this.contentOffset;
-        return NSRect.rectWithValues(p.x, p.y, this.getWidth(), this.getHeight());
+        return _create(CGRect, 'initXIntYIntWidthIntHeightInt', p.x, p.y, this.getWidth(), this.getHeight());
     }
 
     addSubview(view:UIView, index?) {
         this.contentView.addSubview(view, index);
     }
 
-    set contentSize(size: NSSize) {
+    set contentSize(size: CGSize) {
         if (size.width > 0) {
             this.contentView.setWidth(size.width);
         }

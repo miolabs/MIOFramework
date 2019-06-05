@@ -5985,29 +5985,29 @@ var UILabel = /** @class */ (function (_super) {
 /**
  * Created by godshadow on 12/3/16.
  */
-var UIControlEvents;
-(function (UIControlEvents) {
-    UIControlEvents[UIControlEvents["TouchDown"] = 1] = "TouchDown";
-    UIControlEvents[UIControlEvents["TouchDownRepeat"] = 2] = "TouchDownRepeat";
-    UIControlEvents[UIControlEvents["TouchDragInside"] = 4] = "TouchDragInside";
-    UIControlEvents[UIControlEvents["TouchDragOutside"] = 8] = "TouchDragOutside";
-    UIControlEvents[UIControlEvents["TouchDragEnter"] = 16] = "TouchDragEnter";
-    UIControlEvents[UIControlEvents["TouchDragExit"] = 32] = "TouchDragExit";
-    UIControlEvents[UIControlEvents["TouchUpInside"] = 64] = "TouchUpInside";
-    UIControlEvents[UIControlEvents["TouchUpOutside"] = 128] = "TouchUpOutside";
-    UIControlEvents[UIControlEvents["TouchCancel"] = 256] = "TouchCancel";
-    UIControlEvents[UIControlEvents["ValueChanged"] = 4096] = "ValueChanged";
-    UIControlEvents[UIControlEvents["PrimaryActionTriggered"] = 8192] = "PrimaryActionTriggered";
-    UIControlEvents[UIControlEvents["EditingDidBegin"] = 65536] = "EditingDidBegin";
-    UIControlEvents[UIControlEvents["EditingChanged"] = 131072] = "EditingChanged";
-    UIControlEvents[UIControlEvents["EditingDidEnd"] = 262144] = "EditingDidEnd";
-    UIControlEvents[UIControlEvents["EditingDidEndOnExit"] = 524288] = "EditingDidEndOnExit";
-    UIControlEvents[UIControlEvents["AllTouchEvents"] = 4095] = "AllTouchEvents";
-    UIControlEvents[UIControlEvents["EditingEvents"] = 983040] = "EditingEvents";
-    UIControlEvents[UIControlEvents["ApplicationReserved"] = 251658240] = "ApplicationReserved";
-    UIControlEvents[UIControlEvents["SystemReserved"] = 4026531840] = "SystemReserved";
-    UIControlEvents[UIControlEvents["AllEvents"] = 4294967295] = "AllEvents";
-})(UIControlEvents || (UIControlEvents = {}));
+var UIControl.Event;
+(function (UIControl.Event) {
+    UIControl.Event[UIControl.Event["TouchDown"] = 1] = "TouchDown";
+    UIControl.Event[UIControl.Event["TouchDownRepeat"] = 2] = "TouchDownRepeat";
+    UIControl.Event[UIControl.Event["TouchDragInside"] = 4] = "TouchDragInside";
+    UIControl.Event[UIControl.Event["TouchDragOutside"] = 8] = "TouchDragOutside";
+    UIControl.Event[UIControl.Event["TouchDragEnter"] = 16] = "TouchDragEnter";
+    UIControl.Event[UIControl.Event["TouchDragExit"] = 32] = "TouchDragExit";
+    UIControl.Event[UIControl.Event["TouchUpInside"] = 64] = "TouchUpInside";
+    UIControl.Event[UIControl.Event["TouchUpOutside"] = 128] = "TouchUpOutside";
+    UIControl.Event[UIControl.Event["TouchCancel"] = 256] = "TouchCancel";
+    UIControl.Event[UIControl.Event["ValueChanged"] = 4096] = "ValueChanged";
+    UIControl.Event[UIControl.Event["PrimaryActionTriggered"] = 8192] = "PrimaryActionTriggered";
+    UIControl.Event[UIControl.Event["EditingDidBegin"] = 65536] = "EditingDidBegin";
+    UIControl.Event[UIControl.Event["EditingChanged"] = 131072] = "EditingChanged";
+    UIControl.Event[UIControl.Event["EditingDidEnd"] = 262144] = "EditingDidEnd";
+    UIControl.Event[UIControl.Event["EditingDidEndOnExit"] = 524288] = "EditingDidEndOnExit";
+    UIControl.Event[UIControl.Event["AllTouchEvents"] = 4095] = "AllTouchEvents";
+    UIControl.Event[UIControl.Event["EditingEvents"] = 983040] = "EditingEvents";
+    UIControl.Event[UIControl.Event["ApplicationReserved"] = 251658240] = "ApplicationReserved";
+    UIControl.Event[UIControl.Event["SystemReserved"] = 4026531840] = "SystemReserved";
+    UIControl.Event[UIControl.Event["AllEvents"] = 4294967295] = "AllEvents";
+})(UIControl.Event || (UIControl.Event = {}));
 var UIControl = /** @class */ (function (_super) {
     __extends(UIControl, _super);
     function UIControl() {
@@ -6036,7 +6036,7 @@ var UIControl = /** @class */ (function (_super) {
                 if (actionSelector != null) {
                     this_1.addTarget(this_1, function () {
                         owner[actionSelector](this);
-                    }, UIControlEvents.AllEvents);
+                    }, UIControl.Event.AllEvents);
                     return "break";
                 }
             };
@@ -6073,7 +6073,7 @@ var UIControl = /** @class */ (function (_super) {
                     });
                     segue._sender = this;
                     segue.perform();
-                }, UIControlEvents.AllEvents);
+                }, UIControl.Event.AllEvents);
             }
         }
     };
@@ -7631,7 +7631,7 @@ var UINavigationController = /** @class */ (function (_super) {
             if (vc.navigationItem != null && vc.navigationItem.backBarButtonItem[0] != null) {
                 vc.navigationItem.backBarButtonItem[0].addTarget(this, function () {
                     vc.navigationController[0].popViewController();
-                }, UIControlEvents.AllTouchEvents);
+                }, UIControl.Event.AllTouchEvents);
             }
             this.view.addSubview(vc.view[0]);
             this.addChildViewController(vc);

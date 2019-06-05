@@ -9,24 +9,19 @@
     <script src="/mio-uikit-web.js"></script>
     <script src="/loader.js"></script>
     <script src="/typescriptServices.js"></script>
+    <link rel="stylesheet" href="/app.css">
+    <link rel="stylesheet" href="/animate.css">
 </head>
 <style>
     * {
     margin: 0;
     padding: 0;
-    border: 0;
     vertical-align: baseline;
-    font-family: inherit;
-    font-size: inherit;
-    background: transparent;
     outline: none;
     box-sizing: border-box;
     }
     article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
     display: block;
-    }
-    body {
-    line-height: 1;
     }
     ol, ul {
     list-style: none;
@@ -38,10 +33,6 @@
     html, body {
     width: 100%;
     height: 100%;
-    font-size: 18px;
-    line-height: 1.42857;
-    color: #333;
-    font-family: sans-serif;
     }
     nav {
     width: 100%;
@@ -76,13 +67,14 @@
     resize: none;
     font-size: 13px;
     line-height: 1.42857;
+    border: 0;
     }
     #source-code {
     left: 0;
     }
     #target-code-wrapper {
     right: 0;
-    transition: color 0.3s linear;
+    transition: opacity 0.3s linear, color 0.3s linear;
     }
     #target-code {
     width: 100%;
@@ -101,6 +93,8 @@
     }
     #visual-output {
     position: relative;
+    overflow: scroll;
+    transition: opacity 0.3s linear;
     }
     .transpile-btn {
     background-color: #13ce66;
@@ -110,6 +104,8 @@
     padding: 3px 10px;
     cursor: pointer;
     transition: background-color 0.2s linear;
+    font-size: 15px;
+    line-height: 1.4;
     }
     .transpile-btn:hover {
     background-color: #28eb80;
@@ -168,8 +164,8 @@
     }
     #target-code-spinner {
     position: absolute;
-    right: calc(25% - 45px);
-    top: calc(50% - 30px);
+    left: calc(66% - 30px);
+    top: calc(50% - 25px);
     display: none;
     }
 </style>
@@ -329,19 +325,16 @@ var sourceCodeEl = document.getElementById("source-code"),
     targetOutputEl = document.getElementById("target-output"),
     transpileBtns = document.getElementsByClassName("transpile-btn"),
     spinner = document.getElementById("target-code-spinner"),
-    lastSourceCode = sourceCodeEl.value,
-    lastLanguage = "ts",
     isWaitingForTranspilation = false;
 Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
     transpileBtn.onclick = function() {
         if(isWaitingForTranspilation) return;
         var language = transpileBtn.getAttribute("data-language");
-        if(!sourceCodeEl.value || (sourceCodeEl.value === lastSourceCode && language === lastLanguage)) return;
+        if(!sourceCodeEl.value) return;
         isWaitingForTranspilation = true;
         spinner.style.display = 'block';
-        targetCodeEl.style.color = '#aaa';
-        lastSourceCode = sourceCodeEl.value;
-        lastLanguage = language;
+        targetCodeEl.style.opacity = .3;
+        visualOutputEl.style.opacity = .3;
         var xhr = new XMLHttpRequest();
         xhr.open("POST", TRANSPILE_URL);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -349,14 +342,20 @@ Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
             if(xhr.readyState !== 4) return;
             isWaitingForTranspilation = false;
             spinner.style.display = 'none';
+            targetCodeEl.style.opacity = 1;
+            visualOutputEl.style.opacity = 1;
             if(xhr.status === 200) {
-                let {outputText, formatText} = formatAndTranspile(xhr.responseText, {})
+                let code = xhr.responseText
+                code = code.slice(code.indexOf('}\n}\n') + '}\n}\n'.length)//to remove Playground duplication
+                //code = code.replace(/init[0-9]+XYWidthHeight/g, "initXYWidthHeight")//TODO temporary fix until CoreData isNative in transpiler
+                //code = code.replace(/_frame/g, "frame")//TODO temporary fix until frame is not prefixed with _
+                //code = code.replace(/\(objc_selector_expr[\s\S]+buttonActionSender\)/, "_this.buttonActionSender")//TODO temporary fix
+                let {outputText, formatText} = formatAndTranspile(code, {})
                 targetCodeEl.value = formatText;
                 targetCodeEl.style.color = '';
                 targetOutputEl.value = '';
                 visualOutputEl.innerHTML = '';
                 printSeparatorTerminator = function(text) { targetOutputEl.value += text + '\n' }
-                outputText = outputText.slice(outputText.indexOf('}());') + '}());'.length)//to remove Playground duplication
                 eval('(function(){' + outputText + '})();')
             }
             else {

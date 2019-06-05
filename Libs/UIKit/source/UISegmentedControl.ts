@@ -1,5 +1,5 @@
 import { UIControl } from "./UIControl";
-import { UIControlEvents } from "./UIControl";
+import { UIControl.Event } from "./UIControl";
 import { UIButtonType } from "./UIButton";
 import { UIButton } from "./UIButton";
 import { MUIOutletRegister } from "./core/MUICore";
@@ -36,7 +36,7 @@ export class UISegmentedControl extends UIControl
 
     private _addSegmentedItem(item:UIButton){
         this.segmentedItems.push(item);
-        item.addTarget(this, this._didClickSegmentedButton, UIControlEvents.AllTouchEvents);
+        item.addTarget(this, this._didClickSegmentedButton, UIControl.Event.allTouchEvents);
     }
 
     private _didClickSegmentedButton(button){
@@ -60,6 +60,6 @@ export class UISegmentedControl extends UIControl
         let item = this.segmentedItems[this.selectedSegmentIndex];
         item.setSelected(true);
 
-        this._performActionsForEvents(UIControlEvents.ValueChanged);
+        this._performActionsForEvents(UIControl.Event.valueChanged);
     }
 }

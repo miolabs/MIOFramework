@@ -1046,7 +1046,7 @@ var CGRect = /** @class */ (function () {
         var f = new CGRect(CGPoint.Zero(), CGSize.Zero());
         return f;
     };
-    CGRect.prototype.init2XYWidthHeight = function (x, y, w, h) {
+    CGRect.prototype.initXIntYIntWidthIntHeightInt = function (x, y, w, h) {
         this.origin = new CGPoint(x, y);
         this.size = new CGSize(w, h);
     };
@@ -1272,7 +1272,7 @@ var Bundle = /** @class */ (function (_super) {
         }
         return this._mainBundle;
     };
-    Bundle.prototype.initWithURL = function (url) {
+    Bundle.prototype.initUrlURL = function (url) {
         this.url = url;
     };
     Bundle.prototype.loadNibNamed = function (name, owner, options) {
@@ -1412,7 +1412,7 @@ var NSNumber = /** @class */ (function (_super) {
     }
     NSNumber.numberWithBool = function (value) {
         var n = new NSNumber();
-        n.initWithBool(value);
+        n.initValueBool(value);
         return n;
     };
     NSNumber.numberWithInteger = function (value) {
@@ -1422,10 +1422,10 @@ var NSNumber = /** @class */ (function (_super) {
     };
     NSNumber.numberWithFloat = function (value) {
         var n = new NSNumber();
-        n.initWithFloat(value);
+        n.initValueFloat(value);
         return n;
     };
-    NSNumber.prototype.initWithBool = function (value) {
+    NSNumber.prototype.initValueBool = function (value) {
         if (isNaN(value) || value == null) {
             this.storeValue = 1;
         }
@@ -1441,7 +1441,7 @@ var NSNumber = /** @class */ (function (_super) {
             this.storeValue = value;
         }
     };
-    NSNumber.prototype.initWithFloat = function (value) {
+    NSNumber.prototype.initValueFloat = function (value) {
         if (isNaN(value) || value == null) {
             this.storeValue = 0.0;
         }
@@ -1467,7 +1467,7 @@ var NSDecimalNumber = /** @class */ (function (_super) {
     }
     NSDecimalNumber.decimalNumberWithString = function (str) {
         var dn = new NSDecimalNumber();
-        dn.initWithString(str);
+        dn.initStringOptional(_injectIntoOptional(str));
         return dn;
     };
     NSDecimalNumber.one = function () {
@@ -1492,10 +1492,10 @@ var NSDecimalNumber = /** @class */ (function (_super) {
         n._initWithValue(value);
         return n;
     };
-    NSDecimalNumber.prototype.initWithString = function (str) {
-        this._initWithValue(str);
+    NSDecimalNumber.prototype.initStringOptional = function (str) {
+        this._initWithValue(str[0]);
     };
-    NSDecimalNumber.prototype.initWithDecimal = function (value) {
+    NSDecimalNumber.prototype.initDecimalDecimal = function (value) {
         _super.prototype.init.call(this);
         if (isNaN(value) || value == null) {
             this.storeValue = new decimal_js_1.Decimal(0);
@@ -1510,22 +1510,22 @@ var NSDecimalNumber = /** @class */ (function (_super) {
     };
     NSDecimalNumber.prototype.decimalNumberByAdding = function (value) {
         var dv = new NSDecimalNumber();
-        dv.initWithDecimal(this.storeValue.add(value.storeValue));
+        dv.initDecimalDecimal(this.storeValue.add(value.storeValue));
         return dv;
     };
     NSDecimalNumber.prototype.decimalNumberBySubtracting = function (value) {
         var dv = new NSDecimalNumber();
-        dv.initWithDecimal(this.storeValue.sub(value.storeValue));
+        dv.initDecimalDecimal(this.storeValue.sub(value.storeValue));
         return dv;
     };
     NSDecimalNumber.prototype.decimalNumberByMultiplyingBy = function (value) {
         var dv = new NSDecimalNumber();
-        dv.initWithDecimal(this.storeValue.mul(value.storeValue));
+        dv.initDecimalDecimal(this.storeValue.mul(value.storeValue));
         return dv;
     };
     NSDecimalNumber.prototype.decimalNumberByDividingBy = function (value) {
         var dv = new NSDecimalNumber();
-        dv.initWithDecimal(this.storeValue.div(value.storeValue));
+        dv.initDecimalDecimal(this.storeValue.div(value.storeValue));
         return dv;
     };
     Object.defineProperty(NSDecimalNumber.prototype, "decimalValue", {
@@ -2153,10 +2153,10 @@ var NSPredicate = /** @class */ (function (_super) {
     }
     NSPredicate.predicateWithFormat = function (format) {
         var p = new NSPredicate();
-        p.initWithFormat(format);
+        p.initFormatStringArgumentArrayOptional(format);
         return p;
     };
-    NSPredicate.prototype.initWithFormat = function (format) {
+    NSPredicate.prototype.initFormatStringArgumentArrayOptional = function (format) {
         this._predicateFormat = format;
         this.parse(format);
     };
@@ -2167,8 +2167,8 @@ var NSPredicate = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
-    NSPredicate.prototype.evaluateObject = function (object) {
-        return this.predicateGroup.evaluateObject(object);
+    NSPredicate.prototype.evaluateWithObject = function (object) {
+        return this.predicateGroup.evaluateObject(object[0]);
     };
     // 
     // Parse format string
@@ -2482,7 +2482,7 @@ var NSSet = /** @class */ (function (_super) {
         }
         return set;
     };
-    NSSet.prototype.filterWithPredicate = function (predicate) {
+    NSSet.prototype.filteredSetUsingPredicate = function (predicate) {
         var objs = _NSPredicateFilterObjects(this._objects, predicate);
         return objs;
     };
@@ -2698,11 +2698,11 @@ var Formatter = /** @class */ (function (_super) {
     Formatter.prototype.stringForObjectValue = function (value) {
         return value[0];
     };
-    Formatter.prototype.getObjectValueForString = function (str) {
+    Formatter.prototype.getObjectValueForStringErrorDescription = function (str) {
     };
     Formatter.prototype.editingStringForObjectValue = function (value) {
     };
-    Formatter.prototype.isPartialStringValid = function (str) {
+    Formatter.prototype.isPartialStringValidNewEditingStringErrorDescriptionationEnabled = function (str) {
         var newStr = "";
         return [false, newStr];
     };
@@ -2747,7 +2747,7 @@ var DateFormatter = /** @class */ (function (_super) {
         return null;
     };
     DateFormatter.prototype.stringFromDate = function (date) {
-        return this.stringForObjectValue(date);
+        return this.stringForObjectValue(_injectIntoOptional(date));
     };
     DateFormatter.prototype.stringForObjectValue = function (value) {
         var date = value;
@@ -2771,7 +2771,7 @@ var DateFormatter = /** @class */ (function (_super) {
         }
         return str;
     };
-    DateFormatter.prototype.isPartialStringValid = function (str) {
+    DateFormatter.prototype.isPartialStringValidationEnabledNewEditingStringErrorDescription = function (str) {
         var _a;
         if (str.length == 0)
             return [true, str];
@@ -3113,7 +3113,7 @@ var NumberFormatter = /** @class */ (function (_super) {
         return null;
     };
     NumberFormatter.prototype.stringFrom = function (number) {
-        return _injectIntoOptional(this.stringForObjectValue(number)); //TODO automatically refactor function results
+        return _injectIntoOptional(this.stringForObjectValue(_injectIntoOptional(number))); //TODO automatically refactor function results
     };
     NumberFormatter.prototype.stringForObjectValue = function (value) {
         var _a;
@@ -3257,7 +3257,7 @@ var NumberFormatter = /** @class */ (function (_super) {
         }
         return result;
     };
-    NumberFormatter.prototype.isPartialStringValid = function (str) {
+    NumberFormatter.prototype.isPartialStringValidationEnabledNewEditingStringErrorDescription = function (str) {
         var _a;
         if (str.length == 0)
             return [true, str];
@@ -3351,11 +3351,11 @@ var Timer = /** @class */ (function (_super) {
     }
     Timer.scheduledTimerWithTimeInterval = function (timeInterval, repeat, target, completion) {
         var timer = new Timer();
-        timer.initWithTimeInterval(timeInterval, repeat, target, completion);
+        timer.initTimeIntervalTimeIntervalRepeatsBoolBlockfunction_type(timeInterval, repeat, target, completion);
         timer.fire();
         return timer;
     };
-    Timer.prototype.initWithTimeInterval = function (timeInterval, repeat, target, completion) {
+    Timer.prototype.initTimeIntervalTimeIntervalRepeatsBoolBlockfunction_type = function (timeInterval, repeat, target, completion) {
         this._timerInterval = timeInterval;
         this._repeat = repeat;
         this._target = target;
@@ -3471,21 +3471,21 @@ var UserDefaults = /** @class */ (function () {
     UserDefaults.standardUserDefaults = function () {
         return UserDefaults._sharedInstance;
     };
-    UserDefaults.prototype.setBooleanForKey = function (key, value) {
+    UserDefaults.prototype.setBoolForKey = function (key, value) {
         var v = value ? "1" : "0";
-        this.setValueForKey(key, v);
+        this.setForKey(_injectIntoOptional(key), v);
     };
     UserDefaults.prototype.booleanForKey = function (key) {
         var v = this.valueForKey(key);
         return v == "1" ? true : false;
     };
-    UserDefaults.prototype.setValueForKey = function (key, value) {
-        localStorage.setItem(key, value);
+    UserDefaults.prototype.setForKey = function (key, value) {
+        localStorage.setItem(key[0], value);
     };
     UserDefaults.prototype.valueForKey = function (key) {
         return localStorage.getItem(key);
     };
-    UserDefaults.prototype.removeValueForKey = function (key) {
+    UserDefaults.prototype.removeObjectForKey = function (key) {
         localStorage.removeItem(key);
     };
     UserDefaults._sharedInstance = new UserDefaults();
@@ -3520,23 +3520,23 @@ var NSURL = /** @class */ (function (_super) {
     }
     NSURL.urlWithString = function (urlString) {
         var url = new NSURL();
-        url.initWithURLString(urlString);
+        url.initStringString(urlString);
         return url;
     };
-    NSURL.prototype.initWithScheme = function (scheme, host, path) {
+    NSURL.prototype.initSchemeStringHostOptionalPathString = function (scheme, host, path) {
         _super.prototype.init.call(this);
         this.scheme = _injectIntoOptional(scheme);
-        this.host = _injectIntoOptional(host);
+        this.host = _injectIntoOptional(host[0]);
         this.path = _injectIntoOptional(path);
         this.absoluteString = _injectIntoOptional("");
         if (scheme.length > 0)
             this.absoluteString[0] += scheme + "://";
-        if (host.length > 0)
-            this.absoluteString[0] += host + "/";
+        if (host[0].length > 0)
+            this.absoluteString[0] += host[0] + "/";
         if (path.length > 0)
             this.absoluteString[0] += path;
     };
-    NSURL.prototype.initWithURLString = function (urlString) {
+    NSURL.prototype.initStringString = function (urlString) {
         _super.prototype.init.call(this);
         this.absoluteString = _injectIntoOptional(urlString);
         this._parseURLString(urlString);
@@ -3661,10 +3661,10 @@ var NSURLRequest = /** @class */ (function (_super) {
     }
     NSURLRequest.requestWithURL = function (url) {
         var request = new NSURLRequest();
-        request.initWithURL(url);
+        request.initUrlURL(url);
         return request;
     };
-    NSURLRequest.prototype.initWithURL = function (url) {
+    NSURLRequest.prototype.initUrlURL = function (url) {
         this.url = _injectIntoOptional(url);
     };
     NSURLRequest.prototype.setHeaderField = function (field, value) {
@@ -4384,7 +4384,7 @@ var NSSortDescriptor = /** @class */ (function (_super) {
     }
     NSSortDescriptor.sortDescriptorWithKey = function (key, ascending) {
         var sd = new NSSortDescriptor();
-        sd.initKeyOptionalAscendingBool(key, ascending);
+        sd.initKeyOptionalAscendingBool(_injectIntoOptional(key), ascending);
         return sd;
     };
     NSSortDescriptor.prototype.initKeyOptionalAscendingBool = function (key, ascending) {

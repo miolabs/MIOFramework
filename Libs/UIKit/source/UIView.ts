@@ -364,7 +364,7 @@ export class UIView extends NSObject {
         this.didChangeValue("frame");
 
         if (UIView.animationsChanges != null) {
-            let animation = { "View": this, "Key": "left", "EndValue": x + "px" };
+            let animation = { "View": this, "Key": "x", "EndValue": x + "px" };
             UIView.animationsChanges.addObject(animation);
         }
         else {
@@ -384,7 +384,7 @@ export class UIView extends NSObject {
         this.didChangeValue("frame");
 
         if (UIView.animationsChanges != null) {
-            let animation = { "View": this, "Key": "top", "EndValue": y + "px" };
+            let animation = { "View": this, "Key": "y", "EndValue": y + "px" };
             UIView.animationsChanges.addObject(animation);
         }
         else {
@@ -452,18 +452,22 @@ export class UIView extends NSObject {
         this.setHeight(h);
     }
 
-    setFrame(frame) {
+    setFrame(frame:CGRect) {
         this.willChangeValue("frame");
         this.setFrameComponents(frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
         this.didChangeValue("frame");
     }
 
     get frame() {
-        return CGRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        return _create(CGRect, 'initXIntYIntWidthIntHeightInt', this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    }
+
+    set frame(frame:CGRect){
+        this.setFrame(frame);
     }
 
     public get bounds() {
-        return CGRect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
+        return _create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, this.getWidth(), this.getHeight());
     }
 
     //
@@ -587,28 +591,13 @@ export class UIView extends NSObject {
             let key = anim["Key"];
             let value = anim["EndValue"];
 
-            view.layer.style.transition = key + " " + duration + "s";
-            switch (key) {
-                case "opacity":
-                    view.layer.style.opacity = value;
-                    break;
+            let cssProp =
+                key === 'x' ? 'left' :
+                key === 'y' ? 'top' :
+                key
 
-                case "x":
-                    view.layer.style.left = value;
-                    break;
-
-                case "y":
-                    view.layer.style.top = value;
-                    break;
-
-                case "width":
-                    view.layer.style.width = value;
-                    break;
-
-                case "height":
-                    view.layer.style.height = value;
-                    break;
-            }
+            view.layer.style.transition = (view.layer.style.transition ? view.layer.style.transition + ", " : "") + cssProp + " " + duration + "s";
+            setTimeout(() => view.layer.style[cssProp] = value)
 
             UIView.addTrackingAnimationView(view);
         }

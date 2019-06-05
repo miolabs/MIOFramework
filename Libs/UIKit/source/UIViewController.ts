@@ -1,5 +1,5 @@
 import { NSObject } from "mio-foundation-web";
-import { NSSize } from "mio-foundation-web";
+import { CGSize } from "mio-foundation-web";
 import { NSLocalizeString } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
@@ -56,11 +56,11 @@ export class UIViewController extends NSObject {
     splitViewController: UISplitViewController = null;
     tabBarController/*TODO: UITabBarController*/ = null;
 
-    modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
+    modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.fullScreen : UIModalPresentationStyle.pageSheet;
     modalTransitionStyle = UIModalTransitionStyle.CoverVertical;
     transitioningDelegate = null;
 
-    protected _contentSize = new NSSize(320, 200);
+    protected _contentSize = new CGSize(320, 200);
     protected _preferredContentSize = null;
 
     constructor(layerID?) {
@@ -126,11 +126,12 @@ export class UIViewController extends NSObject {
             return;
         }
 
-        this.view = new UIView(this.layerID);
+        this.view = new UIView(this.layerID);        
 
         if (this._htmlResourcePath == null) {
             this.view.init();
             MUICoreLayerAddStyle(this.view.layer, "view-controller");
+            //this.view.layer.style.height = "100%";
             this._didLoadView();
             return;
         }
@@ -192,6 +193,10 @@ export class UIViewController extends NSObject {
             this.viewDidLoad();
             this._loadChildControllers();
         }
+        else if (this._htmlResourcePath == null){
+            this.viewDidLoad();
+            this._loadChildControllers();
+        }
     }
 
     protected _loadChildControllers() {
@@ -206,7 +211,7 @@ export class UIViewController extends NSObject {
     protected _loadChildViewController(index, max) {
         if (index < max) {
             let vc = this._childViewControllers[index];
-            vc.onLoadView(this, function () {
+            vc.onLoadView(this, function (this: UIViewController) {
 
                 let newIndex = index + 1;
                 this._loadChildViewController(newIndex, max);
@@ -312,7 +317,7 @@ export class UIViewController extends NSObject {
     }
 
     showViewController(vc, animated) {
-        vc.onLoadView(this, function () {
+        vc.onLoadView(this, function (this: UIViewController) {
 
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);
@@ -351,10 +356,15 @@ export class UIViewController extends NSObject {
         //     && vc.modalPresentationStyle != UIModalPresentationStyle.Custom)
         //     vc.modalPresentationStyle = UIModalPresentationStyle.PageSheet;
 
-        vc.onLoadView(this, function () {
+        vc.onLoadView(this, function (this: UIViewController) {
 
-            if (vc.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
-                this.view.addSubview(vc.presentationController.presentedView);
+            if (vc.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
+                let wv = new UIView();
+                wv.init();
+                MUICoreLayerAddStyle(wv.layer, "window");
+                MUICoreLayerAddStyle(wv.layer, "alert");
+                this.view.addSubview(wv);
+                wv.addSubview(vc.presentationController.presentedView);
                 this.addChildViewController(vc);
                 _MUIShowViewController(this, vc, null, animated, this, function () {
                 });
@@ -393,7 +403,7 @@ export class UIViewController extends NSObject {
 
         _MUIHideViewController(fromVC, toVC, null, this, function () {
 
-            if (fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+            if (fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
                 toVC.removeChildViewController(fromVC);
                 let pc1 = fromVC.presentationController;
                 let view = pc1.presentedView;

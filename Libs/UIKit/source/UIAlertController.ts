@@ -1,5 +1,5 @@
 import { NSObject } from "mio-foundation-web";
-import { NSSize } from "mio-foundation-web";
+import { CGSize } from "mio-foundation-web";
 import { NSIndexPath } from "mio-foundation-web";
 import { UITextField } from "./UITextField";
 import { UIViewController } from "./UIViewController";
@@ -70,13 +70,9 @@ export class UIAlertAction extends UIAlertItem
         static get destructive() {return Object.assign(new UIAlertAction.Style(), {rawValue: 2})}
     }
 
-    static alertActionWithTitle(title:string, style:any/*UIAlertAction.Style*/, target, completion):UIAlertAction{
-        let action = new UIAlertAction();
-        action.initWithTitle(title, style);
-        action.target = target;
-        action.completion = completion;
-
-        return action;
+    initTitleOptionalStyleUIAlertActionStyleHandlerOptional(title:string, style:any/*UIAlertAction.Style*/, completion){
+        this.initWithTitle(title, style);
+        this.completion = completion;
     }
 
     initWithTitle(title, style){
@@ -106,7 +102,7 @@ export class UIAlertController extends UIViewController
 
     private _headerCell = null;
 
-    private _alertViewSize = new NSSize(320, 50);
+    private _alertViewSize = new CGSize(320, 50);
 
     static Style = class {
         static get actionSheet() {return Object.assign(new UIAlertController.Style(), {rawValue: 0})}
@@ -116,7 +112,7 @@ export class UIAlertController extends UIViewController
     initWithTitle(title:string, message:string, style:UIAlertViewStyle){
         super.init();
 
-        this.modalPresentationStyle = UIModalPresentationStyle.FormSheet;
+        this.modalPresentationStyle = UIModalPresentationStyle.formSheet;
 
         this._title = title;
         this._message = message;
@@ -196,7 +192,7 @@ export class UIAlertController extends UIViewController
 
     private _calculateContentSize(){
         let h = 80 + (this._items.length * 50) + 1;
-        this._alertViewSize = new NSSize(320, h);
+        this._alertViewSize = new CGSize(320, h);
     }
 
     numberOfSectionsIn(tableview:UITableView){
@@ -215,10 +211,10 @@ export class UIAlertController extends UIViewController
         else{
             let item = this._items[indexPath.row - 1];
             if (item.type == UIAlertItemType.Action) {
-                cell = this._createActionCellWithTitle(item.title, item.style);
+                cell = this._createActionCellWithTitle((item as UIAlertAction).title, (item as UIAlertAction).style);
             }
             else if (item.type == UIAlertItemType.TextField) {
-                cell = this._createTextFieldCell(item.textField);
+                cell = this._createTextFieldCell((item as UIAlertTextField).textField);
             }
         }
 
@@ -246,9 +242,7 @@ export class UIAlertController extends UIViewController
         let item = this._items[indexPath.row - 1];
         if (item.type == UIAlertItemType.Action) {
             
-            if (item.target != null && item.completion != null)
-                item.completion.call(item.target);
-            
+            if (item.completion != null) item.completion();            
             this.dismissViewController(true);
         }
     }

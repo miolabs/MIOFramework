@@ -26,7 +26,7 @@ export class UIPageController extends UIViewController
         else {
             let vc = this.childViewControllers[0];
             this.view.addSubview(vc.view);
-            vc.onLoadView(this, function () {
+            vc.onLoadView(this, function (this: UIPageController) {
 
                 this._setViewLoaded(true);
             });

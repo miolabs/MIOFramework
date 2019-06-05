@@ -1,4 +1,4 @@
-import { Project, BinaryExpression, PropertyDeclaration, ParameterDeclaration, ClassInstancePropertyTypes, ReferencedSymbol, SetAccessorDeclaration, GetAccessorDeclaration, ReturnStatement } from "ts-morph"
+import { Project, BinaryExpression, PropertyDeclaration, ParameterDeclaration, ClassInstancePropertyTypes, ReferencedSymbol, SetAccessorDeclaration, GetAccessorDeclaration, ReturnStatement, CallExpression } from "ts-morph"
 import fs = require('fs')
 
 const module = process.argv[2]
@@ -29,8 +29,7 @@ let replacements = []
 
 for(let optional of optionals) {
   //console.log('----------------------')
-  //console.log(optional)
-  let ok = optional[optional.length - 1] === 'window'
+  //console.log(JSON.stringify(optional))
   for(const referencedSymbol of getReferences(optional)) {
     for(let reference of referencedSymbol.getReferences()) {
 
@@ -44,6 +43,26 @@ for(let optional of optionals) {
 
       let isParameter = reference.getNode().getParent().getKindName() === 'Parameter'
       if(isParameter) {
+        for(const referencedSymbol of getReferences(optional.slice(0, optional.length - 4))) {
+          for(let reference of referencedSymbol.getReferences()) {
+            let callExpression = reference.getNode() as CallExpression
+            while(callExpression) {
+              if(callExpression.getKindName() === 'CallExpression') break
+              callExpression = callExpression.getParent()
+            }
+            if(!callExpression) continue
+            let arg = callExpression.getArguments()[optional[optional.length - 2]]
+            replacements.push({
+              file: arg.getSourceFile().getFilePath(),
+              range: [arg.getStart(), arg.getStart()],
+              text: '_injectIntoOptional('
+            }, {
+              file: reference.getSourceFile().getFilePath(),
+              range: [arg.getEnd(), arg.getEnd()],
+              text: ')'
+            })
+          }
+        }
         continue
       }
 
@@ -133,7 +152,10 @@ for(let optional of optionals) {
   }
 }
 
+let iteratedRenames = {}
 for(let rename of renames) {
+  if(iteratedRenames[JSON.stringify(rename.chain)]) continue
+  iteratedRenames[JSON.stringify(rename.chain)] = true
   for(const referencedSymbol of getReferences(rename.chain)) {
     for(let reference of referencedSymbol.getReferences()) {
       replacements.push({
@@ -147,13 +169,15 @@ for(let rename of renames) {
 
 replacements.sort((a, b) => a.range[0] < b.range[1] ? 1 : -1)
 
-//console.log(replacements)
+//console.dir(replacements, {'maxArrayLength': null})
 
 for(let replacement of replacements) {
   let file = project.getSourceFile(replacement.file)
 
   file.replaceText(replacement.range, replacement.text)
 }
+
+//console.log('!!!', project.getSourceFile("UIKit.web.ts").getText())
 
 /*for(let sourceFile of project.getSourceFiles()) {
   let path = sourceFile.getFilePath()

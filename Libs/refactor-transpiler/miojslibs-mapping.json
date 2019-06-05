@@ -9,9 +9,6 @@
     "initTitleOptionalMessageOptionalPreferredStyleUIAlertControllerStyle": "initWithTitle",
     "addTextFieldConfigurationHandler": "addTextFieldWithConfigurationHandler"
   },
-  "UIAlertAction": {
-    "initTitleOptionalStyleUIAlertActionStyleHandlerOptional": "initWithTitle"
-  },
   "UIViewController": {
     "presentAnimatedCompletion": "presentViewController",
     "initCoderNSCoder": "initWithCoder",
@@ -20,6 +17,9 @@
     "shouldPerformSegueWithIdentifierSender": "shouldPerformSegueWithIdentifier",
     "prepareForSegueSender": "prepareForSegue",
     "performSegueWithIdentifierSender": "performSegueWithIdentifier"
+  },
+  "UIButton": {
+    "setTitleFor": "setTitle"
   },
   "UIControl": {
     "addTargetActionForControlEvents": "addTarget",
@@ -51,8 +51,6 @@
   },
   "UISplitViewController": {
     "showDetailViewControllerSender": "showDetailViewController",
-    "displayMode": "displayModeButtonItemAction",
-    "displayModeButtonItem": "displayModeButtonItemAction",
     "initNameStringBundleOptional": "initWithName"
   },
   "UIStoryboardSegue": {
@@ -69,8 +67,7 @@
     "setEditingAnimated": "setEditing"
   },
   "Bundle": {
-    "initUrlURL": "initWithURL",
-    "initURLURL": "initUrlURL"
+    "initUrlURL": "initWithURL"
   },
   "Formatter": {
     "getObjectValueForStringErrorDescription": "getObjectValueForString",
@@ -102,8 +99,7 @@
     "evaluateWithObjectSubstitutionVariables": "evaluateObject"
   },
   "NSSet": {
-    "filteredSetUsingPredicate": "filterWithPredicate",
-    "addObserverForKeyPathOptionsContext": "addObserver"
+    "filteredSetUsingPredicate": "filterWithPredicate"
   },
   "NSURL": {
     "initSchemeStringHostOptionalPathString": "initWithScheme",
@@ -113,25 +109,17 @@
     "initRequestURLRequestDelegateOptional": "NSURLConnection"
   },
   "NSURLRequest": {
-    "initUrlURL": "initWithURL",
-    "initURLURL": "initWithURL"
-  },
-  "NotificationCenter": {
-    "addObserverForNameObjectQueueUsingBlock": "addObserver"
+    "initUrlURL": "initWithURL"
   },
   "NumberFormatter": {
     "isPartialStringValidationEnabled": "isPartialStringValid"
   },
   "Timer": {
-    "initTimeIntervalTimeIntervalRepeatsBoolBlockfunction_type": "initWithTimeInterval",
+    "initTimeIntervalTimeIntervalRepeatsBoolBlockfunction_type": "initWithTimeInterval"
   },
   "UserDefaults": {
     "setBoolForKey": "setBooleanForKey",
     "setForKey": "setValueForKey",
     "removeObjectForKey": "removeValueForKey"
-  },
-  "XMLParserDelegate": {
-    "parserDidStartElementNamespaceURIQualifiedNameAttributes": "parserDidStartElement",
-    "parserDidEndElementNamespaceURIQualifiedName": "parserDidEndElement"
   }
 }

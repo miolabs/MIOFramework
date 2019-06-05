@@ -8,10 +8,9 @@ import { NSClassFromString } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
 import { CGRect } from "mio-foundation-web";
 import { NSFormatter } from "mio-foundation-web";
-import { NSSize } from "mio-foundation-web";
+import { CGSize } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
 import { NSCoder } from "mio-foundation-web";
-import { NSRect } from "mio-foundation-web";
 import { MIOCoreIsMobile } from "mio-foundation-web";
 import { NSTimer } from "mio-foundation-web";
 import { MIOCoreGetPlatform } from "mio-foundation-web";
@@ -1295,7 +1294,7 @@ export class UIView extends NSObject {
         this.didChangeValue("frame");
 
         if (UIView.animationsChanges != null) {
-            let animation = { "View": this, "Key": "left", "EndValue": x + "px" };
+            let animation = { "View": this, "Key": "x", "EndValue": x + "px" };
             UIView.animationsChanges.addObject(animation);
         }
         else {
@@ -1315,7 +1314,7 @@ export class UIView extends NSObject {
         this.didChangeValue("frame");
 
         if (UIView.animationsChanges != null) {
-            let animation = { "View": this, "Key": "top", "EndValue": y + "px" };
+            let animation = { "View": this, "Key": "y", "EndValue": y + "px" };
             UIView.animationsChanges.addObject(animation);
         }
         else {
@@ -1383,18 +1382,22 @@ export class UIView extends NSObject {
         this.setHeight(h);
     }
 
-    setFrame(frame) {
+    setFrame(frame:CGRect) {
         this.willChangeValue("frame");
         this.setFrameComponents(frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
         this.didChangeValue("frame");
     }
 
     get frame() {
-        return CGRect.rectWithValues(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        return _create(CGRect, 'initXIntYIntWidthIntHeightInt', this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    }
+
+    set frame(frame:CGRect){
+        this.setFrame(frame);
     }
 
     public get bounds() {
-        return CGRect.rectWithValues(0, 0, this.getWidth(), this.getHeight());
+        return _create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, this.getWidth(), this.getHeight());
     }
 
     //
@@ -1518,28 +1521,13 @@ export class UIView extends NSObject {
             let key = anim["Key"];
             let value = anim["EndValue"];
 
-            view.layer.style.transition = key + " " + duration + "s";
-            switch (key) {
-                case "opacity":
-                    view.layer.style.opacity = value;
-                    break;
+            let cssProp =
+                key === 'x' ? 'left' :
+                key === 'y' ? 'top' :
+                key
 
-                case "x":
-                    view.layer.style.left = value;
-                    break;
-
-                case "y":
-                    view.layer.style.top = value;
-                    break;
-
-                case "width":
-                    view.layer.style.width = value;
-                    break;
-
-                case "height":
-                    view.layer.style.height = value;
-                    break;
-            }
+            view.layer.style.transition = (view.layer.style.transition ? view.layer.style.transition + ", " : "") + cssProp + " " + duration + "s";
+            setTimeout(() => view.layer.style[cssProp] = value)
 
             UIView.addTrackingAnimationView(view);
         }
@@ -1674,36 +1662,12 @@ export class UILabel extends UIView
  * Created by godshadow on 12/3/16.
  */
 
- export enum UIControlEvents
- {
-     TouchDown = 1 <<  0,
-     TouchDownRepeat = 1 <<  1,
-     TouchDragInside = 1 <<  2,
-     TouchDragOutside = 1 <<  3,
-     TouchDragEnter = 1 <<  4,
-     TouchDragExit = 1 <<  5,
-     TouchUpInside = 1 <<  6,
-     TouchUpOutside = 1 <<  7,
-     TouchCancel = 1 <<  8,
-     ValueChanged = 1 << 12,
-     PrimaryActionTriggered = 1 << 13,
-     EditingDidBegin = 1 << 16,
-     EditingChanged = 1 << 17,
-     EditingDidEnd = 1 << 18,
-     EditingDidEndOnExit = 1 << 19,
-     AllTouchEvents = 0x00000FFF,
-     EditingEvents = 0x000F0000,
-     ApplicationReserved = 0x0F000000,
-     SystemReserved = 0xF0000000,
-     AllEvents = 0xFFFFFFFF
- }
-
 function MUICoreControlParseEventTypeString(eventTypeString:string){
 
-    if (eventTypeString == null) return UIControlEvents.AllEvents;
+    if (eventTypeString == null) return UIControl.Event.allEvents;
 
     let value = eventTypeString[0].toUpperCase() + eventTypeString.substr(1);
-    return UIControlEvents[value];
+    return UIControl.Event[value];
 }
 
 export class UIControl extends UIView
@@ -1761,13 +1725,13 @@ export class UIControl extends UIView
                     segue._sender = this;
                     segue.perform();
 
-                }, UIControlEvents.AllEvents);                
+                }, UIControl.Event.allEvents);                
             }    
         }        
     }
 
     private actions = [];    
-    addTarget(target, action, controlEvents:UIControlEvents){
+    addTarget(target, action, controlEvents:any/*UIControl.Event*/){
         
         if (action == null) throw new Error("UIControl: Can't add null action");
 
@@ -1779,7 +1743,7 @@ export class UIControl extends UIView
         this.actions.push(item);
     }
 
-    protected _performActionsForEvents(events:UIControlEvents){
+    protected _performActionsForEvents(events:any/*UIControl.Event*/){
 
         for (let index = 0; index < this.actions.length; index++){
             let action = this.actions[index];
@@ -1857,7 +1821,41 @@ export class UIControl extends UIView
                  instance.mouseOutAction.call(target);
          }
     }
+
+    static State = class {
+        static normal = 0
+        static highlighted = 1
+        static disabled = 2
+        static selected = 3
+        static focused = 4
+        static application = 5
+        static reserved = 6
+    }
+
+    static Event = class {
+        static touchDown = 1 <<  0
+        static touchDownRepeat = 1 <<  1
+        static touchDragInside = 1 <<  2
+        static touchDragOutside = 1 <<  3
+        static touchDragEnter = 1 <<  4
+        static touchDragExit = 1 <<  5
+        static touchUpInside = 1 <<  6
+        static touchUpOutside = 1 <<  7
+        static touchCancel = 1 <<  8
+        static valueChanged = 1 << 12
+        static primaryActionTriggered = 1 << 13
+        static editingDidBegin = 1 << 16
+        static editingChanged = 1 << 17
+        static editingDidEnd = 1 << 18
+        static editingDidEndOnExit = 1 << 19
+        static allTouchEvents = 0x00000FFF
+        static editingEvents = 0x000F0000
+        static applicationReserved = 0x0F000000
+        static systemReserved = 0xF0000000
+        static allEvents = 0xFFFFFFFF
+    }
 }
+
 
 
 
@@ -1890,6 +1888,12 @@ export class UIButton extends UIControl
 
     init(){
         super.init();
+        MUICoreLayerAddStyle(this.layer, "btn");
+        this.setupLayers();
+    }
+
+    initFrameCGRect(frame: CGRect) {
+        super.initFrameCGRect(frame);
         MUICoreLayerAddStyle(this.layer, "btn");
         this.setupLayers();
     }
@@ -1960,7 +1964,7 @@ export class UIButton extends UIControl
             if (this.enabled == false) return;            
             if (this.type == UIButtonType.MomentaryPushIn) this.setSelected(false);
 
-            this._performActionsForEvents(UIControlEvents.TouchUpInside);
+            this._performActionsForEvents(UIControl.Event.touchUpInside);
 
             // if (this.action != null && this.target != null)
             //     this.action.call(this.target, this);
@@ -1978,6 +1982,10 @@ export class UIButton extends UIControl
 
     get title(){
         return this._titleLayer.innerHTML;
+    }
+
+    setTitleColorFor(color: UIColor) {
+        this._titleLayer.style.color = "#" + color.hex;
     }
 
     setImageURL(urlString:string){
@@ -2293,7 +2301,7 @@ export class UISegmentedControl extends UIControl
 
     private _addSegmentedItem(item:UIButton){
         this.segmentedItems.push(item);
-        item.addTarget(this, this._didClickSegmentedButton, UIControlEvents.AllTouchEvents);
+        item.addTarget(this, this._didClickSegmentedButton, UIControl.Event.allTouchEvents);
     }
 
     private _didClickSegmentedButton(button){
@@ -2317,7 +2325,7 @@ export class UISegmentedControl extends UIControl
         let item = this.segmentedItems[this.selectedSegmentIndex];
         item.setSelected(true);
 
-        this._performActionsForEvents(UIControlEvents.ValueChanged);
+        this._performActionsForEvents(UIControl.Event.valueChanged);
     }
 }
 
@@ -2364,7 +2372,7 @@ export class UISwitch extends UIControl
         this._inputLayer.checked = value;
         this._on = value;
 
-        this._performActionsForEvents(UIControlEvents.ValueChanged);
+        this._performActionsForEvents(UIControl.Event.valueChanged);
     }
 
     private _toggleValue(){
@@ -2430,11 +2438,11 @@ export class UIViewController extends NSObject {
     splitViewController: UISplitViewController = null;
     tabBarController/*TODO: UITabBarController*/ = null;
 
-    modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.FullScreen : UIModalPresentationStyle.PageSheet;
+    modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.fullScreen : UIModalPresentationStyle.pageSheet;
     modalTransitionStyle = UIModalTransitionStyle.CoverVertical;
     transitioningDelegate = null;
 
-    protected _contentSize = new NSSize(320, 200);
+    protected _contentSize = new CGSize(320, 200);
     protected _preferredContentSize = null;
 
     constructor(layerID?) {
@@ -2500,11 +2508,12 @@ export class UIViewController extends NSObject {
             return;
         }
 
-        this.view = new UIView(this.layerID);
+        this.view = new UIView(this.layerID);        
 
         if (this._htmlResourcePath == null) {
             this.view.init();
             MUICoreLayerAddStyle(this.view.layer, "view-controller");
+            //this.view.layer.style.height = "100%";
             this._didLoadView();
             return;
         }
@@ -2566,6 +2575,10 @@ export class UIViewController extends NSObject {
             this.viewDidLoad();
             this._loadChildControllers();
         }
+        else if (this._htmlResourcePath == null){
+            this.viewDidLoad();
+            this._loadChildControllers();
+        }
     }
 
     protected _loadChildControllers() {
@@ -2580,7 +2593,7 @@ export class UIViewController extends NSObject {
     protected _loadChildViewController(index, max) {
         if (index < max) {
             let vc = this._childViewControllers[index];
-            vc.onLoadView(this, function () {
+            vc.onLoadView(this, function (this: UIViewController) {
 
                 let newIndex = index + 1;
                 this._loadChildViewController(newIndex, max);
@@ -2686,7 +2699,7 @@ export class UIViewController extends NSObject {
     }
 
     showViewController(vc, animated) {
-        vc.onLoadView(this, function () {
+        vc.onLoadView(this, function (this: UIViewController) {
 
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);
@@ -2725,10 +2738,15 @@ export class UIViewController extends NSObject {
         //     && vc.modalPresentationStyle != UIModalPresentationStyle.Custom)
         //     vc.modalPresentationStyle = UIModalPresentationStyle.PageSheet;
 
-        vc.onLoadView(this, function () {
+        vc.onLoadView(this, function (this: UIViewController) {
 
-            if (vc.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
-                this.view.addSubview(vc.presentationController.presentedView);
+            if (vc.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
+                let wv = new UIView();
+                wv.init();
+                MUICoreLayerAddStyle(wv.layer, "window");
+                MUICoreLayerAddStyle(wv.layer, "alert");
+                this.view.addSubview(wv);
+                wv.addSubview(vc.presentationController.presentedView);
                 this.addChildViewController(vc);
                 _MUIShowViewController(this, vc, null, animated, this, function () {
                 });
@@ -2767,7 +2785,7 @@ export class UIViewController extends NSObject {
 
         _MUIHideViewController(fromVC, toVC, null, this, function () {
 
-            if (fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+            if (fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
                 toVC.removeChildViewController(fromVC);
                 let pc1 = fromVC.presentationController;
                 let view = pc1.presentedView;
@@ -2782,7 +2800,7 @@ export class UIViewController extends NSObject {
         });
     }
 
-    transitionFromViewControllerToViewController(fromVC, toVC, duration, animationType, target?, completion?) {
+    transitionFromViewControllerToViewController(fromVC, toVC, duration, options, animations?, completion?) {
         //TODO
     }
 
@@ -2889,21 +2907,23 @@ export class UIViewController extends NSObject {
 
 
 
+
+
 /**
  * Created by godshadow on 06/12/2016.
  */
 
 export enum UIModalPresentationStyle
 {
-    FullScreen,
-    PageSheet, // normal modal sheet in osx
-    FormSheet, // normal modal like floating window but horizontal and vertically centered
-    CurrentContext,
-    Custom,
-    OverFullScreen,     // Similar to FullScreen but the view beneath doesnpt dissappear
-    OverCurrentContext, // Similuar like previus, but in current context
-    Popover, // the popover, almost like FormSheet but no centered
-    None
+    fullScreen,
+    pageSheet, // normal modal sheet in osx
+    formSheet, // normal modal like floating window but horizontal and vertically centered
+    currentContext,
+    custom,
+    overFullScreen,     // Similar to FullScreen but the view beneath doesnpt dissappear
+    overCurrentContext, // Similuar like previus, but in current context
+    popover, // the popover, almost like FormSheet but no centered
+    none
 }
 
 export enum UIModalTransitionStyle
@@ -2915,7 +2935,7 @@ export enum UIModalTransitionStyle
 
 export class UIPresentationController extends NSObject
 {
-    presentationStyle = UIModalPresentationStyle.PageSheet;
+    presentationStyle = UIModalPresentationStyle.pageSheet;
     shouldPresentInFullscreen = false;
 
     protected _presentedViewController:UIViewController = null; //ToVC
@@ -2962,9 +2982,9 @@ export class UIPresentationController extends NSObject
 
         this._calculateFrame();
 
-        if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet 
-            || toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
-            || toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.pageSheet 
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.formSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
             || MIOCoreIsPhone() == true){
             MUICoreLayerAddStyle(view.layer, "modal_window");
         }       
@@ -2980,66 +3000,66 @@ export class UIPresentationController extends NSObject
     }
 
     _calculateFrame(){
-        let fromVC = this.presentingViewController;
-        let toVC = this.presentedViewController;
-        let view = this.presentedView;
+        let fromVC: UIViewController = this.presentingViewController;
+        let toVC: UIViewController = this.presentedViewController;
+        let view: UIView = this.presentedView;
 
-        if (toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen){
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen){
             view.layer.style.left = "0px";
             view.layer.style.top = "0px";
             view.layer.style.width = "100%";
             view.layer.style.height = "100%";
         }
-        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext)
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.currentContext)
         {
             let w = fromVC.view.getWidth();
             let h = fromVC.view.getHeight();
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
         }
-        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet)
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.pageSheet)
         {
             // Present like desktop sheet window
             let ws = MUIWindowSize();
 
             let size = toVC.preferredContentSize;
-            if (size == null) size = new NSSize(320, 200);
+            if (size == null) size = new CGSize(320, 200);
 
             let w = size.width;
             let h = size.height;
             let x = (ws.width - w) / 2;
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-            this.window.setFrame(NSRect.rectWithValues(x, 0, w, h))
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+            this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, 0, w, h))
 
             view.layer.classList.add("modal");
         }
-        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet)
+        else if (toVC.modalPresentationStyle == UIModalPresentationStyle.formSheet)
         {
             // Present at the center of the screen
             let ws = MUIWindowSize();
 
             let size = toVC.preferredContentSize;
-            if (size == null) size = new NSSize(320, 200);
+            if (size == null) size = new CGSize(320, 200);
 
             let w = size.width;
             let h = size.height;
             let x = (ws.width - w) / 2;
             let y = (ws.height - h) / 2;
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-            this.window.setFrame(NSRect.rectWithValues(x, y, w, h))
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+            this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, y, w, h))
 
             view.layer.classList.add("modal");
         }
         else
         {
             let size = toVC.preferredContentSize;
-            if (size == null) size = new NSSize(320, 200);
+            if (size == null) size = new CGSize(320, 200);
             let w = size.width;
             let h = size.height;
 
-            view.setFrame(NSRect.rectWithValues(0, 0, w, h));
+            view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
         }        
     }
 
@@ -3052,7 +3072,7 @@ export class UIPresentationController extends NSObject
         this._window = window;
         
         // Track view frame changes
-        if (MIOCoreIsMobile() == false && vc.modalPresentationStyle != UIModalPresentationStyle.CurrentContext){
+        if (MIOCoreIsMobile() == false && vc.modalPresentationStyle != UIModalPresentationStyle.currentContext){
             vc.addObserver(this, "preferredContentSize");
         }
     }
@@ -3138,9 +3158,9 @@ export class UIModalPresentAnimationController extends NSObject
 
         let toVC = transitionContext.presentedViewController;
 
-        if (toVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet 
-            || toVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
-            || toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen){
+        if (toVC.modalPresentationStyle == UIModalPresentationStyle.pageSheet 
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.formSheet
+            || toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen){
             
             if (MIOCoreIsPhone() == true)
                 animations = MUIClassListForAnimationType(MUIAnimationType.SlideInUp);
@@ -3172,9 +3192,9 @@ export class UIModalDismissAnimationController extends NSObject
 
         let fromVC = transitionContext.presentingViewController;
 
-        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.PageSheet 
-            || fromVC.modalPresentationStyle == UIModalPresentationStyle.FormSheet
-            || fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen){
+        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.pageSheet 
+            || fromVC.modalPresentationStyle == UIModalPresentationStyle.formSheet
+            || fromVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen){
             
             if (MIOCoreIsPhone() == true)                        
                 animations = MUIClassListForAnimationType(MUIAnimationType.SlideOutDown);
@@ -3217,7 +3237,7 @@ export class UIPopoverPresentationController extends UIPresentationController
     permittedArrowDirections = UIPopoverArrowDirection.Any;
 
     sourceView = null;
-    sourceRect = NSRect.Zero();
+    sourceRect = CGRect.Zero();
 
     delegate = null;
 
@@ -3284,8 +3304,8 @@ export class UIPopoverPresentationController extends UIPresentationController
                 x = v.layer.getBoundingClientRect().left - w - 10;
         }
 
-        view.setFrame(NSRect.rectWithValues(0, 0, w, h));
-        this.window.setFrame(NSRect.rectWithValues(x, y, w, h))
+        view.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', 0, 0, w, h));
+        this.window.setFrame(_create(CGRect, 'initXIntYIntWidthIntHeightInt', x, y, w, h))
     }
 
     private _drawRoundRect(x, y, width, height, radius) {
@@ -3558,16 +3578,16 @@ export class UIScrollView extends UIView {
         return p;
     }
 
-    get bounds():NSRect{
+    get bounds():CGRect{
         let p = this.contentOffset;
-        return NSRect.rectWithValues(p.x, p.y, this.getWidth(), this.getHeight());
+        return _create(CGRect, 'initXIntYIntWidthIntHeightInt', p.x, p.y, this.getWidth(), this.getHeight());
     }
 
     addSubview(view:UIView, index?) {
         this.contentView.addSubview(view, index);
     }
 
-    set contentSize(size: NSSize) {
+    set contentSize(size: CGSize) {
         if (size.width > 0) {
             this.contentView.setWidth(size.width);
         }
@@ -3702,11 +3722,11 @@ export class UITableView extends UIView
         // tapGesture.initWithTarget(this, this.cellDidTap);
         // cell.addGestureRecognizer(tapGesture);
 
-        cell._target = this;
-        cell._onClickFn = this.cellOnClickFn;
+        // cell._target = this;
+        // cell._onClickFn = this.cellOnClickFn;
         //cell._onDblClickFn = this.cellOnDblClickFn;
         //cell._onAccessoryClickFn = this.cellOnAccessoryClickFn;
-        cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
+        // cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
 
         return cell;
     }
@@ -3755,6 +3775,11 @@ export class UITableView extends UIView
             section.addObject(cell);
         }        
 
+        cell._target = this;
+        cell._onClickFn = this.cellOnClickFn;
+        //cell._onDblClickFn = this.cellOnDblClickFn;
+        //cell._onAccessoryClickFn = this.cellOnAccessoryClickFn;
+        cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
     }
 
     private removeCell(indexPath){        
@@ -4169,13 +4194,18 @@ export class UITableViewCell extends UIView {
     private _setupLayer() {
         //this.layer.style.position = "absolute";        
 
+        this.layer.addEventListener("click", function(e) {
+            e.stopPropagation();            
+            this._onClickFn.call(this._target, this);
+        }.bind(this));
+
         let instance = this;
-        this.layer.onclick = function (e) {
-            if (instance._onClickFn != null) {
-                e.stopPropagation();
-                instance._onClickFn.call(instance._target, instance);
-            }
-        };
+        // this.layer.onclick = function (e) {
+        //     if (instance._onClickFn != null) {
+        //         e.stopPropagation();
+        //         instance._onClickFn.call(instance._target, instance);
+        //     }
+        // };
 
         this.layer.ondblclick = function (e) {
             if (instance._onDblClickFn != null) {
@@ -4384,13 +4414,9 @@ export class UIAlertAction extends UIAlertItem
         static get destructive() {return Object.assign(new UIAlertAction.Style(), {rawValue: 2})}
     }
 
-    static alertActionWithTitle(title:string, style:any/*UIAlertAction.Style*/, target, completion):UIAlertAction{
-        let action = new UIAlertAction();
-        action.initWithTitle(title, style);
-        action.target = target;
-        action.completion = completion;
-
-        return action;
+    initTitleOptionalStyleUIAlertActionStyleHandlerOptional(title:string, style:any/*UIAlertAction.Style*/, completion){
+        this.initWithTitle(title, style);
+        this.completion = completion;
     }
 
     initWithTitle(title, style){
@@ -4420,7 +4446,7 @@ export class UIAlertController extends UIViewController
 
     private _headerCell = null;
 
-    private _alertViewSize = new NSSize(320, 50);
+    private _alertViewSize = new CGSize(320, 50);
 
     static Style = class {
         static get actionSheet() {return Object.assign(new UIAlertController.Style(), {rawValue: 0})}
@@ -4430,7 +4456,7 @@ export class UIAlertController extends UIViewController
     initWithTitle(title:string, message:string, style:UIAlertViewStyle){
         super.init();
 
-        this.modalPresentationStyle = UIModalPresentationStyle.FormSheet;
+        this.modalPresentationStyle = UIModalPresentationStyle.formSheet;
 
         this._title = title;
         this._message = message;
@@ -4510,7 +4536,7 @@ export class UIAlertController extends UIViewController
 
     private _calculateContentSize(){
         let h = 80 + (this._items.length * 50) + 1;
-        this._alertViewSize = new NSSize(320, h);
+        this._alertViewSize = new CGSize(320, h);
     }
 
     numberOfSectionsIn(tableview:UITableView){
@@ -4529,10 +4555,10 @@ export class UIAlertController extends UIViewController
         else{
             let item = this._items[indexPath.row - 1];
             if (item.type == UIAlertItemType.Action) {
-                cell = this._createActionCellWithTitle(item.title, item.style);
+                cell = this._createActionCellWithTitle((item as UIAlertAction).title, (item as UIAlertAction).style);
             }
             else if (item.type == UIAlertItemType.TextField) {
-                cell = this._createTextFieldCell(item.textField);
+                cell = this._createTextFieldCell((item as UIAlertTextField).textField);
             }
         }
 
@@ -4547,24 +4573,20 @@ export class UIAlertController extends UIViewController
         return h;
     }
 
-    canSelectCellAtIndexPath(tableview, indexPath:NSIndexPath)
-    {
+    canSelectCellAtIndexPath(tableview, indexPath:NSIndexPath){
         if (indexPath.row == 0) return false;
 
-        var item = this._items[indexPath.row - 1];
+        let item = this._items[indexPath.row - 1];
         if (item.type == UIAlertItemType.Action) return true;
 
         return false;
     }
 
-    didSelectCellAtIndexPath(tableView, indexPath:NSIndexPath)
-    {
-        var item = this._items[indexPath.row - 1];
+    didSelectCellAtIndexPath(tableView, indexPath:NSIndexPath){
+        let item = this._items[indexPath.row - 1];
         if (item.type == UIAlertItemType.Action) {
             
-            if (item.target != null && item.completion != null)
-                item.completion.call(item.target);
-            
+            if (item.completion != null) item.completion();            
             this.dismissViewController(true);
         }
     }
@@ -4629,15 +4651,16 @@ export class UIAlertController extends UIViewController
 
         switch(style.rawValue){
 
-            case UIAlertAction.Style._default.rawValue:                                
+            case UIAlertAction.Style._default.rawValue:
+                MUICoreLayerAddStyle(buttonLabel.layer, "default");
                 break;
 
             case UIAlertAction.Style.cancel.rawValue:                
-                buttonLabel.layer.classList.add("alert");                
+                MUICoreLayerAddStyle(buttonLabel.layer, "cancel");
                 break;
 
             case UIAlertAction.Style.destructive.rawValue:                
-                buttonLabel.layer.classList.add("alert");                
+                MUICoreLayerAddStyle(buttonLabel.layer, "destructive");
                 break;
         }
 
@@ -4817,7 +4840,7 @@ export class UIBarButtonItem extends UIBarItem
                     this.target = owner;
                     this.action = owner[action];
 
-                    button.addTarget(this.target, this.action, UIControlEvents.TouchUpInside);
+                    button.addTarget(this.target, this.action, UIControl.Event.TouchUpInside);
                 }
             }
         }
@@ -4847,6 +4870,7 @@ export class UINavigationBar extends UIView
     private rigthView:UIView = null;
     private setup(){
         MUICoreLayerAddStyle(this.layer, "navigation-bar");
+        this.layer.style.width = "100%";
 
         this.leftView = new UIView();
         this.leftView.init();
@@ -5089,7 +5113,7 @@ export class UINavigationController extends UIViewController
             MUICoreLayerAddStyle(backButton.layer, "system-back-icon");
             backButton.addTarget(vc, function(this:UIViewController){
                 this.navigationController.popViewController(true);
-            }, UIControlEvents.TouchUpInside);
+            }, UIControl.Event.touchUpInside);
 
             let backBarButtonItem = new UIBarButtonItem();
             backBarButtonItem.initWithCustomView(backButton);
@@ -5408,7 +5432,7 @@ export class UISplitViewController extends UIViewController
 
         //if (vc.transitioningDelegate == null) vc.transitioningDelegate = this;
 
-        vc.onLoadView(this, function () {
+        vc.onLoadView(this, function (this: UISplitViewController) {
 
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);
@@ -5543,7 +5567,7 @@ export function MUIWindowSize()
     //var h = document.body.clientHeight;window.innerHeight
     var h = window.innerHeight;
 
-    return new NSSize(w, h);
+    return new CGSize(w, h);
 }
 
 export function _MUIShowViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, animated:boolean, target?, completion?)
@@ -5551,8 +5575,8 @@ export function _MUIShowViewController(fromVC:UIViewController, toVC:UIViewContr
     toVC.viewWillAppear();
     //toVC._childControllersWillAppear();
 
-    if (toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
-        || toVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+    if (toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
+        || toVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
 
         fromVC.viewWillDisappear();
         //fromVC._childControllersWillDisappear();
@@ -5605,8 +5629,8 @@ export function _MUIAnimationDidStart(fromVC:UIViewController, toVC:UIViewContro
     toVC.viewDidAppear();
     //toVC._childControllersDidAppear();
 
-    if (toVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
-        || toVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+    if (toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
+        || toVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
 
         fromVC.viewDidDisappear();
         //fromVC._childControllersDidDisappear();
@@ -5623,8 +5647,8 @@ export function _MUIAnimationDidStart(fromVC:UIViewController, toVC:UIViewContro
 
 export function _MUIHideViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, target?, completion?)
 {
-    if (fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
-        || fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext
+    if (fromVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
+        || fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext
         || MIOCoreIsPhone() == true) {
 
         toVC.viewWillAppear();
@@ -5667,8 +5691,8 @@ export function _MUIHideViewController(fromVC:UIViewController, toVC:UIViewContr
 
     _MUIAnimationStart(layer, ac, animationContext, function () {
 
-        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.FullScreen
-            || fromVC.modalPresentationStyle == UIModalPresentationStyle.CurrentContext) {
+        if (fromVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
+            || fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
 
             toVC.viewDidAppear();
             //toVC._childControllersDidAppear();
