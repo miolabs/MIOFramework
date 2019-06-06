@@ -87,7 +87,7 @@ export class UITableView extends UIView
         if (layer != null) {
             let newLayer = layer.cloneNode(true);
             newLayer.style.display = "";            
-            cell.initWithLayer(newLayer, this);
+            cell.initWithLayer(newLayer, this.owner);
             cell.awakeFromHTML();
         }
 
