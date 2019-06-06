@@ -186,8 +186,7 @@
     </nav>
     <div id="transpiler">
         <div id="source-code-wrapper" class="code-wrapper" spellcheck="false">
-            <div id="source-code" spellcheck="false">
-import Foundation
+            <div id="source-code" spellcheck="false">import Foundation
 import UIKit
 
 //Playground - noun: a place where people can play
@@ -201,18 +200,64 @@ for el in arr {
 }
 
 //Create UIKit objects and see how they look on the web
-let view = UIView(frame: CGRect(x: 0, y: 0, width: 200, height: 50))
-view.backgroundColor = UIColor(displayP3Red: 255, green: 0, blue: 0, alpha: 1)
+//Make any views visible by running `Playground.addSubview(vc.view)` at the end
+class ViewController: UIViewController {
 
-UIView.animate(withDuration: 5) {
-  view.frame = CGRect(x: 100, y: 100, width: 200, height: 50)
+  var view1:UIView!
+
+  override func viewDidLoad(){
+    super.viewDidLoad()
+
+    view1 = UIView(frame: CGRect(x: 30, y: 80, width: 200, height: 50))
+    view1.backgroundColor = UIColor(displayP3Red: 255, green: 166, blue: 0, alpha: 1)
+    view.addSubview(view1)
+
+    let button = UIButton(frame: CGRect(x: 20, y: 20, width: 200, height: 50))
+    button.setTitle("Animate!", for: .normal)
+    button.setTitleColor(UIColor(displayP3Red: 0, green: 0, blue: 255, alpha: 1), for: .normal)
+    view.addSubview(button)
+    button.addTarget(self, action: #selector(buttonAction(sender:)), for: .touchUpInside)
+
+    let button2 = UIButton(frame: CGRect(x: 150, y: 20, width: 200, height: 50))
+    button2.setTitle("ShowAlert", for: .normal)
+    button2.setTitleColor(UIColor(displayP3Red: 0, green: 0, blue: 255, alpha: 1), for: .normal)
+    view.addSubview(button2)
+    button2.addTarget(self, action: #selector(alertButtonAction(sender:)), for: .touchUpInside)
+  }
+
+  @objc func buttonAction(sender: UIButton) {
+    UIView.animate(withDuration: 2) {
+      self.view1.frame = CGRect(x: 140, y: 150, width: 200, height: 50)
+    }
+  }
+
+  @objc func alertButtonAction(sender: UIButton){
+    let avc = UIAlertController(title: "Alert", message: "Add a new movie", preferredStyle: .alert)
+
+      avc.addTextField { (textField:UITextField) in
+      textField.placeholder = "Name"
+    }
+
+    avc.addAction(UIAlertAction.init(title: "OK", style: .default, handler: { (action:UIAlertAction) in
+      guard let title = avc.textFields?[0].text else {
+      return
+    }
+    print("You press OK with text: " + title)
+    }))
+
+    avc.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: { (action:UIAlertAction) in
+      print("You press CANCEL")
+    }))
+
+    present(avc, animated: true, completion: nil)
+  }
 }
 
-Playground.addSubview(view)</div>
+let vc = ViewController()
+Playground.addSubview(vc.view)</div>
         </div>
         <div id="target-code-wrapper" class="code-wrapper">
-            <div id="target-code" spellcheck="false">
-let arr = _create(Array, 'initArrayLiteralArray', [3, 1, 2], {});
+            <div id="target-code" spellcheck="false">let arr = _create(Array, 'initArrayLiteralArray', [3, 1, 2], {});
 arr.sortBy(Int.$lessThan, { $setThis: $val => arr = $val });
 {
   let $el$generator = _cloneStruct(arr.makeIterator({}));
@@ -221,13 +266,73 @@ arr.sortBy(Int.$lessThan, { $setThis: $val => arr = $val });
     if (!((($ifLet0 = $el$generator.next({ $setThis: $val => $el$generator = $val })) || true) && $ifLet0.rawValue == 'some' && ((el_1 = $ifLet0[0]) || true))) break
     printSeparatorTerminator(_create(Array, 'initArrayLiteralArray', [el_1], {}), null, null);
   }
-};</div>
+};
+class ViewController extends UIViewController {
+  view1$internal
+  view1$get() { return this.view1$internal }
+  get view1() { return this.view1$get() }
+  view1$set($newValue) {
+    let $oldValue = this.view1$internal
+    this.view1$internal = $newValue
+  }
+  set view1($newValue) { this.view1$set($newValue) };
+  viewDidLoad($info?) {
+    let _this = this;
+    super.viewDidLoad({});
+    _this.view1 = _injectIntoOptional(_create(UIView, 'initFrameCGRect', _create(CGRect, 'initXIntYIntWidthIntHeightInt', 30, 80, 200, 50, {}), {}));
+    _this.view1[0].backgroundColor = _injectIntoOptional(_create(UIColor, 'initDisplayP3RedCGFloatGreenCGFloatBlueCGFloatAlphaCGFloat', 255, 166, 0, 1, {}));
+    _this.view[0].addSubview(_this.view1[0]);
+    const _button = _create(UIButton, 'initFrameCGRect', _create(CGRect, 'initXIntYIntWidthIntHeightInt', 20, 20, 200, 50, {}), {});
+    _button.setTitleFor(_injectIntoOptional("Animate!"), UIControl.State.normal);
+    _button.setTitleColorFor(_injectIntoOptional(_create(UIColor, 'initDisplayP3RedCGFloatGreenCGFloatBlueCGFloatAlphaCGFloat', 0, 0, 255, 1, {})), UIControl.State.normal);
+    _this.view[0].addSubview(_button);
+    _button.addTargetActionFor(_injectIntoOptional(_this), _this.buttonActionSender, UIControl.Event.touchUpInside);
+    const button2 = _create(UIButton, 'initFrameCGRect', _create(CGRect, 'initXIntYIntWidthIntHeightInt', 150, 20, 200, 50, {}), {});
+    button2.setTitleFor(_injectIntoOptional("ShowAlert"), UIControl.State.normal);
+    button2.setTitleColorFor(_injectIntoOptional(_create(UIColor, 'initDisplayP3RedCGFloatGreenCGFloatBlueCGFloatAlphaCGFloat', 0, 0, 255, 1, {})), UIControl.State.normal);
+    _this.view[0].addSubview(button2);
+    button2.addTargetActionFor(_injectIntoOptional(_this), _this.alertButtonActionSender, UIControl.Event.touchUpInside);
+  }
+  buttonActionSender(sender, $info?) {
+    let _this = this;
+    UIView.animateWithDurationAnimations(2, (($info?) => _this.view1[0].frame = _create(CGRect, 'initXIntYIntWidthIntHeightInt', 140, 150, 200, 50, {})));
+  }
+  alertButtonActionSender(sender, $info?) {
+    let _this = this;
+    const avc = _create(UIAlertController, 'initTitleOptionalMessageOptionalPreferredStyleUIAlertControllerStyle', _injectIntoOptional("Alert"), _injectIntoOptional("Add a new movie"), UIAlertController.Style.alert, {});
+    avc.addTextFieldConfigurationHandler(_injectIntoOptional(((textField, $info?) => textField.placeholder = _injectIntoOptional("Name"))));
+    avc.addAction(_create(UIAlertAction, 'initTitleOptionalStyleUIAlertActionStyleHandlerOptional', _injectIntoOptional("OK"), UIAlertAction.Style._default, _injectIntoOptional(((action, $info?) => {
+      const $ifLet2, title_3
+      if (!((($ifLet2 = (((_.tmp0 = avc.textFields).rawValue === 'some') ? (_.tmp0[0].subscript$get(0).text) : Optional.none)) || true) && $ifLet2.rawValue == 'some' && ((title_3 = $ifLet2[0]) || true))) {
+        return;
+      };
+      printSeparatorTerminator(_create(Array, 'initArrayLiteralArray', [String.$add("You press OK with text: ", title_3)], {}), null, null);
+    })), {}));
+    avc.addAction(_create(UIAlertAction, 'initTitleOptionalStyleUIAlertActionStyleHandlerOptional', _injectIntoOptional("Cancel"), UIAlertAction.Style.cancel, _injectIntoOptional(((action, $info?) => printSeparatorTerminator(_create(Array, 'initArrayLiteralArray', ["You press CANCEL"], {}), null, null))), {}));
+    _this.presentAnimatedCompletion(avc, true, _injectIntoOptional(null));
+  }
+  initNibNameOptionalBundleOptional(nibNameOrNil, nibBundleOrNil, $info?) {
+    let _this = this;
+    super.initNibNameOptionalBundleOptional(nibNameOrNil, nibBundleOrNil);
+    return;
+  }
+  initCoderNSCoder(aDecoder, $info?) {
+    let _this = this;
+    super.initCoderNSCoder(aDecoder);
+    return;
+  }
+  static readonly initCoderNSCoder$failable = true
+  init$vars() {
+    let _this = this;
+    if (super.init$vars) super.init$vars()
+    this.view1$internal = _injectIntoOptional(null)
+  }
+}
+const vc = _create(ViewController, 'init', {});
+Playground.addSubview(vc.view[0]);</div>
             <div id="target-output-wrapper">
                 <!--<div id="target-output-header">Console output</div>-->
-                <textarea id="target-output" readonly>
-1
-2
-3</textarea>
+                <textarea id="target-output" readonly></textarea>
             </div>
         </div>
         <div id="visual-output"></div>
@@ -380,7 +485,6 @@ Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
                 targetOutputEl.style.color = '';
                 targetOutputEl.value = '';
                 visualOutputEl.innerHTML = '';
-                printSeparatorTerminator = function(text) { targetOutputEl.value += text + '\n' }
                 eval('(function(){' + outputText + '})();')
             }
             else {
@@ -399,6 +503,108 @@ Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
         xhr.send(JSON.stringify({code: code, language: language}));
     }
 });
+
+var firstCode = `
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var arr = _create(Array, 'initArrayLiteralArray', [3, 1, 2], {});
+arr.sortBy(Int.$lessThan, { $setThis: function ($val) { return arr = $val; } });
+{
+    var $el$generator_1 = _cloneStruct(arr.makeIterator({}));
+    while (true) {
+        var $ifLet0, el_1;
+        if (!((($ifLet0 = $el$generator_1.next({ $setThis: function ($val) { return $el$generator_1 = $val; } })) || true) && $ifLet0.rawValue == 'some' && ((el_1 = $ifLet0[0]) || true)))
+            break;
+        printSeparatorTerminator(_create(Array, 'initArrayLiteralArray', [el_1], {}), null, null);
+    }
+}
+;
+var ViewController = /** @class */ (function (_super) {
+    __extends(ViewController, _super);
+    function ViewController() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ViewController.prototype.view1$get = function () { return this.view1$internal; };
+    Object.defineProperty(ViewController.prototype, "view1", {
+        get: function () { return this.view1$get(); },
+        set: function ($newValue) { this.view1$set($newValue); },
+        enumerable: true,
+        configurable: true
+    });
+    ViewController.prototype.view1$set = function ($newValue) {
+        var $oldValue = this.view1$internal;
+        this.view1$internal = $newValue;
+    };
+    ;
+    ViewController.prototype.viewDidLoad = function ($info) {
+        var _this = this;
+        _super.prototype.viewDidLoad.call(this, {});
+        _this.view1 = _injectIntoOptional(_create(UIView, 'initFrameCGRect', _create(CGRect, 'initXIntYIntWidthIntHeightInt', 30, 80, 200, 50, {}), {}));
+        _this.view1[0].backgroundColor = _injectIntoOptional(_create(UIColor, 'initDisplayP3RedCGFloatGreenCGFloatBlueCGFloatAlphaCGFloat', 255, 166, 0, 1, {}));
+        _this.view[0].addSubview(_this.view1[0]);
+        var _button = _create(UIButton, 'initFrameCGRect', _create(CGRect, 'initXIntYIntWidthIntHeightInt', 20, 20, 200, 50, {}), {});
+        _button.setTitleFor(_injectIntoOptional("Animate!"), UIControl.State.normal);
+        _button.setTitleColorFor(_injectIntoOptional(_create(UIColor, 'initDisplayP3RedCGFloatGreenCGFloatBlueCGFloatAlphaCGFloat', 0, 0, 255, 1, {})), UIControl.State.normal);
+        _this.view[0].addSubview(_button);
+        _button.addTargetActionFor(_injectIntoOptional(_this), _this.buttonActionSender, UIControl.Event.touchUpInside);
+        var button2 = _create(UIButton, 'initFrameCGRect', _create(CGRect, 'initXIntYIntWidthIntHeightInt', 150, 20, 200, 50, {}), {});
+        button2.setTitleFor(_injectIntoOptional("ShowAlert"), UIControl.State.normal);
+        button2.setTitleColorFor(_injectIntoOptional(_create(UIColor, 'initDisplayP3RedCGFloatGreenCGFloatBlueCGFloatAlphaCGFloat', 0, 0, 255, 1, {})), UIControl.State.normal);
+        _this.view[0].addSubview(button2);
+        button2.addTargetActionFor(_injectIntoOptional(_this), _this.alertButtonActionSender, UIControl.Event.touchUpInside);
+    };
+    ViewController.prototype.buttonActionSender = function (sender, $info) {
+        var _this = this;
+        UIView.animateWithDurationAnimations(2, (function ($info) { return _this.view1[0].frame = _create(CGRect, 'initXIntYIntWidthIntHeightInt', 140, 150, 200, 50, {}); }));
+    };
+    ViewController.prototype.alertButtonActionSender = function (sender, $info) {
+        var _this = this;
+        var avc = _create(UIAlertController, 'initTitleOptionalMessageOptionalPreferredStyleUIAlertControllerStyle', _injectIntoOptional("Alert"), _injectIntoOptional("Add a new movie"), UIAlertController.Style.alert, {});
+        avc.addTextFieldConfigurationHandler(_injectIntoOptional((function (textField, $info) { return textField.placeholder = _injectIntoOptional("Name"); })));
+        avc.addAction(_create(UIAlertAction, 'initTitleOptionalStyleUIAlertActionStyleHandlerOptional', _injectIntoOptional("OK"), UIAlertAction.Style._default, _injectIntoOptional((function (action, $info) {
+            var $ifLet2, title_3;
+            if (!((($ifLet2 = (((_.tmp0 = avc.textFields).rawValue === 'some') ? (_.tmp0[0].subscript$get(0).text) : Optional.none)) || true) && $ifLet2.rawValue == 'some' && ((title_3 = $ifLet2[0]) || true))) {
+                return;
+            }
+            ;
+            printSeparatorTerminator(_create(Array, 'initArrayLiteralArray', [String.$add("You press OK with text: ", title_3)], {}), null, null);
+        })), {}));
+        avc.addAction(_create(UIAlertAction, 'initTitleOptionalStyleUIAlertActionStyleHandlerOptional', _injectIntoOptional("Cancel"), UIAlertAction.Style.cancel, _injectIntoOptional((function (action, $info) { return printSeparatorTerminator(_create(Array, 'initArrayLiteralArray', ["You press CANCEL"], {}), null, null); })), {}));
+        _this.presentAnimatedCompletion(avc, true, _injectIntoOptional(null));
+    };
+    ViewController.prototype.initNibNameOptionalBundleOptional = function (nibNameOrNil, nibBundleOrNil, $info) {
+        var _this = this;
+        _super.prototype.initNibNameOptionalBundleOptional.call(this, nibNameOrNil, nibBundleOrNil);
+        return;
+    };
+    ViewController.prototype.initCoderNSCoder = function (aDecoder, $info) {
+        var _this = this;
+        _super.prototype.initCoderNSCoder.call(this, aDecoder);
+        return;
+    };
+    ViewController.prototype.init$vars = function () {
+        var _this = this;
+        if (_super.prototype.init$vars)
+            _super.prototype.init$vars.call(this);
+        this.view1$internal = _injectIntoOptional(null);
+    };
+    ViewController.initCoderNSCoder$failable = true;
+    return ViewController;
+}(UIViewController));
+var vc = _create(ViewController, 'init', {});
+Playground.addSubview(vc.view[0]);`
+window.onload = function(){printSeparatorTerminator = function(text) { targetOutputEl.value += text + '\n' };eval(firstCode)}
 </script>
 </body>
 </html>
