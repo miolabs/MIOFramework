@@ -484,6 +484,7 @@ Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
                 targetCodeEditor.clearSelection();
                 targetOutputEl.style.color = '';
                 targetOutputEl.value = '';
+                targetOutputEl.scrollTop = 0;
                 visualOutputEl.innerHTML = '';
                 eval('(function(){' + outputText + '})();')
             }
@@ -491,6 +492,7 @@ Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
                 let errorMessage = xhr.responseText || 'Transpilation failed :(';
                 targetCodeEditor.setValue('');
                 targetOutputEl.value = errorMessage;
+                targetOutputEl.scrollTop = 0;
                 targetOutputEl.style.color = '#fc605e';
             }
         };
@@ -604,7 +606,13 @@ var ViewController = /** @class */ (function (_super) {
 }(UIViewController));
 var vc = _create(ViewController, 'init', {});
 Playground.addSubview(vc.view[0]);`
-window.onload = function(){printSeparatorTerminator = function(text) { targetOutputEl.value += text + '\n' };eval(firstCode)}
+window.onload = function(){
+    printSeparatorTerminator = function(text) {
+        targetOutputEl.value += text + '\n'
+        targetOutputEl.scrollTop = targetOutputEl.scrollHeight
+    };
+    eval(firstCode);
+}
 </script>
 </body>
 </html>
