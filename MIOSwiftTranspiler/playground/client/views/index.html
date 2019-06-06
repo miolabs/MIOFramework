@@ -9,6 +9,7 @@
     <script src="/mio-uikit-web.js"></script>
     <script src="/loader.js"></script>
     <script src="/typescriptServices.js"></script>
+    <script src="/ace.js"></script>
     <link rel="stylesheet" href="/app.css">
     <link rel="stylesheet" href="/animate.css">
 </head>
@@ -19,6 +20,10 @@
     vertical-align: baseline;
     outline: none;
     box-sizing: border-box;
+    font-family: inherit;
+    }
+    html, body {
+    font-family: 'Lato', sans-serif;
     }
     article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
     display: block;
@@ -70,7 +75,8 @@
     border: 0;
     }
     #source-code {
-    left: 0;
+    width: 100%;
+    height: 100%;
     }
     #target-code-wrapper {
     right: 0;
@@ -90,6 +96,9 @@
     height: 90px;
     overflow: auto;
     padding-top: 10px;
+    }
+    .ace_scroller.ace_scroll-left {
+    box-shadow: initial!important;
     }
     #visual-output {
     position: relative;
@@ -175,7 +184,8 @@
         <button class="transpile-btn" data-language="ts" type="button">▶ Run the code</button>
     </nav>
     <div id="transpiler">
-            <textarea id="source-code" class="code-wrapper" spellcheck="false" autofocus>
+        <div id="source-code-wrapper" class="code-wrapper" spellcheck="false">
+            <div id="source-code" spellcheck="false">
 import Foundation
 import UIKit
 
@@ -197,9 +207,10 @@ UIView.animate(withDuration: 5) {
   view.frame = CGRect(x: 100, y: 100, width: 200, height: 50)
 }
 
-Playground.addSubview(view)</textarea>
+Playground.addSubview(view)</div>
+        </div>
         <div id="target-code-wrapper" class="code-wrapper">
-            <textarea id="target-code" spellcheck="false" readonly>
+            <div id="target-code" spellcheck="false">
 let arr = _create(Array, 'initArrayLiteralArray', [3, 1, 2], {});
 arr.sortBy(Int.$lessThan, { $setThis: $val => arr = $val });
 {
@@ -209,7 +220,7 @@ arr.sortBy(Int.$lessThan, { $setThis: $val => arr = $val });
     if (!((($ifLet0 = $el$generator.next({ $setThis: $val => $el$generator = $val })) || true) && $ifLet0.rawValue == 'some' && ((el_1 = $ifLet0[0]) || true))) break
     printSeparatorTerminator(_create(Array, 'initArrayLiteralArray', [el_1], {}), null, null);
   }
-};</textarea>
+};</div>
             <div id="target-output-wrapper">
                 <!--<div id="target-output-header">Console output</div>-->
                 <textarea id="target-output" readonly>
@@ -224,6 +235,16 @@ arr.sortBy(Int.$lessThan, { $setThis: $val => arr = $val });
 
 
 <script>
+
+var sourceCodeEditor = ace.edit("source-code");
+sourceCodeEditor.session.setMode("ace/mode/swift");
+sourceCodeEditor.renderer.setShowGutter(false);
+var targetCodeEditor = ace.edit("target-code");
+targetCodeEditor.session.setMode("ace/mode/typescript");
+targetCodeEditor.setReadOnly(true);
+targetCodeEditor.setHighlightActiveLine(false);
+targetCodeEditor.renderer.setShowGutter(false);
+targetCodeEditor.renderer.$cursorLayer.element.style.display = "none"
 
 var visualOutputEl = document.getElementById("visual-output");
 function Playground() {}
@@ -321,9 +342,7 @@ function formatAndTranspile(input, options) {
     }
     return {outputText, formatText};
 }
-var sourceCodeEl = document.getElementById("source-code"),
-    targetCodeEl = document.getElementById("target-code"),
-    targetOutputEl = document.getElementById("target-output"),
+var targetOutputEl = document.getElementById("target-output"),
     transpileBtns = document.getElementsByClassName("transpile-btn"),
     spinner = document.getElementById("target-code-spinner"),
     isWaitingForTranspilation = false;
@@ -331,10 +350,11 @@ Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
     transpileBtn.onclick = function() {
         if(isWaitingForTranspilation) return;
         var language = transpileBtn.getAttribute("data-language");
-        if(!sourceCodeEl.value) return;
+        let code = sourceCodeEditor.getValue();
+        if(!code) return;
         isWaitingForTranspilation = true;
         spinner.style.display = 'block';
-        targetCodeEl.style.opacity = .3;
+        targetCodeEditor.container.style.opacity = .3;
         visualOutputEl.style.opacity = .3;
         var xhr = new XMLHttpRequest();
         xhr.open("POST", TRANSPILE_URL);
@@ -343,7 +363,7 @@ Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
             if(xhr.readyState !== 4) return;
             isWaitingForTranspilation = false;
             spinner.style.display = 'none';
-            targetCodeEl.style.opacity = 1;
+            targetCodeEditor.container.style.opacity = 1;
             visualOutputEl.style.opacity = 1;
             if(xhr.status === 200) {
                 let code = xhr.responseText
@@ -352,8 +372,9 @@ Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
                 //code = code.replace(/_frame/g, "frame")//TODO temporary fix until frame is not prefixed with _
                 //code = code.replace(/\(objc_selector_expr[\s\S]+buttonActionSender\)/, "_this.buttonActionSender")//TODO temporary fix
                 let {outputText, formatText} = formatAndTranspile(code, {})
-                targetCodeEl.value = formatText;
-                targetCodeEl.style.color = '';
+                targetCodeEditor.setValue(formatText);
+                targetCodeEditor.clearSelection();
+                targetOutputEl.style.color = '';
                 targetOutputEl.value = '';
                 visualOutputEl.innerHTML = '';
                 printSeparatorTerminator = function(text) { targetOutputEl.value += text + '\n' }
@@ -361,12 +382,11 @@ Array.prototype.forEach.call(transpileBtns, function(transpileBtn) {
             }
             else {
                 let errorMessage = xhr.responseText || 'Transpilation failed :(';
-                targetCodeEl.value = errorMessage;
-                targetCodeEl.style.color = '#fc605e';
-                targetOutputEl.value = '';
+                targetCodeEditor.setValue('');
+                targetOutputEl.value = errorMessage;
+                targetOutputEl.style.color = '#fc605e';
             }
         };
-        let code = sourceCodeEl.value;
         code = `
         import UIKit
         class Playground {
