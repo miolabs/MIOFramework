@@ -239,6 +239,8 @@ arr.sortBy(Int.$lessThan, { $setThis: $val => arr = $val });
 var sourceCodeEditor = ace.edit("source-code");
 sourceCodeEditor.session.setMode("ace/mode/swift");
 sourceCodeEditor.renderer.setShowGutter(false);
+sourceCodeEditor.setHighlightActiveLine(false);
+sourceCodeEditor.session.setOptions({tabSize: 2});
 var targetCodeEditor = ace.edit("target-code");
 targetCodeEditor.session.setMode("ace/mode/typescript");
 targetCodeEditor.setReadOnly(true);
