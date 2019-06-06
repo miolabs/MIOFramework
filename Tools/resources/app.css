@@ -19,9 +19,11 @@
 .label.align-left {
 	text-align: left;	
 }
+
 .label.align-center {
 	text-align: center;	
 }
+
 .label.align-right {
 	text-align: right;	
 }
@@ -33,12 +35,15 @@
 	height: auto !important;
 	padding: 10px;
 }
+
 .button:hover {
 	opacity: .82;
 }
+
 .button.default { 
 	background-color: #00bebe;
 } 
+
 .button.rounded-rect {
 	background-color: #00bebe;
 	color: #fff;
@@ -46,9 +51,6 @@
 	padding: 10px;
 	cursor: pointer;
 	width: fit-content !important;
-}
-.button.rounded-rect span {
-	/*line-height: 30px;*/
 }
 
 /* TEXT FIELD */
@@ -136,6 +138,7 @@ input[type="checkbox"]:checked::after {
 /* STEPPER */
 
 /* ALERT VIEW */
+
 .alert {
 	position: absolute;
     border-radius: 15px;
@@ -146,19 +149,23 @@ input[type="checkbox"]:checked::after {
 	z-index: 1;
 	text-align: center;
 }
+
 .alert-container {
 	position: relative;
     top: 50%;
     transform: translateY(-50%);
 }
+
 .label.large.strong {
 	font-weight: bold;
 	margin-bottom: 5px;
 	font-size: 18px;
 }
+
 .label.light {
 	margin-bottom: 20px;
 }
+
 .alert-cell .input-text input[type="text"] {
     width: 90%;
     padding: 5px;
@@ -209,6 +216,7 @@ input[type="checkbox"]:checked::after {
 }
 
 /* TABLE VIEW */
+
 .table-view .table-view-cell .label {
 	border-bottom: 1px solid #d6d6d6;
 }
