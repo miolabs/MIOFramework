@@ -240,13 +240,13 @@ class ViewController: UIViewController {
 
     avc.addAction(UIAlertAction.init(title: "OK", style: .default, handler: { (action:UIAlertAction) in
       guard let title = avc.textFields?[0].text else {
-      return
-    }
-    print("You press OK with text: " + title)
+        return
+      }
+      print("You pressed OK with text: " + title)
     }))
 
     avc.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: { (action:UIAlertAction) in
-      print("You press CANCEL")
+      print("You pressed CANCEL")
     }))
 
     present(avc, animated: true, completion: nil)
