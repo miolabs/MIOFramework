@@ -152,6 +152,9 @@ export class UIApplication {
 
         this.delegate.window.rootViewController.onLoadView(this, function (this: UIApplication) {
             
+            let window = this.delegate.window as UIWindow;
+            window.addSubview(window.rootViewController.view);
+            
             this.delegate.window.rootViewController.viewWillAppear(false);
             this.delegate.window.rootViewController.viewDidAppear(false);
 

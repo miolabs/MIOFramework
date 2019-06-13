@@ -21,9 +21,7 @@ export class UIWindow extends UIView
 
     initWithRootViewController(vc: UIViewController){
         this.init();        
-
-        this.rootViewController = vc;
-        this.addSubview(vc.view);        
+        this.rootViewController = vc;        
     }
 
     makeKey(){

@@ -50,7 +50,7 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         let items = domParser.parseFromString(this.result, "text/html");
         let layer = items.getElementById(this.layerID);
 
-        this.completion.call(this.target, layer);
+        this.completion.call(this.target, layer, this.rootClassname);
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){
@@ -67,6 +67,7 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
                 this.isCapturing = true;
                 this.layerID = attributes["id"];
                 this.rootClassname = attributes["data-class"];
+                if (this.rootClassname == null) this.rootClassname = "UIViewController";
             }
         }
 

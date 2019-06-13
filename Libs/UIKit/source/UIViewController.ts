@@ -91,7 +91,6 @@ export class UIViewController extends NSObject {
 
     initWithResource(path) {
         if (path == null) throw new Error("UIViewController:initWithResource can't be null");
-
         super.init();
 
         this._htmlResourcePath = path;
@@ -107,7 +106,7 @@ export class UIViewController extends NSObject {
 
             if (layer.tagName != "DIV") continue;
 
-            var key = layer.getAttribute("data-localize-key");
+            let key = layer.getAttribute("data-localize-key");
             if (key != null)
                 layer.innerHTML = NSLocalizeString(key, key);
 
@@ -120,15 +119,15 @@ export class UIViewController extends NSObject {
         layer.innerHTML = NSLocalizeString(key, key);
     }
 
+    public _contentView:UIView = null;
     loadView() {
         if (this.view != null) {
             this._didLoadView();
             return;
-        }
-
-        this.view = new UIView(this.layerID);        
+        }        
 
         if (this._htmlResourcePath == null) {
+            this.view = new UIView(this.layerID);        
             this.view.init();
             MUICoreLayerAddStyle(this.view.layer, "view-controller");
             //this.view.layer.style.height = "100%";
@@ -136,9 +135,12 @@ export class UIViewController extends NSObject {
             return;
         }
 
-        MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (this: UIViewController, layer) {
-            this.view.initWithLayer(layer, this);
-            this.view.awakeFromHTML();
+        MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (this: UIViewController, layer, classname:string) {                        
+            this._contentView = new UIView();
+            this._contentView.initWithLayer(layer, this);
+            this._segues = this._contentView._segues;
+            this.view = this._contentView.subviews[0];
+            this._checkSegues();
             this._didLoadView();
         });
 
@@ -180,8 +182,6 @@ export class UIViewController extends NSObject {
     _didLoadView() {
         this._layerIsReady = true;
         if (MIOCoreIsPhone() == true) MUICoreLayerAddStyle(this.view.layer, "phone");
-        MUICoreStoryboardParseLayer(this.view.layer, this, this);
-        this._checkSegues();
 
         if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null) {
             this._onLoadLayerAction.call(this._onLoadLayerTarget);
@@ -261,7 +261,7 @@ export class UIViewController extends NSObject {
         }
     }
 
-    get viewIsLoaded() {
+    get viewLoaded() {
         return this._viewIsLoaded;
     }
 

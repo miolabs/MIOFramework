@@ -89,20 +89,22 @@ export class UITableViewCell extends UIView {
     initWithLayer(layer, owner, options?) {
         super.initWithLayer(layer, owner, options);
 
-        let outletIDs = {};
-        this.scanLayerNodes(layer, owner, outletIDs);
+        this.scanLayerNodes(layer, owner);
         
         let style = layer.getAttribute("data-cell-style");
         if (style == "IBUITableViewCellStyleDefault") {
             this.style = UITableViewCellStyle.Default;
             let propertyID = layer.getAttribute("data-cell-textlabel-id")
-            let item = outletIDs[propertyID];
+            let item = owner._outlets[propertyID];
             this.textLabel = item;
         }                
+
+        //MUICoreStoryboardParseLayer(layer, this, owner);
+
         this._setupLayer();
     }
 
-    private scanLayerNodes(layer, owner, outlets) {
+    private scanLayerNodes(layer, owner) {
 
         if (layer.childNodes.length == 0) return;
 
@@ -113,7 +115,7 @@ export class UITableViewCell extends UIView {
                 if (subLayer.tagName != "DIV")
                     continue;
 
-                this.scanLayerNodes(subLayer, owner, outlets);
+                this.scanLayerNodes(subLayer, owner);
 
                 if (subLayer.getAttribute("data-accessory-type") != null) {
                     this.addAccessoryView(subLayer, owner);
@@ -126,6 +128,8 @@ export class UITableViewCell extends UIView {
         }
 
     }
+
+        // Check for actions    
 
     //data-accessory-type="checkmark"
 
@@ -220,6 +224,7 @@ export class UITableViewCell extends UIView {
         this.layer.addEventListener("click", function(e) {
             e.stopPropagation();            
             this._onClickFn.call(this._target, this);
+            this._performSegue();
         }.bind(this));
 
         let instance = this;

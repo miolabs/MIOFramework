@@ -10,7 +10,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Table View Controller-->
+        <!--Title-->
         <scene sceneID="RGa-fR-l9n">
             <objects>
                 <tableViewController id="HkK-wC-lvX" customClass="TableViewController" customModule="Demo3App" customModuleProvider="target" sceneMemberID="viewController">
@@ -45,7 +45,7 @@
                             <outlet property="delegate" destination="HkK-wC-lvX" id="RGf-gn-E2D"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Table View Controller" id="wBb-6L-Lax">
+                    <navigationItem key="navigationItem" title="Title" id="wBb-6L-Lax">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="hLF-Oe-o5n">
                             <connections>
                                 <action selector="addButtonClickedWithSender:" destination="HkK-wC-lvX" id="LwF-Lp-So5"/>

@@ -45,7 +45,7 @@ export class UIStoryboard extends NSObject
     }
 }
 
-export function MUICoreStoryboardParseLayer(layer, object, owner){
+export function MUICoreStoryboardParseLayer(layer, object, owner:UIViewController){
     
     // Check outlets and segues
     if (layer.childNodes.length > 0) {
@@ -85,10 +85,40 @@ export function MUICoreStoryboardParseLayer(layer, object, owner){
     }
 }
 
+export function MUICoreStoryboardParseConnectionsLayer(layer, object, owner:UIViewController){
+    // Check outlets and segues
+    if (layer.childNodes.length > 0) {
+        for (let index = 0; index < layer.childNodes.length; index++) {
+            let subLayer = layer.childNodes[index] as HTMLElement;
+
+            if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+
+            let type = subLayer.getAttribute("data-connection-type");
+
+            if (type == "outlet") {
+                let prop = subLayer.getAttribute("data-property");
+                let outlet = subLayer.getAttribute("data-outlet");
+
+                MUICoreStoryboardConnectOutlet(owner, prop, outlet);
+            }
+            else if (type == "segue") {
+                let destination = subLayer.getAttribute("data-segue-destination");
+                let kind = subLayer.getAttribute("data-segue-kind");
+                let relationship = subLayer.getAttribute("data-segue-relationship");
+                let identifier = subLayer.getAttribute("data-segue-identifier");
+
+                MUICoreStoryboardAddSegue(object, destination, kind, relationship, identifier);
+            }
+
+        }
+
+    }    
+}
+
 declare function _injectIntoOptional(value:any);
 
 export function MUICoreStoryboardConnectOutlet(owner, property, outletID){
-    console.log("prop: " + property + " - outluet: " + outletID);
+    console.log("prop: " + property + " - outlet: " + outletID);
 
     let obj = owner._outlets[outletID];
     owner[property] = _injectIntoOptional(obj);

@@ -5,6 +5,7 @@ import { UIGestureRecognizerState} from "./UIGestureRecognizer";
 import { NSIndexPath } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 import "mio-foundation-web/extensions"
+import { _UIStoryboardSeguePerform } from "./UIStoryboardSegue";
 
 export class UITableView extends UIView
 {
@@ -87,8 +88,8 @@ export class UITableView extends UIView
         if (layer != null) {
             let newLayer = layer.cloneNode(true);
             newLayer.style.display = "";            
-            cell.initWithLayer(newLayer, this);
-            cell.awakeFromHTML();
+            cell.initWithLayer(newLayer, this.owner);
+            cell.awakeFromHTML();            
         }
 
         // let tapGesture = new MUITapGestureRecognizer();
@@ -280,7 +281,7 @@ export class UITableView extends UIView
             cell.selected = true;
             if (this.delegate != null && typeof this.delegate.didSelectCellAtIndexPath === "function") {
                 this.delegate.didSelectCellAtIndexPath(this, indexPath);
-            }                
+            }                                        
         }
         else {
             //TODO:
