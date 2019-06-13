@@ -40,7 +40,7 @@ export class UINavigationController extends UIViewController
         //this.transitioningDelegate = this;                
 
         this.rootViewController = vc;
-        this.view.addSubview(vc.view);
+        //this.view.addSubview(vc.view);
 
         this.viewControllersStack.push(vc);
         this.currentViewControllerIndex = 0;
@@ -55,12 +55,20 @@ export class UINavigationController extends UIViewController
         // }
     }
 
-    protected _setViewLoaded(value) {
-        super._setViewLoaded(value);
+    protected _setViewLoaded(value) {        
+        this._navigationBar = this.view as UINavigationBar;
+        this._navigationBar.removeFromSuperview();
 
-        this._navigationBar = this.view.subviews[0] as UINavigationBar;
+        this.view = new UIView();
+        this.view.init();
+
+        this.view.addSubview(this._navigationBar);
+        this.view.addSubview(this.rootViewController.view);
+        
         let navItems = [this.rootViewController.navigationItem];
         this._navigationBar.setItems(navItems, false);
+
+        super._setViewLoaded(value);
     }
 
     viewWillAppear(animated?:boolean){
@@ -113,7 +121,9 @@ export class UINavigationController extends UIViewController
             let backBarButtonItem = new UIBarButtonItem();
             backBarButtonItem.initWithCustomView(backButton);
             backBarButtonItem.target = vc;
-            backBarButtonItem.action = vc.navigationController.popViewController();
+            backBarButtonItem.action = function(this:UIViewController){
+                this.navigationController.popViewController(true);
+            }
 
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);

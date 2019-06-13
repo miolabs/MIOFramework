@@ -1,5 +1,6 @@
 import { NSObject } from "mio-foundation-web";
 import { UIViewController } from "./UIViewController";
+import { UIView } from "./UIView";
 
 export class UIStoryboardSegue extends NSObject
 {
@@ -27,6 +28,18 @@ export class UIStoryboardSegue extends NSObject
         if (canPerfom == false) return;
 
         this.source.prepareForSegue(this, this._sender);
-        if (this.performHandler != null) this.performHandler.call(this.source);
+        if (this.performHandler != null) this.performHandler();
     }
+}
+
+export function _UIStoryboardSeguePerform(kind:string, sender:any, identifier:string, sourceViewController:UIViewController, destination:string){         
+    if (kind != "show") return;
+
+    let vc = sourceViewController.storyboard._instantiateViewControllerWithDestination(destination);
+    let segue = new UIStoryboardSegue();
+    segue.initWithIdentifierAndPerformHandler(identifier, sourceViewController, vc, function(this:UIStoryboardSegue){
+        if (kind == "show") this.source.navigationController.pushViewController(vc, true);
+    });
+    segue._sender = sender;
+    segue.perform();
 }

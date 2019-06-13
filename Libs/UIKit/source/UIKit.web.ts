@@ -554,7 +554,7 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
         let items = domParser.parseFromString(this.result, "text/html");
         let layer = items.getElementById(this.layerID);
 
-        this.completion.call(this.target, layer);
+        this.completion.call(this.target, layer, this.rootClassname);
     }
 
     parserDidStartDocument(parser:MIOCoreHTMLParser){
@@ -571,6 +571,7 @@ class MUICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
                 this.isCapturing = true;
                 this.layerID = attributes["id"];
                 this.rootClassname = attributes["data-class"];
+                if (this.rootClassname == null) this.rootClassname = "UIViewController";
             }
         }
 
@@ -1006,6 +1007,13 @@ export class UIView extends NSObject {
     _checkSegues() {
     }
 
+    private _performSegue(){
+        if (this._segues.length == 0) return;
+
+        let item = this._segues[0];                        
+        _UIStoryboardSeguePerform(item["Kind"], this, item["Identifier"], this.owner, item["Destination"]);        
+    }
+
     constructor(layerID?) {
         super();
         this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(this);
@@ -1052,10 +1060,22 @@ export class UIView extends NSObject {
     
                 if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
     
+                if (subLayer.getAttribute("data-connections") == "true") {
+                    MUICoreStoryboardParseConnectionsLayer(subLayer, this, owner);
+                    continue;
+                }
+
+                if (subLayer.getAttribute("data-navigation-key") == "navigationItem"){             
+                    owner.navigationItem = new UINavigationItem();
+                    owner.navigationItem.initWithLayer(subLayer, owner);
+                    continue;
+                }
+
                 let className = subLayer.getAttribute("data-class");
-                if (className == null || className.length == 0) className = "UIView";
+                //if (className == null || className.length == 0) className = "UIView";
+                if (className == null) continue;
     
-                if (className == "UIBarItem" || className == "UIBarButtonItem" || className == "UINavigationItem") continue;
+                //if (className == "UIBarItem" || className == "UIBarButtonItem" || className == "UINavigationItem") continue;    
 
                 let sv = MUICoreViewCreateView(subLayer, owner);
                 this._linkViewToSubview(sv);
@@ -1065,7 +1085,7 @@ export class UIView extends NSObject {
             }   
         }
     
-        MUICoreStoryboardParseLayer(layer, this, owner);
+        //MUICoreStoryboardParseLayer(layer, this, owner);
     }
 
     copy() {
@@ -1863,6 +1883,7 @@ export class UIControl extends UIView
 
 
 
+
 /**
  * Created by godshadow on 12/3/16.
  */
@@ -2473,7 +2494,6 @@ export class UIViewController extends NSObject {
 
     initWithResource(path) {
         if (path == null) throw new Error("UIViewController:initWithResource can't be null");
-
         super.init();
 
         this._htmlResourcePath = path;
@@ -2489,7 +2509,7 @@ export class UIViewController extends NSObject {
 
             if (layer.tagName != "DIV") continue;
 
-            var key = layer.getAttribute("data-localize-key");
+            let key = layer.getAttribute("data-localize-key");
             if (key != null)
                 layer.innerHTML = NSLocalizeString(key, key);
 
@@ -2502,15 +2522,15 @@ export class UIViewController extends NSObject {
         layer.innerHTML = NSLocalizeString(key, key);
     }
 
+    public _contentView:UIView = null;
     loadView() {
         if (this.view != null) {
             this._didLoadView();
             return;
-        }
-
-        this.view = new UIView(this.layerID);        
+        }        
 
         if (this._htmlResourcePath == null) {
+            this.view = new UIView(this.layerID);        
             this.view.init();
             MUICoreLayerAddStyle(this.view.layer, "view-controller");
             //this.view.layer.style.height = "100%";
@@ -2518,9 +2538,12 @@ export class UIViewController extends NSObject {
             return;
         }
 
-        MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (this: UIViewController, layer) {
-            this.view.initWithLayer(layer, this);
-            this.view.awakeFromHTML();
+        MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (this: UIViewController, layer, classname:string) {                        
+            this._contentView = new UIView();
+            this._contentView.initWithLayer(layer, this);
+            this._segues = this._contentView._segues;
+            this.view = this._contentView.subviews[0];
+            this._checkSegues();
             this._didLoadView();
         });
 
@@ -2562,8 +2585,6 @@ export class UIViewController extends NSObject {
     _didLoadView() {
         this._layerIsReady = true;
         if (MIOCoreIsPhone() == true) MUICoreLayerAddStyle(this.view.layer, "phone");
-        MUICoreStoryboardParseLayer(this.view.layer, this, this);
-        this._checkSegues();
 
         if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null) {
             this._onLoadLayerAction.call(this._onLoadLayerTarget);
@@ -2643,7 +2664,7 @@ export class UIViewController extends NSObject {
         }
     }
 
-    get viewIsLoaded() {
+    get viewLoaded() {
         return this._viewIsLoaded;
     }
 
@@ -3633,6 +3654,7 @@ export class UIScrollView extends UIView {
 
 
 
+
 export class UITableView extends UIView
 {
     dataSource = null;
@@ -3715,7 +3737,7 @@ export class UITableView extends UIView
             let newLayer = layer.cloneNode(true);
             newLayer.style.display = "";            
             cell.initWithLayer(newLayer, this.owner);
-            cell.awakeFromHTML();
+            cell.awakeFromHTML();            
         }
 
         // let tapGesture = new MUITapGestureRecognizer();
@@ -3907,7 +3929,7 @@ export class UITableView extends UIView
             cell.selected = true;
             if (this.delegate != null && typeof this.delegate.didSelectCellAtIndexPath === "function") {
                 this.delegate.didSelectCellAtIndexPath(this, indexPath);
-            }                
+            }                                        
         }
         else {
             //TODO:
@@ -3964,7 +3986,7 @@ export class UITableViewController extends UIViewController
     viewDidLoad(){
       super.viewDidLoad();
 
-      this.tableView = this.view.subviews[0] as UITableView;
+      this.tableView = this.view as UITableView;
       this.tableView.dataSource = this;
       this.tableView.delegate = this;
     }
@@ -4076,7 +4098,7 @@ export class UITableViewCell extends UIView {
             this.textLabel = item;
         }                
 
-        MUICoreStoryboardParseLayer(layer, this, owner);
+        //MUICoreStoryboardParseLayer(layer, this, owner);
 
         this._setupLayer();
     }
@@ -4101,13 +4123,6 @@ export class UITableViewCell extends UIView {
                 if (subLayer.getAttribute("data-editing-accessory-view") != null) {
                     this.addEditingAccessoryView(subLayer, owner);
                 }
-
-                let actionSelector = subLayer.getAttribute("data-action-selector");
-                let eventType = MUICoreControlParseEventTypeString(subLayer.getAttribute("data-event-type"));
-                if (actionSelector != null) {                    
-                    this.addTarget(owner, owner[actionSelector], eventType);
-                }
-
             }
         }
 
@@ -4208,6 +4223,7 @@ export class UITableViewCell extends UIView {
         this.layer.addEventListener("click", function(e) {
             e.stopPropagation();            
             this._onClickFn.call(this._target, this);
+            this._performSegue();
         }.bind(this));
 
         let instance = this;
@@ -5056,7 +5072,7 @@ export class UINavigationController extends UIViewController
         //this.transitioningDelegate = this;                
 
         this.rootViewController = vc;
-        this.view.addSubview(vc.view);
+        //this.view.addSubview(vc.view);
 
         this.viewControllersStack.push(vc);
         this.currentViewControllerIndex = 0;
@@ -5071,12 +5087,20 @@ export class UINavigationController extends UIViewController
         // }
     }
 
-    protected _setViewLoaded(value) {
-        super._setViewLoaded(value);
+    protected _setViewLoaded(value) {        
+        this._navigationBar = this.view as UINavigationBar;
+        this._navigationBar.removeFromSuperview();
 
-        this._navigationBar = this.view.subviews[0] as UINavigationBar;
+        this.view = new UIView();
+        this.view.init();
+
+        this.view.addSubview(this._navigationBar);
+        this.view.addSubview(this.rootViewController.view);
+        
         let navItems = [this.rootViewController.navigationItem];
         this._navigationBar.setItems(navItems, false);
+
+        super._setViewLoaded(value);
     }
 
     viewWillAppear(animated?:boolean){
@@ -5129,7 +5153,9 @@ export class UINavigationController extends UIViewController
             let backBarButtonItem = new UIBarButtonItem();
             backBarButtonItem.initWithCustomView(backButton);
             backBarButtonItem.target = vc;
-            backBarButtonItem.action = vc.navigationController.popViewController();
+            backBarButtonItem.action = function(this:UIViewController){
+                this.navigationController.popViewController(true);
+            }
 
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);
@@ -5786,9 +5812,7 @@ export class UIWindow extends UIView
 
     initWithRootViewController(vc: UIViewController){
         this.init();        
-
-        this.rootViewController = vc;
-        this.addSubview(vc.view);        
+        this.rootViewController = vc;        
     }
 
     makeKey(){
@@ -5914,7 +5938,7 @@ export class UIStoryboard extends NSObject
     }
 }
 
-export function MUICoreStoryboardParseLayer(layer, object, owner){
+export function MUICoreStoryboardParseLayer(layer, object, owner:UIViewController){
     
     // Check outlets and segues
     if (layer.childNodes.length > 0) {
@@ -5954,10 +5978,40 @@ export function MUICoreStoryboardParseLayer(layer, object, owner){
     }
 }
 
+export function MUICoreStoryboardParseConnectionsLayer(layer, object, owner:UIViewController){
+    // Check outlets and segues
+    if (layer.childNodes.length > 0) {
+        for (let index = 0; index < layer.childNodes.length; index++) {
+            let subLayer = layer.childNodes[index] as HTMLElement;
+
+            if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+
+            let type = subLayer.getAttribute("data-connection-type");
+
+            if (type == "outlet") {
+                let prop = subLayer.getAttribute("data-property");
+                let outlet = subLayer.getAttribute("data-outlet");
+
+                MUICoreStoryboardConnectOutlet(owner, prop, outlet);
+            }
+            else if (type == "segue") {
+                let destination = subLayer.getAttribute("data-segue-destination");
+                let kind = subLayer.getAttribute("data-segue-kind");
+                let relationship = subLayer.getAttribute("data-segue-relationship");
+                let identifier = subLayer.getAttribute("data-segue-identifier");
+
+                MUICoreStoryboardAddSegue(object, destination, kind, relationship, identifier);
+            }
+
+        }
+
+    }    
+}
+
 declare function _injectIntoOptional(value:any);
 
 export function MUICoreStoryboardConnectOutlet(owner, property, outletID){
-    console.log("prop: " + property + " - outluet: " + outletID);
+    console.log("prop: " + property + " - outlet: " + outletID);
 
     let obj = owner._outlets[outletID];
     owner[property] = _injectIntoOptional(obj);
@@ -5972,6 +6026,7 @@ export function MUICoreStoryboardAddSegue(owner, destination:string, kind:string
     if (relationship != null) s["Relationship"] = relationship;
     owner._segues.push(s);
 }
+
 
 
 
@@ -6001,9 +6056,22 @@ export class UIStoryboardSegue extends NSObject
         if (canPerfom == false) return;
 
         this.source.prepareForSegue(this, this._sender);
-        if (this.performHandler != null) this.performHandler.call(this.source);
+        if (this.performHandler != null) this.performHandler();
     }
 }
+
+export function _UIStoryboardSeguePerform(kind:string, sender:any, identifier:string, sourceViewController:UIViewController, destination:string){         
+    if (kind != "show") return;
+
+    let vc = sourceViewController.storyboard._instantiateViewControllerWithDestination(destination);
+    let segue = new UIStoryboardSegue();
+    segue.initWithIdentifierAndPerformHandler(identifier, sourceViewController, vc, function(this:UIStoryboardSegue){
+        if (kind == "show") this.source.navigationController.pushViewController(vc, true);
+    });
+    segue._sender = sender;
+    segue.perform();
+}
+
 
 
 
@@ -6172,6 +6240,9 @@ export class UIApplication {
         this.delegate.window.makeKeyAndVisible();
 
         this.delegate.window.rootViewController.onLoadView(this, function (this: UIApplication) {
+            
+            let window = this.delegate.window as UIWindow;
+            window.addSubview(window.rootViewController.view);
             
             this.delegate.window.rootViewController.viewWillAppear(false);
             this.delegate.window.rootViewController.viewDidAppear(false);

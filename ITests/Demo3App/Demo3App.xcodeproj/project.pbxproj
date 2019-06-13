@@ -6,6 +6,20 @@
 	objectVersion = 50;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		14E397A922A9E92A000CAD6C /* bfgfg */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 14E397AA22A9E92A000CAD6C /* Build configuration list for PBXAggregateTarget "bfgfg" */;
+			buildPhases = (
+				14E397AD22A9E930000CAD6C /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = bfgfg;
+			productName = bfgfg;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		14947DD32275B93A006F9AFF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14947DD22275B93A006F9AFF /* AppDelegate.swift */; };
 		14947DD82275B93A006F9AFF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14947DD62275B93A006F9AFF /* Main.storyboard */; };
@@ -100,6 +114,9 @@
 					14947DCE2275B93A006F9AFF = {
 						CreatedOnToolsVersion = 10.2.1;
 					};
+					14E397A922A9E92A000CAD6C = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
 				};
 			};
 			buildConfigurationList = 14947DCA2275B93A006F9AFF /* Build configuration list for PBXProject "Demo3App" */;
@@ -116,6 +133,7 @@
 			projectRoot = "";
 			targets = (
 				14947DCE2275B93A006F9AFF /* Demo3App */,
+				14E397A922A9E92A000CAD6C /* bfgfg */,
 			);
 		};
 /* End PBXProject section */
@@ -132,6 +150,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		14E397AD22A9E930000CAD6C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		14947DCB2275B93A006F9AFF /* Sources */ = {
@@ -318,6 +356,24 @@
 			};
 			name = Release;
 		};
+		14E397AB22A9E92A000CAD6C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 53X2422NYU;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		14E397AC22A9E92A000CAD6C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 53X2422NYU;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -335,6 +391,15 @@
 			buildConfigurations = (
 				14947DE22275B93B006F9AFF /* Debug */,
 				14947DE32275B93B006F9AFF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		14E397AA22A9E92A000CAD6C /* Build configuration list for PBXAggregateTarget "bfgfg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				14E397AB22A9E92A000CAD6C /* Debug */,
+				14E397AC22A9E92A000CAD6C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

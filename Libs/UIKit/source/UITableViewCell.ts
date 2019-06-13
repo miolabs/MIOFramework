@@ -99,7 +99,7 @@ export class UITableViewCell extends UIView {
             this.textLabel = item;
         }                
 
-        MUICoreStoryboardParseLayer(layer, this, owner);
+        //MUICoreStoryboardParseLayer(layer, this, owner);
 
         this._setupLayer();
     }
@@ -124,13 +124,6 @@ export class UITableViewCell extends UIView {
                 if (subLayer.getAttribute("data-editing-accessory-view") != null) {
                     this.addEditingAccessoryView(subLayer, owner);
                 }
-
-                let actionSelector = subLayer.getAttribute("data-action-selector");
-                let eventType = MUICoreControlParseEventTypeString(subLayer.getAttribute("data-event-type"));
-                if (actionSelector != null) {                    
-                    this.addTarget(owner, owner[actionSelector], eventType);
-                }
-
             }
         }
 
@@ -231,6 +224,7 @@ export class UITableViewCell extends UIView {
         this.layer.addEventListener("click", function(e) {
             e.stopPropagation();            
             this._onClickFn.call(this._target, this);
+            this._performSegue();
         }.bind(this));
 
         let instance = this;

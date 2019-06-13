@@ -1,5 +1,6 @@
 import { NSLocalizeString } from "mio-foundation-web";
-import { UIControl, UIControl.Event } from "./UIControl";
+import { UIControl } from "./UIControl";
+import { UIControl.Event } from "./UIControl";
 import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";
 import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
 import { UIColor } from "./UIColor";

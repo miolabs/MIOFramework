@@ -10,7 +10,7 @@ import { MUICoreLayerCreate } from "./core/MUICoreLayer";
 import { UIGestureRecognizer } from "./UIGestureRecognizer";
 import { UIEvent } from "./UIEvent";
 import { MUICoreLayerSearchElementByID } from "./core/MUICoreLayer";
-import { MUICoreStoryboardParseLayer } from "./UIStoryboard";
+import { MUICoreStoryboardParseConnectionsLayer } from "./UIStoryboard";
 import { UIColor } from "./UIColor";
 
 
@@ -76,6 +76,13 @@ export class UIView extends NSObject {
     _checkSegues() {
     }
 
+    private _performSegue(){
+        if (this._segues.length == 0) return;
+
+        let item = this._segues[0];                        
+        _UIStoryboardSeguePerform(item["Kind"], this, item["Identifier"], this.owner, item["Destination"]);        
+    }
+
     constructor(layerID?) {
         super();
         this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(this);
@@ -122,10 +129,22 @@ export class UIView extends NSObject {
     
                 if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
     
+                if (subLayer.getAttribute("data-connections") == "true") {
+                    MUICoreStoryboardParseConnectionsLayer(subLayer, this, owner);
+                    continue;
+                }
+
+                if (subLayer.getAttribute("data-navigation-key") == "navigationItem"){             
+                    owner.navigationItem = new UINavigationItem();
+                    owner.navigationItem.initWithLayer(subLayer, owner);
+                    continue;
+                }
+
                 let className = subLayer.getAttribute("data-class");
-                if (className == null || className.length == 0) className = "UIView";
+                //if (className == null || className.length == 0) className = "UIView";
+                if (className == null) continue;
     
-                if (className == "UIBarItem" || className == "UIBarButtonItem" || className == "UINavigationItem") continue;
+                //if (className == "UIBarItem" || className == "UIBarButtonItem" || className == "UINavigationItem") continue;    
 
                 let sv = MUICoreViewCreateView(subLayer, owner);
                 this._linkViewToSubview(sv);
@@ -135,7 +154,7 @@ export class UIView extends NSObject {
             }   
         }
     
-        MUICoreStoryboardParseLayer(layer, this, owner);
+        //MUICoreStoryboardParseLayer(layer, this, owner);
     }
 
     copy() {
