@@ -108,7 +108,9 @@ class TableViewController: UITableViewController {
             self.tableView.reloadData()
         }))
         
-        avc.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
+        avc.addAction(UIAlertAction.init(title: "Cancel", style: .default, handler: nil))
+        avc.addAction(UIAlertAction.init(title: "Cancel2", style: .default, handler: nil))
+        avc.addAction(UIAlertAction.init(title: "Cancel3", style: .cancel, handler: nil))
         
         present(avc, animated: true, completion: nil)
     }
