@@ -102,8 +102,8 @@ function copyResources(done) {
 	fs.copyFileSync(SWIFT_PATH + "lib.js", DEST + "libs/mio-swiftlib/lib.js");
 
 	//COPY ICONS FOLDER
+	fs.mkdirSync("dist/icons/", {recursive: true});
 	fs.recurseSync(SRC_ICONS_PATH, function(filepath, relative, filename) {
-		fs.mkdir("dist/icons/", {recursive: true});
 		fs.copyFileSync(filepath, "dist/icons/" + filename);
 	});
 
