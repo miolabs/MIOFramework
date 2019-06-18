@@ -1,0 +1,402 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		145C236B22B964690020A60B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 145C236A22B964690020A60B /* Assets.xcassets */; };
+		14E0F7B022B7CDE200CAA4EF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E0F7AF22B7CDE200CAA4EF /* AppDelegate.swift */; };
+		14E0F7B222B7CDE200CAA4EF /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E0F7B122B7CDE200CAA4EF /* MainViewController.swift */; };
+		14E0F7B522B7CDE200CAA4EF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14E0F7B322B7CDE200CAA4EF /* Main.storyboard */; };
+		14E0F7B822B7CDE200CAA4EF /* ZaraCore.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 14E0F7B622B7CDE200CAA4EF /* ZaraCore.xcdatamodeld */; };
+		14E0F7BD22B7CDE300CAA4EF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14E0F7BB22B7CDE300CAA4EF /* LaunchScreen.storyboard */; };
+		14E0F7E822B8965600CAA4EF /* CollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E0F7E722B8965600CAA4EF /* CollectionViewCell.swift */; };
+		14E0F7EB22B8AA0900CAA4EF /* HeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E0F7EA22B8AA0900CAA4EF /* HeaderCell.swift */; };
+		14E0F7ED22B8AC4200CAA4EF /* ImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E0F7EC22B8AC4200CAA4EF /* ImageCell.swift */; };
+		14E0F7F122B8CDB600CAA4EF /* ShoppingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E0F7F022B8CDB600CAA4EF /* ShoppingViewController.swift */; };
+		14E0F7F422B8D6A600CAA4EF /* FavoritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E0F7F322B8D6A600CAA4EF /* FavoritesViewController.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		145C236A22B964690020A60B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		14E0F7AC22B7CDE200CAA4EF /* ZaraCore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZaraCore.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		14E0F7AF22B7CDE200CAA4EF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		14E0F7B122B7CDE200CAA4EF /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		14E0F7B422B7CDE200CAA4EF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		14E0F7B722B7CDE200CAA4EF /* ZaraCore.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ZaraCore.xcdatamodel; sourceTree = "<group>"; };
+		14E0F7BC22B7CDE300CAA4EF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		14E0F7BE22B7CDE300CAA4EF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		14E0F7E722B8965600CAA4EF /* CollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewCell.swift; sourceTree = "<group>"; };
+		14E0F7EA22B8AA0900CAA4EF /* HeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderCell.swift; sourceTree = "<group>"; };
+		14E0F7EC22B8AC4200CAA4EF /* ImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCell.swift; sourceTree = "<group>"; };
+		14E0F7F022B8CDB600CAA4EF /* ShoppingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingViewController.swift; sourceTree = "<group>"; };
+		14E0F7F322B8D6A600CAA4EF /* FavoritesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesViewController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		14E0F7A922B7CDE200CAA4EF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		14E0F7A322B7CDE200CAA4EF = {
+			isa = PBXGroup;
+			children = (
+				14E0F7AE22B7CDE200CAA4EF /* ZaraCore */,
+				14E0F7AD22B7CDE200CAA4EF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		14E0F7AD22B7CDE200CAA4EF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				14E0F7AC22B7CDE200CAA4EF /* ZaraCore.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		14E0F7AE22B7CDE200CAA4EF /* ZaraCore */ = {
+			isa = PBXGroup;
+			children = (
+				14E0F7F222B8D69200CAA4EF /* Favorites Scene */,
+				14E0F7EF22B8CD9400CAA4EF /* Shopping Scene */,
+				14E0F7E922B898BF00CAA4EF /* Main Scene */,
+				14E0F7AF22B7CDE200CAA4EF /* AppDelegate.swift */,
+				145C236A22B964690020A60B /* Assets.xcassets */,
+				14E0F7B322B7CDE200CAA4EF /* Main.storyboard */,
+				14E0F7BB22B7CDE300CAA4EF /* LaunchScreen.storyboard */,
+				14E0F7BE22B7CDE300CAA4EF /* Info.plist */,
+				14E0F7B622B7CDE200CAA4EF /* ZaraCore.xcdatamodeld */,
+			);
+			path = ZaraCore;
+			sourceTree = "<group>";
+		};
+		14E0F7E922B898BF00CAA4EF /* Main Scene */ = {
+			isa = PBXGroup;
+			children = (
+				14E0F7B122B7CDE200CAA4EF /* MainViewController.swift */,
+				14E0F7E722B8965600CAA4EF /* CollectionViewCell.swift */,
+				14E0F7EA22B8AA0900CAA4EF /* HeaderCell.swift */,
+				14E0F7EC22B8AC4200CAA4EF /* ImageCell.swift */,
+			);
+			name = "Main Scene";
+			sourceTree = "<group>";
+		};
+		14E0F7EF22B8CD9400CAA4EF /* Shopping Scene */ = {
+			isa = PBXGroup;
+			children = (
+				14E0F7F022B8CDB600CAA4EF /* ShoppingViewController.swift */,
+			);
+			name = "Shopping Scene";
+			sourceTree = "<group>";
+		};
+		14E0F7F222B8D69200CAA4EF /* Favorites Scene */ = {
+			isa = PBXGroup;
+			children = (
+				14E0F7F322B8D6A600CAA4EF /* FavoritesViewController.swift */,
+			);
+			name = "Favorites Scene";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		14E0F7AB22B7CDE200CAA4EF /* ZaraCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 14E0F7C122B7CDE300CAA4EF /* Build configuration list for PBXNativeTarget "ZaraCore" */;
+			buildPhases = (
+				14E0F7A822B7CDE200CAA4EF /* Sources */,
+				14E0F7A922B7CDE200CAA4EF /* Frameworks */,
+				14E0F7AA22B7CDE200CAA4EF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ZaraCore;
+			productName = ZaraCore;
+			productReference = 14E0F7AC22B7CDE200CAA4EF /* ZaraCore.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		14E0F7A422B7CDE200CAA4EF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1020;
+				LastUpgradeCheck = 1020;
+				ORGANIZATIONNAME = "Javier Segura Perez";
+				TargetAttributes = {
+					14E0F7AB22B7CDE200CAA4EF = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
+				};
+			};
+			buildConfigurationList = 14E0F7A722B7CDE200CAA4EF /* Build configuration list for PBXProject "ZaraCore" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 14E0F7A322B7CDE200CAA4EF;
+			productRefGroup = 14E0F7AD22B7CDE200CAA4EF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				14E0F7AB22B7CDE200CAA4EF /* ZaraCore */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		14E0F7AA22B7CDE200CAA4EF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				14E0F7BD22B7CDE300CAA4EF /* LaunchScreen.storyboard in Resources */,
+				145C236B22B964690020A60B /* Assets.xcassets in Resources */,
+				14E0F7B522B7CDE200CAA4EF /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		14E0F7A822B7CDE200CAA4EF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				14E0F7E822B8965600CAA4EF /* CollectionViewCell.swift in Sources */,
+				14E0F7EB22B8AA0900CAA4EF /* HeaderCell.swift in Sources */,
+				14E0F7F422B8D6A600CAA4EF /* FavoritesViewController.swift in Sources */,
+				14E0F7F122B8CDB600CAA4EF /* ShoppingViewController.swift in Sources */,
+				14E0F7B822B7CDE200CAA4EF /* ZaraCore.xcdatamodeld in Sources */,
+				14E0F7B222B7CDE200CAA4EF /* MainViewController.swift in Sources */,
+				14E0F7B022B7CDE200CAA4EF /* AppDelegate.swift in Sources */,
+				14E0F7ED22B8AC4200CAA4EF /* ImageCell.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		14E0F7B322B7CDE200CAA4EF /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				14E0F7B422B7CDE200CAA4EF /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		14E0F7BB22B7CDE300CAA4EF /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				14E0F7BC22B7CDE300CAA4EF /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		14E0F7BF22B7CDE300CAA4EF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		14E0F7C022B7CDE300CAA4EF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		14E0F7C222B7CDE300CAA4EF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 53X2422NYU;
+				INFOPLIST_FILE = ZaraCore/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.miolabs.ZaraCore;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		14E0F7C322B7CDE300CAA4EF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 53X2422NYU;
+				INFOPLIST_FILE = ZaraCore/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.miolabs.ZaraCore;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		14E0F7A722B7CDE200CAA4EF /* Build configuration list for PBXProject "ZaraCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				14E0F7BF22B7CDE300CAA4EF /* Debug */,
+				14E0F7C022B7CDE300CAA4EF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		14E0F7C122B7CDE300CAA4EF /* Build configuration list for PBXNativeTarget "ZaraCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				14E0F7C222B7CDE300CAA4EF /* Debug */,
+				14E0F7C322B7CDE300CAA4EF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		14E0F7B622B7CDE200CAA4EF /* ZaraCore.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				14E0F7B722B7CDE200CAA4EF /* ZaraCore.xcdatamodel */,
+			);
+			currentVersion = 14E0F7B722B7CDE200CAA4EF /* ZaraCore.xcdatamodel */;
+			path = ZaraCore.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 14E0F7A422B7CDE200CAA4EF /* Project object */;
+}
