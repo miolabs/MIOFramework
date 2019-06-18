@@ -118,6 +118,15 @@ for(let optional of optionals) {
             text: ")"
           })
         }
+        else {
+          let hasSemicolon = declaration.getLastChild().getKindName() === 'SemicolonToken'
+          let pos = declaration.getLastChild().getEnd() - (hasSemicolon ? 1 : 0)
+          replacements.push({
+            file: reference.getSourceFile().getFilePath(),
+            range: [pos, pos],
+            text: " = _injectIntoOptional(null)"
+          })
+        }
         continue
       }
   
@@ -177,7 +186,7 @@ for(let replacement of replacements) {
   file.replaceText(replacement.range, replacement.text)
 }
 
-//console.log('!!!', project.getSourceFile("UIKit.web.ts").getText())
+//for(let sourceFile of project.getSourceFiles()) console.log(sourceFile.getText())
 
 /*for(let sourceFile of project.getSourceFiles()) {
   let path = sourceFile.getFilePath()
