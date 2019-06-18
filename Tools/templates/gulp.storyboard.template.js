@@ -63,7 +63,10 @@ function parserDidStartElement(parser, element, attributes){
 		let item = pushNewElement(element, attributes);
 
 		let key = attributes["key"];
-		item["ExtraAttributes"].push('data-bar-button-item-key="' +  key + '"');		
+		if (key != null) item["ExtraAttributes"].push('data-bar-button-item-key="' +  key + '"');		
+
+		let image = attributes["image"];
+		if (image != null) item["ExtraAttributes"].push('data-bar-button-item-image="' +  image + '.png"');		
 
 		let systemItem = attributes["systemItem"];
 		if (systemItem != null) {			
@@ -112,10 +115,31 @@ function parserDidStartElement(parser, element, attributes){
 	else if(element == "tableViewCellContentView") {
 		pushNewElement(element, attributes);
 	}
+	else if(element == "collectionView") {
+		pushNewElement(element, attributes);
+	}
+	else if(element == "collectionViewFlowLayout") {
+		pushNewElement(element, attributes);
+	}
+	else if(element == "collectionViewCell") {
+		let item = pushNewElement(element, attributes);
+		let style = attributes["style"];
+		let textLabelID = attributes["textLabel"];
+
+		let reuseIdentifier = attributes["reuseIdentifier"];
+		item["ExtraAttributes"].push('data-cell-identifier="' + reuseIdentifier + '"');
+		if (style != null) item["ExtraAttributes"].push('data-cell-style="' + style + '"');		
+	}
 	else if (element == "segmentedControl"){
 		let item = pushNewElement(element, attributes);						
 	
 		parseSegmentControlStyle(attributes["segmentControlStyle"], item["Classes"]);		
+	}
+	else if (element == "toolbar"){		
+		let item = pushNewElement(element, attributes);
+	}
+	else if (element == "imageView"){		
+		let item = pushNewElement(element, attributes);
 	}
 	else if (element == "segment"){		
 		currentElement["Content"] = currentElement["Content"] + '<div class="segment"><span>' + attributes["title"] +'</span></div>';
@@ -140,13 +164,14 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "rect"){		
 		let styles = currentElement["Styles"];
-		if (currentElement["CustomClass"] != "UITableViewCell") {			
-			styles.push("position:relative;");
-		}
+		// if (currentElement["CustomClass"] != "UITableViewCell") {			
+		// 	styles.push("position:relative;");
+		// }
 		// else {
 		// 	styles.push("position:relative;");
 		// }
 	
+		styles.push("position:absolute;");
 		if (attributes["x"] != null) styles.push("left:" + attributes["x"] + "px;");
 		if (attributes["y"] != null) styles.push("top:" + attributes["y"] + "px;");
 		if (attributes["width"] != null) styles.push("width:" + attributes["width"] + "px;");
@@ -260,6 +285,21 @@ function parserDidEndElement(parser, element){
 	else if(element == "tableViewCellContentView") {
 		popElement();
 	}
+	else if(element == "collectionView") {
+		popElement();
+	}
+	else if(element == "collectionViewFlowLayout") {
+		popElement();
+	}
+	else if(element == "collectionViewCell") {
+		popElement();
+	}
+	else if (element == "toolbar"){		
+		popElement();
+	}
+	else if (element == "imageView"){		
+		popElement();
+	}
 	else if (element == "segmentedControl"){
 		popElement();
 	}
@@ -302,6 +342,9 @@ function pushNewElement(element, attributes){
 	if (customClass == null) customClass = "UI" + element.charAt(0).toUpperCase() + element.substring(1);
 	item["ExtraAttributes"] = ['data-class="' + customClass + '"'];	
 	item["CustomClass"] = customClass;
+
+	let tag = attributes["tag"];
+	if (tag != null) item["ExtraAttributes"].push('data-tag="' + tag + '"');	
 
 	classes.push(parseClassType(element));
 	if (contenMode != null) classes.push(contenMode);
@@ -356,7 +399,9 @@ function popElement(){
 	
 	if (outlets.length + segues.length > 0) content += '</div>';
 
-	addContentToParentItem('<div ' + classes + 'id="' + id + '"' + extraAttributes.join(" ") + styles + '>', parentItem);
+	addContentToParentItem('<div ' + classes, parentItem);
+	if (id != null) addContentToParentItem(' id="' + id + '"', parentItem);
+	addContentToParentItem(extraAttributes.join(" ") + styles + '>', parentItem);
 	if (content.length > 0) addContentToParentItem(content, parentItem);	
 	addContentToParentItem('</div>', parentItem);		
 

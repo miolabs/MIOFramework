@@ -1,4 +1,5 @@
 import { NSObject } from "mio-foundation-web";
+import { NSClassFromString } from "mio-foundation-web";
 import { NSLocalizeString } from "mio-foundation-web";
 import { UIViewController } from "./UIViewController";
 import { _MUIHideViewController } from "./core/MUICore";
@@ -55,14 +56,26 @@ export class UINavigationController extends UIViewController
         // }
     }
 
-    protected _setViewLoaded(value) {        
-        this._navigationBar = this.view as UINavigationBar;
-        this._navigationBar.removeFromSuperview();
-
+    protected _loadViewFromNib(layer, classname:string){
+        this._contentView = new UIView();
+        this._contentView.initWithLayer(layer, this);
+        
+        this._navigationBar = this._contentView.subviews[0];
+        this._segues = this._contentView._segues;        
+        
         this.view = new UIView();
         this.view.init();
-
         this.view.addSubview(this._navigationBar);
+
+        this._checkSegues();
+        this._didLoadView();
+    }
+
+    protected _setViewLoaded(value) {                
+        this.rootViewController.view.layer.style.left = "0px";
+        this.rootViewController.view.layer.style.top = "44px";
+        this.rootViewController.view.layer.style.width = "100%";
+        this.rootViewController.view.layer.style.botton = "0px";
         this.view.addSubview(this.rootViewController.view);
         
         let navItems = [this.rootViewController.navigationItem];

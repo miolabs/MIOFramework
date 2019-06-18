@@ -3781,6 +3781,7 @@ export class NumberFormatter extends Formatter {
 }
 
 
+
 /**
  * Created by godshadow on 21/3/16.
  */
@@ -3793,28 +3794,25 @@ export class Timer extends NSObject
     private _completion = null;
 
     private _coreTimer = null;
-
-    static scheduledTimerWithTimeInterval(timeInterval, repeat, target, completion)
-    {
-        var timer = new Timer();
-        timer.initWithTimeInterval(timeInterval, repeat, target, completion);
-
+    
+    //TODO: Remove this hack (method name) for swift js
+    static scheduledTimerWithTimeIntervalRepeatsBlock(timeInterval, repeat, completion){
+        let timer = new Timer();
+        timer.initWithTimeInterval(timeInterval, repeat, completion);
         timer.fire();
 
         return timer;
     }
 
-    initWithTimeInterval(timeInterval, repeat, target, completion)
-    {
+    initWithTimeInterval(timeInterval, repeat, completion){
         this._timerInterval = timeInterval;
         this._repeat = repeat;
-        this._target = target;
+        //this._target = target;
         this._completion = completion;
     }
 
-    fire()
-    {
-        var instance = this;
+    fire(){
+        let instance = this;
         
         if (this._repeat){
             this._coreTimer = setInterval(function(){

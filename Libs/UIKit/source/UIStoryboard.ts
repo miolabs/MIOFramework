@@ -65,7 +65,7 @@ export function MUICoreStoryboardParseLayer(layer, object, owner:UIViewControlle
                         let prop = d.getAttribute("data-property");
                         let outlet = d.getAttribute("data-outlet");
 
-                        MUICoreStoryboardConnectOutlet(owner, prop, outlet);
+                        MUICoreStoryboardConnectOutlet(object, owner, prop, outlet);
                     }
                     else if (type == "segue") {
                         let destination = d.getAttribute("data-segue-destination");
@@ -99,7 +99,7 @@ export function MUICoreStoryboardParseConnectionsLayer(layer, object, owner:UIVi
                 let prop = subLayer.getAttribute("data-property");
                 let outlet = subLayer.getAttribute("data-outlet");
 
-                MUICoreStoryboardConnectOutlet(owner, prop, outlet);
+                MUICoreStoryboardConnectOutlet(object, owner, prop, outlet);
             }
             else if (type == "segue") {
                 let destination = subLayer.getAttribute("data-segue-destination");
@@ -117,11 +117,11 @@ export function MUICoreStoryboardParseConnectionsLayer(layer, object, owner:UIVi
 
 declare function _injectIntoOptional(value:any);
 
-export function MUICoreStoryboardConnectOutlet(owner, property, outletID){
+export function MUICoreStoryboardConnectOutlet(object, owner, property, outletID){
     console.log("prop: " + property + " - outlet: " + outletID);
 
     let obj = owner._outlets[outletID];
-    owner[property] = _injectIntoOptional(obj);
+    object[property] = _injectIntoOptional(obj);
 }
 
 

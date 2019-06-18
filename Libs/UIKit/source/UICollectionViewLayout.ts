@@ -1,20 +1,22 @@
-import { MIOObject, MIOSize, MIOIndexPath } from "../MIOFoundation";
+import { NSObject } from "mio-foundation-web";
+import { CGSize } from "mio-foundation-web";
+import { NSIndexPath } from "mio-foundation-web";
 import { UICollectionView } from "./UICollectionView";
 import { UICollectionViewLayoutAttributes } from "./UICollectionViewLayoutAttributes";
 import { UICollectionViewUpdateItem } from "./UICollectionViewUpdateItem";
 import { UIEdgeInsets } from "./UIEdgeInsets";
 
-export class UICollectionViewLayout extends MIOObject
+export class UICollectionViewLayout extends NSObject
 {    
     collectionView:UICollectionView = null;
 
     minimumLineSpacing = 0;
     minimumInteritemSpacing = 0;
-    itemSize = new MIOSize(0,0);
-    estimatedItemSize = new MIOSize(0,0);
+    itemSize = new CGSize(0,0);
+    estimatedItemSize = new CGSize(0,0);
     sectionInset:UIEdgeInsets = null;
-    headerReferenceSize:MIOSize = new MIOSize(0, 0);
-    footerReferenceSize:MIOSize = new MIOSize(0, 0);
+    headerReferenceSize:CGSize = new CGSize(0, 0);
+    footerReferenceSize:CGSize = new CGSize(0, 0);
 
     init(){
         super.init();
@@ -25,13 +27,13 @@ export class UICollectionViewLayout extends MIOObject
 
     invalidateLayout(){}    
 
-    get collectionViewContentSize():MIOSize {return MIOSize.Zero();}
+    get collectionViewContentSize():CGSize {return CGSize.Zero();}
 
-    layoutAttributesForItemAtIndexPath(indexPath:MIOIndexPath):UICollectionViewLayoutAttributes{return null};
+    layoutAttributesForItemAtIndexPath(indexPath:NSIndexPath):UICollectionViewLayoutAttributes{return null};
 
     prepareForCollectionViewUpdates(updateItems:UICollectionViewUpdateItem[]){}
-    initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath:MIOIndexPath):UICollectionViewLayoutAttributes {return null;}
-    finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath:MIOIndexPath):UICollectionViewLayoutAttributes {return null;}
+    initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath:NSIndexPath):UICollectionViewLayoutAttributes {return null;}
+    finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath:NSIndexPath):UICollectionViewLayoutAttributes {return null;}
     finalizeCollectionViewUpdates(){}
 }
 
@@ -49,6 +51,6 @@ export class UICollectionViewFlowLayout extends UICollectionViewLayout
 
         this.minimumLineSpacing = 10;
         this.minimumInteritemSpacing = 10;
-        this.itemSize = new MIOSize(50, 50);
+        this.itemSize = new CGSize(50, 50);
     }
 }

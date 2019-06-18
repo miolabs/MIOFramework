@@ -22,21 +22,21 @@ export class UIToolbar extends UIView
 {
     buttons = [];
 
-    initWithLayer(layer, owner, options?)
-    {
+    initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
+        layer.style.width = "100%";
 
         // Check if we have sub nodes
         if (this.layer.childNodes.length > 0)
         {
-            for (var index = 0; index < this.layer.childNodes.length; index++)
+            for (let index = 0; index < this.layer.childNodes.length; index++)
             {
                 let layer = this.layer.childNodes[index]; // TODO: variablename shadows parameter
                 if (layer.tagName == "DIV")
                 {
-                    var lid = layer.getAttribute("id");
-                    var tb = new UIToolbarButton(lid); 
-                    var button = UIToolbarButton.buttonWithLayer(layer, owner);
+                    let lid = layer.getAttribute("id");
+                    let tb = new UIToolbarButton(lid); 
+                    let button = UIToolbarButton.buttonWithLayer(layer, owner);
                     button.parent = this;
 
                     this._linkViewToSubview(button);
@@ -46,8 +46,7 @@ export class UIToolbar extends UIView
         }
     }
 
-    addToolbarButton(button)
-    {
+    addToolbarButton(button){
         this.buttons.push(button);
     }
 }

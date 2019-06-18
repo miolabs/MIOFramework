@@ -93,6 +93,7 @@ function copyResources(done) {
 	const SWIFT_PATH = "node_modules/mio-swiftlib/";
 	const ANIMATECSS_PATH = "node_modules/animate.css/animate.min.css";
 	const SRC_ICONS_PATH = "../../Tools/resources/icons/";
+	const ASSETS_PATH = "./{AppName}/Assets.xcassets/";
 
 	//RESOURCES
 	fs.copyFileSync(RESOURCES_PATH + "index.html", DEST + "index.html");
@@ -107,6 +108,13 @@ function copyResources(done) {
 		fs.copyFileSync(filepath, "dist/icons/" + filename);
 	});
 
+	//COPY ASSETS FOLDER
+	fs.mkdirSync("dist/assets/", {recursive: true});
+	// fs.recurseSync(ASSETS_PATH, function(filepath, relative, filename) {
+	// 	fs.copyFileSync(filepath, "dist/assets/" + filename);		
+	// });
+	assetsFolderScan(ASSETS_PATH);
+
 	//FOUNDATION WEB
 	if (fs.existsSync(FOUNDATION_PATH + "mio-foundation-web.js")) fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web.js", DEST + "libs/mio-foundation-web/mio-foundation-web.js");
 
@@ -116,6 +124,16 @@ function copyResources(done) {
 	fs.copyFileSync(APP_PLIST_PATH, DEST + "app.plist");
 
 	done();
+}
+
+function assetsFolderScan(path){
+	fs.recurseSync(path, function(filepath, relative, filename) {
+		if (fs.lstatSync(filepath).isDirectory() == true) assetsFolderScan(filepath)
+		else {
+			var ext = filename.substring(filename.lastIndexOf('.') + 1);
+			if (ext != "json") fs.copyFileSync(filepath, "dist/assets/" + filename);		
+		}
+	});
 }
 
 module.exports = {

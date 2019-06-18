@@ -1,4 +1,4 @@
-import { MIOObject } from "../MIOFoundation";
+import { NSObject } from "mio-foundation-web";
 
 
 
@@ -10,7 +10,7 @@ export function MIOEdgeInsetsMake(top, left, bottom, rigth){
     return ei;
 }
 
-export class UIEdgeInsets extends MIOObject
+export class UIEdgeInsets extends NSObject
 {
     top = 0;
     left = 0;
@@ -22,7 +22,7 @@ export class UIEdgeInsets extends MIOObject
         ei.init();
 
         return ei;
-    }
+    }    
 
     initWithValues(top, left, bottom, right){
         

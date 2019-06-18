@@ -1,5 +1,6 @@
 
 import { NSObject } from "mio-foundation-web";
+import { MIOCoreStringHasSuffix } from "mio-foundation-web";
 import { CGRect } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 import "./node_modules/mio-foundation-web/extensions"
@@ -11,7 +12,10 @@ import { UIGestureRecognizer } from "./UIGestureRecognizer";
 import { UIEvent } from "./UIEvent";
 import { MUICoreLayerSearchElementByID } from "./core/MUICoreLayer";
 import { MUICoreStoryboardParseConnectionsLayer } from "./UIStoryboard";
+import { MUICoreStoryboardParseLayer } from "./UIStoryboard";
 import { UIColor } from "./UIColor";
+import { UINavigationItem } from "./UINavigationItem";
+import { _UIStoryboardSeguePerform } from "./UIStoryboardSegue";
 
 
 /**
@@ -130,7 +134,9 @@ export class UIView extends NSObject {
                 if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
     
                 if (subLayer.getAttribute("data-connections") == "true") {
-                    MUICoreStoryboardParseConnectionsLayer(subLayer, this, owner);
+                    let obj = this;
+                    if (options != null && options["Object"] != null) obj = options["Object"];
+                    MUICoreStoryboardParseConnectionsLayer(subLayer, obj, owner);
                     continue;
                 }
 
@@ -144,7 +150,7 @@ export class UIView extends NSObject {
                 //if (className == null || className.length == 0) className = "UIView";
                 if (className == null) continue;
     
-                //if (className == "UIBarItem" || className == "UIBarButtonItem" || className == "UINavigationItem") continue;    
+                if (className == "UIBarItem" || className == "UIBarButtonItem" || className == "UINavigationItem" || className == "UICollectionViewFlowLayout") continue;    
 
                 let sv = MUICoreViewCreateView(subLayer, owner);
                 this._linkViewToSubview(sv);
@@ -280,7 +286,7 @@ export class UIView extends NSObject {
     viewWithTag(tag): UIView {
         // TODO: Use also the view tag component
         let view = MUICoreViewSearchViewTag(this, tag);
-        return view;
+        return _injectIntoOptional(view);
     }
 
     layoutSubviews() {
@@ -499,8 +505,9 @@ export class UIView extends NSObject {
     }
 
     protected _getIntValueFromCSSProperty(property) {
-        var v = this._getValueFromCSSProperty(property);
-        var r = v.hasSuffix("px");
+        let v = this._getValueFromCSSProperty(property);
+        //let r = v.hasSuffix("px");
+        let r = MIOCoreStringHasSuffix(v, "px");
         if (r == true) v = v.substring(0, v.length - 2);
         else {
             var r2 = v.hasSuffix("%");

@@ -24,11 +24,21 @@ export * from './UITextField'
 export * from './UISegmentedControl'
 export * from './UISwitch'
 
+export * from './UIImage'
+export * from './UIImageView'
+
 export * from './UIViewController'
 export * from './UIViewController_PresentationController'
 export * from './UIViewController_PopoverPresentationController'
 
 export * from './UIScrollView'
+
+export * from './UIEdgeInsets'
+export * from './UICollectionViewLayoutAttributes'
+export * from './UICollectionViewUpdateItem'
+export * from './UICollectionView'
+export * from './UICollectionViewLayout'
+
 export * from './UITableView'
 export * from './UITableViewController'
 export * from './UITableViewCell'
@@ -42,6 +52,7 @@ export * from './UINavigationBar'
 export * from './UINavigationItem'
 export * from './UINavigationController'
 
+export * from './UIToolbar'
 
 //export * from './UISplitViewController'
 

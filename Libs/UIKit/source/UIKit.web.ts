@@ -6,6 +6,7 @@ import { NSLocalizeString } from "mio-foundation-web";
 import { MIOCoreBundleGetContentsFromURLString } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 import { NSPoint } from "mio-foundation-web";
+import { MIOCoreStringHasSuffix } from "mio-foundation-web";
 import { CGRect } from "mio-foundation-web";
 import { NSFormatter } from "mio-foundation-web";
 import { CGSize } from "mio-foundation-web";
@@ -17,6 +18,7 @@ import { MIOCoreGetPlatform } from "mio-foundation-web";
 import { MIOCorePlatformType } from "mio-foundation-web";
 import { NSIndexPath } from "mio-foundation-web";
 import "mio-foundation-web/extensions"
+import { NSIndexPath, NSObject } from "mio-foundation-web";
 import { NSBundle } from "mio-foundation-web";
 import { MIOCoreBundleGetAppResource } from "mio-foundation-web";
 import { NSURLRequest } from "mio-foundation-web";
@@ -945,6 +947,10 @@ export class UIPanGestureRecognizer extends UIGestureRecognizer
 
 
 
+
+
+
+
 /**
  * Created by godshadow on 11/3/16.
  */
@@ -1061,7 +1067,9 @@ export class UIView extends NSObject {
                 if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
     
                 if (subLayer.getAttribute("data-connections") == "true") {
-                    MUICoreStoryboardParseConnectionsLayer(subLayer, this, owner);
+                    let obj = this;
+                    if (options != null && options["Object"] != null) obj = options["Object"];
+                    MUICoreStoryboardParseConnectionsLayer(subLayer, obj, owner);
                     continue;
                 }
 
@@ -1075,7 +1083,7 @@ export class UIView extends NSObject {
                 //if (className == null || className.length == 0) className = "UIView";
                 if (className == null) continue;
     
-                //if (className == "UIBarItem" || className == "UIBarButtonItem" || className == "UINavigationItem") continue;    
+                if (className == "UIBarItem" || className == "UIBarButtonItem" || className == "UINavigationItem" || className == "UICollectionViewFlowLayout") continue;    
 
                 let sv = MUICoreViewCreateView(subLayer, owner);
                 this._linkViewToSubview(sv);
@@ -1211,7 +1219,7 @@ export class UIView extends NSObject {
     viewWithTag(tag): UIView {
         // TODO: Use also the view tag component
         let view = MUICoreViewSearchViewTag(this, tag);
-        return view;
+        return _injectIntoOptional(view);
     }
 
     layoutSubviews() {
@@ -1430,8 +1438,9 @@ export class UIView extends NSObject {
     }
 
     protected _getIntValueFromCSSProperty(property) {
-        var v = this._getValueFromCSSProperty(property);
-        var r = v.hasSuffix("px");
+        let v = this._getValueFromCSSProperty(property);
+        //let r = v.hasSuffix("px");
+        let r = MIOCoreStringHasSuffix(v, "px");
         if (r == true) v = v.substring(0, v.length - 2);
         else {
             var r2 = v.hasSuffix("%");
@@ -2403,6 +2412,73 @@ export class UISwitch extends UIControl
 
 
 
+export class UIImage extends NSObject
+{    
+    initNamedString(name: string){
+        this._imageURL = "assets/" + name;
+    }
+
+    _imageURL:string;
+    get _url(){
+        return this._imageURL;
+    }
+}
+
+
+
+
+/**
+ * Created by godshadow on 12/3/16.
+ */
+
+export class UIImageView extends UIView
+{
+    private _imageLayer = null;
+
+    init(){
+        super.init();
+        this.setupLayers();
+    }
+
+    initWithLayer(layer, owner, options?){
+        super.initWithLayer(layer, owner, options);
+        this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "IMG");
+        this.setupLayers();
+    }
+
+    private setupLayers(){
+        if (this._imageLayer == null) {
+            this._imageLayer = document.createElement("img");
+            this._imageLayer.style.width = "100%";
+            this._imageLayer.style.height = "100%";
+            this.layer.appendChild(this._imageLayer);
+        }
+    }
+
+    set image(image:UIImage){
+        if (image != null){
+            this._imageLayer.setAttribute("src", image._url);
+        }
+        else {
+            this._imageLayer.removeAttribute("src");
+        }
+
+    }
+
+    setHeight(h){
+        super.setHeight(h);
+        this._imageLayer.setAttribute("height", h);
+    }
+
+    setWidth(w){
+        super.setWidth(w);
+        this._imageLayer.setAttribute("width", w);
+    }
+}
+
+
+
+
 
 
 
@@ -2522,7 +2598,7 @@ export class UIViewController extends NSObject {
         layer.innerHTML = NSLocalizeString(key, key);
     }
 
-    public _contentView:UIView = null;
+    protected _contentView:UIView = null;
     loadView() {
         if (this.view != null) {
             this._didLoadView();
@@ -2539,12 +2615,7 @@ export class UIViewController extends NSObject {
         }
 
         MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (this: UIViewController, layer, classname:string) {                        
-            this._contentView = new UIView();
-            this._contentView.initWithLayer(layer, this);
-            this._segues = this._contentView._segues;
-            this.view = this._contentView.subviews[0];
-            this._checkSegues();
-            this._didLoadView();
+            this._loadViewFromNib(layer, classname);
         });
 
         // let mainBundle = NSBundle.mainBundle();
@@ -2567,6 +2638,18 @@ export class UIViewController extends NSObject {
         //     this.view.awakeFromHTML();
         //     this._didLoadView();
         // });        
+    }
+
+    protected _loadViewFromNib(layer, classname:string){
+        let layerID = layer.getAttribute("id");
+        if (layerID != null) this._outlets[layerID] = this;
+
+        this._contentView = new UIView();
+        this._contentView.initWithLayer(layer, this, {"Object": this});
+        this.view = this._contentView.subviews[0];
+        this._segues = this._contentView._segues;        
+        this._checkSegues();
+        this._didLoadView();
     }
 
     _didLoadNibWithLayer(layerData) {
@@ -3650,6 +3733,543 @@ export class UIScrollView extends UIView {
 
 
 
+export function MIOEdgeInsetsMake(top, left, bottom, rigth){
+
+    let ei = new UIEdgeInsets();
+    ei.initWithValues(top, left, bottom, rigth);
+
+    return ei;
+}
+
+export class UIEdgeInsets extends NSObject
+{
+    top = 0;
+    left = 0;
+    bottom = 0;
+    right = 0;
+    
+    static Zero():UIEdgeInsets {
+        let ei = new UIEdgeInsets();
+        ei.init();
+
+        return ei;
+    }    
+
+    initWithValues(top, left, bottom, right){
+        
+        super.init();
+
+        this.top = top;
+        this.left = left;
+        this.bottom = bottom;
+        this.right = right;
+    }
+}
+
+
+
+export class UICollectionViewLayoutAttributes extends NSObject
+{
+    indexPath:NSIndexPath = null;
+}
+
+
+export class UICollectionViewUpdateItem extends NSObject
+{
+
+}
+
+
+
+
+
+
+
+
+/**
+ * Created by godshadow on 09/11/2016.
+ */
+
+export class UICollectionViewCell extends UIView
+{
+    _target = null;
+    _onClickFn = null;
+    _index = null;
+    _section = null;
+
+    selected = false;
+
+    init(){
+        super.init();
+        this.setupLayers();
+    }
+
+    initWithLayer(layer, owner, options?){
+        super.initWithLayer(layer, owner, options);
+        this.setupLayers();
+    }
+
+    private setupLayers(){
+        this.layer.style.position = "absolute";
+        let instance = this;
+
+        this.layer.addEventListener("click", function(e) {
+            e.stopPropagation();
+            if (instance._onClickFn != null)
+                instance._onClickFn.call(instance._target, instance);
+        });
+    }
+
+    setSelected(value) {
+        this.willChangeValue("selected");
+        this.selected = value;
+        this.didChangeValue("selected");
+    }
+}
+
+export class UICollectionViewSection extends NSObject
+{
+    header = null;
+    footer = null;
+    cells = [];
+}
+
+export class UICollectionView extends UIView
+{
+    dataSource = null;
+    delegate = null;
+
+    private _collectionViewLayout:UICollectionViewFlowLayout = null;
+
+    private _cellPrototypes = {};
+    private _supplementaryViews = {};
+
+    private _sections = [];
+
+    selectedCellIndex = -1;
+    selectedCellSection = -1;
+
+    public get collectionViewLayout():UICollectionViewFlowLayout{
+        if (this._collectionViewLayout == null) {
+            this._collectionViewLayout = new UICollectionViewFlowLayout();
+            this._collectionViewLayout.init();
+        }
+
+        return this._collectionViewLayout;
+    }
+
+    public set collectionViewLayout(layout:UICollectionViewFlowLayout){
+        //TODO: Set animations for changing layout
+        layout.collectionView = this;
+        this._collectionViewLayout = layout;        
+        layout.invalidateLayout();
+    }
+
+    initWithLayer(layer, options){
+        super.initWithLayer(layer, options);
+
+        // Check if we have prototypes
+        if (this.layer.childNodes.length > 0){
+            for(var index = 0; index < this.layer.childNodes.length; index++){
+                var subLayer = this.layer.childNodes[index];
+
+                if (subLayer.tagName != "DIV")
+                    continue;
+
+                if (subLayer.getAttribute("data-cell-identifier") != null) {
+                    this._addCellPrototypeWithLayer(subLayer);
+                    subLayer.style.display = "none";
+                }
+                else if (subLayer.getAttribute("data-supplementary-view-identifier") != null){
+                    this._addSupplementaryViewPrototypeWithLayer(subLayer);
+                    subLayer.style.display = "none";
+                }
+            }
+        }
+    }
+
+    private _addCellPrototypeWithLayer(subLayer){
+        let cellIdentifier = subLayer.getAttribute("data-cell-identifier");
+        let cellClassname = subLayer.getAttribute("data-class");
+        if (cellClassname == null) cellClassname = "MIOCollectionViewCell";
+
+        let item = {};
+        item["class"] = cellClassname;
+        item["layer"] = subLayer;
+        let size = new CGSize(subLayer.clientWidth, subLayer.clientHeight);
+        if (size != null) item["size"] = size;
+        let bg = window.getComputedStyle(subLayer ,null).getPropertyValue('background-color');
+        if (bg != null) item["bg"] = bg;
+
+        this._cellPrototypes[cellIdentifier] = item;
+    }
+
+    private _addSupplementaryViewPrototypeWithLayer(subLayer){
+        var viewIdentifier = subLayer.getAttribute("data-supplementary-view-identifier");
+        var viewClassname = subLayer.getAttribute("data-class");
+        if (viewClassname == null) viewClassname = "MIOView";
+
+        var item = {};
+        item["class"] = viewClassname;
+        item["layer"] = subLayer;
+        var size = new CGSize(subLayer.clientWidth, subLayer.clientHeight);
+        if (size != null) item["size"] = size;
+        var bg = window.getComputedStyle(subLayer ,null).getPropertyValue('background-color');
+        if (bg != null) item["bg"] = bg;
+
+        this._supplementaryViews[viewIdentifier] = item;
+    }
+
+    registerClassForCellWithReuseIdentifier(cellClassname, identifier){        
+        let item = {};
+        item["class"] = cellClassname;
+        //item["layer"] = null;
+        this._cellPrototypes[identifier] = item;   
+    }
+
+    registerClassForSupplementaryViewWithReuseIdentifier(viewClass,identifier){
+        //TODO:
+    }
+
+    dequeueReusableCellWithReuseIdentifierFor(identifier:string, indexPath:NSIndexPath){
+        let item = this._cellPrototypes[identifier];
+
+        //instance creation here
+        let className = item["class"];
+        let cell = NSClassFromString(className);
+        cell.constructor.apply(cell);
+
+        //cell.init();
+        let layer = item["layer"];
+        if (layer != null) {
+            let newLayer = layer.cloneNode(true);
+            newLayer.style.display = "";
+            let layerID = newLayer.getAttribute("id");
+            if (layerID != null) cell._outlets[layerID] = cell;    
+            cell.initWithLayer(newLayer, cell);
+            cell.awakeFromHTML();
+        }
+        else {
+            cell.init();
+        }
+
+        // else {
+        //     let cells = item["cells"];
+        //     if (cells == null) {
+        //         cells = [];
+        //         item["cells"] = cells;
+        //     }
+        //     cells.push(cell);
+        // }
+
+        return cell;
+    }
+
+    dequeueReusableSupplementaryViewWithReuseIdentifier(identifier){
+        var item = this._supplementaryViews[identifier];
+
+        //instance creation here
+        var className = item["class"];
+        var view = NSClassFromString(className);
+        view.constructor.apply(view);
+
+        //view.init();
+        var layer = item["layer"];
+        if (layer != null) {
+            var newLayer = layer.cloneNode(true);
+            newLayer.style.display = "";
+            // var size = item["size"];
+            // if (size != null) {
+            //     view.setWidth(size.width);
+            //     view.layer.style.width = "100%";
+            //     view.setHeight(size.height);
+            // }
+            // var bg = item["bg"];
+            // if (bg != null) {
+            //     view.layer.style.background = bg;
+            // }
+            view.initWithLayer(newLayer);
+            //view._addLayerToDOM();
+            view.awakeFromHTML();
+        }
+        else {
+            var views = item["views"];
+            if (views == null) {
+                views = [];
+                item["views"] = views;
+            }
+            views.push(view);
+        }
+
+        return view;
+    }
+
+    cellAtIndexPath(indexPath:NSIndexPath){
+        var s = this._sections[indexPath.section];
+        var c = s.cells[indexPath.row];
+
+        return c;
+    }
+
+    public reloadData(){
+        
+        if (this.dataSource == null) return;
+
+        // Remove all subviews
+        for (let index = 0; index < this._sections.length; index++)
+        {
+            let sectionView = this._sections[index];
+            if (sectionView.header != null)
+                sectionView.header.removeFromSuperview();
+
+            if (sectionView.footer != null)
+                sectionView.footer.removeFromSuperview();
+
+            for (var count = 0; count < sectionView.cells.length; count++){
+                let cell = sectionView.cells[count];
+                cell.removeFromSuperview();
+                if (this.delegate != null) {
+                    if (typeof this.delegate.didEndDisplayingCellAtIndexPath === "function"){
+                        let ip = NSIndexPath.indexForRowInSection(count, index);
+                        this.delegate.didEndDisplayingCellAtIndexPath(this, cell, ip);
+                    }
+                }                
+            }
+            sectionView.cells = [];
+        }
+
+        this.selectedCellIndex = -1;
+        this.selectedCellSection = -1;    
+        this._sections = [];
+
+        let sections = 1;
+        if (typeof this.dataSource[0].numberOfSectionsIn === "function") sections = this.dataSource[0].numberOfSectionsIn(this);
+        for (let sectionIndex = 0; sectionIndex < sections; sectionIndex++) {
+
+            let section = new UICollectionViewSection();
+            section.init();
+            this._sections.push(section);
+
+            if (typeof this.dataSource[0].viewForSupplementaryViewAtIndex === "function"){
+                let hv = this.dataSource[0].viewForSupplementaryViewAtIndex(this, "header", sectionIndex);
+                section.header = hv;
+                if (hv != null) this.addSubview(hv);
+            }
+
+            let items = this.dataSource[0].collectionViewNumberOfItemsInSection(this, sectionIndex);
+            for (let index = 0; index < items; index++) {
+
+                let ip = NSIndexPath.indexForRowInSection(index, sectionIndex);
+                let cell = this.dataSource[0].collectionViewCellForItemAt(this, ip);
+                section.cells.push(cell);
+                this.addSubview(cell);
+
+                // events
+                cell._target = this;
+                cell._onClickFn = this.cellOnClickFn;
+                cell._index = index;
+                cell._section = sectionIndex;
+            }
+
+            if (typeof this.dataSource[0].viewForSupplementaryViewAtIndex === "function"){
+                let fv = this.dataSource[0].viewForSupplementaryViewAtIndex(this, "footer", sectionIndex);
+                section.footer = fv;
+                if (fv != null) this.addSubview(fv);
+            }
+        }
+
+        this.collectionViewLayout.invalidateLayout();
+        this.setNeedsDisplay();
+    }
+
+    cellOnClickFn(cell){
+        let index = cell._index;
+        let section = cell._section;
+
+        let canSelectCell = true;
+
+        // if (this.selectedCellIndex == index && this.selectedCellSection == section)
+        //     return;
+
+        if (this.delegate != null && typeof this.delegate.canSelectCellAtIndexPath === "function"){
+            canSelectCell = this.delegate.canSelectCellAtIndexPath(this, index, section);
+        }
+
+        if (canSelectCell == false)
+            return;
+
+        if (this.selectedCellIndex > -1 && this.selectedCellSection > -1){
+            let ip = NSIndexPath.indexForRowInSection(this.selectedCellIndex, this.selectedCellSection);
+            this.deselectCellAtIndexPath(ip);
+        }
+
+        this.selectedCellIndex = index;
+        this.selectedCellSection = section;
+
+        this._selectCell(cell);
+
+        if (this.delegate != null){
+            if (typeof this.delegate.didSelectCellAtIndexPath === "function"){
+                let ip = NSIndexPath.indexForRowInSection(index, section);
+                this.delegate.didSelectCellAtIndexPath(this, ip);
+            }
+        }
+
+    }
+
+    _selectCell(cell){
+        cell.setSelected(true);
+    }
+
+    selectCellAtIndexPath(index, section){
+        this.selectedCellIndex = index;
+        this.selectedCellSection = section;
+        var cell = this._sections[section].cells[index];
+        this._selectCell(cell);
+    }
+
+    _deselectCell(cell){
+        cell.setSelected(false);
+    }
+
+    deselectCellAtIndexPath(indexPath:NSIndexPath)
+    {
+        this.selectedCellIndex = -1;
+        this.selectedCellSection = -1;
+        var cell = this._sections[indexPath.section].cells[indexPath.row];
+        this._deselectCell(cell);
+    }
+
+    layoutSubviews() {                
+
+        if (this.hidden == true) return;
+        // if (this._needDisplay == false) return;
+        // this._needDisplay = false;
+
+        if (this._sections == null)
+            return;        
+
+        // var x = this.collectionViewLayout.sectionInset.left;
+        // var y = this.collectionViewLayout.sectionInset.top;
+
+        // TODO: Check margins
+        let x = 0;
+        let y = 0;
+
+        for (let count = 0; count < this._sections.length; count++)
+        {
+            let section = this._sections[count];
+            x = this.collectionViewLayout.sectionInset.left;
+
+            // Add header view
+            if (section.header != null)
+            {
+                section.header.setY(y);
+                let offsetY = section.header.getHeight();
+                if (offsetY <= 0) offsetY = 23;
+                y += offsetY + this.collectionViewLayout.headerReferenceSize.height;
+            }
+
+            // Add cells
+            let maxX = this.getWidth() - this.collectionViewLayout.sectionInset.right;
+            for (let index = 0; index < section.cells.length; index++) {
+
+                let cell = section.cells[index] as UICollectionViewCell;
+                if (this.delegate != null) {
+                    if (typeof this.delegate.willDisplayCellAtIndexPath === "function")
+                        this.delegate.willDisplayCellAtIndexPath(this, cell, index, count);
+                }
+
+                cell.setWidth(this.collectionViewLayout.itemSize.width);
+                cell.setHeight(this.collectionViewLayout.itemSize.height);
+
+                cell.setX(x);
+                cell.setY(y);
+
+                cell.setNeedsDisplay();
+
+                x += this.collectionViewLayout.itemSize.width + this.collectionViewLayout.minimumInteritemSpacing;                
+                if (x >= maxX) {
+                    x = this.collectionViewLayout.sectionInset.left;
+                    y += this.collectionViewLayout.itemSize.height;
+                    y += this.collectionViewLayout.minimumLineSpacing;
+                }
+            }
+
+            y += this.collectionViewLayout.minimumLineSpacing;
+
+            // Add footer view
+            if (section.footer != null)
+            {
+                section.footer.setY(y);
+                let offsetY = section.footer.getHeight();
+                if (offsetY <= 0) offsetY = 23;
+                y += offsetY + this.collectionViewLayout.footerReferenceSize.height;
+            }
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
+export class UICollectionViewLayout extends NSObject
+{    
+    collectionView:UICollectionView = null;
+
+    minimumLineSpacing = 0;
+    minimumInteritemSpacing = 0;
+    itemSize = new CGSize(0,0);
+    estimatedItemSize = new CGSize(0,0);
+    sectionInset:UIEdgeInsets = null;
+    headerReferenceSize:CGSize = new CGSize(0, 0);
+    footerReferenceSize:CGSize = new CGSize(0, 0);
+
+    init(){
+        super.init();
+
+        this.sectionInset = new UIEdgeInsets();
+        this.sectionInset.init();
+    }
+
+    invalidateLayout(){}    
+
+    get collectionViewContentSize():CGSize {return CGSize.Zero();}
+
+    layoutAttributesForItemAtIndexPath(indexPath:NSIndexPath):UICollectionViewLayoutAttributes{return null};
+
+    prepareForCollectionViewUpdates(updateItems:UICollectionViewUpdateItem[]){}
+    initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath:NSIndexPath):UICollectionViewLayoutAttributes {return null;}
+    finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath:NSIndexPath):UICollectionViewLayoutAttributes {return null;}
+    finalizeCollectionViewUpdates(){}
+}
+
+export enum MIOCollectionViewScrollDirection {
+    Vertical,
+    Horizontal
+}
+
+export class UICollectionViewFlowLayout extends UICollectionViewLayout
+{
+    scrollDirection = MIOCollectionViewScrollDirection.Vertical;
+
+    init(){
+        super.init();
+
+        this.minimumLineSpacing = 10;
+        this.minimumInteritemSpacing = 10;
+        this.itemSize = new CGSize(50, 50);
+    }
+}
+
+
+
+
 
 
 
@@ -3664,6 +4284,7 @@ export class UITableView extends UIView
 
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
+        layer.style.width = "100%";
 
         // Check if we have prototypes
         if (this.layer.childNodes.length > 0) {
@@ -3722,9 +4343,9 @@ export class UITableView extends UIView
         item["class"] = cellClassname;
         item["layer"] = layer;
         this.footerLayer = item;
-    }    
-
-    dequeueReusableCellWithIdentifierFor(identifier:string, indexPath:NSIndexPath): UITableViewCell {
+    } 
+    
+    dequeueReusableCellWithIdentifier(identifier:string): UITableViewCell {
         let item = this.cellPrototypes[identifier];
 
         let cell: UITableViewCell = null;        
@@ -3735,8 +4356,10 @@ export class UITableView extends UIView
         let layer = item["layer"];
         if (layer != null) {
             let newLayer = layer.cloneNode(true);
-            newLayer.style.display = "";            
-            cell.initWithLayer(newLayer, this.owner);
+            newLayer.style.display = "";   
+            let layerID = newLayer.getAttribute("id");
+            if (layerID != null) cell._outlets[layerID] = cell;    
+            cell.initWithLayer(newLayer, cell);         
             cell.awakeFromHTML();            
         }
 
@@ -3750,7 +4373,7 @@ export class UITableView extends UIView
         //cell._onAccessoryClickFn = this.cellOnAccessoryClickFn;
         // cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
 
-        return cell;
+        return _injectIntoOptional(cell);
     }
 
 
@@ -3760,14 +4383,14 @@ export class UITableView extends UIView
 
     private addSectionHeader(section){
         let header = null;
-        if (typeof this.dataSource.viewForHeaderInSection === "function") header = this.dataSource.viewForHeaderInSection(this, section) as UIView;        
+        if (typeof this.dataSource[0].viewForHeaderInSection === "function") header = this.dataSource[0].viewForHeaderInSection(this, section) as UIView;        
         if (header == null) return;
         header.hidden = false;
         this.addSubview(header);
     }
 
     private addCell(indexPath:NSIndexPath){
-        let cell = this.dataSource.tableViewCellForRowAt(this, indexPath) as UITableViewCell;
+        let cell = this.dataSource[0].tableViewCellForRowAt(this, indexPath) as UITableViewCell;
         let section = this.sections[indexPath.section];                
                 
         let nextIP = this.nextIndexPath(indexPath);
@@ -3848,13 +4471,13 @@ export class UITableView extends UIView
         if (this.dataSource == null) return;
 
         let sections = 1;
-        if (typeof this.dataSource.numberOfSectionsIn === "function") sections = this.dataSource.numberOfSectionsIn(this);
+        if (typeof this.dataSource[0].numberOfSectionsIn === "function") sections = this.dataSource[0].numberOfSectionsIn(this);
         
         for (let sectionIndex = 0; sectionIndex < sections; sectionIndex++) {            
             let section = [];                                    
             this.sections.push(section);
             
-            let rows = this.dataSource.tableViewNumberOfRowsInSection(this, sectionIndex);            
+            let rows = this.dataSource[0].tableViewNumberOfRowsInSection(this, sectionIndex);
             if (rows == 0) continue;
             
             this.addSectionHeader(sectionIndex);
@@ -3986,7 +4609,7 @@ export class UITableViewController extends UIViewController
     viewDidLoad(){
       super.viewDidLoad();
 
-      this.tableView = this.view as UITableView;
+      this.tableView = this.view as UITableView;      
       this.tableView.dataSource = this;
       this.tableView.delegate = this;
     }
@@ -5043,6 +5666,7 @@ export class UINavigationItem extends NSObject
 
 
 
+
 /**
  * Created by godshadow on 9/4/16.
  */
@@ -5087,14 +5711,26 @@ export class UINavigationController extends UIViewController
         // }
     }
 
-    protected _setViewLoaded(value) {        
-        this._navigationBar = this.view as UINavigationBar;
-        this._navigationBar.removeFromSuperview();
-
+    protected _loadViewFromNib(layer, classname:string){
+        this._contentView = new UIView();
+        this._contentView.initWithLayer(layer, this);
+        
+        this._navigationBar = this._contentView.subviews[0];
+        this._segues = this._contentView._segues;        
+        
         this.view = new UIView();
         this.view.init();
-
         this.view.addSubview(this._navigationBar);
+
+        this._checkSegues();
+        this._didLoadView();
+    }
+
+    protected _setViewLoaded(value) {                
+        this.rootViewController.view.layer.style.left = "0px";
+        this.rootViewController.view.layer.style.top = "44px";
+        this.rootViewController.view.layer.style.width = "100%";
+        this.rootViewController.view.layer.style.botton = "0px";
         this.view.addSubview(this.rootViewController.view);
         
         let navItems = [this.rootViewController.navigationItem];
@@ -5318,6 +5954,58 @@ export class MUIPopAnimationController extends NSObject
         return animations;
     }
 
+}
+
+
+
+/**
+ * Created by godshadow on 22/5/16.
+ */
+
+
+export class UIToolbarButton extends UIButton
+{
+    public static buttonWithLayer(layer, owner)
+    {        
+        var lid = layer.getAttribute("id");
+        var tb = new UIToolbarButton(lid); 
+        tb.initWithLayer(layer, owner);
+
+        return tb;
+    }
+}
+
+export class UIToolbar extends UIView
+{
+    buttons = [];
+
+    initWithLayer(layer, owner, options?){
+        super.initWithLayer(layer, owner, options);
+        layer.style.width = "100%";
+
+        // Check if we have sub nodes
+        if (this.layer.childNodes.length > 0)
+        {
+            for (let index = 0; index < this.layer.childNodes.length; index++)
+            {
+                let layer = this.layer.childNodes[index]; // TODO: variablename shadows parameter
+                if (layer.tagName == "DIV")
+                {
+                    let lid = layer.getAttribute("id");
+                    let tb = new UIToolbarButton(lid); 
+                    let button = UIToolbarButton.buttonWithLayer(layer, owner);
+                    button.parent = this;
+
+                    this._linkViewToSubview(button);
+                    this.addToolbarButton(button);
+                }
+            }
+        }
+    }
+
+    addToolbarButton(button){
+        this.buttons.push(button);
+    }
 }
 
 
@@ -5958,7 +6646,7 @@ export function MUICoreStoryboardParseLayer(layer, object, owner:UIViewControlle
                         let prop = d.getAttribute("data-property");
                         let outlet = d.getAttribute("data-outlet");
 
-                        MUICoreStoryboardConnectOutlet(owner, prop, outlet);
+                        MUICoreStoryboardConnectOutlet(object, owner, prop, outlet);
                     }
                     else if (type == "segue") {
                         let destination = d.getAttribute("data-segue-destination");
@@ -5992,7 +6680,7 @@ export function MUICoreStoryboardParseConnectionsLayer(layer, object, owner:UIVi
                 let prop = subLayer.getAttribute("data-property");
                 let outlet = subLayer.getAttribute("data-outlet");
 
-                MUICoreStoryboardConnectOutlet(owner, prop, outlet);
+                MUICoreStoryboardConnectOutlet(object, owner, prop, outlet);
             }
             else if (type == "segue") {
                 let destination = subLayer.getAttribute("data-segue-destination");
@@ -6010,11 +6698,11 @@ export function MUICoreStoryboardParseConnectionsLayer(layer, object, owner:UIVi
 
 declare function _injectIntoOptional(value:any);
 
-export function MUICoreStoryboardConnectOutlet(owner, property, outletID){
+export function MUICoreStoryboardConnectOutlet(object, owner, property, outletID){
     console.log("prop: " + property + " - outlet: " + outletID);
 
     let obj = owner._outlets[outletID];
-    owner[property] = _injectIntoOptional(obj);
+    object[property] = _injectIntoOptional(obj);
 }
 
 

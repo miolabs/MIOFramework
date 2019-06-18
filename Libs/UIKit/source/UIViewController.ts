@@ -1,4 +1,5 @@
 import { NSObject } from "mio-foundation-web";
+import { NSClassFromString } from "mio-foundation-web";
 import { CGSize } from "mio-foundation-web";
 import { NSLocalizeString } from "mio-foundation-web";
 import { MIOCoreIsPhone } from "mio-foundation-web";
@@ -119,7 +120,7 @@ export class UIViewController extends NSObject {
         layer.innerHTML = NSLocalizeString(key, key);
     }
 
-    public _contentView:UIView = null;
+    protected _contentView:UIView = null;
     loadView() {
         if (this.view != null) {
             this._didLoadView();
@@ -136,12 +137,7 @@ export class UIViewController extends NSObject {
         }
 
         MUICoreBundleLoadNibName(this._htmlResourcePath, this, function (this: UIViewController, layer, classname:string) {                        
-            this._contentView = new UIView();
-            this._contentView.initWithLayer(layer, this);
-            this._segues = this._contentView._segues;
-            this.view = this._contentView.subviews[0];
-            this._checkSegues();
-            this._didLoadView();
+            this._loadViewFromNib(layer, classname);
         });
 
         // let mainBundle = NSBundle.mainBundle();
@@ -164,6 +160,18 @@ export class UIViewController extends NSObject {
         //     this.view.awakeFromHTML();
         //     this._didLoadView();
         // });        
+    }
+
+    protected _loadViewFromNib(layer, classname:string){
+        let layerID = layer.getAttribute("id");
+        if (layerID != null) this._outlets[layerID] = this;
+
+        this._contentView = new UIView();
+        this._contentView.initWithLayer(layer, this, {"Object": this});
+        this.view = this._contentView.subviews[0];
+        this._segues = this._contentView._segues;        
+        this._checkSegues();
+        this._didLoadView();
     }
 
     _didLoadNibWithLayer(layerData) {

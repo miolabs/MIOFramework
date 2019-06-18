@@ -8,7 +8,7 @@ export class UITableViewController extends UIViewController
     viewDidLoad(){
       super.viewDidLoad();
 
-      this.tableView = this.view as UITableView;
+      this.tableView = this.view as UITableView;      
       this.tableView.dataSource = this;
       this.tableView.delegate = this;
     }

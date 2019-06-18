@@ -1,5 +1,6 @@
 import { UIView } from "./UIView";
 import { MUICoreLayerGetFirstElementWithTag } from "./core/MUICoreLayer";
+import { UIImage } from "./UIImage";
 
 /**
  * Created by godshadow on 12/3/16.
@@ -29,9 +30,9 @@ export class UIImageView extends UIView
         }
     }
 
-    setImage(imageURL){
-        if (imageURL != null){
-            this._imageLayer.setAttribute("src", imageURL);
+    set image(image:UIImage){
+        if (image != null){
+            this._imageLayer.setAttribute("src", image._url);
         }
         else {
             this._imageLayer.removeAttribute("src");

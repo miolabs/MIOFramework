@@ -2,7 +2,7 @@ import { UIView} from "./UIView";
 import { UITableViewCell } from "./UITableViewCell";
 import { UIGestureRecognizer } from "./UIGestureRecognizer";
 import { UIGestureRecognizerState} from "./UIGestureRecognizer";
-import { NSIndexPath } from "mio-foundation-web";
+import { NSIndexPath, NSObject } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 import "mio-foundation-web/extensions"
 import { _UIStoryboardSeguePerform } from "./UIStoryboardSegue";
@@ -16,6 +16,7 @@ export class UITableView extends UIView
 
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
+        layer.style.width = "100%";
 
         // Check if we have prototypes
         if (this.layer.childNodes.length > 0) {
@@ -74,9 +75,9 @@ export class UITableView extends UIView
         item["class"] = cellClassname;
         item["layer"] = layer;
         this.footerLayer = item;
-    }    
-
-    dequeueReusableCellWithIdentifierFor(identifier:string, indexPath:NSIndexPath): UITableViewCell {
+    } 
+    
+    dequeueReusableCellWithIdentifier(identifier:string): UITableViewCell {
         let item = this.cellPrototypes[identifier];
 
         let cell: UITableViewCell = null;        
@@ -87,8 +88,10 @@ export class UITableView extends UIView
         let layer = item["layer"];
         if (layer != null) {
             let newLayer = layer.cloneNode(true);
-            newLayer.style.display = "";            
-            cell.initWithLayer(newLayer, this.owner);
+            newLayer.style.display = "";   
+            let layerID = newLayer.getAttribute("id");
+            if (layerID != null) cell._outlets[layerID] = cell;    
+            cell.initWithLayer(newLayer, cell);         
             cell.awakeFromHTML();            
         }
 
@@ -102,7 +105,7 @@ export class UITableView extends UIView
         //cell._onAccessoryClickFn = this.cellOnAccessoryClickFn;
         // cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
 
-        return cell;
+        return _injectIntoOptional(cell);
     }
 
 
@@ -112,14 +115,14 @@ export class UITableView extends UIView
 
     private addSectionHeader(section){
         let header = null;
-        if (typeof this.dataSource.viewForHeaderInSection === "function") header = this.dataSource.viewForHeaderInSection(this, section) as UIView;        
+        if (typeof this.dataSource[0].viewForHeaderInSection === "function") header = this.dataSource[0].viewForHeaderInSection(this, section) as UIView;        
         if (header == null) return;
         header.hidden = false;
         this.addSubview(header);
     }
 
     private addCell(indexPath:NSIndexPath){
-        let cell = this.dataSource.tableViewCellForRowAt(this, indexPath) as UITableViewCell;
+        let cell = this.dataSource[0].tableViewCellForRowAt(this, indexPath) as UITableViewCell;
         let section = this.sections[indexPath.section];                
                 
         let nextIP = this.nextIndexPath(indexPath);
@@ -200,13 +203,13 @@ export class UITableView extends UIView
         if (this.dataSource == null) return;
 
         let sections = 1;
-        if (typeof this.dataSource.numberOfSectionsIn === "function") sections = this.dataSource.numberOfSectionsIn(this);
+        if (typeof this.dataSource[0].numberOfSectionsIn === "function") sections = this.dataSource[0].numberOfSectionsIn(this);
         
         for (let sectionIndex = 0; sectionIndex < sections; sectionIndex++) {            
             let section = [];                                    
             this.sections.push(section);
             
-            let rows = this.dataSource.tableViewNumberOfRowsInSection(this, sectionIndex);            
+            let rows = this.dataSource[0].tableViewNumberOfRowsInSection(this, sectionIndex);
             if (rows == 0) continue;
             
             this.addSectionHeader(sectionIndex);

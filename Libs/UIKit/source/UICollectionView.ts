@@ -1,6 +1,10 @@
 import { UIView } from "./UIView";
-import { MIOObject, MIOSize, MIOIndexPath } from "../MIOFoundation";
+import { NSObject } from "mio-foundation-web";
+import { NSClassFromString } from "mio-foundation-web";
+import { CGSize } from "mio-foundation-web";
+import { NSIndexPath } from "mio-foundation-web";
 import { UICollectionViewFlowLayout } from "./UICollectionViewLayout";
+import "mio-foundation-web/extensions"
 
 /**
  * Created by godshadow on 09/11/2016.
@@ -43,7 +47,7 @@ export class UICollectionViewCell extends UIView
     }
 }
 
-export class UICollectionViewSection extends MIOObject
+export class UICollectionViewSection extends NSObject
 {
     header = null;
     footer = null;
@@ -112,7 +116,7 @@ export class UICollectionView extends UIView
         let item = {};
         item["class"] = cellClassname;
         item["layer"] = subLayer;
-        let size = new MIOSize(subLayer.clientWidth, subLayer.clientHeight);
+        let size = new CGSize(subLayer.clientWidth, subLayer.clientHeight);
         if (size != null) item["size"] = size;
         let bg = window.getComputedStyle(subLayer ,null).getPropertyValue('background-color');
         if (bg != null) item["bg"] = bg;
@@ -128,7 +132,7 @@ export class UICollectionView extends UIView
         var item = {};
         item["class"] = viewClassname;
         item["layer"] = subLayer;
-        var size = new MIOSize(subLayer.clientWidth, subLayer.clientHeight);
+        var size = new CGSize(subLayer.clientWidth, subLayer.clientHeight);
         if (size != null) item["size"] = size;
         var bg = window.getComputedStyle(subLayer ,null).getPropertyValue('background-color');
         if (bg != null) item["bg"] = bg;
@@ -147,12 +151,12 @@ export class UICollectionView extends UIView
         //TODO:
     }
 
-    dequeueReusableCellWithIdentifier(identifier){
+    dequeueReusableCellWithReuseIdentifierFor(identifier:string, indexPath:NSIndexPath){
         let item = this._cellPrototypes[identifier];
 
         //instance creation here
         let className = item["class"];
-        let cell = Object.create(window[className].prototype);
+        let cell = NSClassFromString(className);
         cell.constructor.apply(cell);
 
         //cell.init();
@@ -160,7 +164,9 @@ export class UICollectionView extends UIView
         if (layer != null) {
             let newLayer = layer.cloneNode(true);
             newLayer.style.display = "";
-            cell.initWithLayer(newLayer);
+            let layerID = newLayer.getAttribute("id");
+            if (layerID != null) cell._outlets[layerID] = cell;    
+            cell.initWithLayer(newLayer, cell);
             cell.awakeFromHTML();
         }
         else {
@@ -184,7 +190,7 @@ export class UICollectionView extends UIView
 
         //instance creation here
         var className = item["class"];
-        var view = Object.create(window[className].prototype);
+        var view = NSClassFromString(className);
         view.constructor.apply(view);
 
         //view.init();
@@ -218,7 +224,7 @@ export class UICollectionView extends UIView
         return view;
     }
 
-    cellAtIndexPath(indexPath:MIOIndexPath){
+    cellAtIndexPath(indexPath:NSIndexPath){
         var s = this._sections[indexPath.section];
         var c = s.cells[indexPath.row];
 
@@ -244,7 +250,7 @@ export class UICollectionView extends UIView
                 cell.removeFromSuperview();
                 if (this.delegate != null) {
                     if (typeof this.delegate.didEndDisplayingCellAtIndexPath === "function"){
-                        let ip = MIOIndexPath.indexForRowInSection(count, index);
+                        let ip = NSIndexPath.indexForRowInSection(count, index);
                         this.delegate.didEndDisplayingCellAtIndexPath(this, cell, ip);
                     }
                 }                
@@ -256,24 +262,25 @@ export class UICollectionView extends UIView
         this.selectedCellSection = -1;    
         this._sections = [];
 
-        let sections = this.dataSource.numberOfSections(this);
+        let sections = 1;
+        if (typeof this.dataSource[0].numberOfSectionsIn === "function") sections = this.dataSource[0].numberOfSectionsIn(this);
         for (let sectionIndex = 0; sectionIndex < sections; sectionIndex++) {
 
             let section = new UICollectionViewSection();
             section.init();
             this._sections.push(section);
 
-            if (typeof this.dataSource.viewForSupplementaryViewAtIndex === "function"){
-                let hv = this.dataSource.viewForSupplementaryViewAtIndex(this, "header", sectionIndex);
+            if (typeof this.dataSource[0].viewForSupplementaryViewAtIndex === "function"){
+                let hv = this.dataSource[0].viewForSupplementaryViewAtIndex(this, "header", sectionIndex);
                 section.header = hv;
                 if (hv != null) this.addSubview(hv);
             }
 
-            let items = this.dataSource.numberOfItemsInSection(this, sectionIndex);
+            let items = this.dataSource[0].collectionViewNumberOfItemsInSection(this, sectionIndex);
             for (let index = 0; index < items; index++) {
 
-                let ip = MIOIndexPath.indexForRowInSection(index, sectionIndex);
-                let cell = this.dataSource.cellForItemAtIndexPath(this, ip);
+                let ip = NSIndexPath.indexForRowInSection(index, sectionIndex);
+                let cell = this.dataSource[0].collectionViewCellForItemAt(this, ip);
                 section.cells.push(cell);
                 this.addSubview(cell);
 
@@ -284,8 +291,8 @@ export class UICollectionView extends UIView
                 cell._section = sectionIndex;
             }
 
-            if (typeof this.dataSource.viewForSupplementaryViewAtIndex === "function"){
-                let fv = this.dataSource.viewForSupplementaryViewAtIndex(this, "footer", sectionIndex);
+            if (typeof this.dataSource[0].viewForSupplementaryViewAtIndex === "function"){
+                let fv = this.dataSource[0].viewForSupplementaryViewAtIndex(this, "footer", sectionIndex);
                 section.footer = fv;
                 if (fv != null) this.addSubview(fv);
             }
@@ -312,7 +319,7 @@ export class UICollectionView extends UIView
             return;
 
         if (this.selectedCellIndex > -1 && this.selectedCellSection > -1){
-            let ip = MIOIndexPath.indexForRowInSection(this.selectedCellIndex, this.selectedCellSection);
+            let ip = NSIndexPath.indexForRowInSection(this.selectedCellIndex, this.selectedCellSection);
             this.deselectCellAtIndexPath(ip);
         }
 
@@ -323,7 +330,7 @@ export class UICollectionView extends UIView
 
         if (this.delegate != null){
             if (typeof this.delegate.didSelectCellAtIndexPath === "function"){
-                let ip = MIOIndexPath.indexForRowInSection(index, section);
+                let ip = NSIndexPath.indexForRowInSection(index, section);
                 this.delegate.didSelectCellAtIndexPath(this, ip);
             }
         }
@@ -345,7 +352,7 @@ export class UICollectionView extends UIView
         cell.setSelected(false);
     }
 
-    deselectCellAtIndexPath(indexPath:MIOIndexPath)
+    deselectCellAtIndexPath(indexPath:NSIndexPath)
     {
         this.selectedCellIndex = -1;
         this.selectedCellSection = -1;
