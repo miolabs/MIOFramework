@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct HTMLItem
+class HTMLItem
 {
     var identifier:String?
     var templateClass:String?
@@ -427,7 +427,7 @@ class NIBParser : NSObject, XMLParserDelegate
         let id = attributes["id"]
         let contenMode = parse_content_mode(attributes["contentMode"])
         
-        var item = HTMLItem()
+        let item = HTMLItem()
         item.identifier = id
         
         if elementName != "size" {
@@ -506,7 +506,7 @@ class NIBParser : NSObject, XMLParserDelegate
             currentFileContent! += content
         }
         else {
-            item!.content += content;
+            item!.content = content;
         }
     }
 
