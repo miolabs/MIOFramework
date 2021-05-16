@@ -23,11 +23,15 @@ class NIBParserTemplate
         }
     }
     
-    public func renderContent(classname:String, identifier:String?, options:[String]) -> String {
+    public func renderContent(classname:String, identifier:String?, options:[String], childrens:String?) -> String {
         
         guard let item = items[classname] as? [String:Any] else { return "" }
         
         guard let template = item["tmpl"] as? String else { return ""}
+        
+        if childrens != nil {
+            return template.replacingOccurrences(of: "{children}", with: childrens!)
+        }
         
         return template
     }

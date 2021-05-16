@@ -465,7 +465,7 @@ class NIBParser : NSObject, XMLParserDelegate
             currentElement = parentItem
         }
 
-        let content = parserTemplate.renderContent(classname: item.templateClass!, identifier: item.identifier, options: [])
+        let content = parserTemplate.renderContent(classname: item.templateClass!, identifier: item.identifier, options: [], childrens: item.content)
         add_content_to_parent_item(content, &parentItem)
         
 //        let classes = item.classes.count > 0 ? "class=\"" + item.classes.joined(separator: " ") + "\"" : ""
