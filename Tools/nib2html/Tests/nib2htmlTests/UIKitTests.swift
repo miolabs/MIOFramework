@@ -15,12 +15,12 @@ final class UIKitTests: XCTestCase {
         
     func testBasicSB() throws {
         
-        let file = packageRootPath + "/BasicTest.storyboard"
-        let backend = try readBackend( URL(fileURLWithPath: packageRootPath + "/../html_backend.json" ) )
+        let file = URL(fileURLWithPath: packageRootPath + "/BasicTest.storyboard" )
+        let template = URL(fileURLWithPath: packageRootPath + "/../../Sources/nib2html/html_backend.json" )
         
-        let parser = NIBParser(contentsOf: URL(fileURLWithPath: file ) )
+        let parser = NIBParser(contentsOf: file, templateURL: template )
+        parser.outputFolder = packageRootPath
         parser.parse()
-        
-        parser.elementsStack
+                
     }
 }

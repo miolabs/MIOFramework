@@ -20,7 +20,7 @@
   }
 ,"navigationBar":
   {
-    "tmpl": "<nav class="navbar" {outlet}><div class=\"container-fluid\">{children}</div></nav>"
+    "tmpl": "<nav class=\"navbar\" {outlet}><div class=\"container-fluid\">{children}</div></nav>"
   }
 ,"navigationItem":
   {

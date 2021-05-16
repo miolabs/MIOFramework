@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		144F6FC12651864700120CDA /* NIBParserTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144F6FC02651864700120CDA /* NIBParserTemplate.swift */; };
+		144F6FC22651864E00120CDA /* NIBParserTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144F6FC02651864700120CDA /* NIBParserTemplate.swift */; };
 		145D6557263DB82300F4427D /* NIBParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145D6555263DB82300F4427D /* NIBParser.swift */; };
 		145D6558263DB82300F4427D /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145D6556263DB82300F4427D /* main.swift */; };
 		145D655B263DB84500F4427D /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 145D655A263DB84500F4427D /* ArgumentParser */; };
@@ -30,6 +32,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		144F6FC02651864700120CDA /* NIBParserTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NIBParserTemplate.swift; sourceTree = "<group>"; };
 		145D6545263DB7C300F4427D /* nib2html */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = nib2html; sourceTree = BUILT_PRODUCTS_DIR; };
 		145D6555263DB82300F4427D /* NIBParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NIBParser.swift; sourceTree = "<group>"; };
 		145D6556263DB82300F4427D /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
@@ -83,6 +86,7 @@
 			isa = PBXGroup;
 			children = (
 				145D6555263DB82300F4427D /* NIBParser.swift */,
+				144F6FC02651864700120CDA /* NIBParserTemplate.swift */,
 				145D6556263DB82300F4427D /* main.swift */,
 				63D17F032651833A008019CE /* readBackend.swift */,
 				63D17F0726518356008019CE /* html_backend.json */,
@@ -197,6 +201,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				144F6FC12651864700120CDA /* NIBParserTemplate.swift in Sources */,
 				145D6558263DB82300F4427D /* main.swift in Sources */,
 				63D17F042651833A008019CE /* readBackend.swift in Sources */,
 				145D6557263DB82300F4427D /* NIBParser.swift in Sources */,
@@ -209,6 +214,7 @@
 			files = (
 				63D17F082651837A008019CE /* readBackend.swift in Sources */,
 				145D656C263DB9B100F4427D /* UIKitTests.swift in Sources */,
+				144F6FC22651864E00120CDA /* NIBParserTemplate.swift in Sources */,
 				145D6563263DB87600F4427D /* nib2htmlTests.swift in Sources */,
 				145D656E263DBAED00F4427D /* NIBParser.swift in Sources */,
 			);

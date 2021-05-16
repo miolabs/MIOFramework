@@ -10,6 +10,7 @@ import Foundation
 struct HTMLItem
 {
     var identifier:String?
+    var templateClass:String?
     var content:String = ""
     var styles:[String] = []
     var classes:[String] = []
@@ -37,20 +38,26 @@ struct HTMLItemSegue
 class NIBParser : NSObject, XMLParserDelegate
 {
     let url:URL
+    let parserTemplate:NIBParserTemplate
     var outputFolder:String?
     
-    init(contentsOf url:URL) {
+    init(contentsOf url:URL, templateURL:URL) {
         self.url = url
-    }
-    
+        self.parserTemplate = NIBParserTemplate(contentOf: templateURL.standardizedFileURL)
+    }        
+        
+    let semaphore = DispatchSemaphore(value: 0)
     func parse(){
+                                        
         print("Parsing nib file: \(url.absoluteString)")
         guard let parser = XMLParser(contentsOf: url) else {
             print("Error. Invalid NIB or StoryBoard file.")
             return
         }
-        
+
+        parser.delegate = self
         parser.parse()
+        _ = semaphore.wait(timeout: .distantFuture)
     }
     
     var initialViewControllerID:String? = nil
@@ -266,26 +273,28 @@ class NIBParser : NSObject, XMLParserDelegate
             if let h = attributeDict["height"] { currentElement!.styles.append("height:" + h + "px;") }
         }
         else if (elementName == "color"){
-            guard let key = parse_color_key(key: attributeDict["key"]) else { return }
-            
-            var r = 0.0
-            var g = 0.0
-            var b = 0.0
-            if (attributeDict["white"] == "1") {
-                r = 255.0
-                g = 255.0
-                b = 255.0
-            }
-            else {
-                r = Double(attributeDict["red"]!)! * 255.0
-                g = Double(attributeDict["green"]!)! * 255.0
-                b = Double(attributeDict["blue"]!)! * 255.0
-            }
-
-            let a = Double(attributeDict["alpha"]!)!
-
-            let value = key + ":rgba(\(r),\(g),\(b),\(a));"
-            currentElement!.styles.append(value)
+//            guard let key = parse_color_key(key: attributeDict["key"]) else { return }
+//
+//            var r = 0.0
+//            var g = 0.0
+//            var b = 0.0
+//            if (attributeDict["white"] == "1") {
+//                r = 255.0
+//                g = 255.0
+//                b = 255.0
+//            }
+//            if attributeDict["systemBackgroundColor"] == "1" {
+//            }
+//            else {
+//                r = Double(attributeDict["red"]!)! * 255.0
+//                g = Double(attributeDict["green"]!)! * 255.0
+//                b = Double(attributeDict["blue"]!)! * 255.0
+//            }
+//
+//            let a = Double(attributeDict["alpha"]!)!
+//
+//            let value = key + ":rgba(\(r),\(g),\(b),\(a));"
+//            currentElement!.styles.append(value)
         }
         else if elementName == "fontDescription" {
             if let size = attributeDict["pointSize"] {
@@ -410,6 +419,7 @@ class NIBParser : NSObject, XMLParserDelegate
     
     func parserDidEndDocument(_ parser: XMLParser) {
         write_storyboard_file(name: (url.absoluteString) )
+        semaphore.signal()
     }
                
     @discardableResult
@@ -423,10 +433,11 @@ class NIBParser : NSObject, XMLParserDelegate
         if elementName != "size" {
             var customClass = attributes["customClass"]
             if customClass == nil {
-                customClass = "UI" + elementName.dropFirst().uppercased() + elementName.dropFirst(1)
+                customClass = "UI" + elementName.first!.uppercased() + elementName.dropFirst()
             }
             item.extraAttributes.append("data-class=\"" + customClass! + "\"")
             item.customClass = customClass
+            item.templateClass = elementName
             
             item.classes.append(parse_class_type(elementName))
             if contenMode != nil {
@@ -454,37 +465,40 @@ class NIBParser : NSObject, XMLParserDelegate
             currentElement = parentItem
         }
 
-        let classes = item.classes.count > 0 ? "class=\"" + item.classes.joined(separator: " ") + "\"" : ""
-        let styles = item.styles.count > 0 ? "style=\"" + item.styles.joined(separator: " ") + "\"" : ""
-        var content = item.content
-
-        if (item.outlets.count + item.segues.count) > 0 { content += "<div class=\"hidden\" data-connections=\"true\">" }
-
-        // Outlets
-        for o in item.outlets {
-            let prop = o.property
-            let dst = o.destination
-            content += "<div class=\"hidden\" data-connection-type=\"outlet\" data-outlet=\"\(dst)\" data-property=\"\(prop)\"></div>"
-        }
+        let content = parserTemplate.renderContent(classname: item.templateClass!, identifier: item.identifier, options: [])
+        add_content_to_parent_item(content, &parentItem)
         
-        // Segues
-        for s in item.segues {
-                        
-            content += "<div class=\"hidden\" data-connection-type=\"segue\""
-            content += " data-segue-destination=\"\(s.destination)\""
-            content += " data-segue-kind=\"\(s.kind)\""
-            if let id = s.identifier { content += " data-segue-identifier=\"\(id)\"" }
-            if let rel = s.relationship { content += " data-segue-relationship=\"\(rel)\"" }
-            content += "></div>"
-        }
-        
-        if (item.outlets.count + item.segues.count) > 0 { content += "</div>" }
+//        let classes = item.classes.count > 0 ? "class=\"" + item.classes.joined(separator: " ") + "\"" : ""
+//        let styles = item.styles.count > 0 ? "style=\"" + item.styles.joined(separator: " ") + "\"" : ""
+//        var content = item.content
+//
+//        if (item.outlets.count + item.segues.count) > 0 { content += "<div class=\"hidden\" data-connections=\"true\">" }
+//
+//        // Outlets
+//        for o in item.outlets {
+//            let prop = o.property
+//            let dst = o.destination
+//            content += "<div class=\"hidden\" data-connection-type=\"outlet\" data-outlet=\"\(dst)\" data-property=\"\(prop)\"></div>"
+//        }
+//
+//        // Segues
+//        for s in item.segues {
+//
+//            content += "<div class=\"hidden\" data-connection-type=\"segue\""
+//            content += " data-segue-destination=\"\(s.destination)\""
+//            content += " data-segue-kind=\"\(s.kind)\""
+//            if let id = s.identifier { content += " data-segue-identifier=\"\(id)\"" }
+//            if let rel = s.relationship { content += " data-segue-relationship=\"\(rel)\"" }
+//            content += "></div>"
+//        }
+//
+//        if (item.outlets.count + item.segues.count) > 0 { content += "</div>" }
 
-        add_content_to_parent_item("<div \(classes)", &parentItem)
-        if item.identifier != nil { add_content_to_parent_item(" id=\"\(item.identifier!)\"", &parentItem) }
-        add_content_to_parent_item(item.extraAttributes.joined(separator: " ") + styles + ">", &parentItem)
-        if item.content.count > 0 { add_content_to_parent_item(content, &parentItem) }
-        add_content_to_parent_item("</div>", &parentItem)
+//        add_content_to_parent_item("<div \(classes)", &parentItem)
+//        if item.identifier != nil { add_content_to_parent_item(" id=\"\(item.identifier!)\"", &parentItem) }
+//        add_content_to_parent_item(item.extraAttributes.joined(separator: " ") + styles + ">", &parentItem)
+//        if item.content.count > 0 { add_content_to_parent_item(content, &parentItem) }
+//        add_content_to_parent_item("</div>", &parentItem)
     }
     
     func add_content_to_parent_item(_ content:String, _ item:inout HTMLItem?) {
