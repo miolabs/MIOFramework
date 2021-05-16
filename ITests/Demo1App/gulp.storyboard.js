@@ -50,6 +50,32 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "navigationBar"){
 		pushNewElement(element, attributes);
 	}
+	else if (element == "navigationItem"){
+		let item = pushNewElement(element, attributes);
+		let title = attributes["title"];
+		let key = attributes["key"];		
+		
+		item["Classes"].push("hidden");
+		item["ExtraAttributes"].push('data-navigation-key="' +  key + '"');		
+		if (title != null) item["ExtraAttributes"].push('data-navigation-title="' + title + '"');		
+	}
+	else if (element == "barButtonItem"){
+		let item = pushNewElement(element, attributes);
+
+		let key = attributes["key"];
+		if (key != null) item["ExtraAttributes"].push('data-bar-button-item-key="' +  key + '"');		
+		
+		let title = attributes["title"];
+		if (title != null) item["ExtraAttributes"].push('data-bar-button-item-title="' +  title + '"');		
+
+		let image = attributes["image"];
+		if (image != null) item["ExtraAttributes"].push('data-bar-button-item-image="' +  image + '"');		
+
+		let systemItem = attributes["systemItem"];
+		if (systemItem != null) {			
+			item["ExtraAttributes"].push('data-bar-button-item-system="' + systemItem + '"');
+		}		
+	}
 	else if (element == "label"){
 		let item = pushNewElement(element, attributes);
 		parseTextAlignment(attributes["textAlignment"], item["Classes"]);
@@ -81,17 +107,49 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if(element == "tableViewCell") {
 		let item = pushNewElement(element, attributes);
+		let style = attributes["style"];
+		let textLabelID = attributes["textLabel"];
 
 		let reuseIdentifier = attributes["reuseIdentifier"];
 		item["ExtraAttributes"].push('data-cell-identifier="' + reuseIdentifier + '"');
+		if (style != null) item["ExtraAttributes"].push('data-cell-style="' + style + '"');
+		if (textLabelID != null) item["ExtraAttributes"].push('data-cell-textlabel-id="' + textLabelID + '"');
 	}
 	else if(element == "tableViewCellContentView") {
 		pushNewElement(element, attributes);
+	}
+	else if(element == "collectionView") {
+		pushNewElement(element, attributes);
+	}
+	else if(element == "collectionViewFlowLayout") {
+		let item = pushNewElement(element, attributes);
+
+		//let key = attributes["key"];		
+		item["ExtraAttributes"].push('data-collection-view-layout="true"');
+		
+		let scrollDirection = attributes["scrollDirection"];
+		item["ExtraAttributes"].push('data-collection-view-layout-direction="'+ scrollDirection + '"');
+
+	}
+	else if(element == "collectionViewCell") {
+		let item = pushNewElement(element, attributes);
+		let style = attributes["style"];
+		let textLabelID = attributes["textLabel"];
+
+		let reuseIdentifier = attributes["reuseIdentifier"];
+		item["ExtraAttributes"].push('data-cell-identifier="' + reuseIdentifier + '"');
+		if (style != null) item["ExtraAttributes"].push('data-cell-style="' + style + '"');		
 	}
 	else if (element == "segmentedControl"){
 		let item = pushNewElement(element, attributes);						
 	
 		parseSegmentControlStyle(attributes["segmentControlStyle"], item["Classes"]);		
+	}
+	else if (element == "toolbar"){		
+		let item = pushNewElement(element, attributes);
+	}
+	else if (element == "imageView"){		
+		let item = pushNewElement(element, attributes);
 	}
 	else if (element == "segment"){		
 		currentElement["Content"] = currentElement["Content"] + '<div class="segment"><span>' + attributes["title"] +'</span></div>';
@@ -114,15 +172,28 @@ function parserDidStartElement(parser, element, attributes){
 	else if (element == "stepper"){
 		let item = pushNewElement(element, attributes);
 	}
+	else if (element == "size"){		
+		let item = pushNewElement(element, attributes);
+
+		let key = attributes["key"];
+		let width = attributes["width"];
+		let height = attributes["height"];
+
+		item["ExtraAttributes"].push('data-key="' + key + '"');		
+		item["ExtraAttributes"].push('data-type="size"');		
+		item["ExtraAttributes"].push('data-width="' + width + '"');		
+		item["ExtraAttributes"].push('data-height="' + height + '"');		
+	}
 	else if (element == "rect"){		
 		let styles = currentElement["Styles"];
-		if (currentElement["CustomClass"] != "UITableViewCell") {			
-			styles.push("position:relative;");
-		}
+		// if (currentElement["CustomClass"] != "UITableViewCell") {			
+		// 	styles.push("position:relative;");
+		// }
 		// else {
 		// 	styles.push("position:relative;");
 		// }
 	
+		styles.push("position:absolute;");
 		if (attributes["x"] != null) styles.push("left:" + attributes["x"] + "px;");
 		if (attributes["y"] != null) styles.push("top:" + attributes["y"] + "px;");
 		if (attributes["width"] != null) styles.push("width:" + attributes["width"] + "px;");
@@ -163,8 +234,10 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "action") {
 		let selector =  attributes["selector"];
-		let eventType = attributes["eventType"];		
-		let actionDiv = '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "Sender") + '" data-event-type="' + eventType + '"></div>';
+		let eventType = attributes["eventType"];			
+		let actionDiv = '<div class="hidden" data-action-selector="' + selector.replace("WithSender:", "Sender") + '"';
+		if (eventType != null) actionDiv += ' data-event-type="' + eventType + '"';
+		actionDiv += '></div>';
 		currentElement["Content"] = currentElement["Content"] + actionDiv;
 	}
 	else if (element == "outlet") {
@@ -210,6 +283,12 @@ function parserDidEndElement(parser, element){
 	else if (element == "navigationBar"){
 		popElement();
 	}
+	else if (element == "navigationItem"){
+		popElement();
+	}
+	else if (element == "barButtonItem"){
+		popElement();
+	}
 	else if (element == "label"){
 		popElement();
 	}
@@ -226,6 +305,21 @@ function parserDidEndElement(parser, element){
 		popElement();
 	}
 	else if(element == "tableViewCellContentView") {
+		popElement();
+	}
+	else if(element == "collectionView") {
+		popElement();
+	}
+	else if(element == "collectionViewFlowLayout") {
+		popElement();
+	}
+	else if(element == "collectionViewCell") {
+		popElement();
+	}
+	else if (element == "toolbar"){		
+		popElement();
+	}
+	else if (element == "imageView"){		
 		popElement();
 	}
 	else if (element == "segmentedControl"){
@@ -249,6 +343,9 @@ function parserDidEndElement(parser, element){
 	else if (element == "stepper"){
 		popElement();
 	}
+	else if (element == "size"){		
+		popElement();
+	}
 
 }
 
@@ -265,14 +362,20 @@ function pushNewElement(element, attributes){
 	item["Classes"] = classes;
 	item["Segues"]	= [];	
 	item["Outlets"] = [];
+	item["ExtraAttributes"] = [];
 
-	let customClass = attributes["customClass"];
-	if (customClass == null) customClass = "UI" + element.charAt(0).toUpperCase() + element.substring(1);
-	item["ExtraAttributes"] = ['data-class="' + customClass + '"'];	
-	item["CustomClass"] = customClass;
+	if (element != "size") {
+		let customClass = attributes["customClass"];
+		if (customClass == null) customClass = "UI" + element.charAt(0).toUpperCase() + element.substring(1);
+		item["ExtraAttributes"].push('data-class="' + customClass + '"');	
+		item["CustomClass"] = customClass;
 
-	classes.push(parseClassType(element));
-	if (contenMode != null) classes.push(contenMode);
+		classes.push(parseClassType(element));
+		if (contenMode != null) classes.push(contenMode);	
+	}
+
+	let tag = attributes["tag"];
+	if (tag != null) item["ExtraAttributes"].push('data-tag="' + tag + '"');	
 
 	elementsStack.push(item);
 	currentElement = item;
@@ -324,7 +427,9 @@ function popElement(){
 	
 	if (outlets.length + segues.length > 0) content += '</div>';
 
-	addContentToParentItem('<div ' + classes + 'id="' + id + '"' + extraAttributes.join(" ") + styles + '>', parentItem);
+	addContentToParentItem('<div ' + classes, parentItem);
+	if (id != null) addContentToParentItem(' id="' + id + '"', parentItem);
+	addContentToParentItem(extraAttributes.join(" ") + styles + '>', parentItem);
 	if (content.length > 0) addContentToParentItem(content, parentItem);	
 	addContentToParentItem('</div>', parentItem);		
 

@@ -164,7 +164,7 @@
                                 </connections>
                             </tableView>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rd7-11-dGg">
-                                <rect key="frame" x="0.0" y="656" width="414" height="44"/>
+                                <rect key="frame" x="0.0" y="744" width="414" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="44" id="sq4-IA-1yK"/>
                                 </constraints>
@@ -189,18 +189,6 @@
                     </view>
                     <navigationItem key="navigationItem" id="LHS-Aa-Zem">
                         <barButtonItem key="leftBarButtonItem" title="SEARCH" id="KB2-1c-qUT"/>
-                        <rightBarButtonItems>
-                            <barButtonItem title="Item" image="ShoppingCart" id="HYH-2L-qE4">
-                                <connections>
-                                    <segue destination="bwx-82-YDm" kind="presentation" id="aY8-wX-Rgf"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem title="Item" image="FavoritesIcon" id="HHn-Zb-jql">
-                                <connections>
-                                    <segue destination="rWy-kL-Mow" kind="presentation" id="ZQC-Fq-sWP"/>
-                                </connections>
-                            </barButtonItem>
-                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="tableView" destination="mVX-2W-sY8" id="05V-7S-lrx"/>
@@ -316,9 +304,7 @@
     </scenes>
     <resources>
         <image name="CloseIcon" width="34.5" height="35"/>
-        <image name="FavoritesIcon" width="37.5" height="35.5"/>
         <image name="FavoritesView" width="1125" height="2187"/>
-        <image name="ShoppingCart" width="37.5" height="35.5"/>
         <image name="ShoppingView" width="1125" height="2160"/>
     </resources>
     <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

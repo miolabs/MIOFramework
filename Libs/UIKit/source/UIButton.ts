@@ -57,7 +57,7 @@ export class UIButton extends UIControl
 
         // Check for img layer
         this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "IMG");
-        if (this._imageLayer == null) this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "DIV");
+        //if (this._imageLayer == null) this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "DIV");
 
         // Check for status
         let status = this.layer.getAttribute("data-status");
@@ -74,6 +74,12 @@ export class UIButton extends UIControl
         if (this._titleLayer == null) {
             this._titleLayer = document.createElement("span");
             this.layer.appendChild(this._titleLayer);
+        }
+
+        if (this._imageLayer == null) {
+            this._imageLayer = document.createElement("img");
+            this._imageLayer.setAttribute("width", "44px");
+            this.layer.appendChild(this._imageLayer);
         }
 
         let key = this.layer.getAttribute("data-title");
@@ -107,6 +113,7 @@ export class UIButton extends UIControl
             if (this.type == UIButtonType.MomentaryPushIn) this.setSelected(false);
 
             this._performActionsForEvents(UIControl.Event.touchUpInside);
+            this._performSegue();
 
             // if (this.action != null && this.target != null)
             //     this.action.call(this.target, this);
@@ -131,6 +138,7 @@ export class UIButton extends UIControl
     }
 
     setImageURL(urlString:string){
+
         if (urlString != null){
             this._imageLayer.setAttribute("src", urlString);
         }

@@ -1,5 +1,11 @@
 import { NSNumber } from "./NSNumber";
-import { Decimal } from 'decimal.js';
+
+export namespace Decimal {
+    export type Value = string | number | Decimal;
+}
+export declare class Decimal { 
+    constructor(n: Decimal.Value);
+}
 
 export class NSDecimalNumber extends NSNumber
 {

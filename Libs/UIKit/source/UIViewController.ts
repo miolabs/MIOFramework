@@ -379,14 +379,19 @@ export class UIViewController extends NSObject {
             }
             else {
                 // It's a window instead of a view
-                let w: UIWindow = pc.window;
+                let w: UIWindow = vc.presentationController.window;
                 if (w == null) {
                     w = new UIWindow();
                     w.init();
                     w.layer.style.background = "";
+                    w.layer.style.width = "100%";
+                    w.layer.style.height = "100%";
                     w.rootViewController = vc;
-                    w.addSubview(pc.presentedView);
-                    pc.window = w;
+                    vc.presentationController.presentedView = vc.view;
+                    vc.view.layer.style.width = "100%";
+                    vc.view.layer.style.height = "100%";
+                    w.addSubview(vc.presentationController.presentedView);
+                    vc.presentationController.window = w;
                 }
 				w.setHidden(false);
 				if (vc instanceof UIAlertController) MUICoreLayerAddStyle(w.layer, "alert");

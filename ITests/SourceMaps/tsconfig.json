@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "system",
+        "sourceMap": true,	
+        "outDir": "./build",	
+        "target": "es5",
+        "noImplicitAny": false,
+        "outFile": "./build/lib.js"
+    },
+    "include": [        
+        "sources"
+    ]
+  }

@@ -1,6 +1,6 @@
 import { NSObject } from "mio-foundation-web";
 import { CGSize } from "mio-foundation-web";
-import { NSIndexPath } from "mio-foundation-web";
+import { IndexPath } from "mio-foundation-web";
 import { UITextField } from "./UITextField";
 import { UIViewController } from "./UIViewController";
 import { UIView } from "./UIView";
@@ -203,7 +203,7 @@ export class UIAlertController extends UIViewController
         return this._items.length + 1;
     }
 
-    tableViewCellForRowAt(tableview, indexPath:NSIndexPath){
+    tableViewCellForRowAt(tableview, indexPath:IndexPath){
         let cell:UITableViewCell = null;
         if (indexPath.row == 0){
             cell = this._createHeaderCell();
@@ -222,14 +222,14 @@ export class UIAlertController extends UIViewController
         return cell;
     }
 
-    heightForRowAtIndexPath(tableView:UITableView, indexPath:NSIndexPath) {
+    heightForRowAtIndexPath(tableView:UITableView, indexPath:IndexPath) {
         let h = 50;
         if (indexPath.row == 0) h = 80;
         
         return h;
     }
 
-    canSelectCellAtIndexPath(tableview, indexPath:NSIndexPath){
+    canSelectCellAtIndexPath(tableview, indexPath:IndexPath){
         if (indexPath.row == 0) return false;
 
         let item = this._items[indexPath.row - 1];
@@ -238,7 +238,7 @@ export class UIAlertController extends UIViewController
         return false;
     }
 
-    didSelectCellAtIndexPath(tableView, indexPath:NSIndexPath){
+    didSelectCellAtIndexPath(tableView, indexPath:IndexPath){
         let item = this._items[indexPath.row - 1];
         if (item.type == UIAlertItemType.Action) {
             

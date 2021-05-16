@@ -33,7 +33,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             return 1
 
         default:
-            return 9
+            return staticItems.count
         }
     }
     
@@ -76,7 +76,8 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
 
     func configureImageCell(_ cell:ImageCell, at indexPath:IndexPath){
-        cell.item = "StaticItem" + String(indexPath.row + 1)
+        let item = staticItems[indexPath.row]
+        cell.item = item
     }
     
     /*
@@ -131,16 +132,16 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         items.append(["Title": "TIMELESS", "ImageName": "Timeless"])
         items.append(["Title": "DRESS TIME", "ImageName": "DressTime"])
         items.append(["Title": "MUM", "ImageName": "Mum"])
-        items.append(["Title": "DRESS TIME", "ImageName": "DressTimeKid"])
-        items.append(["Title": "COLLECTION", "ImageName": "Collection"])
-        items.append(["Title": "DENIM", "ImageName": "Denim"])
-        items.append(["Title": "LIVING ZARA", "ImageName": "Living Zara"])
-        items.append(["Title": "EDITED", "ImageName": "Edited"])
-        items.append(["Title": "BEAUTY", "ImageName": "Beauty"])
-        items.append(["Title": "JOIN LIFE", "ImageName": "JoinLife"])
-        items.append(["Title": "STREET", "ImageName": "Street"])
-        items.append(["Title": "ALL TIME", "ImageName": "AllTime"])
-        items.append(["Title": "ESSENTIALS", "ImageName": "Essentials"])
+//        items.append(["Title": "DRESS TIME", "ImageName": "DressTimeKid"])
+//        items.append(["Title": "COLLECTION", "ImageName": "Collection"])
+//        items.append(["Title": "DENIM", "ImageName": "Denim"])
+//        items.append(["Title": "LIVING ZARA", "ImageName": "Living Zara"])
+//        items.append(["Title": "EDITED", "ImageName": "Edited"])
+//        items.append(["Title": "BEAUTY", "ImageName": "Beauty"])
+//        items.append(["Title": "JOIN LIFE", "ImageName": "JoinLife"])
+//        items.append(["Title": "STREET", "ImageName": "Street"])
+//        items.append(["Title": "ALL TIME", "ImageName": "AllTime"])
+//        items.append(["Title": "ESSENTIALS", "ImageName": "Essentials"])
         
         
         return items
@@ -150,13 +151,35 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         var items:[String] = []
         
-        for var index in 1..<9 {
-            items.append("ScrollItem" + String(index))
-        }
+        items.append("ScrollItem1")
+        items.append("ScrollItem2")
+        items.append("ScrollItem3")
+        items.append("ScrollItem4")
+        items.append("ScrollItem5")
+        items.append("ScrollItem6")
+        items.append("ScrollItem7")
+        items.append("ScrollItem8")
+        
         return items
     }()
 
-    
+    lazy var staticItems: [String] = {
+        
+        var items:[String] = []
+        
+        items.append("StaticItem1")
+        items.append("StaticItem2")
+        items.append("StaticItem3")
+        items.append("StaticItem4")
+        items.append("StaticItem5")
+        items.append("StaticItem6")
+        items.append("StaticItem7")
+        items.append("StaticItem8")
+        items.append("StaticItem9")
+        
+        return items
+    }()
+
 
 }
 

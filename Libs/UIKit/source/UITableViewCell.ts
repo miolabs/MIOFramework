@@ -219,7 +219,8 @@ export class UITableViewCell extends UIView {
     }
 
     private _setupLayer() {
-        //this.layer.style.position = "absolute";        
+        this.layer.style.position = "relative";        
+        this.layer.style.top = "";        
 
         this.layer.addEventListener("click", function(e) {
             e.stopPropagation();            

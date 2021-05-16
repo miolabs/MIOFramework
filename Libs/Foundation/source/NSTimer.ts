@@ -1,5 +1,4 @@
 import { NSObject } from "./NSObject";
-import { NSTimer } from "./foundation.node";
 
 /**
  * Created by godshadow on 21/3/16.
@@ -53,10 +52,9 @@ export class Timer extends NSObject
             clearTimeout(this._coreTimer);
     }
 
-    private _timerCallback()
-    {
-        if (this._target != null && this._completion != null)
-            this._completion.call(this._target, this);
+    private _timerCallback(){
+        if (this._completion != null)
+            this._completion(this);
 
         if (this._repeat == true)
             this.invalidate();

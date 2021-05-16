@@ -44,7 +44,9 @@ class CollectionViewCell: UITableViewCell, UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ItemCell", for: indexPath)
         
         let item = _items[indexPath.row]
-        if let image = UIImage(named: item) {
+        let image = UIImage(named: item)
+        
+        if image != nil {
             let imageView = cell.viewWithTag(1) as! UIImageView
             imageView.image = image
         }

@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "declaration": true,
+        "sourceMap": true,	
+        "outDir": "./build/web",	
+        "target": "es6",
+        "noImplicitAny": false,
+        "typeRoots": ["./typings"]        
+    },
+    "include": [        
+        "source/platform/web/MIOCore_web.ts",        
+        "source/*"
+    ],
+    "exclude": [        
+        "source/platform/**/*",
+        "source/index*.ts"
+    ]
+  }

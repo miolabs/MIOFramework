@@ -3,6 +3,7 @@ var pipeline = require('readable-stream').pipeline;
 var ts = require("gulp-typescript");
 var fs = require("file-system");
 var sb = require("./gulp.storyboard");
+var parseModel = require("./gulp.datamodel");
 var utils = require("./gulp.utils");
 
 function unifySwiftFiles(done) {
@@ -69,49 +70,76 @@ function parseStoryBoard(done) {
 	done();
 }
 
+function parseDataModel(done) {
+	var DATAMODEL_PATH = "./Demo1App/Demo1App" + ".xcdatamodeld/Demo1App.xcdatamodel/contents";
+
+	if(fs.existsSync(DATAMODEL_PATH)) {
+		var fileString = fs.readFileSync(DATAMODEL_PATH, "utf8");
+		console.log(fileString);
+		parseModel.parserDidStartElement(fileString); //gulp.datamodel.js
+	} else {
+		console.log("DATAMODEL PATH DOES NOT EXIST!");
+	}
+	
+	done();
+}
+
 function copyResources(done) {
-	const SRC = "../../Tools/resources/";
+	const RESOURCES_PATH = "../../Tools/resources/";
 	const DEST = __dirname + "/dist/";
 	const APP_PLIST_PATH = "./Demo1App/Info.plist";
 	const FOUNDATION_PATH = "node_modules/mio-foundation-web/";
 	const UIKIT_PATH = "node_modules/mio-uikit-web/";
 	const SWIFT_PATH = "node_modules/mio-swiftlib/";
 	const ANIMATECSS_PATH = "node_modules/animate.css/animate.min.css";
+	const SRC_ICONS_PATH = "../../Tools/resources/icons/";
+	const ASSETS_PATH = "./Demo1App/Assets.xcassets/";
 
-	fs.copyFileSync(SRC + "index.html", DEST + "index.html");
-	fs.copyFileSync(SRC + "main.js", DEST + "scripts/main.js");
+	//RESOURCES
+	fs.copyFileSync(RESOURCES_PATH + "index.html", DEST + "index.html");
+	fs.copyFileSync(RESOURCES_PATH + "main.js", DEST + "scripts/main.js");
 	fs.copyFileSync("./.build/app.js", DEST + "scripts/app.js");
-	fs.copyFileSync(SRC + "app.css", DEST + "styles/app.css");
+	fs.copyFileSync(RESOURCES_PATH + "app.css", DEST + "styles/app.css");
 	fs.copyFileSync(SWIFT_PATH + "lib.js", DEST + "libs/mio-swiftlib/lib.js");
 
+	//COPY ICONS FOLDER
+	fs.mkdirSync("dist/icons/", {recursive: true});
+	fs.recurseSync(SRC_ICONS_PATH, function(filepath, relative, filename) {
+		fs.copyFileSync(filepath, "dist/icons/" + filename);
+	});
+
+	//COPY ASSETS FOLDER
+	fs.mkdirSync("dist/assets/", {recursive: true});
+	// fs.recurseSync(ASSETS_PATH, function(filepath, relative, filename) {
+	// 	fs.copyFileSync(filepath, "dist/assets/" + filename);		
+	// });
+	assetsFolderScan(ASSETS_PATH);
+
 	//FOUNDATION WEB
-	//fs.copyFileSync(FOUNDATION_PATH + "types/mio-foundation-web.d.ts", DEST + "libs/mio-foundation-web/types/mio-foundation-web.d.ts");
-	//fs.copyFileSync(FOUNDATION_PATH + "extensions.ts", DEST + "libs/mio-foundation-web/extensions.ts");
-	//fs.copyFileSync(FOUNDATION_PATH + "LICENSE", DEST + "libs/mio-foundation-web/LICENSE");
 	if (fs.existsSync(FOUNDATION_PATH + "mio-foundation-web.js")) fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web.js", DEST + "libs/mio-foundation-web/mio-foundation-web.js");
-	// if (fs.existsSync(FOUNDATION_PATH + "mio-foundation-web.min.js")) fs.copyFileSync(FOUNDATION_PATH + "mio-foundation-web.min.js", DEST + "libs/mio-foundation-web/mio-foundation-web.min.js");
-	//fs.copyFileSync(FOUNDATION_PATH + "package.json", DEST + "libs/mio-foundation-web/package.json");
-	//fs.copyFileSync(FOUNDATION_PATH + "README.md", DEST + "libs/mio-foundation-web/README.md");
 
 	//UIKIT
-	//fs.copyFileSync(UIKIT_PATH + "types/mio-uikit-web.d.ts", DEST + "libs/mio-uikit-web/types/mio-uikit-web.d.ts");
-	//fs.copyFileSync(UIKIT_PATH + "LICENSE", DEST + "libs/mio-uikit-web/LICENSE");
 	if (fs.existsSync(UIKIT_PATH + "mio-uikit-web.js")) fs.copyFileSync(UIKIT_PATH + "mio-uikit-web.js", DEST + "libs/mio-uikit-web/mio-uikit-web.js");
-	// if (fs.existsSync(UIKIT_PATH + "mio-uikit-web.min.js")) fs.copyFileSync(UIKIT_PATH + "mio-uikit-web.min.js", DEST + "libs/mio-uikit-web/mio-uikit-web.min.js");
-	
 	fs.copyFileSync(ANIMATECSS_PATH, DEST + "styles/animate.min.css");
-
-	//fs.copyFileSync(UIKIT_PATH + "package.json", DEST + "libs/mio-uikit-web/package.json");
-	//fs.copyFileSync(UIKIT_PATH + "README.md", DEST + "libs/mio-uikit-web/README.md");
-
 	fs.copyFileSync(APP_PLIST_PATH, DEST + "app.plist");
 
 	done();
+}
+
+function assetsFolderScan(path){
+	fs.recurseSync(path, function(filepath, relative, filename) {
+		if (fs.lstatSync(filepath).isDirectory() == true) assetsFolderScan(filepath)
+		else {
+			var ext = filename.substring(filename.lastIndexOf('.') + 1);
+			if (ext != "json") fs.copyFileSync(filepath, "dist/assets/" + filename);		
+		}
+	});
 }
 
 module.exports = {
 	unifySwiftFiles,
 	uglifyJs,
 	parseStoryBoard,
+	parseDataModel,
 	copyResources
 }

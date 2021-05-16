@@ -25,6 +25,8 @@ export class UIToolbar extends UIView
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
         layer.style.width = "100%";
+        layer.style.top = "";
+        layer.style.bottom = "0px";
 
         // Check if we have sub nodes
         if (this.layer.childNodes.length > 0)

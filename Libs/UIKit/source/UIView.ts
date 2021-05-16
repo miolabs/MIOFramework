@@ -80,7 +80,7 @@ export class UIView extends NSObject {
     _checkSegues() {
     }
 
-    private _performSegue(){
+    protected _performSegue(){
         if (this._segues.length == 0) return;
 
         let item = this._segues[0];                        

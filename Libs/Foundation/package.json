@@ -14,13 +14,21 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-node-prod": "gulp buildNode && tsc && gulp minifyNodeProd && gulp buildNodePackage && gulp removeTempFolders",
     "build-web-prod": "gulp buildWeb && tsc && gulp cleanWebJsFile && gulp minifyWebProd && gulp buildWebPackage && gulp removeTempFolders",
-    "build-web-dev-transpiler": "gulp buildWeb && ts-node  --disableWarnings ../refactor-transpiler/refactor-miojslibs.ts foundation && gulp cleanWebJsFile && gulp buildWebDevPackage && gulp buildWebDevPackageFile && gulp removeTempFolders"
+    "build-web-dev-transpiler": "gulp buildWeb && ts-node  --disableWarnings ../refactor-transpiler/refactor-miojslibs.ts foundation && gulp cleanWebJsFile && gulp buildWebDevPackage && gulp buildWebDevPackageFile && gulp removeTempFolders",
+    "compile-web": "rm -rf build && tsc -p tsconfig.web.json",
+    "merge-maps": "merge-source-maps build/web/*.js"
+  },
+  "dependencies": {
+    "@types/decimal.js": "^7.4.0",
+    "decimal.js": "^10.2.1"
   },
   "devDependencies": {
-    "decimal.js": "^10.1.1",
+    "@types/node": "^15.0.1",
+    "combine-source-map": "^0.8.0",
     "gulp": "^4.0.0",
     "gulp-concat": "^2.6.1",
     "gulp-uglify": "^3.0.2",
+    "merge-source-maps": "^0.6.0",
     "readable-stream": "^3.3.0",
     "rimraf": "^2.6.3",
     "ts-node": "^0.7.2",

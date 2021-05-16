@@ -1,6 +1,6 @@
 import { NSObject } from "./NSObject";
 
-export function NSIndexPathEqual(indexPath1:NSIndexPath, indexPath2:NSIndexPath):boolean {
+export function IndexPathEqual(indexPath1:IndexPath, indexPath2:IndexPath):boolean {
 
     //TODO: CHECK REAL INDEX PATH
     if (indexPath1 == null || indexPath2 == null) return false;
@@ -13,19 +13,29 @@ export function NSIndexPathEqual(indexPath1:NSIndexPath, indexPath2:NSIndexPath)
     return false;
 }
 
-export class NSIndexPath extends NSObject
+export class IndexPath extends NSObject
 {
+    //FIXME: Remove the data type in the maethod name
+    static indexForRowIntInSectionInt(row:number, section:number){
+        IndexPath.indexForRowInSection(row, section);
+    }
+
     static indexForRowInSection(row:number, section:number){
-        let ip = new NSIndexPath();
+        let ip = new IndexPath();
         ip.add(section);
         ip.add(row);
         return ip;
     }
 
     static indexForColumnInRowAndSection(column:number, row:number, section:number){
-        let ip = NSIndexPath.indexForRowInSection(row, section);
+        let ip = IndexPath.indexForRowInSection(row, section);
         ip.add(column);
         return ip;
+    }
+    
+    initRowIntSectionInt(row:number, section:number){
+        this.add(section);
+        this.add(row);
     }
 
     private indexes = [];
@@ -50,7 +60,7 @@ export class NSIndexPath extends NSObject
         return this.indexes[2];
     }
 
-    isEqualToIndexPath(indexPath:NSIndexPath){
-        return NSIndexPathEqual(this, indexPath);
+    isEqualToIndexPath(indexPath:IndexPath){
+        return IndexPathEqual(this, indexPath);
     }
 }

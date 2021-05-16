@@ -16,9 +16,9 @@ import { MIOCoreIsMobile } from "mio-foundation-web";
 import { NSTimer } from "mio-foundation-web";
 import { MIOCoreGetPlatform } from "mio-foundation-web";
 import { MIOCorePlatformType } from "mio-foundation-web";
-import { NSIndexPath } from "mio-foundation-web";
+import { IndexPath } from "mio-foundation-web";
 import "mio-foundation-web/extensions"
-import { NSIndexPath, NSObject } from "mio-foundation-web";
+import { IndexPath, NSObject } from "mio-foundation-web";
 import { NSBundle } from "mio-foundation-web";
 import { MIOCoreBundleGetAppResource } from "mio-foundation-web";
 import { NSURLRequest } from "mio-foundation-web";
@@ -1013,7 +1013,7 @@ export class UIView extends NSObject {
     _checkSegues() {
     }
 
-    private _performSegue(){
+    protected _performSegue(){
         if (this._segues.length == 0) return;
 
         let item = this._segues[0];                        
@@ -1945,7 +1945,7 @@ export class UIButton extends UIControl
 
         // Check for img layer
         this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "IMG");
-        if (this._imageLayer == null) this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "DIV");
+        //if (this._imageLayer == null) this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "DIV");
 
         // Check for status
         let status = this.layer.getAttribute("data-status");
@@ -1962,6 +1962,12 @@ export class UIButton extends UIControl
         if (this._titleLayer == null) {
             this._titleLayer = document.createElement("span");
             this.layer.appendChild(this._titleLayer);
+        }
+
+        if (this._imageLayer == null) {
+            this._imageLayer = document.createElement("img");
+            this._imageLayer.setAttribute("width", "44px");
+            this.layer.appendChild(this._imageLayer);
         }
 
         let key = this.layer.getAttribute("data-title");
@@ -1995,6 +2001,7 @@ export class UIButton extends UIControl
             if (this.type == UIButtonType.MomentaryPushIn) this.setSelected(false);
 
             this._performActionsForEvents(UIControl.Event.touchUpInside);
+            this._performSegue();
 
             // if (this.action != null && this.target != null)
             //     this.action.call(this.target, this);
@@ -2019,6 +2026,7 @@ export class UIButton extends UIControl
     }
 
     setImageURL(urlString:string){
+
         if (urlString != null){
             this._imageLayer.setAttribute("src", urlString);
         }
@@ -2414,8 +2422,12 @@ export class UISwitch extends UIControl
 
 export class UIImage extends NSObject
 {    
+    static $equal(imageA:UIImage, imageB:UIImage){
+        return imageA === imageB;
+    }
+
     initNamedString(name: string){
-        this._imageURL = "assets/" + name;
+        this._imageURL = "assets/" + name + ".png";
     }
 
     _imageURL:string;
@@ -2857,14 +2869,19 @@ export class UIViewController extends NSObject {
             }
             else {
                 // It's a window instead of a view
-                let w: UIWindow = pc.window;
+                let w: UIWindow = vc.presentationController.window;
                 if (w == null) {
                     w = new UIWindow();
                     w.init();
                     w.layer.style.background = "";
+                    w.layer.style.width = "100%";
+                    w.layer.style.height = "100%";
                     w.rootViewController = vc;
-                    w.addSubview(pc.presentedView);
-                    pc.window = w;
+                    vc.presentationController.presentedView = vc.view;
+                    vc.view.layer.style.width = "100%";
+                    vc.view.layer.style.height = "100%";
+                    w.addSubview(vc.presentationController.presentedView);
+                    vc.presentationController.window = w;
                 }
 				w.setHidden(false);
 				if (vc instanceof UIAlertController) MUICoreLayerAddStyle(w.layer, "alert");
@@ -3770,7 +3787,7 @@ export class UIEdgeInsets extends NSObject
 
 export class UICollectionViewLayoutAttributes extends NSObject
 {
-    indexPath:NSIndexPath = null;
+    indexPath:IndexPath = null;
 }
 
 
@@ -3806,6 +3823,7 @@ export class UICollectionViewCell extends UIView
 
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
+        layer.style.width = "100%";
         this.setupLayers();
     }
 
@@ -3865,13 +3883,15 @@ export class UICollectionView extends UIView
         layout.invalidateLayout();
     }
 
-    initWithLayer(layer, options){
-        super.initWithLayer(layer, options);
+    initWithLayer(layer, owner, options){
+        super.initWithLayer(layer, owner, options);
+        layer.style.width = "100%";
+        layer.style.overflowX = "scroll";
 
         // Check if we have prototypes
-        if (this.layer.childNodes.length > 0){
-            for(var index = 0; index < this.layer.childNodes.length; index++){
-                var subLayer = this.layer.childNodes[index];
+        if (layer.childNodes.length > 0){
+            for(var index = 0; index < layer.childNodes.length; index++){
+                var subLayer = layer.childNodes[index];
 
                 if (subLayer.tagName != "DIV")
                     continue;
@@ -3884,7 +3904,12 @@ export class UICollectionView extends UIView
                     this._addSupplementaryViewPrototypeWithLayer(subLayer);
                     subLayer.style.display = "none";
                 }
-            }
+                else if (subLayer.getAttribute("data-collection-view-layout") != null){
+                    let classname = subLayer.getAttribute("data-class");
+                    this._collectionViewLayout = NSClassFromString(classname);
+                    this._collectionViewLayout.initWithLayer(subLayer, owner);
+                }
+            }            
         }
     }
 
@@ -3931,7 +3956,7 @@ export class UICollectionView extends UIView
         //TODO:
     }
 
-    dequeueReusableCellWithReuseIdentifierFor(identifier:string, indexPath:NSIndexPath){
+    dequeueReusableCellWithReuseIdentifierFor(identifier:string, indexPath:IndexPath){
         let item = this._cellPrototypes[identifier];
 
         //instance creation here
@@ -4004,7 +4029,7 @@ export class UICollectionView extends UIView
         return view;
     }
 
-    cellAtIndexPath(indexPath:NSIndexPath){
+    cellAtIndexPath(indexPath:IndexPath){
         var s = this._sections[indexPath.section];
         var c = s.cells[indexPath.row];
 
@@ -4030,7 +4055,7 @@ export class UICollectionView extends UIView
                 cell.removeFromSuperview();
                 if (this.delegate != null) {
                     if (typeof this.delegate.didEndDisplayingCellAtIndexPath === "function"){
-                        let ip = NSIndexPath.indexForRowInSection(count, index);
+                        let ip = IndexPath.indexForRowInSection(count, index);
                         this.delegate.didEndDisplayingCellAtIndexPath(this, cell, ip);
                     }
                 }                
@@ -4059,7 +4084,7 @@ export class UICollectionView extends UIView
             let items = this.dataSource[0].collectionViewNumberOfItemsInSection(this, sectionIndex);
             for (let index = 0; index < items; index++) {
 
-                let ip = NSIndexPath.indexForRowInSection(index, sectionIndex);
+                let ip = IndexPath.indexForRowInSection(index, sectionIndex);
                 let cell = this.dataSource[0].collectionViewCellForItemAt(this, ip);
                 section.cells.push(cell);
                 this.addSubview(cell);
@@ -4099,7 +4124,7 @@ export class UICollectionView extends UIView
             return;
 
         if (this.selectedCellIndex > -1 && this.selectedCellSection > -1){
-            let ip = NSIndexPath.indexForRowInSection(this.selectedCellIndex, this.selectedCellSection);
+            let ip = IndexPath.indexForRowInSection(this.selectedCellIndex, this.selectedCellSection);
             this.deselectCellAtIndexPath(ip);
         }
 
@@ -4110,7 +4135,7 @@ export class UICollectionView extends UIView
 
         if (this.delegate != null){
             if (typeof this.delegate.didSelectCellAtIndexPath === "function"){
-                let ip = NSIndexPath.indexForRowInSection(index, section);
+                let ip = IndexPath.indexForRowInSection(index, section);
                 this.delegate.didSelectCellAtIndexPath(this, ip);
             }
         }
@@ -4132,7 +4157,7 @@ export class UICollectionView extends UIView
         cell.setSelected(false);
     }
 
-    deselectCellAtIndexPath(indexPath:NSIndexPath)
+    deselectCellAtIndexPath(indexPath:IndexPath)
     {
         this.selectedCellIndex = -1;
         this.selectedCellSection = -1;
@@ -4189,14 +4214,14 @@ export class UICollectionView extends UIView
                 cell.setNeedsDisplay();
 
                 x += this.collectionViewLayout.itemSize.width + this.collectionViewLayout.minimumInteritemSpacing;                
-                if (x >= maxX) {
-                    x = this.collectionViewLayout.sectionInset.left;
-                    y += this.collectionViewLayout.itemSize.height;
-                    y += this.collectionViewLayout.minimumLineSpacing;
-                }
+                // if (x >= maxX) {
+                //     x = this.collectionViewLayout.sectionInset.left;
+                //     y += this.collectionViewLayout.itemSize.height;
+                //     y += this.collectionViewLayout.minimumLineSpacing;
+                // }
             }
 
-            y += this.collectionViewLayout.minimumLineSpacing;
+            //y += this.collectionViewLayout.minimumLineSpacing;
 
             // Add footer view
             if (section.footer != null)
@@ -4207,6 +4232,19 @@ export class UICollectionView extends UIView
                 y += offsetY + this.collectionViewLayout.footerReferenceSize.height;
             }
         }
+    }
+
+    scrollToItemAtAtAnimated(indexPath:IndexPath, scrollPosition:any, animated:boolean){
+        
+    }
+
+    static ScrollPosition = class {
+        static top = 1 <<  0
+        static centeredVertically = 1 <<  1
+        static bottom = 1 <<  2
+        static left = 1 <<  3
+        static centeredHorizontally = 1 <<  4
+        static right = 1 <<  5
     }
 
 }
@@ -4237,15 +4275,46 @@ export class UICollectionViewLayout extends NSObject
         this.sectionInset.init();
     }
 
+    initWithLayer(layer, owner, options?){
+        this.sectionInset = new UIEdgeInsets();
+        this.sectionInset.init();
+
+        if (layer.childNodes.length > 0){
+            for(var index = 0; index < layer.childNodes.length; index++){
+                var subLayer = layer.childNodes[index];
+
+                if (subLayer.tagName != "DIV")
+                    continue;
+
+                if (subLayer.getAttribute("data-key") != null) {
+                    this.setKeyValueFromLayer(subLayer);
+                    subLayer.style.display = "none";
+                }
+            }
+        }                
+    }
+    
+    setKeyValueFromLayer(layer){
+        let key = layer.getAttribute("data-key");
+        let type = layer.getAttribute("data-type"); 
+        
+        if (type == "size"){
+            let width = layer.getAttribute("data-width"); 
+            let heigth = layer.getAttribute("data-height"); 
+            let size = new CGSize(parseFloat(width), parseFloat(heigth));
+            this[key] = size;
+        }
+    }
+
     invalidateLayout(){}    
 
     get collectionViewContentSize():CGSize {return CGSize.Zero();}
 
-    layoutAttributesForItemAtIndexPath(indexPath:NSIndexPath):UICollectionViewLayoutAttributes{return null};
+    layoutAttributesForItemAtIndexPath(indexPath:IndexPath):UICollectionViewLayoutAttributes{return null};
 
     prepareForCollectionViewUpdates(updateItems:UICollectionViewUpdateItem[]){}
-    initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath:NSIndexPath):UICollectionViewLayoutAttributes {return null;}
-    finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath:NSIndexPath):UICollectionViewLayoutAttributes {return null;}
+    initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath:IndexPath):UICollectionViewLayoutAttributes {return null;}
+    finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath:IndexPath):UICollectionViewLayoutAttributes {return null;}
     finalizeCollectionViewUpdates(){}
 }
 
@@ -4265,6 +4334,15 @@ export class UICollectionViewFlowLayout extends UICollectionViewLayout
         this.minimumInteritemSpacing = 10;
         this.itemSize = new CGSize(50, 50);
     }
+
+    initWithLayer(layer, owner, options?){
+        super.initWithLayer(layer, owner, options);
+
+        let direction = layer.getAttribute("data-collection-view-layout-direction");
+        if (direction == "horizontal") this.scrollDirection = MIOCollectionViewScrollDirection.Horizontal;
+        else if (direction == "vertical") this.scrollDirection = MIOCollectionViewScrollDirection.Vertical;
+    }
+    
 }
 
 
@@ -4285,6 +4363,7 @@ export class UITableView extends UIView
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
         layer.style.width = "100%";
+        layer.style.overflowY = "scroll";
 
         // Check if we have prototypes
         if (this.layer.childNodes.length > 0) {
@@ -4389,7 +4468,7 @@ export class UITableView extends UIView
         this.addSubview(header);
     }
 
-    private addCell(indexPath:NSIndexPath){
+    private addCell(indexPath:IndexPath){
         let cell = this.dataSource[0].tableViewCellForRowAt(this, indexPath) as UITableViewCell;
         let section = this.sections[indexPath.section];                
                 
@@ -4437,20 +4516,20 @@ export class UITableView extends UIView
         cell.removeFromSuperview();
     }
 
-    private nextIndexPath(indexPath:NSIndexPath){        
+    private nextIndexPath(indexPath:IndexPath){        
         let sectionIndex = indexPath.section;
         let rowIndex = indexPath.row + 1;
 
         if (sectionIndex >= this.sections.length) return null;
         let section = this.sections[sectionIndex];
-        if (rowIndex < section.length) return NSIndexPath.indexForRowInSection(rowIndex, sectionIndex);
+        if (rowIndex < section.length) return IndexPath.indexForRowInSection(rowIndex, sectionIndex);
 
         sectionIndex++;        
         if (sectionIndex >= this.sections.length) return null;
         section = this.sections[sectionIndex];
         if (section.length == 0) return null;
 
-        return NSIndexPath.indexForRowInSection(0, sectionIndex);
+        return IndexPath.indexForRowInSection(0, sectionIndex);
     }
 
     private addSectionFooter(section){
@@ -4483,7 +4562,7 @@ export class UITableView extends UIView
             this.addSectionHeader(sectionIndex);
             
             for (let cellIndex = 0; cellIndex < rows; cellIndex++) {
-                let ip = NSIndexPath.indexForRowInSection(cellIndex, sectionIndex);
+                let ip = IndexPath.indexForRowInSection(cellIndex, sectionIndex);
                 this.addCell(ip);
             }
 
@@ -4505,19 +4584,19 @@ export class UITableView extends UIView
         }
     }
 
-    cellAtIndexPath(indexPath:NSIndexPath){
+    cellAtIndexPath(indexPath:IndexPath){
         if (indexPath.section >= this.sections.length) return null;
         let section = this.sections[indexPath.section];
         if (indexPath.row >= section.length) return null;
         return section[indexPath.row];
     }
 
-    indexPathForCell(cell: UITableViewCell): NSIndexPath {
+    indexPathForCell(cell: UITableViewCell): IndexPath {
         let section = cell._section;
         let sectionIndex = this.sections.indexOf(section);
         let rowIndex = section.indexOf(cell);
 
-        return NSIndexPath.indexForRowInSection(rowIndex, sectionIndex);
+        return IndexPath.indexForRowInSection(rowIndex, sectionIndex);
     }
 
 
@@ -4529,7 +4608,7 @@ export class UITableView extends UIView
         let rowIndex = section.indexOfObject(cell);
         
         if (this.delegate != null && typeof this.delegate.didSelectCellAtIndexPath === "function") {
-            this.delegate.didSelectCellAtIndexPath(this, NSIndexPath.indexForRowInSection(rowIndex, sectionIndex));
+            this.delegate.didSelectCellAtIndexPath(this, IndexPath.indexForRowInSection(rowIndex, sectionIndex));
         }                
 
     }
@@ -4841,7 +4920,8 @@ export class UITableViewCell extends UIView {
     }
 
     private _setupLayer() {
-        //this.layer.style.position = "absolute";        
+        this.layer.style.position = "relative";        
+        this.layer.style.top = "";        
 
         this.layer.addEventListener("click", function(e) {
             e.stopPropagation();            
@@ -5197,7 +5277,7 @@ export class UIAlertController extends UIViewController
         return this._items.length + 1;
     }
 
-    tableViewCellForRowAt(tableview, indexPath:NSIndexPath){
+    tableViewCellForRowAt(tableview, indexPath:IndexPath){
         let cell:UITableViewCell = null;
         if (indexPath.row == 0){
             cell = this._createHeaderCell();
@@ -5216,14 +5296,14 @@ export class UIAlertController extends UIViewController
         return cell;
     }
 
-    heightForRowAtIndexPath(tableView:UITableView, indexPath:NSIndexPath) {
+    heightForRowAtIndexPath(tableView:UITableView, indexPath:IndexPath) {
         let h = 50;
         if (indexPath.row == 0) h = 80;
         
         return h;
     }
 
-    canSelectCellAtIndexPath(tableview, indexPath:NSIndexPath){
+    canSelectCellAtIndexPath(tableview, indexPath:IndexPath){
         if (indexPath.row == 0) return false;
 
         let item = this._items[indexPath.row - 1];
@@ -5232,7 +5312,7 @@ export class UIAlertController extends UIViewController
         return false;
     }
 
-    didSelectCellAtIndexPath(tableView, indexPath:NSIndexPath){
+    didSelectCellAtIndexPath(tableView, indexPath:IndexPath){
         let item = this._items[indexPath.row - 1];
         if (item.type == UIAlertItemType.Action) {
             
@@ -5476,8 +5556,21 @@ export class UIBarButtonItem extends UIBarItem
 
         let button = new UIButton();
         button.init();
+        button.owner = owner;
+        
         let systemStyle = layer.getAttribute("data-bar-button-item-system");
         if (systemStyle != null) MUICoreLayerAddStyle(button.layer, "system-" + systemStyle + "-icon");
+
+        let imageStyle = layer.getAttribute("data-bar-button-item-image");
+        if (imageStyle != null) button.setImageURL("assets/" + imageStyle + ".png");
+
+        let titleStyle = layer.getAttribute("data-bar-button-item-title");
+        if (titleStyle != null) {
+            button.setTitle(titleStyle);
+            button.layer.style.position = "absolute";
+            button.layer.style.left = "10px";
+            button.layer.style.top = "15px";
+        }
 
         if (layer.childNodes.length > 0) {
             for (let index = 0; index < layer.childNodes.length; index++) {
@@ -5492,6 +5585,13 @@ export class UIBarButtonItem extends UIBarItem
 
                     button.addTarget(this.target, this.action, UIControl.Event.TouchUpInside);
                 }
+                else if (subLayer.getAttribute("data-connections") == "true") {
+                    let obj = this;
+                    //if (options != null && options["Object"] != null) obj = options["Object"];
+                    MUICoreStoryboardParseConnectionsLayer(subLayer, button, owner);
+                    continue;
+                }
+
             }
         }
 
@@ -5524,14 +5624,29 @@ export class UINavigationBar extends UIView
 
         this.leftView = new UIView();
         this.leftView.init();
+        this.leftView.layer.style.position = "absolute";
+        this.leftView.layer.style.top = "0px";
+        this.leftView.layer.style.height = "100%";
+        this.leftView.layer.style.width = "20%";
+        this.leftView.layer.style.left = "0px";
         this.addSubview(this.leftView);
 
         this.titleView = new UIView();
         this.titleView.init();
+        this.titleView.layer.style.position = "absolute";
+        this.titleView.layer.style.top = "0px";
+        this.titleView.layer.style.height = "100%";
+        this.titleView.layer.style.width = "60%";
+        this.titleView.layer.style.left = "20%";
         this.addSubview(this.titleView);
 
         this.rigthView = new UIView();
         this.rigthView.init();
+        this.rigthView.layer.style.position = "absolute";
+        this.rigthView.layer.style.top = "0px";
+        this.rigthView.layer.style.height = "100%";
+        this.rigthView.layer.style.width = "44px";
+        this.rigthView.layer.style.right = "0px";        
         this.addSubview(this.rigthView);
     }
 
@@ -5548,6 +5663,11 @@ export class UINavigationBar extends UIView
             // Add title
             if (ni.titleView != null) {
                 this.titleView.addSubview(ni.titleView);
+            }
+
+            // Add right button
+            if (ni.leftBarButtonItem != null) {
+                this.leftView.addSubview(ni.leftBarButtonItem.customView);                
             }
 
             // Add right button
@@ -5623,6 +5743,9 @@ export class UINavigationItem extends NSObject
                 let button = new UIBarButtonItem();
                 button.initWithLayer(subLayer, owner);
 
+                if (key == "leftBarButtonItem") {
+                    (owner as UIViewController).navigationItem.leftBarButtonItem = button;
+                }                    
                 if (key == "rightBarButtonItem") {
                     (owner as UIViewController).navigationItem.rightBarButtonItem = button;
                 }                    
@@ -5982,6 +6105,8 @@ export class UIToolbar extends UIView
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
         layer.style.width = "100%";
+        layer.style.top = "";
+        layer.style.bottom = "0px";
 
         // Check if we have sub nodes
         if (this.layer.childNodes.length > 0)
@@ -6748,13 +6873,12 @@ export class UIStoryboardSegue extends NSObject
     }
 }
 
-export function _UIStoryboardSeguePerform(kind:string, sender:any, identifier:string, sourceViewController:UIViewController, destination:string){         
-    if (kind != "show") return;
-
+export function _UIStoryboardSeguePerform(kind:string, sender:any, identifier:string, sourceViewController:UIViewController, destination:string){             
     let vc = sourceViewController.storyboard._instantiateViewControllerWithDestination(destination);
     let segue = new UIStoryboardSegue();
     segue.initWithIdentifierAndPerformHandler(identifier, sourceViewController, vc, function(this:UIStoryboardSegue){
         if (kind == "show") this.source.navigationController.pushViewController(vc, true);
+        else if (kind == "presentation") this.source.presentViewController(vc, true);
     });
     segue._sender = sender;
     segue.perform();

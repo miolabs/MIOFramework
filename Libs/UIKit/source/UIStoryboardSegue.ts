@@ -32,13 +32,12 @@ export class UIStoryboardSegue extends NSObject
     }
 }
 
-export function _UIStoryboardSeguePerform(kind:string, sender:any, identifier:string, sourceViewController:UIViewController, destination:string){         
-    if (kind != "show") return;
-
+export function _UIStoryboardSeguePerform(kind:string, sender:any, identifier:string, sourceViewController:UIViewController, destination:string){             
     let vc = sourceViewController.storyboard._instantiateViewControllerWithDestination(destination);
     let segue = new UIStoryboardSegue();
     segue.initWithIdentifierAndPerformHandler(identifier, sourceViewController, vc, function(this:UIStoryboardSegue){
         if (kind == "show") this.source.navigationController.pushViewController(vc, true);
+        else if (kind == "presentation") this.source.presentViewController(vc, true);
     });
     segue._sender = sender;
     segue.perform();

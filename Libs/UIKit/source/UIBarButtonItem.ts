@@ -62,8 +62,21 @@ export class UIBarButtonItem extends UIBarItem
 
         let button = new UIButton();
         button.init();
+        button.owner = owner;
+        
         let systemStyle = layer.getAttribute("data-bar-button-item-system");
         if (systemStyle != null) MUICoreLayerAddStyle(button.layer, "system-" + systemStyle + "-icon");
+
+        let imageStyle = layer.getAttribute("data-bar-button-item-image");
+        if (imageStyle != null) button.setImageURL("assets/" + imageStyle + ".png");
+
+        let titleStyle = layer.getAttribute("data-bar-button-item-title");
+        if (titleStyle != null) {
+            button.setTitle(titleStyle);
+            button.layer.style.position = "absolute";
+            button.layer.style.left = "10px";
+            button.layer.style.top = "15px";
+        }
 
         if (layer.childNodes.length > 0) {
             for (let index = 0; index < layer.childNodes.length; index++) {
@@ -78,6 +91,13 @@ export class UIBarButtonItem extends UIBarItem
 
                     button.addTarget(this.target, this.action, UIControl.Event.TouchUpInside);
                 }
+                else if (subLayer.getAttribute("data-connections") == "true") {
+                    let obj = this;
+                    //if (options != null && options["Object"] != null) obj = options["Object"];
+                    MUICoreStoryboardParseConnectionsLayer(subLayer, button, owner);
+                    continue;
+                }
+
             }
         }
 

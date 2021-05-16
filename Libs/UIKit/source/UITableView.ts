@@ -2,7 +2,7 @@ import { UIView} from "./UIView";
 import { UITableViewCell } from "./UITableViewCell";
 import { UIGestureRecognizer } from "./UIGestureRecognizer";
 import { UIGestureRecognizerState} from "./UIGestureRecognizer";
-import { NSIndexPath, NSObject } from "mio-foundation-web";
+import { IndexPath, NSObject } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 import "mio-foundation-web/extensions"
 import { _UIStoryboardSeguePerform } from "./UIStoryboardSegue";
@@ -17,6 +17,7 @@ export class UITableView extends UIView
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
         layer.style.width = "100%";
+        layer.style.overflowY = "scroll";
 
         // Check if we have prototypes
         if (this.layer.childNodes.length > 0) {
@@ -121,7 +122,7 @@ export class UITableView extends UIView
         this.addSubview(header);
     }
 
-    private addCell(indexPath:NSIndexPath){
+    private addCell(indexPath:IndexPath){
         let cell = this.dataSource[0].tableViewCellForRowAt(this, indexPath) as UITableViewCell;
         let section = this.sections[indexPath.section];                
                 
@@ -169,20 +170,20 @@ export class UITableView extends UIView
         cell.removeFromSuperview();
     }
 
-    private nextIndexPath(indexPath:NSIndexPath){        
+    private nextIndexPath(indexPath:IndexPath){        
         let sectionIndex = indexPath.section;
         let rowIndex = indexPath.row + 1;
 
         if (sectionIndex >= this.sections.length) return null;
         let section = this.sections[sectionIndex];
-        if (rowIndex < section.length) return NSIndexPath.indexForRowInSection(rowIndex, sectionIndex);
+        if (rowIndex < section.length) return IndexPath.indexForRowInSection(rowIndex, sectionIndex);
 
         sectionIndex++;        
         if (sectionIndex >= this.sections.length) return null;
         section = this.sections[sectionIndex];
         if (section.length == 0) return null;
 
-        return NSIndexPath.indexForRowInSection(0, sectionIndex);
+        return IndexPath.indexForRowInSection(0, sectionIndex);
     }
 
     private addSectionFooter(section){
@@ -215,7 +216,7 @@ export class UITableView extends UIView
             this.addSectionHeader(sectionIndex);
             
             for (let cellIndex = 0; cellIndex < rows; cellIndex++) {
-                let ip = NSIndexPath.indexForRowInSection(cellIndex, sectionIndex);
+                let ip = IndexPath.indexForRowInSection(cellIndex, sectionIndex);
                 this.addCell(ip);
             }
 
@@ -237,19 +238,19 @@ export class UITableView extends UIView
         }
     }
 
-    cellAtIndexPath(indexPath:NSIndexPath){
+    cellAtIndexPath(indexPath:IndexPath){
         if (indexPath.section >= this.sections.length) return null;
         let section = this.sections[indexPath.section];
         if (indexPath.row >= section.length) return null;
         return section[indexPath.row];
     }
 
-    indexPathForCell(cell: UITableViewCell): NSIndexPath {
+    indexPathForCell(cell: UITableViewCell): IndexPath {
         let section = cell._section;
         let sectionIndex = this.sections.indexOf(section);
         let rowIndex = section.indexOf(cell);
 
-        return NSIndexPath.indexForRowInSection(rowIndex, sectionIndex);
+        return IndexPath.indexForRowInSection(rowIndex, sectionIndex);
     }
 
 
@@ -261,7 +262,7 @@ export class UITableView extends UIView
         let rowIndex = section.indexOfObject(cell);
         
         if (this.delegate != null && typeof this.delegate.didSelectCellAtIndexPath === "function") {
-            this.delegate.didSelectCellAtIndexPath(this, NSIndexPath.indexForRowInSection(rowIndex, sectionIndex));
+            this.delegate.didSelectCellAtIndexPath(this, IndexPath.indexForRowInSection(rowIndex, sectionIndex));
         }                
 
     }

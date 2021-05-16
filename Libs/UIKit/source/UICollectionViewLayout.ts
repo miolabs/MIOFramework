@@ -1,6 +1,6 @@
 import { NSObject } from "mio-foundation-web";
 import { CGSize } from "mio-foundation-web";
-import { NSIndexPath } from "mio-foundation-web";
+import { IndexPath } from "mio-foundation-web";
 import { UICollectionView } from "./UICollectionView";
 import { UICollectionViewLayoutAttributes } from "./UICollectionViewLayoutAttributes";
 import { UICollectionViewUpdateItem } from "./UICollectionViewUpdateItem";
@@ -25,15 +25,46 @@ export class UICollectionViewLayout extends NSObject
         this.sectionInset.init();
     }
 
+    initWithLayer(layer, owner, options?){
+        this.sectionInset = new UIEdgeInsets();
+        this.sectionInset.init();
+
+        if (layer.childNodes.length > 0){
+            for(var index = 0; index < layer.childNodes.length; index++){
+                var subLayer = layer.childNodes[index];
+
+                if (subLayer.tagName != "DIV")
+                    continue;
+
+                if (subLayer.getAttribute("data-key") != null) {
+                    this.setKeyValueFromLayer(subLayer);
+                    subLayer.style.display = "none";
+                }
+            }
+        }                
+    }
+    
+    setKeyValueFromLayer(layer){
+        let key = layer.getAttribute("data-key");
+        let type = layer.getAttribute("data-type"); 
+        
+        if (type == "size"){
+            let width = layer.getAttribute("data-width"); 
+            let heigth = layer.getAttribute("data-height"); 
+            let size = new CGSize(parseFloat(width), parseFloat(heigth));
+            this[key] = size;
+        }
+    }
+
     invalidateLayout(){}    
 
     get collectionViewContentSize():CGSize {return CGSize.Zero();}
 
-    layoutAttributesForItemAtIndexPath(indexPath:NSIndexPath):UICollectionViewLayoutAttributes{return null};
+    layoutAttributesForItemAtIndexPath(indexPath:IndexPath):UICollectionViewLayoutAttributes{return null};
 
     prepareForCollectionViewUpdates(updateItems:UICollectionViewUpdateItem[]){}
-    initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath:NSIndexPath):UICollectionViewLayoutAttributes {return null;}
-    finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath:NSIndexPath):UICollectionViewLayoutAttributes {return null;}
+    initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath:IndexPath):UICollectionViewLayoutAttributes {return null;}
+    finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath:IndexPath):UICollectionViewLayoutAttributes {return null;}
     finalizeCollectionViewUpdates(){}
 }
 
@@ -53,4 +84,13 @@ export class UICollectionViewFlowLayout extends UICollectionViewLayout
         this.minimumInteritemSpacing = 10;
         this.itemSize = new CGSize(50, 50);
     }
+
+    initWithLayer(layer, owner, options?){
+        super.initWithLayer(layer, owner, options);
+
+        let direction = layer.getAttribute("data-collection-view-layout-direction");
+        if (direction == "horizontal") this.scrollDirection = MIOCollectionViewScrollDirection.Horizontal;
+        else if (direction == "vertical") this.scrollDirection = MIOCollectionViewScrollDirection.Vertical;
+    }
+    
 }

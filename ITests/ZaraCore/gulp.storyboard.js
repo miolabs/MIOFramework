@@ -64,9 +64,12 @@ function parserDidStartElement(parser, element, attributes){
 
 		let key = attributes["key"];
 		if (key != null) item["ExtraAttributes"].push('data-bar-button-item-key="' +  key + '"');		
+		
+		let title = attributes["title"];
+		if (title != null) item["ExtraAttributes"].push('data-bar-button-item-title="' +  title + '"');		
 
 		let image = attributes["image"];
-		if (image != null) item["ExtraAttributes"].push('data-bar-button-item-image="' +  image + '.png"');		
+		if (image != null) item["ExtraAttributes"].push('data-bar-button-item-image="' +  image + '"');		
 
 		let systemItem = attributes["systemItem"];
 		if (systemItem != null) {			
@@ -119,7 +122,14 @@ function parserDidStartElement(parser, element, attributes){
 		pushNewElement(element, attributes);
 	}
 	else if(element == "collectionViewFlowLayout") {
-		pushNewElement(element, attributes);
+		let item = pushNewElement(element, attributes);
+
+		//let key = attributes["key"];		
+		item["ExtraAttributes"].push('data-collection-view-layout="true"');
+		
+		let scrollDirection = attributes["scrollDirection"];
+		item["ExtraAttributes"].push('data-collection-view-layout-direction="'+ scrollDirection + '"');
+
 	}
 	else if(element == "collectionViewCell") {
 		let item = pushNewElement(element, attributes);
@@ -161,6 +171,18 @@ function parserDidStartElement(parser, element, attributes){
 	}
 	else if (element == "stepper"){
 		let item = pushNewElement(element, attributes);
+	}
+	else if (element == "size"){		
+		let item = pushNewElement(element, attributes);
+
+		let key = attributes["key"];
+		let width = attributes["width"];
+		let height = attributes["height"];
+
+		item["ExtraAttributes"].push('data-key="' + key + '"');		
+		item["ExtraAttributes"].push('data-type="size"');		
+		item["ExtraAttributes"].push('data-width="' + width + '"');		
+		item["ExtraAttributes"].push('data-height="' + height + '"');		
 	}
 	else if (element == "rect"){		
 		let styles = currentElement["Styles"];
@@ -321,6 +343,9 @@ function parserDidEndElement(parser, element){
 	else if (element == "stepper"){
 		popElement();
 	}
+	else if (element == "size"){		
+		popElement();
+	}
 
 }
 
@@ -337,17 +362,20 @@ function pushNewElement(element, attributes){
 	item["Classes"] = classes;
 	item["Segues"]	= [];	
 	item["Outlets"] = [];
+	item["ExtraAttributes"] = [];
 
-	let customClass = attributes["customClass"];
-	if (customClass == null) customClass = "UI" + element.charAt(0).toUpperCase() + element.substring(1);
-	item["ExtraAttributes"] = ['data-class="' + customClass + '"'];	
-	item["CustomClass"] = customClass;
+	if (element != "size") {
+		let customClass = attributes["customClass"];
+		if (customClass == null) customClass = "UI" + element.charAt(0).toUpperCase() + element.substring(1);
+		item["ExtraAttributes"].push('data-class="' + customClass + '"');	
+		item["CustomClass"] = customClass;
+
+		classes.push(parseClassType(element));
+		if (contenMode != null) classes.push(contenMode);	
+	}
 
 	let tag = attributes["tag"];
 	if (tag != null) item["ExtraAttributes"].push('data-tag="' + tag + '"');	
-
-	classes.push(parseClassType(element));
-	if (contenMode != null) classes.push(contenMode);
 
 	elementsStack.push(item);
 	currentElement = item;

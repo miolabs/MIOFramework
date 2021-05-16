@@ -44,6 +44,9 @@ export class UINavigationItem extends NSObject
                 let button = new UIBarButtonItem();
                 button.initWithLayer(subLayer, owner);
 
+                if (key == "leftBarButtonItem") {
+                    (owner as UIViewController).navigationItem.leftBarButtonItem = button;
+                }                    
                 if (key == "rightBarButtonItem") {
                     (owner as UIViewController).navigationItem.rightBarButtonItem = button;
                 }                    

@@ -2,7 +2,7 @@ import { UIView } from "./UIView";
 import { NSObject } from "mio-foundation-web";
 import { NSClassFromString } from "mio-foundation-web";
 import { CGSize } from "mio-foundation-web";
-import { NSIndexPath } from "mio-foundation-web";
+import { IndexPath } from "mio-foundation-web";
 import { UICollectionViewFlowLayout } from "./UICollectionViewLayout";
 import "mio-foundation-web/extensions"
 
@@ -26,6 +26,7 @@ export class UICollectionViewCell extends UIView
 
     initWithLayer(layer, owner, options?){
         super.initWithLayer(layer, owner, options);
+        layer.style.width = "100%";
         this.setupLayers();
     }
 
@@ -85,13 +86,15 @@ export class UICollectionView extends UIView
         layout.invalidateLayout();
     }
 
-    initWithLayer(layer, options){
-        super.initWithLayer(layer, options);
+    initWithLayer(layer, owner, options){
+        super.initWithLayer(layer, owner, options);
+        layer.style.width = "100%";
+        layer.style.overflowX = "scroll";
 
         // Check if we have prototypes
-        if (this.layer.childNodes.length > 0){
-            for(var index = 0; index < this.layer.childNodes.length; index++){
-                var subLayer = this.layer.childNodes[index];
+        if (layer.childNodes.length > 0){
+            for(var index = 0; index < layer.childNodes.length; index++){
+                var subLayer = layer.childNodes[index];
 
                 if (subLayer.tagName != "DIV")
                     continue;
@@ -104,7 +107,12 @@ export class UICollectionView extends UIView
                     this._addSupplementaryViewPrototypeWithLayer(subLayer);
                     subLayer.style.display = "none";
                 }
-            }
+                else if (subLayer.getAttribute("data-collection-view-layout") != null){
+                    let classname = subLayer.getAttribute("data-class");
+                    this._collectionViewLayout = NSClassFromString(classname);
+                    this._collectionViewLayout.initWithLayer(subLayer, owner);
+                }
+            }            
         }
     }
 
@@ -151,7 +159,7 @@ export class UICollectionView extends UIView
         //TODO:
     }
 
-    dequeueReusableCellWithReuseIdentifierFor(identifier:string, indexPath:NSIndexPath){
+    dequeueReusableCellWithReuseIdentifierFor(identifier:string, indexPath:IndexPath){
         let item = this._cellPrototypes[identifier];
 
         //instance creation here
@@ -224,7 +232,7 @@ export class UICollectionView extends UIView
         return view;
     }
 
-    cellAtIndexPath(indexPath:NSIndexPath){
+    cellAtIndexPath(indexPath:IndexPath){
         var s = this._sections[indexPath.section];
         var c = s.cells[indexPath.row];
 
@@ -250,7 +258,7 @@ export class UICollectionView extends UIView
                 cell.removeFromSuperview();
                 if (this.delegate != null) {
                     if (typeof this.delegate.didEndDisplayingCellAtIndexPath === "function"){
-                        let ip = NSIndexPath.indexForRowInSection(count, index);
+                        let ip = IndexPath.indexForRowInSection(count, index);
                         this.delegate.didEndDisplayingCellAtIndexPath(this, cell, ip);
                     }
                 }                
@@ -279,7 +287,7 @@ export class UICollectionView extends UIView
             let items = this.dataSource[0].collectionViewNumberOfItemsInSection(this, sectionIndex);
             for (let index = 0; index < items; index++) {
 
-                let ip = NSIndexPath.indexForRowInSection(index, sectionIndex);
+                let ip = IndexPath.indexForRowInSection(index, sectionIndex);
                 let cell = this.dataSource[0].collectionViewCellForItemAt(this, ip);
                 section.cells.push(cell);
                 this.addSubview(cell);
@@ -319,7 +327,7 @@ export class UICollectionView extends UIView
             return;
 
         if (this.selectedCellIndex > -1 && this.selectedCellSection > -1){
-            let ip = NSIndexPath.indexForRowInSection(this.selectedCellIndex, this.selectedCellSection);
+            let ip = IndexPath.indexForRowInSection(this.selectedCellIndex, this.selectedCellSection);
             this.deselectCellAtIndexPath(ip);
         }
 
@@ -330,7 +338,7 @@ export class UICollectionView extends UIView
 
         if (this.delegate != null){
             if (typeof this.delegate.didSelectCellAtIndexPath === "function"){
-                let ip = NSIndexPath.indexForRowInSection(index, section);
+                let ip = IndexPath.indexForRowInSection(index, section);
                 this.delegate.didSelectCellAtIndexPath(this, ip);
             }
         }
@@ -352,7 +360,7 @@ export class UICollectionView extends UIView
         cell.setSelected(false);
     }
 
-    deselectCellAtIndexPath(indexPath:NSIndexPath)
+    deselectCellAtIndexPath(indexPath:IndexPath)
     {
         this.selectedCellIndex = -1;
         this.selectedCellSection = -1;
@@ -409,14 +417,14 @@ export class UICollectionView extends UIView
                 cell.setNeedsDisplay();
 
                 x += this.collectionViewLayout.itemSize.width + this.collectionViewLayout.minimumInteritemSpacing;                
-                if (x >= maxX) {
-                    x = this.collectionViewLayout.sectionInset.left;
-                    y += this.collectionViewLayout.itemSize.height;
-                    y += this.collectionViewLayout.minimumLineSpacing;
-                }
+                // if (x >= maxX) {
+                //     x = this.collectionViewLayout.sectionInset.left;
+                //     y += this.collectionViewLayout.itemSize.height;
+                //     y += this.collectionViewLayout.minimumLineSpacing;
+                // }
             }
 
-            y += this.collectionViewLayout.minimumLineSpacing;
+            //y += this.collectionViewLayout.minimumLineSpacing;
 
             // Add footer view
             if (section.footer != null)
@@ -427,6 +435,19 @@ export class UICollectionView extends UIView
                 y += offsetY + this.collectionViewLayout.footerReferenceSize.height;
             }
         }
+    }
+
+    scrollToItemAtAtAnimated(indexPath:IndexPath, scrollPosition:any, animated:boolean){
+        
+    }
+
+    static ScrollPosition = class {
+        static top = 1 <<  0
+        static centeredVertically = 1 <<  1
+        static bottom = 1 <<  2
+        static left = 1 <<  3
+        static centeredHorizontally = 1 <<  4
+        static right = 1 <<  5
     }
 
 }

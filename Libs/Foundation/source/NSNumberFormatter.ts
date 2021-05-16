@@ -66,8 +66,9 @@ export class NumberFormatter extends Formatter {
         return null;
     }
 
-    stringFrom(number:NSNumber):string{
-        return _injectIntoOptional(this.stringForObjectValue(number));//TODO automatically refactor function results
+    stringFrom(number:NSNumber):string {
+        // return _injectIntoOptional(this.stringForObjectValue(number));//TODO automatically refactor function results
+        return this.stringForObjectValue(number);//TODO automatically refactor function results
     }
 
     stringForObjectValue(value):string {
