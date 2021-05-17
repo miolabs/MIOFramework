@@ -506,7 +506,7 @@ class NIBParser : NSObject, XMLParserDelegate
             currentFileContent! += content
         }
         else {
-            item!.content = content;
+            item!.content += content;
         }
     }
 
