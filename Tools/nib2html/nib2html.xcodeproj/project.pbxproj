@@ -15,6 +15,8 @@
 		145D6563263DB87600F4427D /* nib2htmlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145D6562263DB87600F4427D /* nib2htmlTests.swift */; };
 		145D656C263DB9B100F4427D /* UIKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145D656A263DB9B100F4427D /* UIKitTests.swift */; };
 		145D656E263DBAED00F4427D /* NIBParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145D6555263DB82300F4427D /* NIBParser.swift */; };
+		636C461C26539D7B00B5055F /* htmlBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D17F0726518356008019CE /* htmlBackend.swift */; };
+		636C461F26539D7C00B5055F /* htmlBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D17F0726518356008019CE /* htmlBackend.swift */; };
 		63D17F042651833A008019CE /* readBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D17F032651833A008019CE /* readBackend.swift */; };
 		63D17F082651837A008019CE /* readBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D17F032651833A008019CE /* readBackend.swift */; };
 /* End PBXBuildFile section */
@@ -42,7 +44,7 @@
 		145D656A263DB9B100F4427D /* UIKitTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIKitTests.swift; path = Tests/nib2htmlTests/UIKitTests.swift; sourceTree = SOURCE_ROOT; };
 		145D656B263DB9B100F4427D /* BasicTest.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BasicTest.storyboard; path = Tests/nib2htmlTests/BasicTest.storyboard; sourceTree = SOURCE_ROOT; };
 		63D17F032651833A008019CE /* readBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = readBackend.swift; sourceTree = "<group>"; };
-		63D17F0726518356008019CE /* html_backend.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = html_backend.json; sourceTree = "<group>"; };
+		63D17F0726518356008019CE /* htmlBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = htmlBackend.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,7 +91,7 @@
 				144F6FC02651864700120CDA /* NIBParserTemplate.swift */,
 				145D6556263DB82300F4427D /* main.swift */,
 				63D17F032651833A008019CE /* readBackend.swift */,
-				63D17F0726518356008019CE /* html_backend.json */,
+				63D17F0726518356008019CE /* htmlBackend.swift */,
 			);
 			name = nib2html;
 			path = Sources/nib2html;
@@ -203,6 +205,7 @@
 			files = (
 				144F6FC12651864700120CDA /* NIBParserTemplate.swift in Sources */,
 				145D6558263DB82300F4427D /* main.swift in Sources */,
+				636C461C26539D7B00B5055F /* htmlBackend.swift in Sources */,
 				63D17F042651833A008019CE /* readBackend.swift in Sources */,
 				145D6557263DB82300F4427D /* NIBParser.swift in Sources */,
 			);
@@ -213,6 +216,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				63D17F082651837A008019CE /* readBackend.swift in Sources */,
+				636C461F26539D7C00B5055F /* htmlBackend.swift in Sources */,
 				145D656C263DB9B100F4427D /* UIKitTests.swift in Sources */,
 				144F6FC22651864E00120CDA /* NIBParserTemplate.swift in Sources */,
 				145D6563263DB87600F4427D /* nib2htmlTests.swift in Sources */,

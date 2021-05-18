@@ -10,7 +10,7 @@ struct nib2html: ParsableCommand {
     var nibFileName: String
     
     mutating func run() throws {
-        let parser = NIBParser(contentsOf: URL(string:nibFileName)!, templateURL: URL(fileURLWithPath: "html_backend.json"))
+        let parser = NIBParser(contentsOf: URL(string:nibFileName)!, template: HTML_BOOTSTRAP5 )
         parser.parse()
    }
 }

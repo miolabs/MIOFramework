@@ -18,7 +18,7 @@ final class UIKitTests: XCTestCase {
         let file = URL(fileURLWithPath: packageRootPath + "/BasicTest.storyboard" )
         let template = URL(fileURLWithPath: packageRootPath + "/../../Sources/nib2html/html_backend.json" )
         
-        let parser = NIBParser(contentsOf: file, templateURL: template )
+        let parser = NIBParser(contentsOf: file, template: HTML_BOOTSTRAP5 )
         parser.outputFolder = packageRootPath + "/temp"
         parser.parse()
                 
