@@ -121,12 +121,20 @@ class SizeConstraint: Constraint
 }
 
 
+let g_default_attrs: [ String: [String:String] ] =
+[
+  "tableViewCell" : [ "rowHeight" : "44" ]
+, "stackView": [ "axis": "horizontal" ]
+]
+
+
 class NIBParser : NSObject, XMLParserDelegate
 {
     let url:URL
     let parserTemplate:NIBParserTemplate
     var outputFolder:String?
     var root: HTMLItem
+    let supported_elements = Set( [ "viewController", "navigationController", "tableViewController", "view", "navigationBar", "navigationItem" , "barButtonItem", "label", "button", "textField", "tableView", "tableViewCell", "tableViewCellContentView", "collectionView", "collectionViewFlowLayout", "collectionViewCell", "toolbar", "imageView", "segmentedControl", "segment", "segments", "switch", "slider", "progressView", "activityIndicatorView", "pageControl", "stepper", "size", "stackView", "scene", "tabBar", "tabBarItem" ] )
     
     init(contentsOf url:URL, template: Template ) {
         self.root = HTMLItem()
@@ -149,7 +157,7 @@ class NIBParser : NSObject, XMLParserDelegate
     }
     
     var initialViewControllerID:String? = nil
-    var storyBoardItems:[String:Any] = [:]
+   // var storyBoardItems:[String:Any] = [:]
 
     var currentFileName:String? = nil
 //    var currentFileContent:String? = nil
@@ -163,216 +171,197 @@ class NIBParser : NSObject, XMLParserDelegate
             initialViewControllerID = attributeDict["initialViewController"]
         }
         
-        if elementName == "scene" {
-//            let id = attributes["sceneID"]
-//            currentFileContent = ""
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "viewController" || elementName == "navigationController" || elementName == "tableViewController" {
-            let item = push_new_element(elementName, attributeDict)
-            
-            let id = attributeDict["id"]!
-            currentFileName = id + ".html"
-            
-            storyBoardItems[id] = item.customClass
+//        if elementName == "viewController" || elementName == "navigationController" || elementName == "tableViewController" {
+//            let item = push_new_element(elementName, attributeDict)
+//
+//            let id = attributeDict["id"]!
+//            currentFileName = id + ".html"
+//
+//            storyBoardItems[id] = item.customClass
+//
+//            item.extraAttributes.append("data-root-view-controller=\"true\"")
+//        }
 
-            item.extraAttributes.append("data-root-view-controller=\"true\"")
-        }
-        else if elementName == "view" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "navigationBar" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "navigationItem" {
-            let item = push_new_element(elementName, attributeDict)
+        if elementName == "scene" { root = HTMLItem( ) }
 
-            item.classes.append("hidden")
-            
-            if let key = attributeDict["key"] {
-                item.extraAttributes.append("data-navigation-key=\"" +  key + "\"")
-            }
-            
-            if let title = attributeDict["title"] {
-                item.extraAttributes.append("data-navigation-title=\"" + title + "\"")
-            }
+        if supported_elements.contains( elementName ) {
+            push_new_element( elementName, attributeDict.merging( g_default_attrs[ elementName ] ?? [:] ){ old, new in old } )
         }
-        else if (elementName == "barButtonItem") {
-            let item = push_new_element(elementName, attributeDict)
-
-            if let key = attributeDict["key"] {
-                item.extraAttributes.append("data-bar-button-item-key=\"" + key + "\"")
-            }
-
-            if let title = attributeDict["title"] {
-                item.extraAttributes.append("data-bar-button-item-title=\"" + title + "\"")
-            }
-
-            if let image = attributeDict["image"] {
-                item.extraAttributes.append("data-bar-button-item-image=\"" + image + "\"")
-            }
-
-            if let systemItem = attributeDict["systemItem"] {
-                item.extraAttributes.append("data-bar-button-item-system=\"" + systemItem + "\"")
-            }
-        }
-        else if elementName == "label" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "button" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "textField" {
-            // let item =
-                push_new_element(elementName, attributeDict)
-            
-//            if let align = parse_text_alignment(attributeDict["textAlignment"]) {
-//                item.classes.append(align)
+        
+//        else if elementName == "view" {
+//        }
+//        else if elementName == "navigationBar" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "navigationItem" {
+//            let item = push_new_element(elementName, attributeDict)
+//
+//            item.classes.append("hidden")
+//
+//            if let key = attributeDict["key"] {
+//                item.extraAttributes.append("data-navigation-key=\"" +  key + "\"")
 //            }
 //
-//            var inputAttrs:[String] = []
-//            if let attrText = attributeDict["text"] {
-//                inputAttrs.append("value='" + attrText + "'")
+//            if let title = attributeDict["title"] {
+//                item.extraAttributes.append("data-navigation-title=\"" + title + "\"")
+//            }
+//        }
+//        else if (elementName == "barButtonItem") {
+//            let item = push_new_element(elementName, attributeDict)
+//
+//            if let key = attributeDict["key"] {
+//                item.extraAttributes.append("data-bar-button-item-key=\"" + key + "\"")
 //            }
 //
-//            if let attrPlaceholder = attributeDict["placeholder"] {
-//                inputAttrs.append("placeholder='" + attrPlaceholder + "'")
+//            if let title = attributeDict["title"] {
+//                item.extraAttributes.append("data-bar-button-item-title=\"" + title + "\"")
 //            }
 //
-//            if let borderStyle = parse_border_style(attributeDict["borderStyle"]) {
-//                inputAttrs.append(borderStyle)
+//            if let image = attributeDict["image"] {
+//                item.extraAttributes.append("data-bar-button-item-image=\"" + image + "\"")
 //            }
 //
-//            item.content = item.content + "<input type=\"text\" " + inputAttrs.joined(separator: " ") + ">"
-        }
-        else if elementName == "tableView" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "tableViewCell" {
-            let item = push_new_element(elementName, attributeDict)
-                                    
-            let reuseIdentifier = attributeDict["reuseIdentifier"]!
-            item.extraAttributes.append("data-cell-identifier=\"" + reuseIdentifier + "\"")
-            
-            if let style = attributeDict["style"] {
-                item.extraAttributes.append("data-cell-style=\"" + style + "\"")
-            }
-            
-            if let textLabelID = attributeDict["textLabel"] {
-                item.extraAttributes.append("data-cell-textlabel-id=\"" + textLabelID + "\"")
-            }
-        }
-        else if elementName == "tableViewCellContentView" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "collectionView" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "collectionViewFlowLayout" {
-            let item = push_new_element(elementName, attributeDict)
-            
-            item.extraAttributes.append("data-collection-view-layout=\"true\"")
-
-            let scrollDirection = attributeDict["scrollDirection"]!
-            item.extraAttributes.append("data-collection-view-layout-direction=\"" + scrollDirection + "\"")
-        }
-        else if elementName == "collectionViewCell" {
-            let item = push_new_element(elementName, attributeDict)
-//            let textLabelID = attributes["textLabel"]
-
-            let reuseIdentifier = attributeDict["reuseIdentifier"]!
-            item.extraAttributes.append("data-cell-identifier=\"" + reuseIdentifier + "\"")
-
-            if let style = attributeDict["style"] {
-                item.extraAttributes.append("data-cell-style=\"" + style + "\"")
-            }
-        }
-        else if elementName == "segmentedControl" {
-            push_new_element(elementName, attributeDict)
-//
-//            if let style = parse_segment_control_style(attributeDict["segmentControlStyle"]) {
-//                item.classes.append(style)
+//            if let systemItem = attributeDict["systemItem"] {
+//                item.extraAttributes.append("data-bar-button-item-system=\"" + systemItem + "\"")
 //            }
-        }
-        else if elementName == "toolbar" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "imageView" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "segment" {
-            push_new_element(elementName, attributeDict)
-            // currentElement!.content = currentElement!.content + "<div class=\"segment\"><span>" + attributeDict["title"]! + "</span></div>"
-        }
-        else if elementName == "switch" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "slider" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "progressView" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "activityIndicatorView" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "pageControl" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "stepper" {
-            push_new_element(elementName, attributeDict)
-        }
-        else if elementName == "size" {
-            let item = push_new_element(elementName, attributeDict)
-
-            let key = attributeDict["key"]!
-            let width = attributeDict["width"]!
-            let height = attributeDict["height"]!
-
-            item.extraAttributes.append("data-key=\"" + key + "\"")
-            item.extraAttributes.append("data-type=\"size\"")
-            item.extraAttributes.append("data-width=\"" + width + "\"")
-            item.extraAttributes.append("data-height=\"" + height + "\"")
-        }
-        else if (elementName == "rect"){
-            // if (currentElement["CustomClass"] != "UITableViewCell") {
-            //     styles.push("position:relative;");
-            // }
-            // else {
-            //     styles.push("position:relative;");
-            // }
-
-//            currentElement!.styles.append("position:absolute;")
-//            if let x = attributeDict["x"] { currentElement!.styles.append("left:" + x + "px;") }
-//            if let y = attributeDict["y"] { currentElement!.styles.append("top:" + y + "px;") }
-//            if let w = attributeDict["width"] { currentElement!.styles.append("width:" + w + "px;") }
-//            if let h = attributeDict["height"] { currentElement!.styles.append("height:" + h + "px;") }
-        }
-        else if (elementName == "color"){
-//            var r = 0.0
-//            var g = 0.0
-//            var b = 0.0
-//            if (attributeDict["white"] == "1") {
-//                r = 255.0
-//                g = 255.0
-//                b = 255.0
-//            } else if attributeDict["systemBackgroundColor"] == "1" {
-//            } else {
-//                r = Double(attributeDict["red"]!)! * 255.0
-//                g = Double(attributeDict["green"]!)! * 255.0
-//                b = Double(attributeDict["blue"]!)! * 255.0
+//        }
+//        else if elementName == "label" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "button" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "textField" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "tableView" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "tableViewCell" {
+//            let item = push_new_element(elementName, attributeDict)
+//
+//            let reuseIdentifier = attributeDict["reuseIdentifier"]!
+//            item.extraAttributes.append("data-cell-identifier=\"" + reuseIdentifier + "\"")
+//
+//            if let style = attributeDict["style"] {
+//                item.extraAttributes.append("data-cell-style=\"" + style + "\"")
 //            }
 //
-//            let a = Double(attributeDict["alpha"]!)!
+//            if let textLabelID = attributeDict["textLabel"] {
+//                item.extraAttributes.append("data-cell-textlabel-id=\"" + textLabelID + "\"")
+//            }
+//        }
+//        else if elementName == "tableViewCellContentView" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "collectionView" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "collectionViewFlowLayout" {
+//            let item = push_new_element(elementName, attributeDict)
 //
-//            currentElement!.viewAttributes[ attributeDict[ "key" ]! ] = "rgba(\(r),\(g),\(b),\(a))"
-        }
-        else if elementName == "fontDescription" {
+//            item.extraAttributes.append("data-collection-view-layout=\"true\"")
+//
+//            let scrollDirection = attributeDict["scrollDirection"]!
+//            item.extraAttributes.append("data-collection-view-layout-direction=\"" + scrollDirection + "\"")
+//        }
+//        else if elementName == "collectionViewCell" {
+//            let item = push_new_element(elementName, attributeDict)
+////            let textLabelID = attributes["textLabel"]
+//
+//            let reuseIdentifier = attributeDict["reuseIdentifier"]!
+//            item.extraAttributes.append("data-cell-identifier=\"" + reuseIdentifier + "\"")
+//
+//            if let style = attributeDict["style"] {
+//                item.extraAttributes.append("data-cell-style=\"" + style + "\"")
+//            }
+//        }
+//        else if elementName == "segmentedControl" {
+//            push_new_element(elementName, attributeDict)
+////
+////            if let style = parse_segment_control_style(attributeDict["segmentControlStyle"]) {
+////                item.classes.append(style)
+////            }
+//        }
+//        else if elementName == "toolbar" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "imageView" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "segment" {
+//            push_new_element(elementName, attributeDict)
+//            // currentElement!.content = currentElement!.content + "<div class=\"segment\"><span>" + attributeDict["title"]! + "</span></div>"
+//        }
+//        else if elementName == "switch" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "slider" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "progressView" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "activityIndicatorView" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "pageControl" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "stepper" {
+//            push_new_element(elementName, attributeDict)
+//        }
+//        else if elementName == "size" {
+//            let item = push_new_element(elementName, attributeDict)
+//
+//            let key = attributeDict["key"]!
+//            let width = attributeDict["width"]!
+//            let height = attributeDict["height"]!
+//
+//            item.extraAttributes.append("data-key=\"" + key + "\"")
+//            item.extraAttributes.append("data-type=\"size\"")
+//            item.extraAttributes.append("data-width=\"" + width + "\"")
+//            item.extraAttributes.append("data-height=\"" + height + "\"")
+//        }
+//        else if (elementName == "rect"){
+//            // if (currentElement["CustomClass"] != "UITableViewCell") {
+//            //     styles.push("position:relative;");
+//            // }
+//            // else {
+//            //     styles.push("position:relative;");
+//            // }
+//
+////            currentElement!.styles.append("position:absolute;")
+////            if let x = attributeDict["x"] { currentElement!.styles.append("left:" + x + "px;") }
+////            if let y = attributeDict["y"] { currentElement!.styles.append("top:" + y + "px;") }
+////            if let w = attributeDict["width"] { currentElement!.styles.append("width:" + w + "px;") }
+////            if let h = attributeDict["height"] { currentElement!.styles.append("height:" + h + "px;") }
+//        }
+//        else if (elementName == "color"){
+////            var r = 0.0
+////            var g = 0.0
+////            var b = 0.0
+////            if (attributeDict["white"] == "1") {
+////                r = 255.0
+////                g = 255.0
+////                b = 255.0
+////            } else if attributeDict["systemBackgroundColor"] == "1" {
+////            } else {
+////                r = Double(attributeDict["red"]!)! * 255.0
+////                g = Double(attributeDict["green"]!)! * 255.0
+////                b = Double(attributeDict["blue"]!)! * 255.0
+////            }
+////
+////            let a = Double(attributeDict["alpha"]!)!
+////
+////            currentElement!.viewAttributes[ attributeDict[ "key" ]! ] = "rgba(\(r),\(g),\(b),\(a))"
+//        }
+        if elementName == "fontDescription" {
             if let size = attributeDict["pointSize"] {
                 currentElement!.viewAttributes[ "fontSize" ] = size
             }
         }
-        else if elementName == "state" {
+        else if elementName == "state" { // this is found in the button
             if let title = attributeDict["title"] {
                 currentElement!.viewAttributes[ "state-\(attributeDict["key"]!)" ] = title
             }
@@ -404,21 +393,16 @@ class NIBParser : NSObject, XMLParserDelegate
             let segue = HTMLItemSegue(destination: destination, kind: kind, identifier: identifier, relationship: relationship)
             currentElement!.segues.append(segue)
         }
-        else if elementName == "stackView" {
-            push_new_element(elementName, attributeDict.merging( [ "axis": "horizontal" ] ){ old, new in old } )
-        }
         else if elementName == "constraint" {
             add_constraint( attributeDict )
         }
     }
     
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        let supported_elements = Set( [ "viewController", "navigationController", "tableViewController", "view", "navigationBar", "navigationItem" , "barButtonItem", "label", "button", "textField", "tableView", "tableViewCell", "tableViewCellContentView", "collectionView", "collectionViewFlowLayout", "collectionViewCell", "toolbar", "imageView", "segmentedControl", "switch", "slider", "progressView", "activityIndicatorView", "pageControl", "stepper", "size", "stackView" ] )
-        
         if elementName == "scene" {
             pop_element()
             write_html_file()
-            currentFileName = nil
+//            currentFileName = nil
 //            currentFileContent = nil
         }
         else if supported_elements.contains( elementName ) {
@@ -560,7 +544,6 @@ class NIBParser : NSObject, XMLParserDelegate
 //        add_content_to_parent_item("</div>", &parentItem)
     }
 
-    
 //    func add_content_to_parent_item(_ content:String, _ item:inout HTMLItem?) {
 //        if item == nil {
 //            currentFileContent! += content
@@ -648,11 +631,15 @@ class NIBParser : NSObject, XMLParserDelegate
     
     func write_html_file() {
         let content = generate_html( root )
-        let path = output_file_path(withFilename: currentFileName!)
+        let path = output_file_path(withFilename: root.viewAttributes[ "sceneID" ]! + ".html" )
         try? content.write(toFile: path, atomically: true, encoding: .utf8)
     }
     
     func generate_html ( _ view: HTMLItem ) -> String {
+        func join_non_empty ( _ arr: [String], _ separator: String ) -> String {
+            return arr.filter{ $0.trimmingCharacters(in: .whitespaces ).count > 0 }.joined( separator: separator )
+        }
+        
         var view = view
         
         sort_subviews( &view )
@@ -678,9 +665,9 @@ class NIBParser : NSObject, XMLParserDelegate
         return parserTemplate.renderContent( classname: view.templateClass!
                                            , identifier: view.identifier
                                            , options:
-                                             [ "class": view.classes.joined( separator: " "  )
-                                             , "style" : view.styles .joined( separator: "; " )
-                                             ].merging( view.viewAttributes ){ old, new in old }
+                                            [ "class": join_non_empty( view.classes, " "  )
+                                            , "style": join_non_empty( view.styles , "; " )
+                                            ].merging( view.viewAttributes ){ old, new in old }
                                            , childrens: view.subviews.map{ generate_html( $0 ) }.joined( )
                                            )
     }
@@ -751,7 +738,7 @@ class NIBParser : NSObject, XMLParserDelegate
         
         var item:[String:Any] = [:]
         item["InitialViewControllerID"] = initialViewControllerID
-        item["ClassByID"] = storyBoardItems
+        // item["ClassByID"] = storyBoardItems
 
         guard let content = try? JSONSerialization.data(withJSONObject: item, options: []) else { return }
         

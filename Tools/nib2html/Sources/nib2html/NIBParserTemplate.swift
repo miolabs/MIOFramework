@@ -39,14 +39,16 @@ class NIBParserTemplate
     }
     
     func insert_html_attribte ( _ tmpl: inout String, _ attr: String, _ separator: String, _ options: [String:String] ) {
-        if options[ attr ] == nil || options[ attr ]!.count == 0 { return }
+        let value = options[ attr ]?.trimmingCharacters(in: .whitespaces) ?? ""
+        
+        if value.count == 0 { return }
         
         if let attr_range = regex( tmpl, "\(attr)=\"[^\"]*\"" ) {
-           tmpl.insert( contentsOf: options[ attr ]! + separator
+           tmpl.insert( contentsOf: value + separator
                           , at: tmpl.index( tmpl.startIndex
                                           , offsetBy: attr_range.location + "\(attr)=\"".count ))
         } else {
-            tmpl.insert( contentsOf: " \(attr)=\"\(options[ attr ]!)\" "
+            tmpl.insert( contentsOf: " \(attr)=\"\(value)\" "
                        , at:   tmpl.range(of: " ")?.lowerBound
                             ?? tmpl.range(of: "/>")?.lowerBound
                             ?? tmpl.range(of: ">")!.lowerBound
@@ -86,7 +88,7 @@ class NIBParserTemplate
             } else if target == "style" {
                 if options[ "style" ] == nil { options[ "style" ] = "" }
                 
-                options[ "style" ]! += "; " + target_value[ target ]!
+                options[ "style" ]! += target_value[ target ]! + "; "
             } else {
                 tmpl = tmpl.replacingOccurrences( of: "{\(target)}", with: target_value[ target ]! )
             }
