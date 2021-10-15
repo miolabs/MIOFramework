@@ -407,6 +407,9 @@ class NIBParser : NSObject, XMLParserDelegate
         }
         else if supported_elements.contains( elementName ) {
             pop_element()
+        } else {
+            // TODO: IF DEBUG
+            print( "\(elementName) is not supported" )
         }
     }
     

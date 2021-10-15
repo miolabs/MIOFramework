@@ -15,6 +15,8 @@
 		145D6563263DB87600F4427D /* nib2htmlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145D6562263DB87600F4427D /* nib2htmlTests.swift */; };
 		145D656C263DB9B100F4427D /* UIKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145D656A263DB9B100F4427D /* UIKitTests.swift */; };
 		145D656E263DBAED00F4427D /* NIBParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145D6555263DB82300F4427D /* NIBParser.swift */; };
+		631384382680D93E00BBC414 /* nib2htmlTestUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631384372680D93E00BBC414 /* nib2htmlTestUI.swift */; };
+		631384402680D94700BBC414 /* LoginTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631384262680D52200BBC414 /* LoginTest.swift */; };
 		636C461C26539D7B00B5055F /* htmlBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D17F0726518356008019CE /* htmlBackend.swift */; };
 		636C461F26539D7C00B5055F /* htmlBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D17F0726518356008019CE /* htmlBackend.swift */; };
 		63D17F042651833A008019CE /* readBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D17F032651833A008019CE /* readBackend.swift */; };
@@ -43,6 +45,10 @@
 		145D6564263DB87600F4427D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		145D656A263DB9B100F4427D /* UIKitTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIKitTests.swift; path = Tests/nib2htmlTests/UIKitTests.swift; sourceTree = SOURCE_ROOT; };
 		145D656B263DB9B100F4427D /* BasicTest.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BasicTest.storyboard; path = Tests/nib2htmlTests/BasicTest.storyboard; sourceTree = SOURCE_ROOT; };
+		631384262680D52200BBC414 /* LoginTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTest.swift; sourceTree = "<group>"; };
+		631384352680D93E00BBC414 /* nib2htmlTestUI.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = nib2htmlTestUI.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		631384372680D93E00BBC414 /* nib2htmlTestUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = nib2htmlTestUI.swift; sourceTree = "<group>"; };
+		631384392680D93E00BBC414 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		63D17F032651833A008019CE /* readBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = readBackend.swift; sourceTree = "<group>"; };
 		63D17F0726518356008019CE /* htmlBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = htmlBackend.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -63,6 +69,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		631384322680D93E00BBC414 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -71,6 +84,7 @@
 			children = (
 				145D6554263DB82300F4427D /* nib2html */,
 				145D6561263DB87600F4427D /* nib2htmlTests */,
+				631384362680D93E00BBC414 /* nib2htmlTestUI */,
 				145D6546263DB7C300F4427D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -80,6 +94,7 @@
 			children = (
 				145D6545263DB7C300F4427D /* nib2html */,
 				145D6560263DB87600F4427D /* nib2htmlTests.xctest */,
+				631384352680D93E00BBC414 /* nib2htmlTestUI.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -101,11 +116,21 @@
 			isa = PBXGroup;
 			children = (
 				145D656B263DB9B100F4427D /* BasicTest.storyboard */,
+				631384262680D52200BBC414 /* LoginTest.swift */,
 				145D656A263DB9B100F4427D /* UIKitTests.swift */,
 				145D6562263DB87600F4427D /* nib2htmlTests.swift */,
 				145D6564263DB87600F4427D /* Info.plist */,
 			);
 			path = nib2htmlTests;
+			sourceTree = "<group>";
+		};
+		631384362680D93E00BBC414 /* nib2htmlTestUI */ = {
+			isa = PBXGroup;
+			children = (
+				631384372680D93E00BBC414 /* nib2htmlTestUI.swift */,
+				631384392680D93E00BBC414 /* Info.plist */,
+			);
+			path = nib2htmlTestUI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -148,13 +173,30 @@
 			productReference = 145D6560263DB87600F4427D /* nib2htmlTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		631384342680D93E00BBC414 /* nib2htmlTestUI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6313843A2680D93E00BBC414 /* Build configuration list for PBXNativeTarget "nib2htmlTestUI" */;
+			buildPhases = (
+				631384312680D93E00BBC414 /* Sources */,
+				631384322680D93E00BBC414 /* Frameworks */,
+				631384332680D93E00BBC414 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = nib2htmlTestUI;
+			productName = nib2htmlTestUI;
+			productReference = 631384352680D93E00BBC414 /* nib2htmlTestUI.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		145D653D263DB7C300F4427D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1250;
+				LastSwiftUpdateCheck = 1200;
 				LastUpgradeCheck = 1250;
 				TargetAttributes = {
 					145D6544263DB7C300F4427D = {
@@ -163,6 +205,9 @@
 					};
 					145D655F263DB87600F4427D = {
 						CreatedOnToolsVersion = 12.5;
+					};
+					631384342680D93E00BBC414 = {
+						CreatedOnToolsVersion = 12.0.1;
 					};
 				};
 			};
@@ -184,12 +229,20 @@
 			targets = (
 				145D6544263DB7C300F4427D /* nib2html */,
 				145D655F263DB87600F4427D /* nib2htmlTests */,
+				631384342680D93E00BBC414 /* nib2htmlTestUI */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		145D655E263DB87600F4427D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		631384332680D93E00BBC414 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -221,6 +274,15 @@
 				144F6FC22651864E00120CDA /* NIBParserTemplate.swift in Sources */,
 				145D6563263DB87600F4427D /* nib2htmlTests.swift in Sources */,
 				145D656E263DBAED00F4427D /* NIBParser.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		631384312680D93E00BBC414 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				631384382680D93E00BBC414 /* nib2htmlTestUI.swift in Sources */,
+				631384402680D94700BBC414 /* LoginTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,6 +475,45 @@
 			};
 			name = Release;
 		};
+		6313843B2680D93E00BBC414 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = nib2htmlTestUI/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.dual-link.nib2htmlTestUI";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6313843C2680D93E00BBC414 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = nib2htmlTestUI/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.dual-link.nib2htmlTestUI";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -439,6 +540,15 @@
 			buildConfigurations = (
 				145D6566263DB87600F4427D /* Debug */,
 				145D6567263DB87600F4427D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6313843A2680D93E00BBC414 /* Build configuration list for PBXNativeTarget "nib2htmlTestUI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6313843B2680D93E00BBC414 /* Debug */,
+				6313843C2680D93E00BBC414 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

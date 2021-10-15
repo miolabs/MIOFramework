@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Y6W-OH-hqX">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -12,7 +13,7 @@
         <scene sceneID="s0d-6b-0kx">
             <objects>
                 <viewController id="Y6W-OH-hqX" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
+                    <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc" customClass="LoginVC" customModule="nib2htmlTests">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
@@ -89,10 +90,10 @@
             </objects>
             <point key="canvasLocation" x="394.20289855072468" y="-207.58928571428569"/>
         </scene>
-        <!--View Controller-->
+        <!--LoginVC-->
         <scene sceneID="c65-rO-jfe">
             <objects>
-                <viewController id="KQq-YB-7t2" sceneMemberID="viewController">
+                <viewController id="KQq-YB-7t2" customClass="LoginVC" customModule="nib2htmlTestUI" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="46w-Ov-fqQ">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -240,6 +241,9 @@
                             <constraint firstItem="SLn-KF-EoY" firstAttribute="leading" secondItem="moY-wt-qtx" secondAttribute="leading" id="rmv-gB-S4U"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="loginButton" destination="JUi-fF-sKT" id="bnS-kP-uHn"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1Cb-7V-cNB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
