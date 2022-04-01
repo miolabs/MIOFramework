@@ -1,4 +1,4 @@
-export class NSRange 
+class NSRange 
 {
     location = 0;
     length = 0;
@@ -9,20 +9,20 @@ export class NSRange
     }    
 }
 
-export function NSMaxRange(range:NSRange):number{
+function NSMaxRange(range:NSRange):number{
     return range.location + range.length;
  }
 
-export function NSEqualRanges(range1:NSRange, range2:NSRange):boolean {
+function NSEqualRanges(range1:NSRange, range2:NSRange):boolean {
     return (range1.location == range2.location && range1.length == range2.length);
  }
 
-export function NSLocationInRange(location:number, range:NSRange){
+function NSLocationInRange(location:number, range:NSRange){
     if (range == null) return false;
     return (location >= range.location && location < NSMaxRange(range))? true : false;
  }
 
-export function NSIntersectionRange(range1:NSRange, range2:NSRange):NSRange {
+function NSIntersectionRange(range1:NSRange, range2:NSRange):NSRange {
 
     let max1 = NSMaxRange(range1);
     let max2 = NSMaxRange(range2);
@@ -43,7 +43,7 @@ export function NSIntersectionRange(range1:NSRange, range2:NSRange):NSRange {
     return result;
 }
 
-export function NSUnionRange(range1:NSRange, range2:NSRange):NSRange{
+function NSUnionRange(range1:NSRange, range2:NSRange):NSRange{
     
     let max1 = NSMaxRange(range1);
     let max2 = NSMaxRange(range2); 

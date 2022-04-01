@@ -1,10 +1,10 @@
-import { NSObject } from "./NSObject";
+// import { NSObject } from "./NSObject";
 
 /**
  * Created by godshadow on 21/3/16.
  */
 
-export class Timer extends NSObject
+class Timer extends NSObject
 {    
     private _timerInterval = 0;
     private _repeat = false;

@@ -1,16 +1,16 @@
 
-export function MIOCoreStringHasPreffix(str, preffix)
+function MIOCoreStringHasPreffix(str, preffix)
 {
     return str.substring(0, preffix.length) === preffix;
 }
 
-export function MIOCoreStringHasSuffix(str, suffix)
+function MIOCoreStringHasSuffix(str, suffix)
 {
     let s = str.substr(str.length - suffix.length);
     return s == suffix;
 }
 
-export function MIOCoreStringAppendPathComponent(string:string, path):string
+function MIOCoreStringAppendPathComponent(string:string, path):string
 {
     let str = string;
 
@@ -27,7 +27,7 @@ export function MIOCoreStringAppendPathComponent(string:string, path):string
     return str;
 }
 
-export function MIOCoreStringLastPathComponent(string:string)
+function MIOCoreStringLastPathComponent(string:string)
 {
     let index = string.lastIndexOf("/");
     if (index == -1) return string;
@@ -37,7 +37,7 @@ export function MIOCoreStringLastPathComponent(string:string)
     return str;
 }
 
-export function MIOCoreStringPathExtension(string:string):string
+function MIOCoreStringPathExtension(string:string):string
 {
     let lastPathComponent = MIOCoreStringLastPathComponent(string);
     let items = lastPathComponent.split(".");
@@ -47,7 +47,7 @@ export function MIOCoreStringPathExtension(string:string):string
     return ext;
 }
 
-export function MIOCoreStringDeletingLastPathComponent(string:string)
+function MIOCoreStringDeletingLastPathComponent(string:string)
 {
     let index = string.lastIndexOf("/");
     let str = string.substr(0, index);
@@ -55,7 +55,7 @@ export function MIOCoreStringDeletingLastPathComponent(string:string)
     return str;
 }
 
-export function MIOCoreStringStandardizingPath(string)
+function MIOCoreStringStandardizingPath(string)
 {
     let array = string.split("/");
 
@@ -86,17 +86,17 @@ export function MIOCoreStringStandardizingPath(string)
 
 
 let _MIOLocalizedStrings = null;
-export function MIOCoreStringSetLocalizedStrings(data) 
+function MIOCoreStringSetLocalizedStrings(data) 
 {
     _MIOLocalizedStrings = data
 }
 
-export function MIOCoreStringGetLocalizedStrings() 
+function MIOCoreStringGetLocalizedStrings() 
 {
     return _MIOLocalizedStrings
 }
 
-export function  MIOCoreStringLocalizeString(key:string, defaultValue:string){
+function  MIOCoreStringLocalizeString(key:string, defaultValue:string){
     let strings =  MIOCoreStringGetLocalizedStrings;
     if (strings == null)
         return defaultValue;

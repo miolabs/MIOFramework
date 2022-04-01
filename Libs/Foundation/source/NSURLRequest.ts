@@ -1,7 +1,7 @@
-import { NSObject } from "./NSObject";
-import { NSURL } from "./NSURL";
+// import { NSObject } from "./NSObject";
+// import { NSURL } from "./NSURL";
 
-export class NSURLRequest extends NSObject
+class NSURLRequest extends NSObject
 {
     url:NSURL = null;
     httpMethod:string = "GET";

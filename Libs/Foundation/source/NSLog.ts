@@ -1,4 +1,4 @@
 
-export function NSLog(format) {
+function NSLog(format) {
     console.log(format);
 }

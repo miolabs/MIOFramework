@@ -1,25 +1,25 @@
-import { NSObject } from "./NSObject";
-import { NSError } from "./NSError";
-import { XMLParser } from "./NSXMLParser";
+// import { NSObject } from "./NSObject";
+// import { NSError } from "./NSError";
+// import { XMLParser } from "./NSXMLParser";
 
-export enum PropertyListFormat
+enum PropertyListFormat
 {
     OpenStepFormat,
     XMLFormat_v1_0,
     BinaryFormat_v1_0,    
 }
 
-export enum PropertyListReadOptions
+enum PropertyListReadOptions
 {
     None
 }
 
-export enum PropertyListWriteOptions
+enum PropertyListWriteOptions
 {
     None
 }
 
-export class PropertyListSerialization extends NSObject
+class PropertyListSerialization extends NSObject
 {            
     static propertyListWithData(data:string, options:PropertyListReadOptions, format:PropertyListFormat, error:NSError){
         let pl = new PropertyListSerialization();

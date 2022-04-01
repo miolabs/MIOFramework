@@ -1,6 +1,6 @@
-import { MIOCorePlatformType } from "../../core/MIOCoreTypes";
+// import { MIOCorePlatformType } from "../../core/MIOCoreTypes";
 
-export function NSClassFromString(className:string){
+function NSClassFromString(className:string){
     let classObject = window[className];
     //if (classObject == null) classObject = MIOCoreClassByName(className);
 
@@ -11,7 +11,7 @@ export function NSClassFromString(className:string){
     return newClass;
 }
 
-export function MIOCoreGetPlatform():MIOCorePlatformType {
+function MIOCoreGetPlatform():MIOCorePlatformType {
     let agent = navigator.userAgent.toLowerCase();
     let browserType = MIOCorePlatformType.Unknown;    
     if (agent.indexOf("chrome") != -1) browserType = MIOCorePlatformType.Chrome;
@@ -20,14 +20,14 @@ export function MIOCoreGetPlatform():MIOCorePlatformType {
     return browserType;
 }
 
-export function MIOCoreGetPlatformLocale(){
+function MIOCoreGetPlatformLocale(){
     // navigator.languages:    Chrome & FF
     // navigator.language:     Safari & Others
     // navigator.userLanguage: IE & Others
     return navigator.languages || navigator.language || navigator['userLanguage'];
 }
 
-export function MIOCoreGetPlatformLanguage(){
+function MIOCoreGetPlatformLanguage(){
     let locale = MIOCoreGetPlatformLocale();
     if (typeof(locale) == "string") return locale.substring(0, 2);
     else {
@@ -36,7 +36,7 @@ export function MIOCoreGetPlatformLanguage(){
     }
 }
 
-export function MIOCoreIsPhone(){    
+function MIOCoreIsPhone(){    
 
     let phone = ['iphone','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile'];
     for (let index = 0; index < phone.length; index++) {
@@ -47,7 +47,7 @@ export function MIOCoreIsPhone(){
     return false;
 }
 
-export function MIOCoreIsPad(){
+function MIOCoreIsPad(){
     let pad = ['ipad'];
     for (let index = 0; index < pad.length; index++) {
         if (navigator.userAgent.toLowerCase().indexOf(pad[index].toLowerCase()) > 0) {
@@ -58,7 +58,7 @@ export function MIOCoreIsPad(){
     return false;    
 }
 
-export function MIOCoreIsMobile()
+function MIOCoreIsMobile()
 {
     //var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile'];
     let mobile = ['iphone','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile'];
@@ -70,11 +70,11 @@ export function MIOCoreIsMobile()
     return false;
 }
 
-export function MIOCoreBundleGetMainURLString():string{
+function MIOCoreBundleGetMainURLString():string{
     return window.location.href;
 }
 
-export function MIOCoreBundleGetContentsFromURLString(path:string, target:any, completion:any){
+function MIOCoreBundleGetContentsFromURLString(path:string, target:any, completion:any){
     let xhr = new XMLHttpRequest();
 
     xhr.onload = function () {        

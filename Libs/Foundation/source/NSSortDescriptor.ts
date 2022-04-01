@@ -1,11 +1,11 @@
-import { NSObject } from "./NSObject";
+// import { NSObject } from "./NSObject";
 
 
 /**
  * Created by godshadow on 28/09/2016.
  */
 
-export class NSSortDescriptor extends NSObject
+class NSSortDescriptor extends NSObject
 {
     key = null;
     ascending = false;
@@ -28,7 +28,7 @@ export class NSSortDescriptor extends NSObject
 // For internal purposes: Don't use it, could change
 //
 
-export function _NSSortDescriptorSortObjects(objs, sortDescriptors)
+function _NSSortDescriptorSortObjects(objs, sortDescriptors)
 {
     let resultObjects = null;
     

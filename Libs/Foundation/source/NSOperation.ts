@@ -1,6 +1,6 @@
-import { NSObject } from "./NSObject";
+// import { NSObject } from "./NSObject";
 
-export class Operation extends NSObject {
+class Operation extends NSObject {
 
     name:string = null;
     target = null;

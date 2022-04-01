@@ -1,8 +1,8 @@
-import { MIOCoreGetPlatform} from './core/MIOCore';
-import { MIOCorePlatformType } from './core/MIOCoreTypes';
-import { DateFormatter, NSDateFormatterStyle } from "./NSDateFormatter";
+// import { MIOCoreGetPlatform} from './core/MIOCore';
+// import { MIOCorePlatformType } from './core/MIOCoreTypes';
+// import { DateFormatter, NSDateFormatterStyle } from "./NSDateFormatter";
 
-export class ISO8601DateFormatter extends DateFormatter {
+class ISO8601DateFormatter extends DateFormatter {
 
     static iso8601DateFormatter():ISO8601DateFormatter {
         var df = new ISO8601DateFormatter();

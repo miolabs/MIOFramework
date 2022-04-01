@@ -1,12 +1,12 @@
 
-export class MIOCoreBundle
+class MIOCoreBundle
 {
     
 }
 
 let _MIOAppBundleResources = {};
 
-export function MIOCoreBundleSetAppResource(resource:string, type:string, content:string){
+function MIOCoreBundleSetAppResource(resource:string, type:string, content:string){
     let files = _MIOAppBundleResources[type];
     if (files == null) {
         files = {};
@@ -16,7 +16,7 @@ export function MIOCoreBundleSetAppResource(resource:string, type:string, conten
     files[resource] = content;
 }
 
-export function MIOCoreBundleGetAppResource(resource:string, type:string){
+function MIOCoreBundleGetAppResource(resource:string, type:string){
     let files = _MIOAppBundleResources[type];
     if (files == null) return null;
 

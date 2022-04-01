@@ -1,14 +1,16 @@
 
-import { NSObject } from "./NSObject";
+// import { NSObject } from "./NSObject";
+/// <reference path="NSObject.ts" />
 
 
-export interface NSCoding
+
+interface NSCoding
 {
     initWithCoder?(coder:NSCoder):void;
     encodeWithCoder?(coder:NSCoder):void;
 }
 
-export class NSCoder extends NSObject
+class NSCoder extends NSObject
 {
     decodeIntegerForKey(key:string):any{
 

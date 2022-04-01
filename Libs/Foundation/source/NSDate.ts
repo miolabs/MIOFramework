@@ -1,10 +1,10 @@
-import { MIOCoreLexer } from "./core/MIOCoreLexer";
+// import { MIOCoreLexer } from "./core/MIOCoreLexer";
 
 /**
  * Created by godshadow on 11/3/16.
  */
 
-export enum NSDateFirstWeekDay{
+enum NSDateFirstWeekDay{
     Sunday,
     Monday
 }
@@ -13,7 +13,7 @@ var _NSDateFirstWeekDay = NSDateFirstWeekDay.Monday;
 var _NSDateStringDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 var _NSDateStringMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-export function NSDateSetFirstWeekDay(day:NSDateFirstWeekDay){
+function NSDateSetFirstWeekDay(day:NSDateFirstWeekDay){
 
     _NSDateFirstWeekDay = day;
     if (day == NSDateFirstWeekDay.Sunday)
@@ -22,17 +22,17 @@ export function NSDateSetFirstWeekDay(day:NSDateFirstWeekDay){
         _NSDateStringDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 }
 
-export function NSDateGetStringForMonth(month)
+function NSDateGetStringForMonth(month)
 {
     return _NSDateStringMonths[month];
 }
 
-export function NSDateGetStringForDay(day:number)
+function NSDateGetStringForDay(day:number)
 {
     return _NSDateStringDays[day];
 }
 
-export function NSDateGetDayFromDate(date) 
+function NSDateGetDayFromDate(date) 
 {
     if (_NSDateFirstWeekDay == NSDateFirstWeekDay.Sunday) return date.getDay();    
 
@@ -47,23 +47,23 @@ export function NSDateGetDayFromDate(date)
     return day;
 }
 
-export function NSDateGetMonthFromDate(date:Date)
+function NSDateGetMonthFromDate(date:Date)
 {
     return date.getMonth();
 }
 
-export function NSDateGetYearFromDate(date:Date)
+function NSDateGetYearFromDate(date:Date)
 {
     return date.getFullYear();
 }
 
-export function NSDateGetDayStringFromDate(date) 
+function NSDateGetDayStringFromDate(date) 
 {
     var day = NSDateGetDayFromDate(date);
     return NSDateGetStringForDay(day);
 }
 
-export function NSDateGetString(date)
+function NSDateGetString(date)
 {
     var d = NSDateGetDateString(date);
     var t = NSDateGetTimeString(date);
@@ -71,7 +71,7 @@ export function NSDateGetString(date)
     return d + " " + t;
 }
 
-export function NSDateGetDateString(date)
+function NSDateGetDateString(date)
 {
     var yyyy = date.getFullYear().toString();
     var mm = (date.getMonth()+1).toString(); // getMonth() is zero-based
@@ -79,14 +79,14 @@ export function NSDateGetDateString(date)
     return yyyy + "-" +(mm[1]?mm:"0"+mm[0]) + "-" +  (dd[1]?dd:"0"+dd[0]); // padding
 }
 
-export function NSDateGetTimeString(date)
+function NSDateGetTimeString(date)
 {
     var hh = date.getHours().toString();
     var mm = date.getMinutes().toString();
     return (hh[1]?hh:"0"+hh[0]) + ":" + (mm[1]?mm:"0"+mm[0]);
 }
 
-export function NSDateGetUTCString(date)
+function NSDateGetUTCString(date)
 {
     var d = NSDateGetUTCDateString(date);
     var t = NSDateGetUTCTimeString(date);
@@ -94,7 +94,7 @@ export function NSDateGetUTCString(date)
     return d + " " + t;
 }
 
-export function NSDateGetUTCDateString(date)
+function NSDateGetUTCDateString(date)
 {
     var yyyy = date.getUTCFullYear().toString();
     var mm = (date.getUTCMonth()+1).toString(); // getMonth() is zero-based
@@ -102,7 +102,7 @@ export function NSDateGetUTCDateString(date)
     return yyyy + "-" +(mm[1]?mm:"0"+mm[0]) + "-" +  (dd[1]?dd:"0"+dd[0]); // padding
 }
 
-export function NSDateGetUTCTimeString(date)
+function NSDateGetUTCTimeString(date)
 {
     var hh = date.getUTCHours().toString();
     var mm = date.getUTCMinutes().toString();
@@ -110,7 +110,7 @@ export function NSDateGetUTCTimeString(date)
     return (hh[1]?hh:"0" + hh[0]) + ":" + (mm[1]?mm:"0" + mm[0]) + ":" + (ss[1]?ss:"0" + ss[0]);
 }
 
-export function NSDateFromString(string)
+function NSDateFromString(string)
 {
     let lexer = new MIOCoreLexer(string);
     
@@ -178,7 +178,7 @@ export function NSDateFromString(string)
     return date;
 }
 
-export function NSDateToUTC(date)
+function NSDateToUTC(date)
 {
     var dif = date.getTimezoneOffset();
     let d = new Date();
@@ -187,7 +187,7 @@ export function NSDateToUTC(date)
     return d;
 }
 
-export function NSDateAddDaysToDateString(dateString, days)
+function NSDateAddDaysToDateString(dateString, days)
 {
     var d = NSDateFromString(dateString);
     d.setDate(d.getDate() + parseInt(days));
@@ -196,7 +196,7 @@ export function NSDateAddDaysToDateString(dateString, days)
     return ds;
 }
 
-export function NSDateRemoveDaysToDateString(dateString, days)
+function NSDateRemoveDaysToDateString(dateString, days)
 {
     var d = NSDateFromString(dateString);
     d.setDate(d.getDate() - parseInt(days));
@@ -206,7 +206,7 @@ export function NSDateRemoveDaysToDateString(dateString, days)
 }
 
 
-export function NSDateFromMiliseconds(miliseconds){
+function NSDateFromMiliseconds(miliseconds){
   var mEpoch = parseInt(miliseconds); 
   if(mEpoch<10000000000) mEpoch *= 1000; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
   var ds = new Date();
@@ -214,39 +214,41 @@ export function NSDateFromMiliseconds(miliseconds){
   return ds;
 }
 
-export function isDate (x) 
+function isDate (x) 
 { 
   return (null != x) && !isNaN(x) && ("undefined" !== typeof x.getDate); 
 }
 
-export function NSDateToday(){
+function NSDateToday(){
     var d = new Date();
     d.setHours(0,0,0);
     return d;
 }
-export function NSDateNow(){
+
+function NSDateNow(){
     return new Date();
 }
-export function NSDateTodayString(){
+
+function NSDateTodayString(){
     let d = NSDateToday();
     return NSDateGetString(d);
 }
 
-export function NSDateYesterday(){
+function NSDateYesterday(){
     let d = new Date();
     d.setDate(d.getDate() - 1);
     d.setHours(0,0,0);
     return d;
 }
 
-export function NSDateTomorrow(){
+function NSDateTomorrow(){
     let d = new Date();
     d.setDate(d.getDate() + 1);
     d.setHours(0,0,0);
     return d;
 }
 
-export function NSDateGetFirstDayOfTheWeek(date:Date){
+function NSDateGetFirstDayOfTheWeek(date:Date){
 
     let dayString = NSDateGetDateString(date);
     // TODO: Check sunday start or monday start
@@ -256,7 +258,7 @@ export function NSDateGetFirstDayOfTheWeek(date:Date){
     return first;
 }
 
-export function NSDateGetLastDayOfTheWeek(date:Date){
+function NSDateGetLastDayOfTheWeek(date:Date){
 
     let dayString = NSDateGetDateString(date);
     // TODO: Check sunday start or monday start
@@ -266,24 +268,24 @@ export function NSDateGetLastDayOfTheWeek(date:Date){
     return last;
 }
 
-export function NSDateGetFirstDateOfTheMonth(month, year):Date{
+function NSDateGetFirstDateOfTheMonth(month, year):Date{
     return new Date(year, month, 1);    
 }
 
-export function NSDateGetFirstDayOfTheMonth(month, year){
+function NSDateGetFirstDayOfTheMonth(month, year){
     let d = NSDateGetFirstDateOfTheMonth(month, year);
     return d.getDate();
 }
 
-export function NSDateGetLastDateOfTheMonth(month, year):Date{
+function NSDateGetLastDateOfTheMonth(month, year):Date{
     return new Date(year, month + 1, 0);
 }
 
-export function NSDateGetLastDayOfTheMonth(month, year){
+function NSDateGetLastDayOfTheMonth(month, year){
     let d = NSDateGetLastDateOfTheMonth(month, year);
     return d.getDate();
 }
 
-export function NSDateCopy(date:Date):Date{    
+function NSDateCopy(date:Date):Date{    
     return new Date(date.getTime());
 }

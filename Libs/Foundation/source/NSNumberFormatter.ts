@@ -1,14 +1,13 @@
-import { Formatter } from "./NSFormatter";
-import { Locale } from "./NSLocale";
-import { NSNumber } from "./NSNumber";
+// import { Formatter } from "./NSFormatter";
+// import { Locale } from "./NSLocale";
+// import { NSNumber } from "./NSNumber";
 
-export enum _NSNumberFormatterType {
-    
+enum _NSNumberFormatterType {    
     Int,
     Decimal
 }
 
-export class NumberFormatter extends Formatter {
+class NumberFormatter extends Formatter {
 
     numberStyle = NumberFormatter.Style.none;
     locale:Locale = null;

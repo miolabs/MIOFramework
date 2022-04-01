@@ -2,9 +2,9 @@
  * Created by godshadow on 26/3/16.
  */
 
-import { NSClassFromString } from "./core/MIOCore";
+//import { NSClassFromString } from "./core/MIOCore";
 
-export class NSObject
+class NSObject
 {
     private _className:string = null;
     getClassName():string {

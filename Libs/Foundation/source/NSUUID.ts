@@ -1,10 +1,10 @@
-import { NSObject } from "./NSObject";
+// import { NSObject } from "./NSObject";
 
 /**
  * Created by godshadow on 15/3/16.
  */
 
-export class NSUUID extends NSObject
+class NSUUID extends NSObject
 {
     // Deprecated
     static UUID():NSUUID{

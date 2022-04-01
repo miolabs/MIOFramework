@@ -1,5 +1,5 @@
 
-export class MIOCoreLexer 
+class MIOCoreLexer 
 {
     private input:string = null;
     private tokenTypes = [];

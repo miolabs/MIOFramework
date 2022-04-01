@@ -1,19 +1,26 @@
 {
-    "compilerOptions": {
-        "module": "esnext",
-        "declaration": true,
-        "sourceMap": true,	
-        "outDir": "./build/web",	
-        "target": "es6",
-        "noImplicitAny": false,
-        "typeRoots": ["./typings"]        
-    },
-    "include": [        
-        "source/platform/web/MIOCore_web.ts",        
-        "source/*"
-    ],
-    "exclude": [        
-        "source/platform/**/*",
-        "source/index*.ts"
-    ]
-  }
+  "compilerOptions": {
+    "lib": ["esnext", "dom"],
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "outFile": "./dist/miofoundation.js",
+    "target": "es5",
+    "noImplicitAny": false,
+    "types": [],
+    "typeRoots": []
+  },
+  "include": [
+    "source/core/MIOCoreTypes.ts",
+    "source/core/MIOCoreLexer.ts",
+    "source/platform/web/MIOCore_web.ts",
+    "source/*"
+
+  ],
+  "exclude": [
+    "node_modules",
+    "./node_modules",
+    "./node_modules/*",
+    "./node_modules/@types/node/index.d.ts"
+  ]
+}

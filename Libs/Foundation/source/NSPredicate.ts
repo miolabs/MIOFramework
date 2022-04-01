@@ -1,12 +1,12 @@
-import { NSObject } from "./NSObject";
-import { ISO8601DateFormatter } from "./NSISO8601DateFormatter";
-import { MIOCoreLexer } from "./core/MIOCoreLexer";
+// import { NSObject } from "./NSObject";
+// import { ISO8601DateFormatter } from "./NSISO8601DateFormatter";
+// import { MIOCoreLexer } from "./core/MIOCoreLexer";
 
 /**
  * Created by godshadow on 1/5/16.
  */
 
-export enum NSPredicateComparatorType {
+enum NSPredicateComparatorType {
     Equal,
     Less,
     LessOrEqual,
@@ -19,29 +19,29 @@ export enum NSPredicateComparatorType {
     NotIn    
 }
 
-export enum NSPredicateRelationshipOperatorType {
+enum NSPredicateRelationshipOperatorType {
     ANY,
     ALL
 }
 
-export enum NSPredicateOperatorType {
+enum NSPredicateOperatorType {
     OR,
     AND
 }
 
-export enum NSPredicateBitwiseOperatorType {
+enum NSPredicateBitwiseOperatorType {
     OR,
     AND,
     XOR
 }
 
-export enum NSPredicateType {
+enum NSPredicateType {
     Predicate,
     Item,
     Operation
 }
 
-export class NSPredicateOperator {
+class NSPredicateOperator {
     type = null;
 
     public static andPredicateOperatorType() {
@@ -59,7 +59,7 @@ export class NSPredicateOperator {
     }    
 }
 
-export enum NSPredicateItemValueType {
+enum NSPredicateItemValueType {
     
     Undefined,
     UUID,
@@ -70,7 +70,7 @@ export enum NSPredicateItemValueType {
     Property
 }
 
-export class NSPredicateItem {
+class NSPredicateItem {
     relationshipOperation:NSPredicateRelationshipOperatorType = null;
     bitwiseOperation:NSPredicateBitwiseOperatorType = null;
     bitwiseKey:string = null;
@@ -187,7 +187,7 @@ export class NSPredicateItem {
     }
 }
 
-export class NSPredicateGroup {
+class NSPredicateGroup {
 
     predicates = [];
 
@@ -241,7 +241,7 @@ export class NSPredicateGroup {
     }
 }
 
-export enum NSPredicateTokenType{
+enum NSPredicateTokenType{
     Identifier,
     
     UUIDValue,
@@ -276,7 +276,7 @@ export enum NSPredicateTokenType{
     ALL
 }
 
-export class NSPredicate extends NSObject {
+class NSPredicate extends NSObject {
      
     predicateGroup = null;    
 
@@ -603,7 +603,7 @@ export class NSPredicate extends NSObject {
 // For internal purposes: Don't use it, could change
 //
 
-export function _NSPredicateFilterObjects(objs, predicate)
+function _NSPredicateFilterObjects(objs, predicate)
 {
     if (objs == null) return [];
 

@@ -1,10 +1,10 @@
-import { NSURLRequest } from "./NSURLRequest";
+// import { NSURLRequest } from "./NSURLRequest";
 
 /**
  * Created by godshadow on 14/3/16.
  */
 
-export class NSURLConnection
+class NSURLConnection
 {
     request:NSURLRequest = null;
     delegate = null;

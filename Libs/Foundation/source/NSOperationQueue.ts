@@ -1,8 +1,8 @@
-import { NSObject } from "./NSObject";
-import { Operation } from "./NSOperation";
-import "./NSArray";
+// import { NSObject } from "./NSObject";
+// import { Operation } from "./NSOperation";
+// import "./NSArray";
 
-export class OperationQueue extends NSObject {
+class OperationQueue extends NSObject {
 
     private _operations = [];
 

@@ -1,16 +1,18 @@
-import { Formatter } from './NSFormatter'
-import { MIOCoreGetPlatform } from './core/MIOCore';
-import { MIOCorePlatformType } from './core/MIOCoreTypes';
+// import { Formatter } from './NSFormatter'
+// import { MIOCoreGetPlatform } from './core/MIOCore';
+// import { MIOCorePlatformType } from './core/MIOCoreTypes';
 
-export enum NSDateFormatterStyle {
+/// <reference path="NSFormatter.ts" />
+
+
+enum NSDateFormatterStyle {
     NoStyle,
     ShortStyle,
     MediumStyle,
     LongStyle,
     FullStyle
 }
-
-export class DateFormatter extends Formatter {
+class DateFormatter extends Formatter {
 
     dateStyle = NSDateFormatterStyle.ShortStyle;
     timeStyle = NSDateFormatterStyle.ShortStyle;    

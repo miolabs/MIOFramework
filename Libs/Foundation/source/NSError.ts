@@ -1,6 +1,7 @@
-import { NSObject } from "./NSObject";
+// import { NSObject } from "./NSObject";
+/// <reference path="NSObject.ts" />
 
-export class NSError extends NSObject
+class NSError extends NSObject
 {
     errorCode = 0;
 }

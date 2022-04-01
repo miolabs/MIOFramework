@@ -1,5 +1,5 @@
 
-export class CGSize
+class CGSize
 {
     width = 0;
     height = 0;

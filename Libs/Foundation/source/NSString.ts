@@ -1,6 +1,8 @@
-import "./extensions/extensions";
+// import "./extensions/extensions";
+// import { MIOCoreStringPathExtension, MIOCoreStringHasPreffix, MIOCoreStringHasSuffix, MIOCoreStringLastPathComponent, MIOCoreStringAppendPathComponent, MIOCoreStringDeletingLastPathComponent, MIOCoreStringLocalizeString } from "./core/MIOCoreString";
+/// <reference path="./core/MIOCoreString.ts" />
+/// <reference path="./extensions/extensions.ts" />
 
-import { MIOCoreStringPathExtension, MIOCoreStringHasPreffix, MIOCoreStringHasSuffix, MIOCoreStringLastPathComponent, MIOCoreStringAppendPathComponent, MIOCoreStringDeletingLastPathComponent, MIOCoreStringLocalizeString } from "./core/MIOCoreString";
 
 String.prototype.lastPathComponent = function() {
     return MIOCoreStringLastPathComponent(this);    
@@ -26,7 +28,7 @@ String.prototype.hasSuffix = function(suffix:string):boolean{
     return MIOCoreStringHasSuffix(this, suffix);
 }
 
-export function NSLocalizeString(key:string, defaultValue:string)
+function NSLocalizeString(key:string, defaultValue:string)
 {
     return MIOCoreStringLocalizeString(key, defaultValue);
 }

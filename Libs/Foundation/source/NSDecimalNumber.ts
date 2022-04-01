@@ -1,13 +1,14 @@
-import { NSNumber } from "./NSNumber";
+// import { NSNumber } from "./NSNumber";
+/// <reference path="NSNumber.ts" />
 
-export namespace Decimal {
-    export type Value = string | number | Decimal;
+declare namespace Decimal {
+    type Value = string | number | Decimal;
 }
-export declare class Decimal { 
+declare class Decimal { 
     constructor(n: Decimal.Value);
 }
 
-export class NSDecimalNumber extends NSNumber
+class NSDecimalNumber extends NSNumber
 {
     static decimalNumberWithString(str:string):NSDecimalNumber{
         let dn = new NSDecimalNumber();

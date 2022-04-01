@@ -1,7 +1,7 @@
-import { NSLog } from "./NSLog";
-import { NSObject } from "./NSObject";
+// import { NSLog } from "./NSLog";
+// import { NSObject } from "./NSObject";
 
-export interface XMLParserDelegate {
+interface XMLParserDelegate {
     parserDidStartDocument?(parser:XMLParser);
     parserDidEndDocument?(parser:XMLParser);
     
@@ -12,7 +12,7 @@ export interface XMLParserDelegate {
     parserFoundComment?(parser:XMLParser, comment:string);
 }
 
-export enum XMLTokenType{
+enum XMLTokenType{
     Identifier,
     QuestionMark,
     ExclamationMark,
@@ -24,7 +24,7 @@ export enum XMLTokenType{
     End
 }
 
-export class XMLParser extends NSObject
+class XMLParser extends NSObject
 {
     private str:string = null;
     private delegate:XMLParserDelegate = null;

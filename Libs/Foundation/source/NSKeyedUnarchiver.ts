@@ -1,9 +1,9 @@
-import { NSCoder } from "./NSCoder";
-import { PropertyListSerialization } from "./NSPropertyListSerialization";
-import { NSClassFromString } from "./core/MIOCore";
+// import { NSCoder } from "./NSCoder";
+// import { PropertyListSerialization } from "./NSPropertyListSerialization";
+// import { NSClassFromString } from "./core/MIOCore";
 
 
-export class NSKeyedUnarchiver extends NSCoder
+class NSKeyedUnarchiver extends NSCoder
 {
     static unarchiveTopLevelObjectWithData(data:string){
         let coder = new NSKeyedUnarchiver();

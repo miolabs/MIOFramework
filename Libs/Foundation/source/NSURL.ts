@@ -1,6 +1,6 @@
-import { NSObject } from "./NSObject";
+// import { NSObject } from "./NSObject";
 
-export enum NSURLTokenType
+enum NSURLTokenType
 {
     Protocol,
     Host,
@@ -9,7 +9,7 @@ export enum NSURLTokenType
     Value
 }
 
-export class NSURL extends NSObject
+class NSURL extends NSObject
 {    
     baseURL:NSURL = null;
     absoluteString:string = null;

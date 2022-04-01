@@ -1,7 +1,7 @@
-import { CGPoint } from "./NSPoint";
-import { CGSize } from "./NSSize";
+// import { CGPoint } from "./NSPoint";
+// import { CGSize } from "./NSSize";
 
-export class CGRect
+class CGRect
 {
     origin:CGPoint = null;
     size:CGSize = null;

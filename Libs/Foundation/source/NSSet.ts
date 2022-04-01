@@ -1,8 +1,8 @@
-import { NSObject } from "./NSObject";
-import { NSPredicate, _NSPredicateFilterObjects } from "./NSPredicate";
-import "./NSArray";
+// import { NSObject } from "./NSObject";
+// import { NSPredicate, _NSPredicateFilterObjects } from "./NSPredicate";
+// import "./NSArray";
 
-export class NSSet extends NSObject {
+class NSSet extends NSObject {
 
     static set() {
 

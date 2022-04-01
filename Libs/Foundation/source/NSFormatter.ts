@@ -1,6 +1,7 @@
-import { NSObject } from "./NSObject";
+//import { NSObject } from "./NSObject";
+/// <reference path="NSObject.ts" />
 
-export class Formatter extends NSObject {
+class Formatter extends NSObject {
 
     stringForObjectValue(value) {
         return value;

@@ -1,4 +1,5 @@
-import { NSObject } from "./NSObject";
+// import { NSObject } from "./NSObject";
+/// <reference path="NSObject.ts" />
 
 /**
  * Created by godshadow on 30/3/16.
@@ -6,7 +7,7 @@ import { NSObject } from "./NSObject";
 
 var _NS_currentLocale;
 
-export class Locale extends NSObject
+class Locale extends NSObject
 {
     languageIdentifier = "es";
     countryIdentifier = "ES";

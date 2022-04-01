@@ -1,6 +1,7 @@
-import { NSObject } from "./NSObject";
+// import { NSObject } from "./NSObject";
+/// <reference path="NSObject.ts" />
 
-export function IndexPathEqual(indexPath1:IndexPath, indexPath2:IndexPath):boolean {
+function IndexPathEqual(indexPath1:IndexPath, indexPath2:IndexPath):boolean {
 
     //TODO: CHECK REAL INDEX PATH
     if (indexPath1 == null || indexPath2 == null) return false;
@@ -13,7 +14,7 @@ export function IndexPathEqual(indexPath1:IndexPath, indexPath2:IndexPath):boole
     return false;
 }
 
-export class IndexPath extends NSObject
+class IndexPath extends NSObject
 {
     //FIXME: Remove the data type in the maethod name
     static indexForRowIntInSectionInt(row:number, section:number){

@@ -2,7 +2,7 @@
  * Created by godshadow on 11/3/16.
  */
 
-export class NSNotification
+class NSNotification
 {
     name = null;
     object = null;
@@ -16,7 +16,7 @@ export class NSNotification
     }
 }
 
-export class NotificationCenter
+class NotificationCenter
 {
     private static _sharedInstance:NotificationCenter = new NotificationCenter();
     notificationNames = {};

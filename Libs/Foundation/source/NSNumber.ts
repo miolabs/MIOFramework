@@ -1,6 +1,7 @@
-import { NSObject } from "./NSObject";
+// import { NSObject } from "./NSObject";
+/// <reference path="NSObject.ts" />
 
-export class NSNumber extends NSObject
+class NSNumber extends NSObject
 {    
     static numberWithBool(value):NSNumber{
         let n = new NSNumber();

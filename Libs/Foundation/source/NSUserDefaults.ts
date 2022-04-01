@@ -2,7 +2,7 @@
  * Created by godshadow on 29/09/2016.
  */
 
-export class UserDefaults
+class UserDefaults
 {
     private static _sharedInstance:UserDefaults = new UserDefaults();
 
