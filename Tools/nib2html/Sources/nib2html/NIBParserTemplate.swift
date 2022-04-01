@@ -12,6 +12,8 @@ class NIBParserTemplate
 {
     var items: Template
     
+    static var attr_regex = try! NSRegularExpression( pattern: "(\\{[^\\}]+\\})" )
+    
     init(contentOf items: Template ) {
         //guard let fileData = try? Data( contentsOf: url ) else { return }
         //do {
@@ -32,13 +34,19 @@ class NIBParserTemplate
         let tmpl_opts = item.options
 
         render_options( &template, tmpl_opts, &options )
-        insert_html_attribte( &template, "class" , " " , options )
-        insert_html_attribte( &template, "style", "; ", options )
+        insert_html_attribute( &template, "class" , " " , options )
+        insert_html_attribute( &template, "style", "; ", options )
 
-        return template.replacingOccurrences(of: "{children}", with: childrens ?? "")
+        let ret = template.replacingOccurrences(of: "{children}", with: childrens ?? "")
+        
+        return clean_not_used_placeholders( ret )
     }
     
-    func insert_html_attribte ( _ tmpl: inout String, _ attr: String, _ separator: String, _ options: [String:String] ) {
+    func clean_not_used_placeholders ( _ str: String ) -> String {
+        return NIBParserTemplate.attr_regex.stringByReplacingMatches(in: str, options: [], range: NSMakeRange(0, str.count), withTemplate: "")
+    }
+    
+    func insert_html_attribute ( _ tmpl: inout String, _ attr: String, _ separator: String, _ options: [String:String] ) {
         let value = options[ attr ]?.trimmingCharacters(in: .whitespaces) ?? ""
         
         if value.count == 0 { return }
@@ -48,11 +56,11 @@ class NIBParserTemplate
                           , at: tmpl.index( tmpl.startIndex
                                           , offsetBy: attr_range.location + "\(attr)=\"".count ))
         } else {
-            tmpl.insert( contentsOf: " \(attr)=\"\(value)\" "
-                       , at:   tmpl.range(of: " ")?.lowerBound
-                            ?? tmpl.range(of: "/>")?.lowerBound
-                            ?? tmpl.range(of: ">")!.lowerBound
-                       )
+            if let at = tmpl.range( of: " " )?.lowerBound
+                     ?? tmpl.range( of: "/>")?.lowerBound
+                     ?? tmpl.range( of: ">" )?.lowerBound {
+                tmpl.insert( contentsOf: " \(attr)=\"\(value)\" ", at: at )
+            }
         }
     }
     
@@ -75,7 +83,11 @@ class NIBParserTemplate
                     
                     if target_value[ target ] == nil { target_value[ target ] = "" }
                     
-                    target_value[ target ]! += action.value( value ) + " "
+                    let sep = target == "class" ? " "
+                            : target == "style" ? "; "
+                            : " "
+                    
+                    target_value[ target ]! += action.value( value ) + sep
                 }
             }
         }

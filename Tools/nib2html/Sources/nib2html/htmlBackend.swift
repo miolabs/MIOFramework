@@ -1,5 +1,24 @@
 let basic_styles =
-[ "textAlignment": [ TemplateItemOption( "class" ) { text in text == "natural" ? "text-left" : "text-\(text)" } ]
+[ "textAlignment":
+    [ TemplateItemOption( "class" ) { text in
+        text == "natural" ? "text-start"
+      : text == "center"  ? "text-center"
+      : text == "left"    ? "text-start"
+      : text == "right"   ? "text-end"
+      :                     "text-start" }
+    ]
+  
+  
+, "alignment":
+    [ TemplateItemOption( "class" ) {
+        a in
+        a == "center"   ? "align-items-center"
+      : a == "leading"  ? "align-items-start"
+      : a == "trailing" ? "align-items-end"
+      :                   "align-items-end"
+    } ]
+  
+  
 , "borderStyle":
     [ TemplateItemOption( "class" ) {
         border in
@@ -32,8 +51,22 @@ let basic_styles =
           size_in_pt in
             "font-size: \(size_in_pt)pt"
       } ]
+
+, "color":
+        [ TemplateItemOption( "style" ) {
+            rgba in "color: \(rgba)"
+        } ]
+
+, "backgroundColor":
+          [ TemplateItemOption( "style" ) {
+              rgba in "background-color: \(rgba)"
+          } ]
+
 ]
 
+func with_basic_style ( _ d: [String:[TemplateItemOption]] ) -> [String:[TemplateItemOption]] {
+    return d.merging( basic_styles ){ old, new in old }
+}
 
 public let HTML_BOOTSTRAP5 =
 [ "scene":
@@ -75,9 +108,9 @@ public let HTML_BOOTSTRAP5 =
                             ]
                  ] )
 , "label":
-  TemplateItem( "<span {outlet}>{text}</span>"
-              , [ "text": [ TemplateItemOption( "text" ) { text in text } ]
-                ].merging( basic_styles ){ old, new in old } )
+  TemplateItem( "<div {outlet}>{text}</div>"
+              , with_basic_style(
+                [ "text": [ TemplateItemOption( "text" ) { text in text } ] ] ) )
 , "button":
   TemplateItem("<button type=\"button\" class=\"btn btn-primary\" {outlet}>{children}</button>"
               , [ "state-normal":
@@ -114,7 +147,7 @@ public let HTML_BOOTSTRAP5 =
                 , [ "accessoryType": [ TemplateItemOption( "accessory" ){ icon in "<i class=\"\(ios_cell_icon_to_awesome_font( icon ))\"></i>" } ]
                   , "rowHeight": [TemplateItemOption( "style" ){ height in "height: \(height)px" }  ] ]
                 )
-, "tableViewCellContentView": TemplateItem("{children}")
+, "tableViewCellContentView": TemplateItem("<div>{children}</div>", with_basic_style([:]) )
 , "collectionView":
   TemplateItem("<div {outlet}>{children}</div>")
 , "collectionViewFlowLayout":
