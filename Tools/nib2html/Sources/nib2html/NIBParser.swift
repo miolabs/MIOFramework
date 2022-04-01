@@ -337,36 +337,46 @@ class NIBParser : NSObject, XMLParserDelegate
 ////            if let w = attributeDict["width"] { currentElement!.styles.append("width:" + w + "px;") }
 ////            if let h = attributeDict["height"] { currentElement!.styles.append("height:" + h + "px;") }
 //        }
-//        else if (elementName == "color"){
-////            var r = 0.0
-////            var g = 0.0
-////            var b = 0.0
-////            if (attributeDict["white"] == "1") {
-////                r = 255.0
-////                g = 255.0
-////                b = 255.0
-////            } else if attributeDict["systemBackgroundColor"] == "1" {
-////            } else {
-////                r = Double(attributeDict["red"]!)! * 255.0
-////                g = Double(attributeDict["green"]!)! * 255.0
-////                b = Double(attributeDict["blue"]!)! * 255.0
-////            }
-////
-////            let a = Double(attributeDict["alpha"]!)!
-////
-////            currentElement!.viewAttributes[ attributeDict[ "key" ]! ] = "rgba(\(r),\(g),\(b),\(a))"
-//        }
-        if elementName == "fontDescription" {
+        switch ( elementName ) {
+        case "color":
+            var r = 0.0
+            var g = 0.0
+            var b = 0.0
+            let a = Double( attributeDict[ "alpha"] ?? "1.0" )! * 255
+
+            if (attributeDict["white"] == "1") {
+                r = 255.0
+                g = 255.0
+                b = 255.0
+            } else if attributeDict["systemBackgroundColor"] == "1" {
+            } else if attributeDict.keys.contains( "systemColor" ) {
+                switch ( attributeDict["systemColor"] ) {
+                    case "systemBackgroundColor":
+                        break
+                    default: break
+                }
+                // systemBackgroundColor
+            } else {
+                r = Double( attributeDict[ "red"  ] ?? "0.0" )! * 255.0
+                g = Double( attributeDict[ "green"] ?? "0.0" )! * 255.0
+                b = Double( attributeDict[ "blue" ] ?? "0.0" )! * 255.0
+            }
+
+
+            let key = attributeDict[ "key" ] == "backgroundColor" ? "backgroundColor" : "color"
+            currentElement!.viewAttributes[ key ] = "rgba(\(floor(r)),\(floor(g)),\(floor(b)),\(floor(a)))"
+
+        case "fontDescription":
             if let size = attributeDict["pointSize"] {
                 currentElement!.viewAttributes[ "fontSize" ] = size
             }
-        }
-        else if elementName == "state" { // this is found in the button
+                
+        case "state": // this is found in the button
             if let title = attributeDict["title"] {
                 currentElement!.viewAttributes[ "state-\(attributeDict["key"]!)" ] = title
             }
-        }
-        else if elementName == "action" {
+                
+        case "action":
             let selector = attributeDict["selector"]!
             
             var actionDiv = "<div class=\"hidden\" data-action-selector=\"" + selector.replacingOccurrences(of: "WithSender:", with: "Sender") + "\""
@@ -375,16 +385,15 @@ class NIBParser : NSObject, XMLParserDelegate
             }
             actionDiv += "></div>"
             currentElement!.content = currentElement!.content + actionDiv
-        }
-        else if elementName == "outlet" {
+        
+        case "outlet":
             let property = attributeDict["property"]!
             let destination = attributeDict["destination"]!
 
             let o = HTMLItemOutlet(property: property, destination: destination)
             currentElement!.outlets.append(o)
-        }
-        else if elementName == "segue" {
-            
+        
+        case "segue":
             let destination = attributeDict["destination"]!
             let kind = attributeDict["kind"]!
             let relationship = attributeDict["relationship"]
@@ -392,9 +401,11 @@ class NIBParser : NSObject, XMLParserDelegate
             
             let segue = HTMLItemSegue(destination: destination, kind: kind, identifier: identifier, relationship: relationship)
             currentElement!.segues.append(segue)
-        }
-        else if elementName == "constraint" {
+        
+        case "constraint":
             add_constraint( attributeDict )
+        
+        default: break
         }
     }
     

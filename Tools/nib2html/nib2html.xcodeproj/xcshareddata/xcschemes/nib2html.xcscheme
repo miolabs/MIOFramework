@@ -60,6 +60,16 @@
             ReferencedContainer = "container:nib2html.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "-o /Users/david/projects/miolabs-projects/tmp/ui"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/david/projects/miolabs-projects/Apps/DLOnlineInvoices/DLOnlineInvoices/Base.lproj/Main.storyboard"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
