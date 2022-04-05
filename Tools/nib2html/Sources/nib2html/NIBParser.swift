@@ -51,6 +51,7 @@ class HTMLItem
     var subviews: [HTMLItem] = []
     var constraints: [Constraint] = []
     var viewAttributes: [String : String] = [:]
+    var parent: HTMLItem? = nil
 }
 
 struct HTMLItemOutlet
@@ -134,7 +135,7 @@ class NIBParser : NSObject, XMLParserDelegate
     let parserTemplate:NIBParserTemplate
     var outputFolder:String?
     var root: HTMLItem
-    let supported_elements = Set( [ "viewController", "navigationController", "tableViewController", "view", "navigationBar", "navigationItem" , "barButtonItem", "label", "button", "textField", "tableView", "tableViewCell", "tableViewCellContentView", "collectionView", "collectionViewFlowLayout", "collectionViewCell", "toolbar", "imageView", "segmentedControl", "segment", "segments", "switch", "slider", "progressView", "activityIndicatorView", "pageControl", "stepper", "size", "stackView", "scene", "tabBar", "tabBarItem" ] )
+    let supported_elements = Set( [ "viewController", "navigationController", "tableViewController", "view", "navigationBar", "navigationItem" , "barButtonItem", "label", "button", "textField", "tableView", "tableViewCell", "tableViewCellContentView", "collectionView", "collectionViewFlowLayout", "collectionViewCell", "toolbar", "imageView", "segmentedControl", "segment", "segments", "switch", "slider", "progressView", "activityIndicatorView", "pageControl", "stepper", "size", "stackView", "scene", "tabBar", "tabBarItem", "tableViewSection", "segue", "outlet", "connections" ] )
     
     init(contentsOf url:URL, template: Template ) {
         self.root = HTMLItem()
@@ -457,6 +458,7 @@ class NIBParser : NSObject, XMLParserDelegate
             item.extraAttributes.append("data-tag=\"" + tag + "\"")
         }
 
+        item.parent = elementsStack.last
         elementsStack.append(item)
         currentElement = item
 
@@ -469,6 +471,19 @@ class NIBParser : NSObject, XMLParserDelegate
         if let constraint = parse_constraint( dict ) {
             // apply_constraint( &currentElement!, constraint )
             currentElement!.constraints.append( constraint )
+            
+            if constraint is SizeConstraint {
+                if (currentElement!.parent?.templateClass ?? "") == "stackView" {
+                    let stack = currentElement!.parent!
+                    let stack_dir = stack.viewAttributes[ "axis" ] ?? "horizontal"
+
+                    if stack_dir == "vertical" && !(constraint as! SizeConstraint).isHorizontal {
+                        currentElement!.viewAttributes[ "flex" ] = "\((constraint as! SizeConstraint).size)"
+                    } else if stack_dir == "horizontal" && (constraint as! SizeConstraint).isHorizontal {
+                        currentElement!.viewAttributes[ "flex" ] = "\((constraint as! SizeConstraint).size)"
+                    }
+                }
+            }
         }
     }
     
@@ -690,18 +705,18 @@ class NIBParser : NSObject, XMLParserDelegate
     func apply_constraint ( _ item: inout HTMLItem, _ c: Any ) {
         if let margin = c as? MarginConstraint {
             if margin.value != 0 {
-                item.styles.append( "margin-\(margin.side): \(margin.value)px" )
+                item.styles.append( "margin-\(margin.side): \(margin.value)px; " )
             }
         } else if let size = c as? SizeConstraint {
             if size.isHorizontal {
                 if size.isFixed {
-                    item.styles.append( "width: \(size.size)px" )
+                    item.styles.append( "width: \(size.size)px; " )
                 } else {
                     // item.classes.append( "d-flex" )
                 }
             } else {
                 if size.isFixed {
-                    item.styles.append( "height: \(size.size)px" )
+                    item.styles.append( "height: \(size.size)px; " )
                 } else {
                     // item.classes.append( "d-flex" )
                 }
