@@ -756,7 +756,9 @@ class NIBParser : NSObject, XMLParserDelegate
 
         guard let content = try? JSONSerialization.data(withJSONObject: item, options: []) else { return }
         
-        let filename = name.replacingOccurrences(of: "storyboard", with: "json")
+        let url = URL(fileURLWithPath: name)
+        
+        let filename = url.lastPathComponent.replacingOccurrences(of: "storyboard", with: "json")
         let path = output_file_path(withFilename: filename)
         
         try? content.write(to: URL(fileURLWithPath: path))

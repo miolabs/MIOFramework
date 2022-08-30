@@ -62,11 +62,11 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-o /Users/david/projects/miolabs-projects/tmp/ui"
+            argument = "-o /Users/godshadow/Projects/Apps/DLOnlineApps/DLOnlineInvoices/.build/wasm32-unknown-wasi/debug/html"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/david/projects/miolabs-projects/Apps/DLOnlineInvoices/DLOnlineInvoices/Base.lproj/Main.storyboard"
+            argument = "/Users/godshadow/Projects/Apps/DLOnlineApps/DLOnlineInvoices/Resources/Main.storyboard"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
