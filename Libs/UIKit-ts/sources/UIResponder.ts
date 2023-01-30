@@ -1,0 +1,4 @@
+class UIResponder extends NSObject
+{
+
+}

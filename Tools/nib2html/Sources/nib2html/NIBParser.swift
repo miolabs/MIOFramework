@@ -158,6 +158,9 @@ class NIBParser : NSObject, XMLParserDelegate
     }
     
     var initialViewControllerID:String? = nil
+    var initialSceneID:String? = nil
+    var currentScenceID:String? = nil
+    
    // var storyBoardItems:[String:Any] = [:]
 
     var currentFileName:String? = nil
@@ -183,7 +186,10 @@ class NIBParser : NSObject, XMLParserDelegate
 //            item.extraAttributes.append("data-root-view-controller=\"true\"")
 //        }
 
-        if elementName == "scene" { root = HTMLItem( ) }
+        if elementName == "scene" {
+            currentScenceID = attributeDict["sceneID"]
+            root = HTMLItem( )
+        }
 
         if supported_elements.contains( elementName ) {
             push_new_element( elementName, attributeDict.merging( g_default_attrs[ elementName ] ?? [:] ){ old, new in old } )
@@ -414,6 +420,8 @@ class NIBParser : NSObject, XMLParserDelegate
         if elementName == "scene" {
             pop_element()
             write_html_file()
+
+            currentScenceID = nil
 //            currentFileName = nil
 //            currentFileContent = nil
         }
@@ -433,6 +441,10 @@ class NIBParser : NSObject, XMLParserDelegate
     @discardableResult
     func push_new_element ( _ elementName: String, _ attributes: [String : String] ) -> HTMLItem {
         let id = attributes["id"]
+        if id == initialViewControllerID {
+            initialSceneID = currentScenceID
+        }
+        
         // let contenMode = parse_content_mode(attributes["contentMode"])
         
         let item = HTMLItem()
@@ -767,6 +779,7 @@ class NIBParser : NSObject, XMLParserDelegate
         
         var item:[String:Any] = [:]
         item["InitialViewControllerID"] = initialViewControllerID
+        item["InitialSceneID"] = initialSceneID
         // item["ClassByID"] = storyBoardItems
 
         guard let content = try? JSONSerialization.data(withJSONObject: item, options: []) else { return }

@@ -1,0 +1,6 @@
+
+
+class UICollectionViewUpdateItem extends NSObject
+{
+
+}
