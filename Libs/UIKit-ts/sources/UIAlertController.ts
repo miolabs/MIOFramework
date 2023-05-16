@@ -1,22 +1,32 @@
 
 /// <reference path="UITableView.ts" />
 
+import { IndexPath, NSObject } from "foundation";
+import { UITableView } from "./UITableView";
+import { UITextField } from "./UITextField";
+import { UIView } from "./UIView";
+import { UIViewController } from "./UIViewController";
+import { CGSize } from "./CoreGraphics/CGSize";
+import { UIModalPresentationStyle } from "./UIPresentationController";
+import { UITableViewCell, UITableViewCellSeparatorStyle, UITableViewCellStyle } from "./UITableViewCell";
+import { UILabel } from "./UILabel";
 
-enum UIAlertViewStyle
+
+export enum UIAlertViewStyle
 {
     default
 }
 
 
-enum UIAlertItemType {
-
+export enum UIAlertItemType 
+{
     none,
     action,
     textField,
     comboBox
 }
 
-class UIAlertItem extends NSObject
+export class UIAlertItem extends NSObject
 {
     type = UIAlertItemType.none;
 
@@ -26,7 +36,7 @@ class UIAlertItem extends NSObject
     }
 }
 
-class UIAlertTextField extends UIAlertItem
+export class UIAlertTextField extends UIAlertItem
 {
     textField:UITextField = null;
 
@@ -70,7 +80,7 @@ class UIAlertAction extends UIAlertItem
     }
 }
 
-class UIAlertController extends UIViewController
+export class UIAlertController extends UIViewController
 {
     textFields = [];
     comboBoxes = [];
@@ -111,24 +121,24 @@ class UIAlertController extends UIViewController
     viewDidLoad(){
         super.viewDidLoad();
         //UICoreLayerRemoveStyle(this.view.layer, "page");
-        this.view.layer.style.background = "";
-        this.view.layer.style.backgroundColor = "";
+        // this.view.layer.style.background = "";
+        // this.view.layer.style.backgroundColor = "";
         //this.view.layer.classList.add("alert-container");
 
         this._backgroundView = new UIView();
         this._backgroundView.init();
-        MUICoreLayerAddStyle(this._backgroundView.layer, "alert-container");
+        // MUICoreLayerAddStyle(this._backgroundView.layer, "alert-container");
         this.view.addSubview(this._backgroundView);
 
         this.tableView = new UITableView();
         this.tableView.init();
         this.tableView.dataSource = this;
         this.tableView.delegate = this;
-        this.tableView.layer.style.background = "";
-        this.tableView.layer.style.position = "";
-        this.tableView.layer.style.width = "";
-        this.tableView.layer.style.height = "";
-        MUICoreLayerAddStyle(this.tableView.layer, "alert-table");
+        // this.tableView.layer.style.background = "";
+        // this.tableView.layer.style.position = "";
+        // this.tableView.layer.style.width = "";
+        // this.tableView.layer.style.height = "";
+        // MUICoreLayerAddStyle(this.tableView.layer, "alert-table");
 
         this._backgroundView.addSubview(this.tableView);
     }
@@ -190,7 +200,7 @@ class UIAlertController extends UIViewController
         return this._items.length + 1;
     }
 
-    tableViewCellForRowAt(tableview, indexPath:IndexPath){
+    tableViewCellForRowAt( tableView:UITableView, indexPath:IndexPath ){
         let cell:UITableViewCell = null;
         if (indexPath.row == 0){
             cell = this._createHeaderCell();
@@ -239,31 +249,31 @@ class UIAlertController extends UIViewController
     private _createHeaderCell():UITableViewCell{
         let cell = new UITableViewCell();
         cell.initWithStyle(UITableViewCellStyle.custom);
-        MUICoreLayerAddStyle(cell.layer, "alert-header");
+        // MUICoreLayerAddStyle(cell.layer, "alert-header");
 
         let titleLabel = new UILabel();
         titleLabel.init();
         titleLabel.text = this._title;
-        titleLabel.layer.style.left = "";
-        titleLabel.layer.style.top = "";
-        titleLabel.layer.style.right = "";
-        titleLabel.layer.style.height = "";
-        titleLabel.layer.style.width = ""; 
-        titleLabel.layer.style.background = "";
-        MUICoreLayerAddStyle(titleLabel.layer, "large");
-        MUICoreLayerAddStyle(titleLabel.layer, "strong");        
+        // titleLabel.layer.style.left = "";
+        // titleLabel.layer.style.top = "";
+        // titleLabel.layer.style.right = "";
+        // titleLabel.layer.style.height = "";
+        // titleLabel.layer.style.width = ""; 
+        // titleLabel.layer.style.background = "";
+        // MUICoreLayerAddStyle(titleLabel.layer, "large");
+        // MUICoreLayerAddStyle(titleLabel.layer, "strong");        
         cell.addSubview(titleLabel);
 
         let messageLabel = new UILabel();
         messageLabel.init();
         messageLabel.text = this._message;
-        messageLabel.layer.style.left = "";
-        messageLabel.layer.style.top = "";
-        messageLabel.layer.style.right = "";
-        messageLabel.layer.style.height = "";
-        messageLabel.layer.style.width = "";
-        messageLabel.layer.style.background = "";
-        MUICoreLayerAddStyle(messageLabel.layer, "light");        
+        // messageLabel.layer.style.left = "";
+        // messageLabel.layer.style.top = "";
+        // messageLabel.layer.style.right = "";
+        // messageLabel.layer.style.height = "";
+        // messageLabel.layer.style.width = "";
+        // messageLabel.layer.style.background = "";
+        // MUICoreLayerAddStyle(messageLabel.layer, "light");        
         cell.addSubview(messageLabel);          
         
         //cell.layer.style.background = "transparent";
@@ -274,36 +284,36 @@ class UIAlertController extends UIViewController
     private _createActionCellWithTitle(title:string, style:any/*UIAlertAction.Style*/):UITableViewCell{
         let cell = new UITableViewCell();
         cell.initWithStyle(UITableViewCellStyle.custom);
-        MUICoreLayerAddStyle(cell.layer, "alert-cell");
+        // MUICoreLayerAddStyle(cell.layer, "alert-cell");
 
         let buttonLabel = new UILabel();
         buttonLabel.init();
         //UICoreLayerRemoveStyle(buttonLabel.layer, "label");
         buttonLabel.text = title;
-        buttonLabel.layer.style.left = "";
-        buttonLabel.layer.style.top = "";
-        buttonLabel.layer.style.right = "";
-        buttonLabel.layer.style.height = "";
-        buttonLabel.layer.style.width = "";
-        buttonLabel.layer.style.background = "";        
+        // buttonLabel.layer.style.left = "";
+        // buttonLabel.layer.style.top = "";
+        // buttonLabel.layer.style.right = "";
+        // buttonLabel.layer.style.height = "";
+        // buttonLabel.layer.style.width = "";
+        // buttonLabel.layer.style.background = "";        
         cell.addSubview(buttonLabel);  
 
         //cell.layer.style.background = "transparent";
-        MUICoreLayerAddStyle(buttonLabel.layer, "btn");                
+        // MUICoreLayerAddStyle(buttonLabel.layer, "btn");                
         //MUICoreLayerAddStyle(buttonLabel.layer, "label");                
 
         switch(style.rawValue){
 
             case UIAlertAction.Style._default.rawValue:
-                MUICoreLayerAddStyle(buttonLabel.layer, "default");
+                // MUICoreLayerAddStyle(buttonLabel.layer, "default");
                 break;
 
             case UIAlertAction.Style.cancel.rawValue:                
-                MUICoreLayerAddStyle(buttonLabel.layer, "cancel");
+                // MUICoreLayerAddStyle(buttonLabel.layer, "cancel");
                 break;
 
             case UIAlertAction.Style.destructive.rawValue:                
-                MUICoreLayerAddStyle(buttonLabel.layer, "destructive");
+                // MUICoreLayerAddStyle(buttonLabel.layer, "destructive");
                 break;
         }
 
@@ -313,15 +323,15 @@ class UIAlertController extends UIViewController
     private _createTextFieldCell(textField:UITextField):UITableViewCell{
         var cell = new UITableViewCell();
         cell.initWithStyle(UITableViewCellStyle.custom);    
-        MUICoreLayerAddStyle(cell.layer, "alert-cell");    
+        // MUICoreLayerAddStyle(cell.layer, "alert-cell");    
 
-        textField.layer.style.left = "";
-        textField.layer.style.top = "";
-        textField.layer.style.right = "";
-        textField.layer.style.height = "";
-        textField.layer.style.width = "";
-        textField.layer.style.background = "";
-        MUICoreLayerAddStyle(textField.layer, "input-text");
+        // textField.layer.style.left = "";
+        // textField.layer.style.top = "";
+        // textField.layer.style.right = "";
+        // textField.layer.style.height = "";
+        // textField.layer.style.width = "";
+        // textField.layer.style.background = "";
+        // MUICoreLayerAddStyle(textField.layer, "input-text");
 
         cell.addSubview(textField);
 
@@ -368,8 +378,8 @@ export class UIAlertFadeInAnimationController extends NSObject{
 
     // TODO: Not iOS like transitions. For now we use css animations
     animations(transitionContext){
-        var animations = MUIClassListForAnimationType(MUIAnimationType.FadeIn);
-        return animations;
+        // let animations = MUIClassListForAnimationType(MUIAnimationType.FadeIn);
+        // return animations;
     }
 
 }
@@ -390,8 +400,8 @@ export class UIAlertFadeOutAnimationController extends NSObject
 
     // TODO: Not iOS like transitions. For now we use css animations
     animations(transitionContext){
-        var animations = MUIClassListForAnimationType(MUIAnimationType.FadeOut);
-        return animations;
+        // let animations = MUIClassListForAnimationType(MUIAnimationType.FadeOut);
+        // return animations;
     }
     
 }

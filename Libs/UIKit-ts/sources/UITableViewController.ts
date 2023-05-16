@@ -1,7 +1,8 @@
-/// <reference path="UITableView.ts" />
+import { UITableView } from "./UITableView";
+import { UIViewController } from "./UIViewController";
 
 
-class UITableViewController extends UIViewController
+export class UITableViewController extends UIViewController
 {
     tableView:UITableView = null;
 

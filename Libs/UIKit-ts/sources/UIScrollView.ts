@@ -2,8 +2,15 @@
  * Created by godshadow on 01/09/16.
  */
 
+import { Timer } from "foundation";
+import { UIView } from "./UIView";
+import { CGRect} from "./CoreGraphics/CGRect";
+import { CGSize } from "./CoreGraphics/CGSize";
+import { CGPoint } from "./CoreGraphics/CGPoint";
 
-class UIScrollView extends UIView {
+
+export class UIScrollView extends UIView
+{
     pagingEnabled = false;
     delegate = null;
     scrolling = false;
@@ -27,26 +34,27 @@ class UIScrollView extends UIView {
     }
 
     initWithLayer(layer, owner, options?) {
-        super.initWithLayer(layer, owner, options);
+        // super.initWithLayer(layer, owner, options);
         this.setupLayer();
     }
 
     private setupLayer() {        
-        if (MIOCoreGetPlatform() == MIOCorePlatformType.Safari) this.layer.style["-webkit-overflow-scrolling"] = "touch"; 
+        // if (MIOCoreGetPlatform() == MIOCorePlatformType.Safari) this.layer.style["-webkit-overflow-scrolling"] = "touch"; 
 
-        let contentLayer = MUICoreLayerCreate();
-        MUICoreLayerAddStyle(contentLayer, "content-view");
-        // contentLayer.style.position = "absolute";
-        // contentLayer.style.width = "100%";
-        // contentLayer.style.height = "100%";
-        // contentLayer.style.overflow = "hidden";
+        // let contentLayer = MUICoreLayerCreate();
+        // MUICoreLayerAddStyle(contentLayer, "content-view");
 
-        this.contentView = new UIView();
-        this.contentView.initWithLayer(contentLayer, this);
-        super.addSubview(this.contentView);
+        // // contentLayer.style.position = "absolute";
+        // // contentLayer.style.width = "100%";
+        // // contentLayer.style.height = "100%";
+        // // contentLayer.style.overflow = "hidden";
+
+        // this.contentView = new UIView();
+        // this.contentView.initWithLayer(contentLayer, this);
+        // super.addSubview(this.contentView);
         
-        this.contentView.layer.addEventListener("wheel", this.scrollEventCallback.bind(this), true);
-        this.layer.addEventListener("scroll", this.scrollEventCallback.bind(this), true);
+        // this.contentView.layer.addEventListener("wheel", this.scrollEventCallback.bind(this), true);
+        // this.layer.addEventListener("scroll", this.scrollEventCallback.bind(this), true);
 
         // if (MIOCoreDeviceOSString() == 'ios'){
         //     this.contentView.layer.addEventListener("touchstart", function(e){
@@ -118,10 +126,10 @@ class UIScrollView extends UIView {
 
 
         if (value == true) {
-            this.contentView.layer.style.overflow = "scroll";
+            // this.contentView.layer.style.overflow = "scroll";
         }
         else {
-            this.contentView.layer.style.overflow = "hidden";
+            // this.contentView.layer.style.overflow = "hidden";
         }
     }
 
@@ -131,24 +139,26 @@ class UIScrollView extends UIView {
         this._showsVerticalScrollIndicator = value;
 
         if (value == false) {
-            this.layer.style.paddingRight = "20px";
+            // this.layer.style.paddingRight = "20px";
         }
         else {
-            this.layer.style.paddingRight = "";
+            // this.layer.style.paddingRight = "";
         }
     }
 
     set contentOffset(point: CGPoint) {
-        if (point.x > 0) this.layer.scrollLeft = point.x;
-        if (point.y > 0) this.layer.scrollTop = point.y;
+        // if (point.x > 0) this.layer.scrollLeft = point.x;
+        // if (point.y > 0) this.layer.scrollTop = point.y;
     }
 
     get contentOffset(): CGPoint {
-        let p = new CGPoint(this.layer.scrollLeft, this.layer.scrollTop);
-        return p;
+        // let p = new CGPoint(this.layer.scrollLeft, this.layer.scrollTop);
+        // return p;
+        return new CGPoint(0,0);
     }
 
-    get bounds():CGRect{
+    get bounds():CGRect
+    {
         let p = this.contentOffset;
         return CGRect.rectFromValues(p.x, p.y, this.getWidth(), this.getHeight());        
     }
@@ -176,19 +186,19 @@ class UIScrollView extends UIView {
         // if (true)
         //     this.layer.style.transition = "scrollTop 0.25s";
 
-        this.layer.scrollTop = 0;
+        // this.layer.scrollTop = 0;
     }
 
     scrollToBottom(animate?) {
         // if (true)
         //     this.layer.style.transition = "scrollTop 0.25s";
 
-        this.layer.scrollTop = this.layer.scrollHeight;
+        // this.layer.scrollTop = this.layer.scrollHeight;
     }
 
     scrollToPoint(x, y, animate?) {
-        this.layer.scrollTop = y;
-        this.lastOffsetY = y;
+        // this.layer.scrollTop = y;
+        // this.lastOffsetY = y;
     }
 
     scrollRectToVisible(rect, animate?) {

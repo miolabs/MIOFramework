@@ -1,72 +1,38 @@
-/**
- * Created by godshadow on 2/5/16.
- */
+import { CALayerEvent, UIControl } from "uikit";
+import { CAComboBoxLayer } from "./CustomLayers/CAComboBoxLayer";
+import { CAComboBoxItemLayer } from "./CustomLayers/CAComboBoxItemLayer";
 
-import { UIControl } from "uikit";
 
 export class MUIComboBox extends UIControl
-{
-    private _selectLayer = null;
+{    
+    static get layerClass() : any { return CAComboBoxLayer }
 
-    target = null;
-    action = null;
+    private _selectedItem = -1;
 
-    init(){
-        super.init();
-        // MUICoreLayerRemoveStyle(this.layer, "view");
-        //UICoreLayerAddStyle(this.layer, "combobox");
-        // this._setup_layers();
+    init(): void {
+        this.layer = new MUIComboBox.layerClass();
+
+        (this.layer as CAComboBoxLayer).setOnChangeBlock( this, this.on_change );
+    }    
+
+    addItem(title:string, value?:any)
+    {
+        let item = new CAComboBoxItemLayer( );
+        item.setValue( title, value );
+        (this.layer as CAComboBoxLayer).addItemLayer( item );
     }
 
-    // initWithLayer(layer, owner, options?){
-    //     super.initWithLayer(layer, owner, options);
-    //     this._selectLayer = MUILayerGetFirstElementWithTag(this.layer, "SELECT");
-    //     this._setup_layers();
-    // }
+    selectItem( value:any ){
+        (this.layer as CAComboBoxLayer).selectItem( value );
+    }
 
-    // private _setup_layers()
-    // {
-    //     if (this._selectLayer == null) {
-    //         this._selectLayer = document.createElement("select");
-    //         this.layer.appendChild(this._selectLayer);
-    //         MUICoreLayerAddStyle(this._selectLayer, "default");
-    //     }
-    // }
+    get selectedItem() : any {
+        return (this.layer as CAComboBoxLayer).selectedItem;
+    }
 
-    // setAllowMultipleSelection(value){
-    //     if (value == true)
-    //         this._selectLayer.setAttribute("multiple", "multiple");
-    //     else
-    //         this._selectLayer.removeAttribute("multiple");
-    // }
-
-    /*
-    layoutSubviews()
-    {
-        super.layoutSubviews();
-
-        var w = this.getWidth();
-        var h = this.getHeight();
-
-        this._selectLayer.style.marginLeft = "8px";
-        this._selectLayer.style.width = (w - 16) + "px";
-        this._selectLayer.style.marginTop = "4px";
-        this._selectLayer.style.height = (h - 8) + "px";
-
-        //var color = this.getBackgroundColor();
-        //this._selectLayer.style.backgroundColor = color;
-
-        // this._selectLayer.style.backgroundColor = "rgb(255, 255, 255)"
-    }*/
-
-    // addItem(text, value?)
-    // {
-    //     var option = document.createElement("option");
-    //     option.innerHTML = text;
-    //     if (value != null)
-    //         option.value = value;
-    //     this._selectLayer.appendChild(option);
-    // }
+    private on_change() {
+        this.sendActions( UIControl.Event.valueChanged );
+    }
 
     // addItems(items)
     // {
@@ -77,8 +43,8 @@ export class MUIComboBox extends UIControl
     //     }
     // }
 
-    // removeAllItems()
-    // {
+    removeAllItems()
+    {
     //     var node = this._selectLayer;
 
     //     while (this._selectLayer.hasChildNodes()) {              // selected elem has children
@@ -91,7 +57,7 @@ export class MUIComboBox extends UIControl
     //             node.removeChild(node.lastChild);      // remove last node
     //         }
     //     }
-    // }
+    }
 
     // getItemAtIndex(index)
     // {
@@ -102,10 +68,6 @@ export class MUIComboBox extends UIControl
     //     return option.innerHTML;
     // }
 
-    // getSelectedItem()
-    // {
-    //     return this._selectLayer.value;
-    // }
 
     // getSelectedItemText()
     // {
@@ -117,20 +79,12 @@ export class MUIComboBox extends UIControl
     //     }
     // }
 
-    // selectItem(item){
-    //     this._selectLayer.value = item;
-    // }
 
-    // setOnChangeAction(target, action)
-    // {
-    //     this.target = target;
-    //     this.action = action;
-    //     var instance = this;
-
-    //     this._selectLayer.onchange = function()
-    //     {
-    //         if (instance.enabled)
-    //             instance.action.call(target, instance, instance._selectLayer.value);
-    //     }
-    // }
+    protected on_event( event:any ) {
+        super.on_event( event );
+        
+        if (event == CALayerEvent.change) {
+            this.sendActions( UIControl.Event.valueChanged );
+        }
+    }
 }

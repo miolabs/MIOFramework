@@ -2,31 +2,33 @@
  * Created by godshadow on 11/3/16.
  */
 
-import { Bundle, NSCoder, NSLocalizeString, NSObject } from "foundation";
+import { Bundle, NSCoder, NSObject } from "foundation";
 import { MIOCoreIsPhone } from "mio-core";
-import { UICoreLoadNibName } from "./core/UICoreNibParser";
-import { CALayer } from "./CoreAnimation/CALayer";
+import { UICoreLoadNibName, UICoreNibCoder } from "./core/UICoreNibParser";
 import { CGSize } from "./CoreGraphics/CGSize";
 import { UINavigationController } from "./UINavigationController";
 import { UINavigationItem } from "./UINavigationItem";
+import { UIPopoverPresentationController } from "./UIPopoverPresentationController";
 import { UIModalPresentationStyle, UIModalTransitionStyle, UIPresentationController } from "./UIPresentationController";
+import { UISplitViewController } from "./UISplitViewController";
 import { UIStoryboard } from "./UIStoryboard";
 import { UIStoryboardSegue } from "./UIStoryboardSegue";
+import { UITabBarController } from "./UITabBarController";
 import { UIView } from "./UIView";
-import { UIWindow } from "./UIWindow";
+import { UIWindow, _UIModalWindow } from "./UIWindow";
+import { _UICoreHideViewController, _UIShowViewController } from "./core/UICore";
 
 
 export class UIViewController extends NSObject
 {
     view: UIView = null;
+    private _nibName:string|null;
 
-    private _htmlResourcePath = null;
+    // private _onViewLoadedTarget = null;
+    private _onViewLoadCompletion = null;
 
-    private _onViewLoadedTarget = null;
-    private _onViewLoadedAction = null;
-
-    private _onLoadLayerTarget = null;
-    private _onLoadLayerAction = null;
+    // private _onLoadLayerTarget = null;
+    // private _onLoadLayerAction = null;
 
     private _viewIsLoaded = false;
     private _layerIsReady = false;
@@ -38,8 +40,8 @@ export class UIViewController extends NSObject
     presentedViewController: UIView = null;
     navigationController: UINavigationController = null;
     navigationItem: UINavigationItem = null;
-    // splitViewController: UISplitViewController = null;
-    tabBarController/*TODO: UITabBarController*/ = null;
+    splitViewController: UISplitViewController = null;
+    tabBarController: UITabBarController = null;
 
     modalPresentationStyle = MIOCoreIsPhone() == true ? UIModalPresentationStyle.fullScreen : UIModalPresentationStyle.pageSheet;
     modalTransitionStyle = UIModalTransitionStyle.coverVertical;
@@ -48,38 +50,30 @@ export class UIViewController extends NSObject
     protected _contentSize = new CGSize(320, 200);
     protected _preferredContentSize = null;
 
-    // constructor() {
-    //     super();
-    //     // this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(this);
-    // }
-
-    // constructor();
-    // constructor(coder:Coder);
-    // constructor(nibName:string, bundle?:Bundle);
-    // constructor(...args:any[]) {
-    //     super();
-
-    //     if (args.count == 0) {
-    //         this.init();            
-    //     }
-    //     else if (args.count == 1 && args[0] instanceof Coder) {
-    //         this.initWithCoder( args[0] );
-    //     }
-    //     else if (args.count == 1 && typeof (args[0]) === "string" ) {
-    //         this.initWithNibName( args[0]);
-    //     }
-    //     else {
-    //         this.initWithNibName( args[0], args[1]);
-    //     }
-    // }
-
     init() {
         super.init();
         this.loadView();
     }
 
     initWithCoder(coder: NSCoder) {
+        if (coder instanceof UICoreNibCoder) {
+            if ( this.view == null ) {
+                this.view = coder.decodeContentView();
+            } else {
+                let cv = coder.decodeContentView();
+                this.view.addSubview( cv );
+            }
+            this._assign_outlets( coder );
+        }
+        this._didLoadView();
+    }
 
+    private _assign_outlets( coder: UICoreNibCoder ){
+        for (let key in this._outlets) {
+            let obj = coder.outlets[ key ];
+            let prop = this._outlets[ key ];
+            this[ prop ] = obj;
+        }
     }
 
     // initWithLayer(layer, owner, options?) {
@@ -98,7 +92,7 @@ export class UIViewController extends NSObject
         if (nibName == null) throw new Error("UIViewController:initWithNibName can't be null");
         super.init();
 
-        this._htmlResourcePath = nibName + ".html";
+        this._nibName = nibName;
         this.loadView();
     }
 
@@ -131,7 +125,7 @@ export class UIViewController extends NSObject
             return;
         }        
 
-        if (this._htmlResourcePath == null) {
+        if (this._nibName == null) {
             this.view = new UIView();
             this.view.init();
             // MUICoreLayerAddStyle(this.view.layer, "view-controller");
@@ -141,11 +135,12 @@ export class UIViewController extends NSObject
         }
 
         this.view = new UIView();
-        this.view.init();
+        this.view.init();                
 
-        UICoreLoadNibName(this._htmlResourcePath, this, (view:UIView, classname:string) => {
-            this._loadViewFromNib(view, classname);
-        });
+        UICoreLoadNibName(this._nibName, this );
+        // UICoreLoadNibName(this._nibName, this, (view:UIView, classname:string) => {
+        //     this._loadViewFromNib(view, classname);
+        // });
 
         // let mainBundle = NSBundle.mainBundle();
         // mainBundle.loadNibNamed(this._htmlResourcePath, this, null);
@@ -168,20 +163,24 @@ export class UIViewController extends NSObject
         //     this._didLoadView();
         // });        
     }
-
+/*
     protected _loadViewFromNib(view:UIView, classname:string){
         // let layerID = layer.getAttribute("id");
         // if (layerID != null) this._outlets[layerID] = this;
 
         // this._contentView = new UIView();
         // this._contentView.initWithLayer(layer, this, {"Object": this});        
+        // this.view.addSubview( view );
+
+        // TODO: merge contents from dymmy view to loaded view
+        // this.view = view;
         this.view.addSubview( view );
         
         // this._segues = this._contentView._segues;        
         this._checkSegues();
         this._didLoadView();
     }
-
+*/
     // _didLoadNibWithLayer(layerData) {
     //     let domParser = new DOMParser();
     //     let items = domParser.parseFromString(layerData, "text/html");
@@ -199,17 +198,17 @@ export class UIViewController extends NSObject
         this._layerIsReady = true;
         // if (MIOCoreIsPhone() == true) MUICoreLayerAddStyle(this.view.layer, "phone");
 
-        if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null) {
-            this._onLoadLayerAction.call(this._onLoadLayerTarget);
-            this._onLoadLayerTarget = null;
-            this._onLoadLayerAction = null;
-        }
+        // if (this._onLoadLayerTarget != null && this._onViewLoadedAction != null) {
+        //     this._onLoadLayerAction.call( this._onLoadLayerTarget );
+        //     this._onLoadLayerTarget = null;
+        //     this._onLoadLayerAction = null;
+        // }
 
-        if (this._onViewLoadedAction != null && this._onViewLoadedTarget != null) {
+        if ( this._onViewLoadCompletion != null ) {
             this.viewDidLoad();
             this._loadChildControllers();
         }
-        else if (this._htmlResourcePath == null){
+        else if ( this._nibName == null ) {
             this.viewDidLoad();
             this._loadChildControllers();
         }
@@ -219,45 +218,44 @@ export class UIViewController extends NSObject
         let count = this._childViewControllers.length;
 
         if (count > 0)
-            this._loadChildViewController(0, count);
+            this._loadChildViewController( 0, count );
         else
-            this._setViewLoaded(true);
+            this._setViewLoaded( true );
     }
 
-    protected _loadChildViewController(index, max) {
+    protected _loadChildViewController( index:number, max:number ) {
         if (index < max) {
             let vc = this._childViewControllers[index];
-            vc.onLoadView(this, function (this: UIViewController) {
-
+            vc.onLoadView( () => {
                 let newIndex = index + 1;
                 this._loadChildViewController(newIndex, max);
-            });
+            } );
         }
         else {
             this._setViewLoaded(true);
         }
     }
 
-    protected _setViewLoaded(value) {
+    protected _setViewLoaded( value:boolean ) {
         this.willChangeValue("viewLoaded");
         this._viewIsLoaded = value;
         this.didChangeValue("viewLoaded");
 
-        if (value == true && this._onViewLoadedAction != null) {
-            this._onViewLoadedAction.call(this._onViewLoadedTarget);
+        if (value == true && this._onViewLoadCompletion != null) {
+            this._onViewLoadCompletion();
         }
-
-        this._onViewLoadedTarget = null;
-        this._onViewLoadedAction = null;
+        
+        this._onViewLoadCompletion = null;
         this.view.setNeedsDisplay();
     }
 
-    onLoadView(target, action) {
-        this._onViewLoadedTarget = target;
-        this._onViewLoadedAction = action;
+    onLoadView( completion:any ) {
+        // this._onViewLoadedTarget = target;
+        this._onViewLoadCompletion = completion;
 
         if (this._viewIsLoaded == true) {
-            action.call(target);
+            // action.call(target);
+            completion();
             //this.view.setNeedsDisplay();
         }
         else if (this._layerIsReady == true) {
@@ -267,15 +265,14 @@ export class UIViewController extends NSObject
         }
     }
 
-    onLoadLayer(target, action) {
-        if (this._layerIsReady == true) {
-            action.call(target);
-        }
-        else {
-            this._onLoadLayerTarget = action;
-            this._onLoadLayerAction = target;
-        }
-    }
+    // onLoadLayer(target, action) {
+    //     if (this._layerIsReady == true) {
+    //         action.call(target);
+    //     }
+    //     else {
+    //         this._onLoadLayerAction = target;
+    //     }
+    // }
 
     get viewLoaded() {
         return this._viewIsLoaded;
@@ -287,16 +284,13 @@ export class UIViewController extends NSObject
 
     addChildViewController(vc: UIViewController) {
         vc.parentViewController = this;
-        this._childViewControllers.push(vc);
+        this._childViewControllers.addObject(vc);
         //vc.willMoveToParentViewController(this);
     }
 
     removeChildViewController(vc: UIViewController) {
-        var index = this._childViewControllers.indexOf(vc);
-        if (index != -1) {
-            this._childViewControllers.splice(index, 1);
-            vc.parentViewController = null;
-        }
+        this._childViewControllers.removeObject( vc );
+        vc.parentViewController = null;
     }
 
     // removeFromParentViewController()
@@ -320,25 +314,25 @@ export class UIViewController extends NSObject
         return this._presentationController;
     }
 
-    // private _popoverPresentationController: UIPopoverPresentationController = null;
-    // get popoverPresentationController(): UIPopoverPresentationController {
-    //     if (this._popoverPresentationController == null) {
-    //         this._popoverPresentationController = new UIPopoverPresentationController();
-    //         this._popoverPresentationController.init();
-    //         this._popoverPresentationController.presentedViewController = this;
-    //         this._presentationController = this._popoverPresentationController;
-    //     }
+    private _popoverPresentationController: UIPopoverPresentationController = null;
+    get popoverPresentationController(): UIPopoverPresentationController {
+        if (this._popoverPresentationController == null) {
+            this._popoverPresentationController = new UIPopoverPresentationController();
+            this._popoverPresentationController.init();
+            this._popoverPresentationController.presentedViewController = this;
+            this._presentationController = this._popoverPresentationController;
+        }
 
-    //     return this._popoverPresentationController;
-    // }
+        return this._popoverPresentationController;
+    }
 
-    showViewController(vc, animated) {
-        vc.onLoadView(this, function (this: UIViewController) {
+    showViewController( vc:UIViewController, animated:boolean ) {
+        vc.onLoadView( () => {
 
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);
 
-            // _MUIShowViewController(this, vc, this, animated);
+            _UIShowViewController(this, vc, this, animated);
         });
     }
 
@@ -372,7 +366,7 @@ export class UIViewController extends NSObject
         //     && vc.modalPresentationStyle != UIModalPresentationStyle.Custom)
         //     vc.modalPresentationStyle = UIModalPresentationStyle.PageSheet;
 
-        vc.onLoadView(this, function (this: UIViewController) {
+        vc.onLoadView( () => {
 
             if (vc.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
                 let wv = new UIView();
@@ -389,29 +383,29 @@ export class UIViewController extends NSObject
                 // It's a window instead of a view
                 let w: UIWindow = vc.presentationController.window;
                 if (w == null) {
-                    w = new UIWindow();
+                    w = new _UIModalWindow();
                     w.init();
-                    w.layer.style.background = "";
-                    w.layer.style.width = "100%";
-                    w.layer.style.height = "100%";
+                    // w.layer.style.background = "";
+                    // w.layer.style.width = "100%";
+                    // w.layer.style.height = "100%";
                     w.rootViewController = vc;
                     vc.presentationController.presentedView = vc.view;
-                    vc.view.layer.style.width = "100%";
-                    vc.view.layer.style.height = "100%";
+                    // vc.view.layer.style.width = "100%";
+                    // vc.view.layer.style.height = "100%";
                     w.addSubview(vc.presentationController.presentedView);
                     vc.presentationController.window = w;
                 }
 				w.setHidden(false);
 				// if (vc instanceof UIAlertController) MUICoreLayerAddStyle(w.layer, "alert");
 
-                // _MUIShowViewController(this, vc, null, animated, this, function () {
-                //     w.makeKey();
-                // });
+                _UIShowViewController(this, vc, null, animated, () => {
+                    w.makeKey();
+                } );
             }
         });
     }
 
-    dismissViewController(animate) {
+    dismissViewController( animate:boolean ) {
         let pc = this._presentationController;
         let vc = this as UIViewController;
         while (pc == null) {
@@ -422,59 +416,60 @@ export class UIViewController extends NSObject
         let fromVC = pc.presentedViewController;
         let fromView = pc.presentedView;
 
-        // _MUIHideViewController(fromVC, toVC, null, this, function () {
+        _UICoreHideViewController(fromVC, toVC, null, () => {
 
-        //     if (fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
-        //         toVC.removeChildViewController(fromVC);
-        //         let pc1 = fromVC.presentationController;
-        //         let view = pc1.presentedView;
-        //         view.removeFromSuperview();
-        //     }
-        //     else {
-        //         // It's a window instead of a view
-        //         let pc1 = fromVC.presentationController;
-        //         let w = pc1.window as UIWindow;
-        //         w.setHidden(true);
-        //     }
-        // });
+            if (fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
+                toVC.removeChildViewController(fromVC);
+                let pc1 = fromVC.presentationController;
+                let view = pc1.presentedView;
+                view.removeFromSuperview();
+            }
+            else {
+                // It's a window instead of a view
+                let pc1 = fromVC.presentationController;
+                let w = pc1.window as UIWindow;
+                // w.setHidden(true);
+                w.removeFromSuperview();
+            }
+        } );
     }
 
-    transitionFromViewControllerToViewController(fromVC, toVC, duration, options, animations?, completion?) {
+    transitionFromViewControllerToViewController(fromVC:UIViewController, toVC:UIViewController, duration:number, options:any, animations?:any, completion?:any) {
         //TODO
     }
 
     viewDidLoad() { }
 
-    viewWillAppear(animated?) {
-        for (var index = 0; index < this._childViewControllers.length; index++) {
-            var vc = this._childViewControllers[index];
-            vc.viewWillAppear(animated);
+    viewWillAppear( animated:boolean ) {
+        for (let index = 0; index < this._childViewControllers.length; index++) {
+            let vc = this._childViewControllers[index];
+            vc.viewWillAppear( animated );
         }
 
         this.view.setViewIsVisible(true);
     }
 
-    viewDidAppear(animated?) {
+    viewDidAppear( animated:boolean ) {
         //this.view.setNeedsDisplay();
 
-        for (var index = 0; index < this._childViewControllers.length; index++) {
-            var vc = this._childViewControllers[index];
-            vc.viewDidAppear(animated);
+        for (let index = 0; index < this._childViewControllers.length; index++) {
+            let vc = this._childViewControllers[index];
+            vc.viewDidAppear( animated );
         }
     }
 
-    viewWillDisappear(animated?) {
-        for (var index = 0; index < this._childViewControllers.length; index++) {
-            var vc = this._childViewControllers[index];
-            vc.viewWillDisappear(animated);
+    viewWillDisappear( animated:boolean ) {
+        for (let index = 0; index < this._childViewControllers.length; index++) {
+            let vc = this._childViewControllers[index];
+            vc.viewWillDisappear( animated );
         }
 
         this.view.setViewIsVisible(false);
     }
 
-    viewDidDisappear(animated?) {
-        for (var index = 0; index < this._childViewControllers.length; index++) {
-            var vc = this._childViewControllers[index];
+    viewDidDisappear( animated:boolean ) {
+        for (let index = 0; index < this._childViewControllers.length; index++) {
+            let vc = this._childViewControllers[index];
             vc.viewDidDisappear(animated);
         }
     }

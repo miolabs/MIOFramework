@@ -1,38 +1,40 @@
-/// <reference path="UIView.ts" />
+import { IndexPath, NSClassFromString } from "foundation";
+import { UIGestureRecognizer, UIGestureRecognizerState } from "./UIGestureRecognizer";
+import { UITableViewCell } from "./UITableViewCell";
+import { UIView } from "./UIView";
 
-
-class UITableView extends UIView
+export class UITableView extends UIView
 {
     dataSource = null;
     delegate = null;
 
     allowsMultipleSelection = false;
 
-    initWithLayer(layer, owner, options?){
-        super.initWithLayer(layer, owner, options);
-        layer.style.width = "100%";
-        layer.style.overflowY = "scroll";
+    // initWithLayer(layer, owner, options?){
+    //     super.initWithLayer(layer, owner, options);
+    //     layer.style.width = "100%";
+    //     layer.style.overflowY = "scroll";
 
-        // Check if we have prototypes
-        if (this.layer.childNodes.length > 0) {
-            for (let index = 0; index < this.layer.childNodes.length; index++) {
-                let subLayer = this.layer.childNodes[index];
+    //     // Check if we have prototypes
+    //     if (this.layer.childNodes.length > 0) {
+    //         for (let index = 0; index < this.layer.childNodes.length; index++) {
+    //             let subLayer = this.layer.childNodes[index];
 
-                if (subLayer.tagName != "DIV")
-                    continue;
+    //             if (subLayer.tagName != "DIV")
+    //                 continue;
 
-                if (subLayer.getAttribute("data-cell-identifier") != null) {
-                    this.addCellPrototypeWithLayer(subLayer);                    
-                }
-                else if (subLayer.getAttribute("data-tableview-header") != null) {
-                    this.addHeaderWithLayer(subLayer);
-                }
-                else if (subLayer.getAttribute("data-tableview-footer") != null) {
-                    this.addFooterWithLayer(subLayer);
-                }
-            }
-        }        
-    }
+    //             if (subLayer.getAttribute("data-cell-identifier") != null) {
+    //                 this.addCellPrototypeWithLayer(subLayer);                    
+    //             }
+    //             else if (subLayer.getAttribute("data-tableview-header") != null) {
+    //                 this.addHeaderWithLayer(subLayer);
+    //             }
+    //             else if (subLayer.getAttribute("data-tableview-footer") != null) {
+    //                 this.addFooterWithLayer(subLayer);
+    //             }
+    //         }
+    //     }        
+    // }
 
     private headerLayer = null;
     private addHeaderWithLayer(layer){    
@@ -77,7 +79,7 @@ class UITableView extends UIView
 
         let cell: UITableViewCell = null;        
         let className = item["class"];
-        cell = NSClassFromString(className);        
+        cell = NSClassFromString(className);
         //cell.reuseIdentifier = identifier;
 
         let layer = item["layer"];
@@ -87,7 +89,7 @@ class UITableView extends UIView
             let layerID = newLayer.getAttribute("id");
             if (layerID != null) cell._outlets[layerID] = cell;    
             cell.initWithLayer(newLayer, cell);         
-            cell.awakeFromHTML();            
+            cell.awakeFromNib();            
         }
 
         // let tapGesture = new MUITapGestureRecognizer();
@@ -100,7 +102,8 @@ class UITableView extends UIView
         //cell._onAccessoryClickFn = this.cellOnAccessoryClickFn;
         // cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
 
-        return _injectIntoOptional(cell);
+        // return _injectIntoOptional(cell);
+        return cell;
     }
 
 

@@ -2,16 +2,16 @@
  * Created by godshadow on 30/3/16.
  */
 
+import { Calendar } from "./Calendar";
 import { NSObject } from "./NSObject";
 
 
 let _NS_currentLocale:Locale;
 
-
 export class Locale extends NSObject
 {
-    languageIdentifier = "es";
-    countryIdentifier = "ES";
+    language = "es";
+    region = "ES";
 
     public static currentLocale(){
         if (_NS_currentLocale == null) {
@@ -32,11 +32,11 @@ export class Locale extends NSObject
 
         let array = identifer.split("_");
         if (array.length == 1) {
-            this.languageIdentifier = array[0];
+            this.language = array[0];
         }
         else if (array.length == 2) {
-            this.languageIdentifier = array[0];
-            this.countryIdentifier = array[1];
+            this.language = array[0];
+            this.region = array[1];
         }
     }
 
@@ -44,7 +44,7 @@ export class Locale extends NSObject
 
         let ds = "";
         
-        switch (this.countryIdentifier) {
+        switch (this.region) {
 
             case "ES":
                 ds =  ",";
@@ -70,7 +70,7 @@ export class Locale extends NSObject
 
         let cs = "";
 
-        switch(this.countryIdentifier) {
+        switch(this.region) {
 
             case "ES":
             case "DE":
@@ -95,7 +95,7 @@ export class Locale extends NSObject
     get currencyCode(){
         let cc = "";
 
-        switch(this.countryIdentifier){
+        switch(this.region){
             case "ES":                
             case "DE":
             case "FR":
@@ -123,7 +123,7 @@ export class Locale extends NSObject
 
         let gs = "";
 
-        switch(this.countryIdentifier){
+        switch(this.region){
 
             case "ES":
                 gs = ".";
@@ -144,7 +144,19 @@ export class Locale extends NSObject
 
         return gs;
     }
+
+    firstWeekday():number {
+        return this.calendar.firstWeekday();
+    }
+
+    private _calendar:Calendar = null; 
+    get calendar() : Calendar {
+        if (this._calendar != null) return this._calendar;
+
+        this._calendar = new Calendar();
+        this._calendar.init();
+
+        return this._calendar;
+    }
+
 }
-
-
-

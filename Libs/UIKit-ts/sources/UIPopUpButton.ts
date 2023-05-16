@@ -2,14 +2,18 @@
  * Created by godshadow on 12/3/16.
  */
 
-class UIPopUpButton extends UIButton
+import { UIButton } from "./UIButton";
+import { UIControl } from "./UIControl";
+import { UIMenu, UIMenuItem } from "./UIMenu";
+
+export class UIPopUpButton extends UIButton
 {
     private _menu = null;
     private _isVisible = false;
 
     initWithLayer(layer, owner, options?)
     {
-        super.initWithLayer(layer, owner, options);
+        // super.initWithLayer(layer, owner, options);
 
         // Check if we have a menu
         /*if (this.layer.childNodes.length > 0)
@@ -72,7 +76,7 @@ class UIPopUpButton extends UIButton
             this._menu.init();
         }
 
-        this._menu.addMenuItem(UIMenuItem.itemWithTitle(title));
+        this._menu.addMenuItem( UIMenuItem.itemWithTitle(title) );
     }
 }
 

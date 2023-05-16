@@ -1,5 +1,4 @@
-import { Bundle, NSObject } from "foundation";
-import { NSClassFromString } from "mio-core";
+import { Bundle, NSObject, NSClassFromString } from "foundation";
 import { UIViewController } from "./UIViewController";
 
 export class UIStoryboard extends NSObject

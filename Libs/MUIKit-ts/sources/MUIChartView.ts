@@ -1,3 +1,5 @@
+/*
+
 import { Chart } from 'chart.js'
 import { UIView } from "./UIView";
 
@@ -141,3 +143,5 @@ export class UIChartView extends UIView {
     }
 
 }
+
+*/

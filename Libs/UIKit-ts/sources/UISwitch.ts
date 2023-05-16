@@ -36,12 +36,13 @@ export class UISwitch extends UIControl
     private _on = false;
     get isOn() {return this._on;}
     set isOn(value){this.setOn(value);}
-    setOn(value){
+
+    setOn( value:boolean ) {
         if (value == this._on) return;
         this._inputLayer.checked = value;
         this._on = value;
 
-        this._performActionsForEvents(UIControl.Event.valueChanged);
+        this.sendActions( UIControl.Event.valueChanged );
     }
 
     private _toggleValue(){

@@ -1,3 +1,4 @@
+/*
 import { UIView , UITableViewCell, UIGestureRecognizer, UITapGestureRecognizer, UIGestureRecognizerState} from "../MIOUI";
 import { MIOUUID, MIOIndexPath } from "../MIOFoundation";
 import { MIOClassFromString } from "../MIOCore/platform";
@@ -236,3 +237,4 @@ class MWSTableViewRow extends UIView
     section = null;
     cell = null;
 }
+*/

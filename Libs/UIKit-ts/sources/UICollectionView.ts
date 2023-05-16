@@ -2,65 +2,79 @@
  * Created by godshadow on 09/11/2016.
  */
 
-class UICollectionViewCell extends UIView
+import { IndexPath, NSObject, NSClassFromString, NSCoder } from "foundation";
+import { UICollectionViewFlowLayout } from "./UICollectionViewLayout";
+import { UIView } from "./UIView";
+import { CALayer } from "./CoreAnimation/CALayer";
+import { CACollectionLayer } from "./CoreAnimation/CACollectionLayer";
+import { MIOCoreClassByName } from "mio-core";
+import { UITapGestureRecognizer } from "./UITapGestureRecognizer";
+import { UIGestureRecognizer, UIGestureRecognizerState } from "./UIGestureRecognizer";
+
+export interface UICollectionViewDatasource
 {
-    _target = null;
-    _onClickFn = null;
-    _index = null;
-    _section = null;
+    numberOfSections ( collectionView:UICollectionView ) : number ;
+    numberOfItemsInSection ( collectionView: UICollectionView, group: number ) : number ;
+    viewForSupplementaryViewAtIndex ( collectionView: UICollectionView, headerName: "header" | "footer", group: number ) : UIView ;
+    cellForItemAtIndexPath ( collectionView: UICollectionView, indexPath: IndexPath ) : UICollectionViewCell ;
+}
 
-    selected = false;
+export interface UICollectionViewDelegate
+{
+    didSelectCellAtIndexPath? ( collectionView: UICollectionView, indexPath: IndexPath ) : void ;
+    canSelectCellAtIndexPath? (collectionView: UICollectionView, indexPath: IndexPath) : boolean ;    
+    
+    willDisplayCellAtIndexPath? ( collectionView: UICollectionView, cell:UICollectionViewCell, indexPath: IndexPath ) : void ;
+    didEndDisplayingCellAtIndexPath? ( collectionView: UICollectionView, cell:UICollectionViewCell, indexPath: IndexPath ) : void ;    
+}
 
-    init(){
-        super.init();
-        this.setupLayers();
-    }
+export class UICollectionViewCell extends UIView
+{
+    _indexPath:IndexPath;
 
-    initWithLayer(layer, owner, options?){
-        super.initWithLayer(layer, owner, options);
-        layer.style.width = "100%";
-        this.setupLayers();
-    }
-
-    private setupLayers(){
-        this.layer.style.position = "absolute";
-        let instance = this;
-
-        this.layer.addEventListener("click", function(e) {
-            e.stopPropagation();
-            if (instance._onClickFn != null)
-                instance._onClickFn.call(instance._target, instance);
-        });
-    }
-
-    setSelected(value) {
-        this.willChangeValue("selected");
-        this.selected = value;
-        this.didChangeValue("selected");
+    set selected (value: boolean) {
+        if ( value == true) {
+            this.layer.addStyle( "selected" );
+        }
+        else {
+            this.layer.removeStyle( "selected" );
+        }
     }
 }
 
-class UICollectionViewSection extends NSObject
+export class UICollectionViewSection extends NSObject
 {
     header = null;
     footer = null;
     cells = [];
 }
 
-class UICollectionView extends UIView
+export class UICollectionView extends UIView
 {
-    dataSource = null;
-    delegate = null;
+    static get layerClass() : any { return CACollectionLayer }
+
+    dataSource:UICollectionViewDatasource = null;
+    delegate:UICollectionViewDelegate = null;
 
     private _collectionViewLayout:UICollectionViewFlowLayout = null;
 
     private _cellPrototypes = {};
-    private _supplementaryViews = {};
+    // private _supplementaryViews = {};
 
     private _sections = [];
 
-    selectedCellIndex = -1;
-    selectedCellSection = -1;
+    selectedIndexPath:IndexPath = null;    
+
+    contentView:UIView = null;
+
+    initWithCoder( coder: NSCoder ): void {
+        super.initWithCoder( coder );
+
+        this.contentView = new UIView();
+        this.contentView.init();
+
+        this.addSubview( this.contentView );
+    }
 
     public get collectionViewLayout():UICollectionViewFlowLayout{
         if (this._collectionViewLayout == null) {
@@ -71,107 +85,52 @@ class UICollectionView extends UIView
         return this._collectionViewLayout;
     }
 
-    public set collectionViewLayout(layout:UICollectionViewFlowLayout){
+    public set collectionViewLayout( layout:UICollectionViewFlowLayout ) {
         //TODO: Set animations for changing layout
         layout.collectionView = this;
         this._collectionViewLayout = layout;        
         layout.invalidateLayout();
-    }
-
-    initWithLayer(layer, owner, options){
-        super.initWithLayer(layer, owner, options);
-        layer.style.width = "100%";
-        layer.style.overflowX = "scroll";
-
-        // Check if we have prototypes
-        if (layer.childNodes.length > 0){
-            for(var index = 0; index < layer.childNodes.length; index++){
-                var subLayer = layer.childNodes[index];
-
-                if (subLayer.tagName != "DIV")
-                    continue;
-
-                if (subLayer.getAttribute("data-cell-identifier") != null) {
-                    this._addCellPrototypeWithLayer(subLayer);
-                    subLayer.style.display = "none";
-                }
-                else if (subLayer.getAttribute("data-supplementary-view-identifier") != null){
-                    this._addSupplementaryViewPrototypeWithLayer(subLayer);
-                    subLayer.style.display = "none";
-                }
-                else if (subLayer.getAttribute("data-collection-view-layout") != null){
-                    let classname = subLayer.getAttribute("data-class");
-                    this._collectionViewLayout = NSClassFromString(classname);
-                    this._collectionViewLayout.initWithLayer(subLayer, owner);
-                }
-            }            
-        }
-    }
-
-    private _addCellPrototypeWithLayer(subLayer){
-        let cellIdentifier = subLayer.getAttribute("data-cell-identifier");
-        let cellClassname = subLayer.getAttribute("data-class");
-        if (cellClassname == null) cellClassname = "MIOCollectionViewCell";
-
+    }    
+    
+    registerClassForCellWithReuseIdentifier(classname:string, identifier:string){        
         let item = {};
-        item["class"] = cellClassname;
-        item["layer"] = subLayer;
-        let size = new CGSize(subLayer.clientWidth, subLayer.clientHeight);
-        if (size != null) item["size"] = size;
-        let bg = window.getComputedStyle(subLayer ,null).getPropertyValue('background-color');
-        if (bg != null) item["bg"] = bg;
-
-        this._cellPrototypes[cellIdentifier] = item;
-    }
-
-    private _addSupplementaryViewPrototypeWithLayer(subLayer){
-        var viewIdentifier = subLayer.getAttribute("data-supplementary-view-identifier");
-        var viewClassname = subLayer.getAttribute("data-class");
-        if (viewClassname == null) viewClassname = "MIOView";
-
-        var item = {};
-        item["class"] = viewClassname;
-        item["layer"] = subLayer;
-        var size = new CGSize(subLayer.clientWidth, subLayer.clientHeight);
-        if (size != null) item["size"] = size;
-        var bg = window.getComputedStyle(subLayer ,null).getPropertyValue('background-color');
-        if (bg != null) item["bg"] = bg;
-
-        this._supplementaryViews[viewIdentifier] = item;
-    }
-
-    registerClassForCellWithReuseIdentifier(cellClassname, identifier){        
-        let item = {};
-        item["class"] = cellClassname;
+        item["class"] = classname;
         //item["layer"] = null;
         this._cellPrototypes[identifier] = item;   
     }
 
-    registerClassForSupplementaryViewWithReuseIdentifier(viewClass,identifier){
+    registerClassForSupplementaryViewWithReuseIdentifier( viewClass:string, identifier:string ){
         //TODO:
     }
 
-    dequeueReusableCellWithReuseIdentifierFor(identifier:string, indexPath:IndexPath){
-        let item = this._cellPrototypes[identifier];
+    dequeueReusableCellWithReuseIdentifierFor( identifier:string, indexPath:IndexPath ){
+        
+        let view = (this.layer as CACollectionLayer).newCellViewByIdentifier( identifier );
 
-        //instance creation here
-        let className = item["class"];
-        let cell = NSClassFromString(className);
-        cell.constructor.apply(cell);
+        let tapGesture = new UITapGestureRecognizer();
+        tapGesture.initWithTarget(this, this._cellDidTap);
+        view.addGestureRecognizer(tapGesture);
+
+        return view;
+
+        // //instance creation here
+        // let className = item["class"];
+        // let cell = NSClassFromString(className);
+        // cell.constructor.apply(cell);
 
         //cell.init();
-        let layer = item["layer"];
-        if (layer != null) {
-            let newLayer = layer.cloneNode(true);
-            newLayer.style.display = "";
-            let layerID = newLayer.getAttribute("id");
-            if (layerID != null) cell._outlets[layerID] = cell;    
-            cell.initWithLayer(newLayer, cell);
-            cell.awakeFromHTML();
-        }
-        else {
-            cell.init();
-        }
+        // let layer = item["layer"];
+        // if (layer != null) {
+        //     let newLayer = layer.cloneNode(true);
+        //     newLayer.style.display = "";
+        //     let layerID = newLayer.getAttribute("id");
+        //     if (layerID != null) cell._outlets[layerID] = cell;    
+        //     cell.initWithLayer(newLayer, cell);
+        //     cell.awakeFromHTML();
+        // }
+        // else {
+        //     cell.init();
+        // }
 
         // else {
         //     let cells = item["cells"];
@@ -182,51 +141,49 @@ class UICollectionView extends UIView
         //     cells.push(cell);
         // }
 
-        return cell;
+        // return v;
     }
 
-    dequeueReusableSupplementaryViewWithReuseIdentifier(identifier){
-        var item = this._supplementaryViews[identifier];
-
-        //instance creation here
-        var className = item["class"];
-        var view = NSClassFromString(className);
-        view.constructor.apply(view);
-
-        //view.init();
-        var layer = item["layer"];
-        if (layer != null) {
-            var newLayer = layer.cloneNode(true);
-            newLayer.style.display = "";
-            // var size = item["size"];
-            // if (size != null) {
-            //     view.setWidth(size.width);
-            //     view.layer.style.width = "100%";
-            //     view.setHeight(size.height);
-            // }
-            // var bg = item["bg"];
-            // if (bg != null) {
-            //     view.layer.style.background = bg;
-            // }
-            view.initWithLayer(newLayer);
-            //view._addLayerToDOM();
-            view.awakeFromHTML();
-        }
-        else {
-            var views = item["views"];
-            if (views == null) {
-                views = [];
-                item["views"] = views;
-            }
-            views.push(view);
-        }
-
+    dequeueReusableSupplementaryViewWithReuseIdentifier( identifier:string ) : UIView {
+        // let item = this._supplementaryViews[identifier];
+        let view = (this.layer as CACollectionLayer).newSupplementaryViewByIdentifier( identifier, this );        
         return view;
+
+
+        // //view.init();
+        // var layer = item["layer"];
+        // if (layer != null) {
+        //     var newLayer = layer.cloneNode(true);
+        //     newLayer.style.display = "";
+        //     // var size = item["size"];
+        //     // if (size != null) {
+        //     //     view.setWidth(size.width);
+        //     //     view.layer.style.width = "100%";
+        //     //     view.setHeight(size.height);
+        //     // }
+        //     // var bg = item["bg"];
+        //     // if (bg != null) {
+        //     //     view.layer.style.background = bg;
+        //     // }
+        //     view.initWithLayer(newLayer);
+        //     //view._addLayerToDOM();
+        //     view.awakeFromHTML();
+        // }
+        // else {
+        //     var views = item["views"];
+        //     if (views == null) {
+        //         views = [];
+        //         item["views"] = views;
+        //     }
+        //     views.push(view);
+        // }
+
+        // return v;
     }
 
     cellAtIndexPath(indexPath:IndexPath){
-        var s = this._sections[indexPath.section];
-        var c = s.cells[indexPath.row];
+        let s = this._sections[indexPath.section];
+        let c = s.cells[indexPath.row];
 
         return c;
     }
@@ -245,7 +202,7 @@ class UICollectionView extends UIView
             if (sectionView.footer != null)
                 sectionView.footer.removeFromSuperview();
 
-            for (var count = 0; count < sectionView.cells.length; count++){
+            for (let count = 0; count < sectionView.cells.length; count++){
                 let cell = sectionView.cells[count];
                 cell.removeFromSuperview();
                 if (this.delegate != null) {
@@ -258,43 +215,39 @@ class UICollectionView extends UIView
             sectionView.cells = [];
         }
 
-        this.selectedCellIndex = -1;
-        this.selectedCellSection = -1;    
+        this.selectedIndexPath = null;
         this._sections = [];
 
         let sections = 1;
-        if (typeof this.dataSource[0].numberOfSectionsIn === "function") sections = this.dataSource[0].numberOfSectionsIn(this);
+        if (typeof this.dataSource.numberOfSections === "function") sections = this.dataSource.numberOfSections(this);
         for (let sectionIndex = 0; sectionIndex < sections; sectionIndex++) {
 
             let section = new UICollectionViewSection();
             section.init();
             this._sections.push(section);
 
-            if (typeof this.dataSource[0].viewForSupplementaryViewAtIndex === "function"){
-                let hv = this.dataSource[0].viewForSupplementaryViewAtIndex(this, "header", sectionIndex);
+            if (typeof this.dataSource.viewForSupplementaryViewAtIndex === "function"){
+                let hv = this.dataSource.viewForSupplementaryViewAtIndex(this, "header", sectionIndex);
                 section.header = hv;
-                if (hv != null) this.addSubview(hv);
+                if (hv != null) this.contentView.addSubview(hv);
             }
 
-            let items = this.dataSource[0].collectionViewNumberOfItemsInSection(this, sectionIndex);
+            let items = this.dataSource.numberOfItemsInSection(this, sectionIndex);
             for (let index = 0; index < items; index++) {
 
                 let ip = IndexPath.indexForRowInSection(index, sectionIndex);
-                let cell = this.dataSource[0].collectionViewCellForItemAt(this, ip);
-                section.cells.push(cell);
-                this.addSubview(cell);
+                let cell = this.dataSource.cellForItemAtIndexPath(this, ip);
+                section.cells.addObject(cell);
+                this.contentView.addSubview(cell);
 
-                // events
-                cell._target = this;
-                cell._onClickFn = this.cellOnClickFn;
-                cell._index = index;
-                cell._section = sectionIndex;
+                // TODO: Don't save in the cell. Find a better way
+                cell._indexPath = ip;
             }
 
-            if (typeof this.dataSource[0].viewForSupplementaryViewAtIndex === "function"){
-                let fv = this.dataSource[0].viewForSupplementaryViewAtIndex(this, "footer", sectionIndex);
+            if (typeof this.dataSource.viewForSupplementaryViewAtIndex === "function"){
+                let fv = this.dataSource.viewForSupplementaryViewAtIndex(this, "footer", sectionIndex);
                 section.footer = fv;
-                if (fv != null) this.addSubview(fv);
+                if (fv != null) this.contentView.addSubview(fv);
             }
         }
 
@@ -302,9 +255,11 @@ class UICollectionView extends UIView
         this.setNeedsDisplay();
     }
 
-    cellOnClickFn(cell){
-        let index = cell._index;
-        let section = cell._section;
+    _cellDidTap( gestureRecognizer: UIGestureRecognizer ){
+        if (gestureRecognizer.state != UIGestureRecognizerState.Ended ) return;
+
+        let cell = gestureRecognizer.view as UICollectionViewCell;
+        let ip = cell._indexPath;
 
         let canSelectCell = true;
 
@@ -312,54 +267,39 @@ class UICollectionView extends UIView
         //     return;
 
         if (this.delegate != null && typeof this.delegate.canSelectCellAtIndexPath === "function"){
-            canSelectCell = this.delegate.canSelectCellAtIndexPath(this, index, section);
+            canSelectCell = this.delegate.canSelectCellAtIndexPath(this, ip );
         }
 
         if (canSelectCell == false)
             return;
 
-        if (this.selectedCellIndex > -1 && this.selectedCellSection > -1){
-            let ip = IndexPath.indexForRowInSection(this.selectedCellIndex, this.selectedCellSection);
-            this.deselectCellAtIndexPath(ip);
+        if (this.selectedIndexPath != null ){
+            this.deselectCellAtIndexPath( this.selectedIndexPath );
         }
 
-        this.selectedCellIndex = index;
-        this.selectedCellSection = section;
-
-        this._selectCell(cell);
+        this.selectCellAtIndexPath( ip );        
 
         if (this.delegate != null){
             if (typeof this.delegate.didSelectCellAtIndexPath === "function"){
-                let ip = IndexPath.indexForRowInSection(index, section);
                 this.delegate.didSelectCellAtIndexPath(this, ip);
             }
         }
 
     }
 
-    _selectCell(cell){
-        cell.setSelected(true);
+    selectCellAtIndexPath( indexPath:IndexPath ){
+        this.selectedIndexPath = indexPath;
+        let cell = this._sections[ indexPath.section ].cells[ indexPath.item ];
+        cell.selected = true;
     }
 
-    selectCellAtIndexPath(index, section){
-        this.selectedCellIndex = index;
-        this.selectedCellSection = section;
-        var cell = this._sections[section].cells[index];
-        this._selectCell(cell);
+    deselectCellAtIndexPath( indexPath:IndexPath ) {
+        this.selectedIndexPath = null;
+        let cell = this._sections[ indexPath.section ].cells[ indexPath.row ];
+        cell.selected = false;
     }
 
-    _deselectCell(cell){
-        cell.setSelected(false);
-    }
-
-    deselectCellAtIndexPath(indexPath:IndexPath)
-    {
-        this.selectedCellIndex = -1;
-        this.selectedCellSection = -1;
-        var cell = this._sections[indexPath.section].cells[indexPath.row];
-        this._deselectCell(cell);
-    }
-
+    /*
     layoutSubviews() {                
 
         if (this.hidden == true) return;
@@ -397,7 +337,7 @@ class UICollectionView extends UIView
                 let cell = section.cells[index] as UICollectionViewCell;
                 if (this.delegate != null) {
                     if (typeof this.delegate.willDisplayCellAtIndexPath === "function")
-                        this.delegate.willDisplayCellAtIndexPath(this, cell, index, count);
+                        this.delegate.willDisplayCellAtIndexPath(this, cell, IndexPath.indexForRowInSection( index, count ) );
                 }
 
                 cell.setWidth(this.collectionViewLayout.itemSize.width);
@@ -428,6 +368,8 @@ class UICollectionView extends UIView
             }
         }
     }
+
+    */
 
     scrollToItemAtAtAnimated(indexPath:IndexPath, scrollPosition:any, animated:boolean){
         

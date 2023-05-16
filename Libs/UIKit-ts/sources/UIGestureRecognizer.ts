@@ -1,4 +1,5 @@
 import { NSObject } from "foundation";
+import { UIEvent } from "./UIEvent";
 import { UIView } from "./UIView";
 
 export enum UIGestureRecognizerState 

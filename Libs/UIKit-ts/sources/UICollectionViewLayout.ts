@@ -1,4 +1,11 @@
-class UICollectionViewLayout extends NSObject
+import { IndexPath, NSObject } from "foundation";
+import { UIEdgeInsets } from "./UIEdgeInsets";
+import { CGSize } from "./CoreGraphics/CGSize";
+import { UICollectionViewLayoutAttributes } from "./UICollectionViewLayoutAttributes";
+import { UICollectionViewUpdateItem } from "./UICollectionViewUpdateItem";
+import { UICollectionView } from "./UICollectionView";
+
+export class UICollectionViewLayout extends NSObject
 {    
     collectionView:UICollectionView = null;
 
@@ -48,16 +55,16 @@ class UICollectionViewLayout extends NSObject
         }
     }
 
-    invalidateLayout(){}    
+    invalidateLayout() {}
 
-    get collectionViewContentSize():CGSize {return CGSize.Zero();}
+    get collectionViewContentSize() : CGSize { return CGSize.Zero(); }
 
-    layoutAttributesForItemAtIndexPath(indexPath:IndexPath):UICollectionViewLayoutAttributes{return null};
+    layoutAttributesForItemAtIndexPath( indexPath:IndexPath) : UICollectionViewLayoutAttributes { return null };
 
-    prepareForCollectionViewUpdates(updateItems:UICollectionViewUpdateItem[]){}
-    initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath:IndexPath):UICollectionViewLayoutAttributes {return null;}
-    finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath:IndexPath):UICollectionViewLayoutAttributes {return null;}
-    finalizeCollectionViewUpdates(){}
+    prepareForCollectionViewUpdates( updateItems: UICollectionViewUpdateItem[] ) {}
+    initialLayoutAttributesForAppearingItemAtIndexPath( itemIndexPath:IndexPath ) : UICollectionViewLayoutAttributes { return null; }
+    finalLayoutAttributesForDisappearingItemAtIndexPath( itemIndexPath:IndexPath ) : UICollectionViewLayoutAttributes { return null; }
+    finalizeCollectionViewUpdates() {}
 }
 
 enum MIOCollectionViewScrollDirection {
@@ -65,7 +72,7 @@ enum MIOCollectionViewScrollDirection {
     Horizontal
 }
 
-class UICollectionViewFlowLayout extends UICollectionViewLayout
+export class UICollectionViewFlowLayout extends UICollectionViewLayout
 {
     scrollDirection = MIOCollectionViewScrollDirection.Vertical;
 

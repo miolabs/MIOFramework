@@ -1,13 +1,17 @@
 /// <reference path="core/UICoreLayer.ts" />
 
+import { UILabel } from "./UILabel";
+import { UIView } from "./UIView";
 
-enum UITableViewCellStyle {
 
+export enum UITableViewCellStyle 
+{
     custom,
     default
 }
 
-enum UITableViewCellAccessoryType {
+export enum UITableViewCellAccessoryType
+{
 
     none,
     disclosureIndicator,
@@ -15,28 +19,28 @@ enum UITableViewCellAccessoryType {
     checkmark
 }
 
-enum UITableViewCellEditingStyle {
-
+export enum UITableViewCellEditingStyle 
+{
     none,
     delete,
     insert
 }
 
-enum UITableViewCellSeparatorStyle {
-
+export enum UITableViewCellSeparatorStyle
+{
     none,
     singleLine,
     singleLineEtched // TODO 
 }
 
-enum UITableViewCellSelectionStyle {
-
+export enum UITableViewCellSelectionStyle 
+{
     none,
     default
 }
 
-class UITableViewCell extends UIView {
-
+export class UITableViewCell extends UIView 
+{
     reuseIdentifier: string = null;
 
     nodeID: string = null;
@@ -71,22 +75,22 @@ class UITableViewCell extends UIView {
         if (style == UITableViewCellStyle.default) {
             this.textLabel = new UILabel();
             this.textLabel.init();
-            this.textLabel.layer.style.top = "";
-            this.textLabel.layer.style.left = "";
-            this.textLabel.layer.style.width = "";
-            this.textLabel.layer.style.height = "";
-            this.textLabel.layer.classList.add("tableviewcell_default_textlabel");
+            // this.textLabel.layer.style.top = "";
+            // this.textLabel.layer.style.left = "";
+            // this.textLabel.layer.style.width = "";
+            // this.textLabel.layer.style.height = "";
+            // this.textLabel.layer.classList.add("tableviewcell_default_textlabel");
             this.addSubview(this.textLabel);
-            this.layer.style.height = "44px";
+            // this.layer.style.height = "44px";
 
-            MUICoreLayerAddStyle(this.layer, "cell");
+            // MUICoreLayerAddStyle(this.layer, "cell");
         }
 
         this._setupLayer();
     }
 
     initWithLayer(layer, owner, options?) {
-        super.initWithLayer(layer, owner, options);
+        // super.initWithLayer(layer, owner, options);
 
         this.scanLayerNodes(layer, owner);
         
@@ -137,14 +141,14 @@ class UITableViewCell extends UIView {
         let type = layer.getAttribute("data-accessory-type");
 
         this.accessoryView = new UIView();
-        this.accessoryView.initWithLayer(layer, owner);
+        // this.accessoryView.initWithLayer(layer, owner);
 
         if (type == "checkmark") this.accessoryType = UITableViewCellAccessoryType.checkmark;
         else this.accessoryType = UITableViewCellAccessoryType.none;
 
         if (this.accessoryType != UITableViewCellAccessoryType.none) return;
         
-        this.accessoryView.layer.addEventListener("click", this.accessoryViewDidClick.bind(this));
+        // this.accessoryView.layer.addEventListener("click", this.accessoryViewDidClick.bind(this));
     }
 
     private accessoryViewDidClick(e:Event){
@@ -159,21 +163,21 @@ class UITableViewCell extends UIView {
         let type = layer.getAttribute("data-editing-accessory-view");
         if (type == "insert") {
             this.editingAccessoryInsertView = new UIView();
-            this.editingAccessoryInsertView.initWithLayer(layer, owner);
+            // this.editingAccessoryInsertView.initWithLayer(layer, owner);
 
-            this.editingAccessoryInsertView.layer.addEventListener("click", this.editingAccessoryViewDidClick.bind(this));
+            // this.editingAccessoryInsertView.layer.addEventListener("click", this.editingAccessoryViewDidClick.bind(this));
         }
         else if (type == "delete") {
             this.editingAccessoryDeleteView = new UIView();
-            this.editingAccessoryDeleteView.initWithLayer(layer, owner);
+            // this.editingAccessoryDeleteView.initWithLayer(layer, owner);
 
-            this.editingAccessoryDeleteView.layer.addEventListener("click", this.editingAccessoryViewDidClick.bind(this));
+            // this.editingAccessoryDeleteView.layer.addEventListener("click", this.editingAccessoryViewDidClick.bind(this));
         }
         else {
             this.editingAccessoryView = new UIView();
-            this.editingAccessoryView.initWithLayer(layer, owner);    
+            // this.editingAccessoryView.initWithLayer(layer, owner);    
 
-            this.editingAccessoryView.layer.addEventListener("click", this.editingAccessoryViewDidClick.bind(this));
+            // this.editingAccessoryView.layer.addEventListener("click", this.editingAccessoryViewDidClick.bind(this));
         }
 
         // // TODO: Change for a gesuture recongnizer or something independent of the html
@@ -218,14 +222,14 @@ class UITableViewCell extends UIView {
     }
 
     private _setupLayer() {
-        this.layer.style.position = "relative";        
-        this.layer.style.top = "";        
+        // this.layer.style.position = "relative";        
+        // this.layer.style.top = "";        
 
-        this.layer.addEventListener("click", function(e) {
-            e.stopPropagation();            
-            this._onClickFn.call(this._target, this);
-            this._performSegue();
-        }.bind(this));
+        // this.layer.addEventListener("click", function(e) {
+        //     e.stopPropagation();            
+        //     this._onClickFn.call(this._target, this);
+        //     this._performSegue();
+        // }.bind(this));
 
         let instance = this;
         // this.layer.onclick = function (e) {
@@ -235,12 +239,12 @@ class UITableViewCell extends UIView {
         //     }
         // };
 
-        this.layer.ondblclick = function (e) {
-            if (instance._onDblClickFn != null) {
-                e.stopPropagation();
-                instance._onDblClickFn.call(instance._target, instance);
-            }
-        };
+        // this.layer.ondblclick = function (e) {
+        //     if (instance._onDblClickFn != null) {
+        //         e.stopPropagation();
+        //         instance._onDblClickFn.call(instance._target, instance);
+        //     }
+        // };
     }
 
     private _accessoryType:UITableViewCellAccessoryType = UITableViewCellAccessoryType.none;
@@ -254,7 +258,7 @@ class UITableViewCell extends UIView {
             return;
 
         if (this.accessoryView == null) {
-            if (this.style == UITableViewCellStyle.default) this.textLabel.layer.style.right = "25px";
+            // if (this.style == UITableViewCellStyle.default) this.textLabel.layer.style.right = "25px";
 
             let layer = document.createElement("div");
             layer.style.position = "absolute";
@@ -263,19 +267,19 @@ class UITableViewCell extends UIView {
             layer.style.width = "15px";
             layer.style.height = "15px";
 
-            this.accessoryView = new UIView("accessory_view");
-            this.accessoryView.initWithLayer(layer, null);
+            // this.accessoryView = new UIView("accessory_view");
+            // this.accessoryView.initWithLayer(layer, null);
 
-            this.addSubview(this.accessoryView);
+            // this.addSubview(this.accessoryView);
         }
 
         // if (type == UITableViewCellAccessoryType.None) this.accessoryView.setHidden(true);
         // else this.accessoryView.setHidden(false);
 
-        if (type == UITableViewCellAccessoryType.none) MUICoreLayerRemoveStyle(this.layer, "checked");
-        else MUICoreLayerAddStyle(this.layer, "checked");
+        // if (type == UITableViewCellAccessoryType.none) MUICoreLayerRemoveStyle(this.layer, "checked");
+        // else MUICoreLayerAddStyle(this.layer, "checked");
 
-        this._accessoryType = type;
+        // this._accessoryType = type;
     }
 
     setPaddingIndex(value) {
@@ -290,7 +294,7 @@ class UITableViewCell extends UIView {
         var offsetY = (h - 15) / 2;
 
         if (this.accessoryView != null) {
-            this.accessoryView.layer.style.top = offsetY + "px";
+            // this.accessoryView.layer.style.top = offsetY + "px";
         }
     }
 
@@ -304,10 +308,10 @@ class UITableViewCell extends UIView {
         this.willChangeValue("selected");
         this._selected = value;
         if (this.selectionStyle == UITableViewCellSelectionStyle.default) {
-            if (value == true)
-                MUICoreLayerAddStyle(this.layer, "selected");
-            else 
-                MUICoreLayerRemoveStyle(this.layer, "selected");
+            // if (value == true)
+            //     MUICoreLayerAddStyle(this.layer, "selected");
+            // else 
+            //     MUICoreLayerRemoveStyle(this.layer, "selected");
         }
         
         this.didChangeValue("selected"); 

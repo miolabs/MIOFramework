@@ -9,7 +9,7 @@ enum MUICoreEventKeyCode
     ArrowDown = 40
 }
 
-enum MUICoreEventType
+export enum MUICoreEventType
 {
     KeyUp,
     KeyDown,
@@ -23,10 +23,10 @@ enum MUICoreEventType
     Resize
 }
 
-class MUICoreEvent
+export class MUICoreEvent
 {
     coreEvent:Event;
-    eventType = null;
+    eventType:MUICoreEventType;
     target = null;
     completion = null;
 
@@ -43,7 +43,7 @@ class MUICoreEvent
 
 class MUICoreKeyEvent extends MUICoreEvent 
 {
-    keyCode = null;
+    keyCode:MUICoreEventKeyCode;
 
     initWithKeyCode(eventType:MUICoreEventType,  eventKeyCode:MUICoreEventKeyCode, event:Event){
 
@@ -54,7 +54,7 @@ class MUICoreKeyEvent extends MUICoreEvent
 
 class MUICoreEventInput extends MUICoreEvent
 {
-    target = null;
+    target:any;
     x = 0;
     y = 0;
     deltaX = 0;
@@ -102,11 +102,65 @@ class MUICoreEventTouch extends MUICoreEventInput
     }
 }
 
+export function MUICoreEventRegisterObserverForType(eventType:MUICoreEventType, observer, completion)
+{
+    let item = {"Target" : observer, "Completion" : completion};
+
+    let array = _miocore_events_event_observers[eventType];
+    if (array == null)
+    {
+        array = [];
+        _miocore_events_event_observers[eventType] = array;
+    }
+
+    array.push(item);
+}
+
+export function MUICoreEventUnregisterObserverForType(eventType:MUICoreEventType, observer)
+{    
+    let obs = _miocore_events_event_observers[eventType];
+    if (obs == null) return;
+
+    let index = -1;
+    for (let count = 0; count < obs.length; count++){
+    
+        let item = obs[count];
+        let target = item["Target"];        
+        if (target === observer) {
+            index = count;
+            break;
+        }
+    }
+
+    if (index > -1) {
+        console.log("removing event observer: " + obs.length);
+        obs.splice(index, 1);
+        console.log("removing event observer: " + obs.length);
+        console.log("removing event observer: " + _miocore_events_event_observers[eventType].length);
+    }
+}
+
+function _MUICoreEventSendToObservers(obs, event:MUICoreEvent){
+
+    if (obs != null)
+    {
+        for (let index = 0; index < obs.length; index++) {
+            
+            let o = obs[index];
+            let target = o["Target"];
+            let completion = o["Completion"];
+
+            completion.call(target, event);
+        }
+    }        
+}
+
 /* 
     EVENTS
 */
 
 // Keyboard events
+let _miocore_events_event_observers = {};
 
 window.addEventListener("keydown", function(e){
         

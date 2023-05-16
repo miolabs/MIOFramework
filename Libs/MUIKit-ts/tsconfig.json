@@ -1,8 +1,23 @@
 {
-    "compilerOptions": {
-      "target": "ES5",
-      "module": "umd",
-      "lib": ["DOM", "ESNext"],
-      "moduleResolution":"Node"
-  }
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "noImplicitAny": false,
+    "module": "es6",
+    "target": "es5",
+    "lib": ["esnext", "dom"],
+    "allowJs": true,
+    "moduleResolution": "node",
+    "esModuleInterop" : true,
+    "allowSyntheticDefaultImports" : true,
+    "sourceMap": true,
+    "types": [
+      "mio-core",
+      "foundation",
+      "uikit"
+    ],
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "dist/@types",
+  },
+  "include": ["sources/**/*"],
 }

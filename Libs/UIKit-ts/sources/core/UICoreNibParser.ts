@@ -1,6 +1,8 @@
-import { NSLocalizeString, NSObject } from "foundation";
-import { MIOCoreGetContentsFromURLString, MIOCoreHTMLParser, MIOCoreHTMLParserDelegate, NSClassFromString } from "mio-core";
-import { CALayer, UIView, UIViewController } from "../_index";
+import { MIOCoreGetContentsFromURLString, MIOCoreHTMLParser, MIOCoreHTMLParserDelegate } from "mio-core";
+import { NSLocalizeString, NSObject, NSClassFromString, NSCoder } from "foundation";
+import { UIView } from "../UIView";
+import { UIViewController } from "../UIViewController";
+
 
 let _UICoreClassesByDestination = {}
 function UICoreSetClassesByDestination(classes){
@@ -11,16 +13,20 @@ function UICoreGetClassesByDestination(resource:string){
     return _UICoreClassesByDestination[resource];
 }
 
-export function UICoreLoadNibName(name:string, owner:any, completion:any){
+export function UICoreLoadNibName(name:string, owner:any /*, completion:any */){
 
-    let parser = new UICoreNibParser();    
-    parser.completion = completion;
+    let parser = new UICoreNibParser();
+    // parser.completion = completion;
 
-    MIOCoreGetContentsFromURLString(name, this, function(code, data){
+    let resource_name = name + ".html";
+
+    MIOCoreGetContentsFromURLString( resource_name, this, function( code:number, data:string ){
         if (code == 200) parser.parseString(data, owner);
         else throw new Error("MUICoreBundleLoadNibName: Couldn't download resource " + name);
     });    
 }
+
+let _valid_html_tags = [ "DIV", "SECTION", "LABEL", "BUTTON" ];
 
 export class UICoreNibParser extends NSObject implements MIOCoreHTMLParserDelegate
 {
@@ -44,10 +50,12 @@ export class UICoreNibParser extends NSObject implements MIOCoreHTMLParserDelega
         let items = domParser.parseFromString(this.result, "text/html");
         let contents = items.getElementById(this.layerID);
 
-        let view = parse_root_controller( contents, owner);
-        this.completion(view, this.rootClassname);
+        parse_root_element( contents, owner );
     }
 
+    //
+    // XML PARSER
+    //
     parserDidStartDocument(parser:MIOCoreHTMLParser){
         console.log("parser started");
     }
@@ -148,41 +156,53 @@ export class UICoreNibParser extends NSObject implements MIOCoreHTMLParserDelega
         this.currentString = null;
         this.currentStringLocalizedKey = null;        
     }
+    
+}
+
+// 
+
+export function UICoreNibLoad( contents:any, owner:any ) {
+    parse_root_element( contents, owner );
+}
+
+function parse_root_element( contents:any, owner:any )
+{
+    let coder = new UICoreNibCoder();
+    coder.initWithContents( contents, owner, {} );
+
+    owner.initWithCoder( coder );
+}
+
+function parse_element( contents:any, coder:UICoreNibCoder ) : UIView | UIViewController {
+
+    let classname = contents.getAttribute("data-class");
+    
+    if ( classname == null && contents.tagName.toLowerCase() == "button") classname = "UIButton"
+    if ( classname == null && contents.tagName.toLowerCase() == "label") classname = "UILabel"
+    if ( classname == null ) classname = "UIView";
+
+    let obj = NSClassFromString( classname );
+
+    let outlets = coder?.outlets || {};
+    let outlet_id = contents.getAttribute( "id" );
+    if ( outlet_id != null) outlets[ outlet_id ] = obj;
+
+    let new_coder = new UICoreNibCoder();
+    new_coder.initWithContents( contents, obj, outlets );
+
+    obj.initWithCoder( new_coder );
+
+    return obj;
 }
 
 
-function parse_root_controller( contents:any, owner:UIViewController ) : UIView {
-    let view:UIView;    
-
-    if (contents.childNodes.length > 0) {
-        for (let index = 0; index < contents.childNodes.length; index++) {
-            let subLayer = contents.childNodes[index] as HTMLElement;
-
-            if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
-
-            if (subLayer.getAttribute("data-connections") == "true") {
-                parse_connections_layer( subLayer, owner, owner);
-            }
-            else if (subLayer.getAttribute("data-navigation-key") == "navigationItem"){             
-                // owner.navigationItem = new UINavigationItem();
-                // owner.navigationItem.initWithLayer(subLayer, owner);
-            }
-            else {
-                view = parse_contents(subLayer, owner);                
-            }
-        }
-    }
-
-    return view;
-}
-
-function parse_connections_layer(contents:any, object, owner:UIViewController){
+function parse_connections_layer(contents:any, object:object ){
     // Check outlets and segues
     if (contents.childNodes.length > 0) {
         for (let index = 0; index < contents.childNodes.length; index++) {
             let subLayer = contents.childNodes[index] as HTMLElement;
 
-            if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+            if ( !_valid_html_tags.containsObject( subLayer.tagName ) ) continue;
 
             let type = subLayer.getAttribute("data-connection-type");
 
@@ -190,7 +210,7 @@ function parse_connections_layer(contents:any, object, owner:UIViewController){
                 let prop = subLayer.getAttribute("data-property");
                 let outlet = subLayer.getAttribute("data-outlet");
 
-                parse_outlet(object, owner, prop, outlet);
+                parse_outlet(object, prop, outlet);
             }
             else if (type == "segue") {
                 let destination = subLayer.getAttribute("data-segue-destination");
@@ -200,21 +220,23 @@ function parse_connections_layer(contents:any, object, owner:UIViewController){
 
                 parse_segue(object, destination, kind, relationship, identifier);
             }
-
         }
-    }    
+    }
 }
 
-function parse_outlet(object, owner, property, outletID){
+
+
+function parse_outlet(object:any, property:any, outletID:string){
     console.log("prop: " + property + " - outlet: " + outletID);
 
-    let obj = owner._outlets[outletID];
-    object[property] = obj;
+    object._outlets[ outletID ] = property;
+    // let obj = outlets[outletID];
+    // object[property] = obj;
 }
 
 
-function parse_segue(owner, destination:string, kind:string, relationship:string, identifier:string) {
-    let s = {};
+function parse_segue(owner:any, destination:string, kind:string, relationship:string, identifier:string) {
+    let s:any = {};
     s["Destination"] = destination;
     s["Kind"] = kind;
     if (identifier != null) s["Identifier"] = identifier;
@@ -222,67 +244,63 @@ function parse_segue(owner, destination:string, kind:string, relationship:string
     owner._segues.push(s);
 }
 
-function parse_contents( contents:any, owner:any ) : UIView|CALayer
-{       
-    let className = contents.getAttribute("data-class");    
-    if (className == "UIBarItem" || className == "UIBarButtonItem" || className == "UINavigationItem" || className == "UICollectionViewFlowLayout") return;
 
-    let item: CALayer|UIView;
-    let layer = new CALayer( contents );
-    
-    if (className != null && className.length > 0) {
-        let view = NSClassFromString( className );
-        view.layer = layer;
-        view.tag = contents.getAttribute("data-tag") || 0;
-        item = view;
-    }
-    else {
-        item = layer;
+
+export class UICoreNibCoder extends NSCoder
+{    
+    owner:object;    
+    outlets: object;
+
+    private contents: any;
+
+    initWithContents(contents:any, owner: object, outlets: object ) {
+        this.contents = contents;
+        this.owner = owner;
+        this.outlets = outlets;        
     }
 
-        
-//     this._addLayerToDOM();
+    decodeBoolForKey(key:string):any {
+        return this.contents.getAttribute("data-" + key ) ?? false;
+    }
 
-    // Add subviews
-    if (contents.childNodes.length > 0) {
-        for (let index = 0; index < contents.childNodes.length; index++) {
-            let subLayer = contents.childNodes[index];
+    decodeIntegerForKey(key: string) : number {
+        return this.contents.getAttribute("data-" + key ) ?? 0;
+    }
 
-            if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
+    decodeClassname() : string {
+        return this.contents.getAttribute("data-class" );
+    }
+
+    decodeContentView() : UIView {
+        return this.decodeSubviews()[0];
+    }    
+
+    decodeSubviews() : UIView[] {
+
+        // Add subviews
+        if (this.contents.childNodes.length == 0) return [];
+
+        let views:UIView[] = [];
+
+        for ( let index = 0; index < this.contents.childNodes.length; index++ ) {
+            let subLayer = this.contents.childNodes[ index ];
+
+            if ( !_valid_html_tags.containsObject( subLayer.tagName ) ) continue;
 
             if (subLayer.getAttribute("data-connections") == "true") {
-                parse_connections_layer( subLayer, view, owner);
-                // let obj = this;
-                // if (options != null && options["Object"] != null) obj = options["Object"];
-                // MUICoreStoryboardParseConnectionsLayer(subLayer, obj, owner);
-                continue;
+                parse_connections_layer( subLayer, this.owner );
             }
 
-//             if (subLayer.getAttribute("data-navigation-key") == "navigationItem"){             
-//                 owner.navigationItem = new UINavigationItem();
-//                 owner.navigationItem.initWithLayer(subLayer, owner);
-//                 continue;
-//             }
+            // let v = parse_contents( subLayer, this.owner, this.outlets );
+    
+            let v = parse_element( subLayer, this );
+            views.addObject( v );
+        }
 
-            let className = contents.getAttribute("data-class");
-            if (className == null || className.length == 0) className = "UIView";
-
-            if (className == "UIBarItem" || className == "UIBarButtonItem" || className == "UINavigationItem" || className == "UICollectionViewFlowLayout") return;
-
-            let sv = parse_contents( subLayer, owner );
-            sv.parent = view;
-            view.subviews.addObject( sv );
-
-            sv.layer.superlayer = view.layer;
-            view.layer.sublayers.addObject( sv.layer );
-                        
-//             let sv = MUICoreViewCreateView(subLayer, owner);
-//             this._linkViewToSubview(sv);
-
-            let id = subLayer.getAttribute("id");
-            if (id != null) owner._outlets[id] = sv;
-        }           
+        return views;
     }
 
-    return view;
+    get layerContents() : any {
+        return this.contents;
+    }
 }

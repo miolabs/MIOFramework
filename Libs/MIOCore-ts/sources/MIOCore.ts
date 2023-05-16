@@ -15,25 +15,19 @@ export function MIOCoreGetDeviceUUID(){
     return _miocore_device_uuid;
 }
 
-let _micore_classes_by_name = {};
-export function MIOCoreRegisterClassByName(name:string, object:any){
-    _micore_classes_by_name[name] = object;
+declare global {
+    var _micore_classes_by_name: object;
 }
 
-export function MIOCoreClassByName(name:string){
-    return _micore_classes_by_name[name];
+globalThis._micore_classes_by_name = {};
+export function MIOCoreRegisterClassByName( name:string, object: any ) {
+    globalThis._micore_classes_by_name[name] = object;
 }
 
-export function NSClassFromString(className:string){
-    let classObject = window[className];
-    if (classObject == null) classObject = MIOCoreClassByName(className);
-
-    if (classObject == null) throw new Error("NSClassFromString: class '" + className + "' didn't register.");
-
-    let newClass = new classObject();
-    if((newClass as any).init$vars) (newClass as any).init$vars()//quick fix for transpiler because it needs it
-    newClass._className = className;
-    return newClass;
+export function MIOCoreClassByName( name:string ) : any {
+    let object_class = window[ name ];
+    if ( object_class == null ) object_class = globalThis._micore_classes_by_name[ name ];
+    return object_class;
 }
 
 export enum MIOCorePlatformType
@@ -66,6 +60,10 @@ export function MIOCoreGetPlatformLanguage(){
         let l = locale[0];
         return l.substring(0, 2);
     }
+}
+
+export function MIOCoreIsDesktop() {
+    return !MIOCoreIsMobile();
 }
 
 export function MIOCoreIsPhone(){    

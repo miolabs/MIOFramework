@@ -1,8 +1,10 @@
+import { UIEvent } from "./UIEvent";
+import { UIGestureRecognizer, UIGestureRecognizerState } from "./UIGestureRecognizer";
+import { UIView } from "./UIView";
+import { CGPoint } from "./_index";
 
-/// <reference path="UIGestureRecognizer.ts" />
 
-
-class UIPanGestureRecognizer extends UIGestureRecognizer
+export class UIPanGestureRecognizer extends UIGestureRecognizer
 {
     minimumNumberOfTouches = 1;
     maximumNumberOfTouches = 0;
@@ -11,7 +13,7 @@ class UIPanGestureRecognizer extends UIGestureRecognizer
     private initialY = null;
 
     private touchDown = false;
-    touchesBeganWithEvent(touches, ev:UIEvent){        
+    touchesBeganWithEvent(touches, ev:UIEvent){
         this.initialX = ev.x;
         this.initialY = ev.y;
         this.touchDown = true;
@@ -39,8 +41,8 @@ class UIPanGestureRecognizer extends UIGestureRecognizer
 
     private deltaX = 0;
     private deltaY = 0;
-    translationInView(view:UIView):CGPoint {
-        return new CGPoint(this.deltaX, this.deltaY);
+    translationInView( view:UIView ): CGPoint {
+        return new CGPoint( this.deltaX, this.deltaY );
     }
 
 }

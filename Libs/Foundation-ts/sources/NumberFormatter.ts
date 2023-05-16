@@ -36,7 +36,7 @@ export class NumberFormatter extends Formatter
         this.currencySymbol = this.locale.currencySymbol;
         this.currencyCode = this.locale.currencyCode;
 
-        switch(this.locale.countryIdentifier){            
+        switch(this.locale.region){
             case "US":
             this.currencyHasSpaces = false;
             this.currencyIsRight = false;

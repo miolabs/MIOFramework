@@ -2,8 +2,11 @@
  * Created by godshadow on 11/3/16.
  */
 
+import { NSObject } from "foundation";
+import { UIViewController } from "./UIViewController";
 
-class UIPageController extends UIViewController
+
+export class UIPageController extends UIViewController
 {
     selectedViewControllerIndex = 0;
     pageControllersCount = 0;
@@ -22,33 +25,32 @@ class UIPageController extends UIViewController
         else {
             let vc = this.childViewControllers[0];
             this.view.addSubview(vc.view);
-            vc.onLoadView(this, function (this: UIPageController) {
-
+            vc.onLoadView( () => {
                 this._setViewLoaded(true);
-            });
+            } );
         }
     }
 
     viewWillAppear(animated?){
-        var vc = this.childViewControllers[this.selectedViewControllerIndex];
+        let vc = this.childViewControllers[this.selectedViewControllerIndex];
         vc.viewWillAppear(animated);
         //vc._childControllersWillAppear();
     }
 
     viewDidAppear(animated?){
-        var vc = this.childViewControllers[this.selectedViewControllerIndex];
+        let vc = this.childViewControllers[this.selectedViewControllerIndex];
         vc.viewDidAppear(animated);
         //vc._childControllersDidAppear();
     }
 
     viewWillDisappear(animated?){
-        var vc = this.childViewControllers[this.selectedViewControllerIndex];
+        let vc = this.childViewControllers[this.selectedViewControllerIndex];
         vc.viewWillDisappear(animated);
         //vc._childControllersWillDisappear();
     }
 
     viewDidDisappear(animated?){
-        var vc = this.childViewControllers[this.selectedViewControllerIndex];
+        let vc = this.childViewControllers[this.selectedViewControllerIndex];
         vc.viewDidDisappear(animated);
         //vc._childControllersDidDisappear();
     }
@@ -71,15 +73,15 @@ class UIPageController extends UIViewController
 
         this.selectedViewControllerIndex = index;
 
-        newVC.onLoadView(this, function () {
+        newVC.onLoadView( () => {
 
             this.view.addSubview(newVC.view);
             this.addChildViewController(newVC);
 
-            _MIUShowViewController(oldVC, newVC, this, false, this, function () {
+            // _MIUShowViewController(oldVC, newVC, this, false, this, function () {
 
-                oldVC.view.removeFromSuperview();
-            });
+            //     oldVC.view.removeFromSuperview();
+            // });
         });
     }
 
@@ -119,7 +121,7 @@ class UIPageController extends UIViewController
  ANIMATIONS
  */
 
-class MIOPageAnimationController extends NSObject
+export class MIOPageAnimationController extends NSObject
 {
     transitionDuration(transitionContext){
         return 0;

@@ -29,6 +29,7 @@
     "gulp-concat": "^2.6.1",
     "gulp-uglify": "^3.0.2",
     "merge-source-maps": "^0.6.0",
+    "mio-core": "file:../MIOCore-ts",
     "readable-stream": "^3.3.0",
     "rimraf": "^2.6.3",
     "ts-node": "^0.7.2",

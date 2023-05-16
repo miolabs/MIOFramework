@@ -1,8 +1,9 @@
 {
-  "name": "my-webpack-project",
+  "name": "mio-core",
   "version": "1.0.0",
-  "description": "My webpack project",
-  "main": "index.js",
+  "description": "MIO Core Lib",
+  "main": "dist/mio-core.js",
+  "types": "dist/@types/_index.d.ts",
   "scripts": {
     "build": "webpack --mode=production --node-env=production",
     "build:dev": "webpack --mode=development",

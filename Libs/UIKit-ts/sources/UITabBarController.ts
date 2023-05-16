@@ -2,10 +2,10 @@
  * Created by godshadow on 24/08/16.
  */
 
-/// <reference path="UITabBar.ts" />
+import { UIViewController } from "./UIViewController";
 
 
-class UITabBarController extends UIViewController
+export class UITabBarController extends UIViewController
 {
     tabBar = null;
     private pageController = null;
@@ -14,8 +14,8 @@ class UITabBarController extends UIViewController
     {
         super.viewDidLoad();
 
-        this.tabBar = new UITabBar(this.layerID + "tabbar");
-        this.view.addSubview(this.tabBar);
+        // this.tabBar = new UITabBar(this.layerID + "tabbar");
+        // this.view.addSubview(this.tabBar);
     }
 
     addTabBarViewController(vc)

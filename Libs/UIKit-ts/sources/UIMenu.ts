@@ -2,10 +2,11 @@
  * Created by godshadow on 5/5/16.
  */
 
-/// <reference path="UIApplication.ts" />
+import { UIApplication } from "./UIApplication";
+import { UIView } from "./UIView";
 
 
-class UIMenuItem extends UIView
+export class UIMenuItem extends UIView
 {
     checked = false;
     title = null;
@@ -41,9 +42,9 @@ class UIMenuItem extends UIView
         }
     }*/
 
-    public static itemWithTitle(title)
+    public static itemWithTitle( title:string )
     {
-        var mi = new UIMenuItem();
+        let mi = new UIMenuItem();
         mi.initWithTitle(title);
 
         return mi;
@@ -54,52 +55,52 @@ class UIMenuItem extends UIView
         this.init();
         this._setupLayer();
 
-        this.layer.style.width = "100%";
-        this.layer.style.height = "";
+        // this.layer.style.width = "100%";
+        // this.layer.style.height = "";
 
         this._titleLayer = document.createElement("span");
         this._titleLayer.classList.add("menu_item");
         this._titleLayer.style.color = "inherit";
         this._titleLayer.innerHTML = title;
-        this.layer.appendChild(this._titleLayer);
+        // this.layer.appendChild(this._titleLayer);
 
         this.title = title;
     }
 
     _setupLayer()
     {
-        var instance = this;
-        this.layer.onmouseenter = function (e) {
+        // let instance = this;
+        // this.layer.onmouseenter = function (e) {
 
-            e.stopPropagation();
-            instance.layer.classList.add("menu_item_on_hover");
-        };
+        //     e.stopPropagation();
+        //     instance.layer.classList.add("menu_item_on_hover");
+        // };
 
-        this.layer.onmouseleave = function (e) {
+        // this.layer.onmouseleave = function (e) {
 
-            e.stopPropagation();
-            instance.layer.classList.remove("menu_item_on_hover");
-        };
+        //     e.stopPropagation();
+        //     instance.layer.classList.remove("menu_item_on_hover");
+        // };
 
-        this.layer.ontouchend = function(e)
-        {
-            e.stopPropagation();
-            if (instance.action != null && instance.target != null) {
+        // this.layer.ontouchend = function(e)
+        // {
+        //     e.stopPropagation();
+        //     if (instance.action != null && instance.target != null) {
 
-                instance.layer.classList.remove("menu_item_on_hover");
-                instance.action.call(instance.target, instance);
-            }
-        }
+        //         instance.layer.classList.remove("menu_item_on_hover");
+        //         instance.action.call(instance.target, instance);
+        //     }
+        // }
 
-        this.layer.onmouseup = function(e)
-        {
-            e.stopPropagation();
-            if (instance.action != null && instance.target != null) {
+        // this.layer.onmouseup = function(e)
+        // {
+        //     e.stopPropagation();
+        //     if (instance.action != null && instance.target != null) {
 
-                instance.layer.classList.remove("menu_item_on_hover");
-                instance.action.call(instance.target, instance);
-            }
-        }
+        //         instance.layer.classList.remove("menu_item_on_hover");
+        //         instance.action.call(instance.target, instance);
+        //     }
+        // }
 
     }
 
@@ -111,11 +112,12 @@ class UIMenuItem extends UIView
 
     getHeight()
     {
-        return this.layer.getBoundingClientRect().height;
+        // return this.layer.getBoundingClientRect().height;
+        return 0;
     }
 }
 
-class UIMenu extends UIView
+export class UIMenu extends UIView
 {
     items = [];
     private _isVisible = false;
@@ -159,8 +161,8 @@ class UIMenu extends UIView
 
     _setupLayer()
     {
-        this.layer.classList.add("menu");
-        this.layer.style.zIndex = 100;
+        // this.layer.classList.add("menu");
+        // this.layer.style.zIndex = 100;
     }
 
     private _addMenuItem(menuItem)

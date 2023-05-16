@@ -1,7 +1,7 @@
 export * from "./Array"
 export * from "./Bundle";
 export * from "./NSCoder";
-export * from "./Date";
+export * from "./NSClassFromString"
 export * from "./DateFormatter";
 export * from "./DecimalNumber";
 export * from "./Error";
@@ -10,6 +10,7 @@ export * from "./IndexPath";
 export * from "./ISO8601DateFormatter";
 export * from "./KeyedUnarchiver";
 export * from "./Locale";
+export * from "./Calendar";
 export * from "./NotificationCenter";
 export * from "./NSLog";
 export * from "./NSNull";

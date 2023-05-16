@@ -27,7 +27,7 @@ export class URLConnection
     }
 
     start(){
-        _http_request(this, this.request.url.absoluteString, this.request.headers, this.request.httpMethod, this.request.httpBody, this.request.binary, this.delegate, this.blockTarget, this.blockFN, this.request.download);
+        _http_request(this, this.request.url.href, this.request.headers, this.request.httpMethod, this.request.httpBody, this.request.binary, this.delegate, this.blockTarget, this.blockFN, this.request.download);
     }
 }
 

@@ -1,4 +1,6 @@
-class UIImage extends NSObject
+import { NSObject } from "foundation";
+
+export class UIImage extends NSObject
 {    
     static $equal(imageA:UIImage, imageB:UIImage){
         return imageA === imageB;

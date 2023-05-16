@@ -1,8 +1,21 @@
 {
     "compilerOptions": {
-        "target": "ES5",
-        "module": "umd",
-        "lib": ["DOM", "ESNext"],
-        "moduleResolution": "node"
-    }
-}
+      "allowJs": true,
+      "allowSyntheticDefaultImports": true,
+      "noImplicitAny": false,
+      "target": "es5",
+      "module": "es6",
+      "lib": ["esnext", "dom"],
+      // "removeComments": true,
+      // "preserveConstEnums": true,
+      "sourceMap": true,
+      "declaration": true,
+      "declarationMap": true,
+      "declarationDir": "dist/@types",
+      "moduleResolution": "node",
+      "outDir": "./dist",      
+      "types": ["mio-core"]
+    },
+    "include": ["sources/**/*"],
+  }
+  

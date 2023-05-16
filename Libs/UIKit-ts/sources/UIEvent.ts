@@ -1,4 +1,6 @@
-class UIEvent extends NSObject
+import { NSObject } from "foundation";
+
+export class UIEvent extends NSObject
 {
     static eventWithSysEvent(sysEvent){
         let ev = new UIEvent();
@@ -8,6 +10,7 @@ class UIEvent extends NSObject
 
     x = 0;
     y = 0;
+    
     initWithSysEvent(e){
         super.init();
 

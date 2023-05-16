@@ -2,10 +2,11 @@
  * Created by godshadow on 12/3/16.
  */
 
-/// <reference path="UIImage.ts" />
+import { UIImage } from "./UIImage";
+import { UIView } from "./UIView";
 
 
-class UIImageView extends UIView
+export class UIImageView extends UIView
 {
     private _imageLayer = null;
 
@@ -15,8 +16,8 @@ class UIImageView extends UIView
     }
 
     initWithLayer(layer, owner, options?){
-        super.initWithLayer(layer, owner, options);
-        this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "IMG");
+        // super.initWithLayer(layer, owner, options);
+        // this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "IMG");
         this.setupLayers();
     }
 
@@ -25,11 +26,11 @@ class UIImageView extends UIView
             this._imageLayer = document.createElement("img");
             this._imageLayer.style.width = "100%";
             this._imageLayer.style.height = "100%";
-            this.layer.appendChild(this._imageLayer);
+            // this.layer.appendChild(this._imageLayer);
         }
     }
 
-    set image(image:UIImage){
+    set image( image:UIImage ){
         if (image != null){
             this._imageLayer.setAttribute("src", image._url);
         }

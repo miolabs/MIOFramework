@@ -3,188 +3,20 @@
  */
 
 import { NSObject } from "foundation";
+import { UIViewController } from "../UIViewController";
 
-enum MUIAnimationType
+
+export interface UIViewControllerTransitioningDelegate
 {
-    None,
-    BeginSheet,
-    EndSheet,
-    Push,
-    Pop,
-    FlipLeft,
-    FlipRight,
-    FadeIn,
-    FadeOut,
-    LightSpeedIn,
-    LightSpeedOut,
-    Hinge,
-    SlideInUp,
-    SlideOutDown,
-    SlideInRight,
-    SlideOutRight,
-    SlideInLeft,
-    SlideOutLeft,
-    HorizontalOutFlip,
-    HorizontalInFlip,   
-    ZoomIn,
-    ZoomOut 
+    animationControllerForPresentedController?( presentedViewController:UIViewController, presentingViewController: UIViewController, sourceController: UIViewController ):void;
+    animationControllerForDismissedController?( vs:UIViewController ):void;
 }
 
 export interface UIViewControllerAnimatedTransitioning extends NSObject
-{    
-    animationControllerForPresentedController():void;
-}
-
-export interface UIViewControllerAnimatedTransitioning extends NSObject
-{    
+{       
     transitionDuration(transitionContext):number;
     animateTransition(transitionContext):void;
     animationEnded(transitionCompleted):void;
     // TODO: Not iOS like transitions. For now we use css animations
     animations(transitionContext):void;
-}
-
-// ANIMATION TYPES
-function MUIClassListForAnimationType(type)
-{
-    let array:string[] = [];
-    array.push("animated");
-
-    switch (type)
-    {
-        case MUIAnimationType.BeginSheet:
-            array.push("slideInDown");
-            break;
-
-        case MUIAnimationType.EndSheet:
-            array.push("slideOutUp");
-            break;
-
-        case MUIAnimationType.Push:
-            array.push("slideInRight");
-            break;
-
-        case MUIAnimationType.Pop:
-            array.push("slideOutRight");
-            break;
-
-        case MUIAnimationType.FadeIn:
-            array.push("fadeIn");
-            break;
-
-        case MUIAnimationType.FadeOut:
-            array.push("fadeOut");
-            break;
-
-        case MUIAnimationType.LightSpeedOut:
-            array.push("lightSpeedOut");
-            break;
-
-        case MUIAnimationType.Hinge:
-            array.push("hinge");
-            break;
-
-        case MUIAnimationType.SlideInUp:
-            array.push("slideInUp");
-            break;
-
-        case MUIAnimationType.SlideOutDown:
-            array.push("slideOutDown");            
-            break;
-
-        case MUIAnimationType.SlideInRight:
-            array.push("slideInRight");
-            break;
-
-        case MUIAnimationType.SlideOutRight:
-            array.push("slideOutRight");
-            break;
-
-        case MUIAnimationType.SlideInLeft:
-            array.push("slideInLeft");
-            break;
-
-        case MUIAnimationType.SlideOutLeft:
-            array.push("slideOutLeft");
-            break;
-
-        case MUIAnimationType.HorizontalOutFlip:
-            array.push("flipOutY");
-            break;            
-
-        case MUIAnimationType.HorizontalInFlip:
-            array.push("flipInY");
-            break;    
-            
-        case MUIAnimationType.ZoomIn:
-            array.push("zoomIn");
-            break;
-
-        case MUIAnimationType.ZoomOut:
-            array.push("zoomOut");
-            break;
-    }
-
-    return array;
-}
-
-function _MUIAddAnimations(layer, animations)
-{
-    let w = layer.offsetWidth;
-    for (var index = 0; index < animations.length; index++)
-        layer.classList.add(animations[index]);
-    w++;
-}
-
-function _MUIRemoveAnimations(layer, animations)
-{
-    for (var index = 0; index < animations.length; index++)
-        layer.classList.remove(animations[index]);
-}
-
-export function _CAAnimationStart(layer, animationController, animationContext, completion?)
-{
-    if (animationController == null){
-        if (completion != null) completion();        
-        return;
-    }
-
-    let duration = animationController.transitionDuration(animationContext);
-    let animations = animationController.animations(animationContext);
-
-    animationController.animateTransition(animationContext);
-
-    if (duration == 0 || animations == null){
-        // NO animation
-        animationController.animationEnded(true);
-
-        if (completion != null) completion();
-        return;
-    }
-
-    layer.style.animationDuration = duration + "s";
-    _MUIAddAnimations(layer, animations);
-
-    layer.animationParams = {};
-    layer.animationParams["animationController"] = animationController;
-    layer.animationParams["animations"] = animations;
-
-    if (completion != null)
-        layer.animationParams["completion"] = completion;
-
-    layer.addEventListener("animationend", _CAAnimationDidFinish);
-}
-
-export function _CAAnimationDidFinish(event)
-{
-    let animationController = event.target.animationParams["animationController"];
-    let animations = event.target.animationParams["animations"];    
-    let completion = event.target.animationParams["completion"];
-    let layer = event.target;
-
-    _MUIRemoveAnimations(layer, animations);
-    layer.removeEventListener("animationend", _CAAnimationDidFinish);
-    animationController.animationEnded(true);
-
-    if (completion != null) completion();
 }

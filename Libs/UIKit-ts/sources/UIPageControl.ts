@@ -2,7 +2,10 @@
  * Created by godshadow on 31/08/16.
  */
 
-class UIPageControl extends UIControl 
+import { UIButton } from "./UIButton";
+import { UIControl } from "./UIControl";
+
+export class UIPageControl extends UIControl 
 {
     numberOfPages = 0;
 
@@ -11,19 +14,19 @@ class UIPageControl extends UIControl
 
     initWithLayer(layer, owner, options?)
     {
-        super.initWithLayer(layer, options);
+        // super.initWithLayer(layer, options);
 
         // Check for page items
-        for (var index = 0; index < this.layer.childNodes.length; index++)
-        {
-            var itemLayer = this.layer.childNodes[index];
-            if (itemLayer.tagName == "DIV")
-            {
-                let i = new UIButton();
-                i.initWithLayer(itemLayer, owner, options);
-                this._items.push(i);
-            }
-        }
+        // for (var index = 0; index < this.layer.childNodes.length; index++)
+        // {
+        //     let itemLayer = this.layer.childNodes[index];
+        //     if (itemLayer.tagName == "DIV")
+        //     {
+        //         let i = new UIButton();
+        //         i.initWithLayer(itemLayer, owner, options);
+        //         this._items.push(i);
+        //     }
+        // }
 
         if (this._items.length > 0)
             this.currentPage = 0;

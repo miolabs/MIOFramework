@@ -9,6 +9,7 @@ import { CGSize } from "./CoreGraphics/CGSize";
 import { UIView } from "./UIView";
 import { UIViewController } from "./UIViewController";
 import { UIWindow } from "./UIWindow";
+import { _CAAnimationType, _CAClassListForAnimationType } from "./CoreAnimation/CoreAnimation+Animations";
 
 export enum UIModalPresentationStyle
 {
@@ -66,7 +67,7 @@ export class UIPresentationController extends NSObject
 
     get transitioningDelegate(){
         if (this._transitioningDelegate == null){
-            this._transitioningDelegate = new MUIModalTransitioningDelegate();
+            this._transitioningDelegate = new UIModalTransitioningDelegate();
             this._transitioningDelegate.init();
         }
 
@@ -102,10 +103,10 @@ export class UIPresentationController extends NSObject
         let view: UIView = this.presentedView;
 
         if (toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen){
-            view.layer.style.left = "0px";
-            view.layer.style.top = "0px";
-            view.layer.style.width = "100%";
-            view.layer.style.height = "100%";
+            // view.layer.style.left = "0px";
+            // view.layer.style.top = "0px";
+            // view.layer.style.width = "100%";
+            // view.layer.style.height = "100%";
         }
         else if (toVC.modalPresentationStyle == UIModalPresentationStyle.currentContext)
         {
@@ -187,7 +188,7 @@ export class UIPresentationController extends NSObject
 
 }
 
-class MUIModalTransitioningDelegate extends NSObject
+class UIModalTransitioningDelegate extends NSObject
 {
     modalTransitionStyle = null;
 
@@ -214,7 +215,7 @@ class MUIModalTransitioningDelegate extends NSObject
     }
 }
 
-class MUIAnimationController extends NSObject
+class UIAnimationController extends NSObject
 {
     transitionDuration(transitionContext){
         return 0;
@@ -259,10 +260,10 @@ class UIModalPresentAnimationController extends NSObject
             || toVC.modalPresentationStyle == UIModalPresentationStyle.formSheet
             || toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen){
             
-            // if (MIOCoreIsPhone() == true)
-            //     animations = MUIClassListForAnimationType(MUIAnimationType.SlideInUp);
-            // else 
-            //     animations = MUIClassListForAnimationType(MUIAnimationType.BeginSheet);
+            if (MIOCoreIsPhone() == true)
+                animations = _CAClassListForAnimationType ( _CAAnimationType.SlideInUp );
+            else 
+                animations = _CAClassListForAnimationType ( _CAAnimationType.BeginSheet );
         }                            
 
         return animations;
@@ -293,10 +294,10 @@ class UIModalDismissAnimationController extends NSObject
             || fromVC.modalPresentationStyle == UIModalPresentationStyle.formSheet
             || fromVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen){
             
-            // if (MIOCoreIsPhone() == true)                        
-            //     animations = MUIClassListForAnimationType(MUIAnimationType.SlideOutDown);
-            // else 
-            //     animations = MUIClassListForAnimationType(MUIAnimationType.EndSheet);
+            if (MIOCoreIsPhone() == true)                        
+                animations = _CAClassListForAnimationType( _CAAnimationType.SlideOutDown );
+            else 
+                animations = _CAClassListForAnimationType( _CAAnimationType.EndSheet );
         }          
                   
         return animations;

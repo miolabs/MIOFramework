@@ -382,7 +382,7 @@ export class MIOCoreHTMLParser
 
                 // Special cases like <style></style> or <script></script>
                 // We need to read everything 'til the next close tag
-                if (element == "style" || element == "script"){
+                if (element == "style" || element == "script"){
                     let chars = this.readToNextString("</" + element + ">");
                     this.foundChars(chars);
                     

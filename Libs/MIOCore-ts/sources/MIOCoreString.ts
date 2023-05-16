@@ -100,16 +100,23 @@ export function MIOLocalizeString(key:string, comments:string) : string
     return value;
 }
 
-export function setMIOLocalizedStrings(data) {
+export function MIOLocalizedStringsSet(data:any) {
     _MIOLocalizedStrings = data
 }
 
-export function getMIOLocalizedStrings() {
+export function MIOLocalizedStringsGet() : any {
     return _MIOLocalizedStrings
 }
 
-export function MIOStringWithFormat(format, ...args:any[]):string {
+export function MIOStringWithFormat(format:string, ...args:any[]):string {
     if (args.length == 0) return format;
 
-    return format.replace('%s', args[0]);
+    let index = 0
+    let str = format.replace(/(%s|%i)/g, function(match) {
+        let result = typeof args[ index ] != "undefined" ? args[ index ] : match ;
+        index++;
+        return result;
+    });
+
+    return str;
 }

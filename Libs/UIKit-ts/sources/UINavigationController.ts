@@ -11,9 +11,10 @@ import { UINavigationBar } from "./UINavigationBar";
 import { UINavigationItem } from "./UINavigationItem";
 import { UIView } from "./UIView";
 import { UIViewController } from "./UIViewController";
+import { UIViewControllerTransitioningDelegate } from "./CoreAnimation/CoreAnimation";
 
 
-export class UINavigationController extends UIViewController
+export class UINavigationController extends UIViewController implements UIViewControllerTransitioningDelegate
 {
     rootViewController:UIViewController = null;
     viewControllersStack = [];
@@ -26,7 +27,7 @@ export class UINavigationController extends UIViewController
 
     init(){
         super.init();
-        this.view.layer.style.overflow = "hidden";        
+        // this.view.layer.style.overflow = "hidden";        
     }
 
     initWithRootViewController(vc:UIViewController){        
@@ -69,10 +70,10 @@ export class UINavigationController extends UIViewController
     }
 
     protected _setViewLoaded(value) {                
-        this.rootViewController.view.layer.style.left = "0px";
-        this.rootViewController.view.layer.style.top = "44px";
-        this.rootViewController.view.layer.style.width = "100%";
-        this.rootViewController.view.layer.style.botton = "0px";
+        // this.rootViewController.view.layer.style.left = "0px";
+        // this.rootViewController.view.layer.style.top = "44px";
+        // this.rootViewController.view.layer.style.width = "100%";
+        // this.rootViewController.view.layer.style.botton = "0px";
         this.view.addSubview(this.rootViewController.view);
         
         let navItems = [this.rootViewController.navigationItem];
@@ -113,7 +114,7 @@ export class UINavigationController extends UIViewController
 
         vc.navigationController = this;
 
-        vc.onLoadView(this, function (this:UINavigationController) {
+        vc.onLoadView( () => {
 
             if (vc.navigationItem == null) {
                 vc.navigationItem = new UINavigationItem();
@@ -142,7 +143,7 @@ export class UINavigationController extends UIViewController
                 this.preferredContentSize = vc.preferredContentSize;
 
             _UIShowViewController(lastVC, vc, this, animated);
-        });
+        } );
     }
 
     popViewController(animated?:boolean){
@@ -162,7 +163,7 @@ export class UINavigationController extends UIViewController
         if (toVC.preferredContentSize != null)
             this.contentSize = toVC.preferredContentSize;
 
-        _UICoreHideViewController(fromVC, toVC, this, this, function () {
+        _UICoreHideViewController(fromVC, toVC, this, ()=> {
             fromVC.removeChildViewController(this);
             fromVC.view.removeFromSuperview();
         });
@@ -184,7 +185,7 @@ export class UINavigationController extends UIViewController
 
         this.contentSize = rootVC.preferredContentSize;
 
-        _UICoreHideViewController(currentVC, rootVC, this, this, function () {
+        _UICoreHideViewController(currentVC, rootVC, this, () => {
             currentVC.view.removeFromSuperview();
             this.removeChildViewController(currentVC);
         });
@@ -228,7 +229,7 @@ export class UINavigationController extends UIViewController
     private _pushAnimationController = null;
     private _popAnimationController = null;
 
-    animationControllerForPresentedController(presentedViewController, presentingViewController, sourceController){
+    animationControllerForPresentedController( presentedViewController:UIViewController, presentingViewController: UIViewController, sourceController: UIViewController ){
         if (this._pushAnimationController == null) {
 
             this._pushAnimationController = new MUIPushAnimationController();
@@ -238,7 +239,7 @@ export class UINavigationController extends UIViewController
         return this._pushAnimationController;
     }
 
-    animationControllerForDismissedController(dismissedController)
+    animationControllerForDismissedController( dismissedController: UIViewController )
     {
         if (this._popAnimationController == null) {
 

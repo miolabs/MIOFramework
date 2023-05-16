@@ -2,10 +2,13 @@
  * Created by godshadow on 25/08/16.
  */
 
-/// <reference path="./core/UICore.ts" />
+import { UIButton, UIButtonType } from "./UIButton";
+import { UIControl } from "./UIControl";
+import { UIView } from "./UIView";
+import { CGRect } from "./CoreGraphics/CGRect";
 
 
-class UITabBarItem extends UIButton
+export class UITabBarItem extends UIButton
 {
     // TODO: Add more extra features. Comming soon
     init(){
@@ -14,12 +17,12 @@ class UITabBarItem extends UIButton
     }
 
     initWithLayer(layer, owner, options?){
-        super.initWithLayer(layer, owner, options);
+        // super.initWithLayer(layer, owner, options);
         this.type = UIButtonType.PushIn;
     }
 }
 
-class UITabBar extends UIView
+export class UITabBar extends UIView
 {
     items = [];
     selectedTabBarItemIndex = -1;
@@ -27,23 +30,23 @@ class UITabBar extends UIView
     private _itemsByIdentifier = {};
 
     initWithLayer(layer, owner, options?){
-        super.initWithLayer(layer, owner, options);
+        // super.initWithLayer(layer, owner, options);
 
         // Check for tab items
         let opts = {};
         let sp = layer.getAttribute("data-status-style-prefix");
         if (sp != null) opts["status-style-prefix"] = sp;
         
-        for (let index = 0; index < this.layer.childNodes.length; index++){
-            let tabItemLayer = this.layer.childNodes[index];
-            if (tabItemLayer.tagName == "DIV"){
-                let ti = new UITabBarItem();
-                ti.initWithLayer(tabItemLayer, owner, opts);
-                ti.type = UIButtonType.PushIn;                
-                this._addTabBarItem(ti);
-                MUIOutletRegister(owner, ti.layerID, ti);
-            }
-        }
+        // for (let index = 0; index < this.layer.childNodes.length; index++){
+        //     let tabItemLayer = this.layer.childNodes[index];
+        //     if (tabItemLayer.tagName == "DIV"){
+        //         let ti = new UITabBarItem();
+        //         ti.initWithLayer(tabItemLayer, owner, opts);
+        //         ti.type = UIButtonType.PushIn;                
+        //         this._addTabBarItem(ti);
+        //         MUIOutletRegister(owner, ti.layerID, ti);
+        //     }
+        // }
 
         if (this.items.length > 0)
             this.selectTabBarItemAtIndex(0);

@@ -21,33 +21,33 @@ export class UINavigationBar extends UIView
     private rigthView:UIView = null;
     private setup(){
         // MUICoreLayerAddStyle(this.layer, "navigation-bar");
-        this.layer.style.width = "100%";
+        // this.layer.style.width = "100%";
 
         this.leftView = new UIView();
         this.leftView.init();
-        this.leftView.layer.style.position = "absolute";
-        this.leftView.layer.style.top = "0px";
-        this.leftView.layer.style.height = "100%";
-        this.leftView.layer.style.width = "20%";
-        this.leftView.layer.style.left = "0px";
+        // this.leftView.layer.style.position = "absolute";
+        // this.leftView.layer.style.top = "0px";
+        // this.leftView.layer.style.height = "100%";
+        // this.leftView.layer.style.width = "20%";
+        // this.leftView.layer.style.left = "0px";
         this.addSubview(this.leftView);
 
         this.titleView = new UIView();
         this.titleView.init();
-        this.titleView.layer.style.position = "absolute";
-        this.titleView.layer.style.top = "0px";
-        this.titleView.layer.style.height = "100%";
-        this.titleView.layer.style.width = "60%";
-        this.titleView.layer.style.left = "20%";
+        // this.titleView.layer.style.position = "absolute";
+        // this.titleView.layer.style.top = "0px";
+        // this.titleView.layer.style.height = "100%";
+        // this.titleView.layer.style.width = "60%";
+        // this.titleView.layer.style.left = "20%";
         this.addSubview(this.titleView);
 
         this.rigthView = new UIView();
         this.rigthView.init();
-        this.rigthView.layer.style.position = "absolute";
-        this.rigthView.layer.style.top = "0px";
-        this.rigthView.layer.style.height = "100%";
-        this.rigthView.layer.style.width = "44px";
-        this.rigthView.layer.style.right = "0px";        
+        // this.rigthView.layer.style.position = "absolute";
+        // this.rigthView.layer.style.top = "0px";
+        // this.rigthView.layer.style.height = "100%";
+        // this.rigthView.layer.style.width = "44px";
+        // this.rigthView.layer.style.right = "0px";        
         this.addSubview(this.rigthView);
     }
 

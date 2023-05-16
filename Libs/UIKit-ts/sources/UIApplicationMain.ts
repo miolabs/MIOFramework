@@ -1,4 +1,4 @@
-import { NSClassFromString } from "mio-core";
+import { NSClassFromString } from "foundation";
 import { UIApplication } from "./UIApplication";
 
 export function UIApplicationMain(argc:number, argv:string[], principalClassName:string|null, delegateClassName:string) : number {

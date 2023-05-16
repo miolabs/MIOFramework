@@ -1,3 +1,5 @@
+/*
+
 import { UIView, UILayerGetFirstElementWithTag } from "./UIView";
 import { MIOObject, MIOFormatter, MIOIndexPath, MIOSize, MIORange, MIONumberFormatter, MIODateFormatter } from "../MIOFoundation";
 import { UILabel } from "./UILabel";
@@ -595,3 +597,5 @@ export class UIReportTableView extends UIScrollView {
     }
     
 }
+
+*/

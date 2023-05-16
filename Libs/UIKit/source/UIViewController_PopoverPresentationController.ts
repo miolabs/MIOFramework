@@ -20,7 +20,8 @@ export enum UIPopoverArrowDirection
     Right
 }
 
-export interface UIPopoverPresentationControllerDelegate {
+export interface UIPopoverPresentationControllerDelegate 
+{
     popoverPresentationControllerDidDismissPopover?(popoverPresentationController:UIPopoverPresentationController);
 }
 

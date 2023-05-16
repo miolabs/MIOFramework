@@ -2,7 +2,13 @@
  * Created by godshadow on 05/08/16.
  */
 
-enum UISplitViewControllerDisplayMode
+import { MIOCoreIsPhone } from "mio-core";
+import { UIButton } from "./UIButton";
+import { MUIPopAnimationController, MUIPushAnimationController } from "./UINavigationController";
+import { UIView } from "./UIView";
+import { UIViewController } from "./UIViewController";
+
+export enum UISplitViewControllerDisplayMode
 {
     Automatic,
     PrimaryHidden,
@@ -10,7 +16,7 @@ enum UISplitViewControllerDisplayMode
     PrimaryOverlay
 }
 
-class UISplitViewController extends UIViewController
+export class UISplitViewController extends UIViewController
 {
     private masterView:UIView = null;
     private detailView:UIView = null;
@@ -22,13 +28,13 @@ class UISplitViewController extends UIViewController
 
         this.masterView = new UIView();
         this.masterView.init();
-        if (MIOCoreIsPhone() == false) MUICoreLayerAddStyle(this.masterView.layer, "master-view");
+        // if (MIOCoreIsPhone() == false) MUICoreLayerAddStyle(this.masterView.layer, "master-view");
         this.view.addSubview(this.masterView);
 
         if (MIOCoreIsPhone() == false) {
             this.detailView = new UIView();
             this.detailView.init();
-            MUICoreLayerAddStyle(this.detailView.layer, "detail-view");        
+            // MUICoreLayerAddStyle(this.detailView.layer, "detail-view");        
             this.view.addSubview(this.detailView);
         }
     }
@@ -119,17 +125,17 @@ class UISplitViewController extends UIViewController
 
         if (oldVC == newVC) return;
 
-        newVC.onLoadView(this, function () {
+        newVC.onLoadView( () => {
 
             this.detailView.addSubview(newVC.view);
             this.addChildViewController(newVC);
             this._detailViewController = vc;
 
-            _MUIShowViewController(oldVC, newVC, this, false, this, function () {
+            // _MUIShowViewController(oldVC, newVC, this, false, this, function () {
 
-                oldVC.view.removeFromSuperview();
-                this.removeChildViewController(oldVC);
-            });
+            //     oldVC.view.removeFromSuperview();
+            //     this.removeChildViewController(oldVC);
+            // });
         });
     }
 
@@ -138,7 +144,7 @@ class UISplitViewController extends UIViewController
 
         //if (vc.transitioningDelegate == null) vc.transitioningDelegate = this;
 
-        vc.onLoadView(this, function (this: UISplitViewController) {
+        vc.onLoadView( () => {
 
             this.view.addSubview(vc.view);
             this.addChildViewController(vc);
@@ -147,9 +153,9 @@ class UISplitViewController extends UIViewController
             if (vc.preferredContentSize != null)
                 this.preferredContentSize = vc.preferredContentSize;
 
-            _MUIShowViewController(oldVC, vc, this, true, this, function(){
-                this.setCollapsed(true);
-            });
+            // _MUIShowViewController(oldVC, vc, this, true, this, function(){
+            //     this.setCollapsed(true);
+            // });
         });
     }
 
@@ -163,10 +169,10 @@ class UISplitViewController extends UIViewController
         if (toVC.preferredContentSize != null)
             this.contentSize = toVC.preferredContentSize;
 
-        _MUIHideViewController(fromVC, toVC, this, this, function () {
-            fromVC.removeChildViewController(this);
-            fromVC.view.removeFromSuperview();
-        });
+        // _MUIHideViewController(fromVC, toVC, this, this, function () {
+        //     fromVC.removeChildViewController(this);
+        //     fromVC.view.removeFromSuperview();
+        // });
     }
 
     private displayModeButtonItemAction(){

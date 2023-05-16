@@ -2,8 +2,7 @@
  * Created by godshadow on 04/08/16.
  */
 
-/// <reference path="core/UICoreLayer.ts" />
-
+import { UIView } from "./UIView";
 
 export class UIWebView extends UIView
 {
@@ -17,10 +16,10 @@ export class UIWebView extends UIView
 
     initWithLayer(layer, owner, options?)
     {
-        super.initWithLayer(layer, owner, options);
+        // super.initWithLayer(layer, owner, options);
 
-        this._iframeLayer = MUILayerGetFirstElementWithTag(this.layer, "IFRAME");
-        this._setupLayer();
+        // this._iframeLayer = MUILayerGetFirstElementWithTag(this.layer, "IFRAME");
+        // this._setupLayer();
     }
 
     private _setupLayer(){
@@ -31,7 +30,7 @@ export class UIWebView extends UIView
             this._iframeLayer.setAttribute("frameborder", "0");
             this._iframeLayer.setAttribute("width", "100%");
             this._iframeLayer.setAttribute("height", "100%");            
-            this.layer.appendChild(this._iframeLayer);
+            // this.layer.appendChild(this._iframeLayer);
         }
     }
 

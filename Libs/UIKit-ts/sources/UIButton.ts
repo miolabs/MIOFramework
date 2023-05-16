@@ -2,9 +2,12 @@
  * Created by godshadow on 12/3/16.
  */
 
+import { NSCoder } from "foundation";
+import { CAButtonLayer } from "./CoreAnimation/CAButtonLayer";
 import { CGRect } from "./CoreGraphics/CGRect";
 import { UIColor } from "./UIColor";
 import { UIControl } from "./UIControl";
+import { UIEvent } from "./UIEvent";
 
 export enum UIButtonType
 {
@@ -24,111 +27,58 @@ export class UIButton extends UIControl
     private _imageLayer = null;
     
     type = UIButtonType.MomentaryPushIn;
+    
+    static get layerClass() : any { return CAButtonLayer }
 
-    init(){
-        super.init();
+    initWithFrame(frame: CGRect) {
+        super.initWithFrame(frame);
         // MUICoreLayerAddStyle(this.layer, "btn");
-        this.setupLayers();
+        // this.setupLayers();
     }
 
-    initFrameCGRect(frame: CGRect) {
-        super.initFrameCGRect(frame);
-        // MUICoreLayerAddStyle(this.layer, "btn");
-        this.setupLayers();
+    initWithCoder( coder: NSCoder ) {
+        super.initWithCoder( coder );
+
+        let type = coder.decodeIntegerForKey( "type" );
+        switch( type ){
+            case "MomentaryPushIn": this.type = UIButtonType.MomentaryPushIn; break;
+            case "PushOnPushOff"  : this.type = UIButtonType.PushOnPushOff; break;
+            case "PushIn"         : this.type = UIButtonType.PushIn; break;
+        }
     }
 
-    // initWithLayer(layer, owner, options?){
-    //     super.initWithLayer(layer, owner, options);
+    //
+    // Event handling
+    //
 
-    //     let type = this.layer.getAttribute("data-type");
-    //     if (type == "MomentaryPushIn")
-    //         this.type = UIButtonType.MomentaryPushIn;
-    //     else if (type == "PushOnPushOff")
-    //         this.type = UIButtonType.PushOnPushOff;
-    //     else if (type == "PushIn")
-    //         this.type = UIButtonType.PushIn;
+    touchesBeginWithEvent(touches: any, event: UIEvent ): void {
+        switch ( this.type ) {
+            case UIButtonType.MomentaryPushIn:
+            case UIButtonType.PushIn:
+            this.setSelected( true );
+            break;
 
-    //     // Check for title layer
-    //     this._titleLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "SPAN");
-
-
-    //     // Check for img layer
-    //     this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "IMG");
-    //     //if (this._imageLayer == null) this._imageLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "DIV");
-
-    //     // Check for status
-    //     let status = this.layer.getAttribute("data-status");
-    //     if (status == "selected")
-    //         this.setSelected(true);
-
-    //     this.setupLayers();
-    // }
-
-    private setupLayers(){
-        //UICoreLayerRemoveStyle(this.layer, "view");
-        //UICoreLayerAddStyle(this.layer, "btn");
-
-        // if (this._titleLayer == null) {
-        //     this._titleLayer = document.createElement("span");
-        //     this.layer.appendChild(this._titleLayer);
-        // }
-
-        // if (this._imageLayer == null) {
-        //     this._imageLayer = document.createElement("img");
-        //     this._imageLayer.setAttribute("width", "44px");
-        //     this.layer.appendChild(this._imageLayer);
-        // }
-
-        // let key = this.layer.getAttribute("data-title");
-        // if (key != null) this.setTitle(NSLocalizeString(key, key));
-        
-        // // Prevent click
-        // this.layer.addEventListener("click", function(e) {
-        //     e.stopPropagation();
-        // });
-        
-        // this.layer.addEventListener("mousedown", function(e) {
-        //     e.stopPropagation();
-        //     if (this.enabled == false) return;
-
-        //     switch (this.type){
-        //         case UIButtonType.MomentaryPushIn:
-        //         case UIButtonType.PushIn:
-        //         this.setSelected(true);
-        //         break;
-
-        //         case UIButtonType.PushOnPushOff:
-        //         this.setSelected(!this.selected);
-        //         break;
-        //     }
-            
-        // }.bind(this));
-
-        // this.layer.addEventListener("mouseup", function(e) {
-        //     e.stopPropagation();
-        //     if (this.enabled == false) return;            
-        //     if (this.type == UIButtonType.MomentaryPushIn) this.setSelected(false);
-
-        //     this._performActionsForEvents(UIControl.Event.touchUpInside);
-        //     this._performSegue();
-
-        //     // if (this.action != null && this.target != null)
-        //     //     this.action.call(this.target, this);
-            
-        // }.bind(this));
+            case UIButtonType.PushOnPushOff:
+            this.setSelected( !this.selected );
+            break;
+        }
     }
 
-    setTitle(title){
-        this._titleLayer.innerHTML = title;
+    touchesEndedWithEvent( touches: any, event: UIEvent ): void {
+        super.touchesEndedWithEvent( touches, event );
+        if ( this.type == UIButtonType.MomentaryPushIn ) this.setSelected( false );
     }
 
-    set title(title){
-        this.setTitle(title);
+    //
+    // Properties
+    //
+
+    setTitle(title:string){
+        (this.layer as CAButtonLayer).string = title;
     }
 
-    get title(){
-        return this._titleLayer.innerHTML;
-    }
+    set title(title){ this.setTitle( title ); }
+    get title() { return (this.layer as CAButtonLayer).string; }
 
     setTitleColorFor(color: UIColor) {
         this._titleLayer.style.color = "#" + color.hex;

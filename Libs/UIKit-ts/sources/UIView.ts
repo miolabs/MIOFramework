@@ -2,15 +2,19 @@
  * Created by godshadow on 11/3/16.
  */
 
-import { NSObject } from "foundation";
-import { CALayer } from "./CoreAnimation/CALayer";
+import { NSCoder } from "foundation";
+import { MIOCoreClassByName } from "mio-core";
+import { UICoreNibCoder } from "./core/UICoreNibParser";
+import { CALayer, CALayerEvent } from "./CoreAnimation/CALayer";
 import { CGRect } from "./CoreGraphics/CGRect";
 import { UIColor } from "./UIColor";
+import { UIEvent } from "./UIEvent";
 import { UIGestureRecognizer } from "./UIGestureRecognizer";
+import { UIResponder } from "./UIResponder";
 import { UIWindow } from "./UIWindow";
 
 
-export class UIView extends NSObject
+export class UIView extends UIResponder
 {
     layer:CALayer;
     layerID = null;    
@@ -19,14 +23,13 @@ export class UIView extends NSObject
     tag: number = 0;
     owner = null;
 
-    private _parent: UIView = null;
-    set parent(view) { this.setParent(view); }
-    get parent(): UIView { return this._parent; }
+    private _superview: UIView = null;
+    set superview(view) { this.setSuperview(view); }
+    get superview(): UIView { return this._superview; }
 
 
     protected _viewIsVisible = false;
     protected _needDisplay = true;
-    // _isLayerInDOM = false;
 
     protected _subviews = [];
     get subviews() {
@@ -53,8 +56,10 @@ export class UIView extends NSObject
     //     this.layerID = layerID ? layerID : MUICoreLayerIDFromObject(this);
     // }
 
+    static get layerClass() : any { return CALayer }
+
     init() {
-        this.layer = new CALayer();
+        this.layer = new UIView.layerClass();
         // this.layer = MUICoreLayerCreate(this.layerID);        
         //UICoreLayerAddStyle(this.layer, "view");
         //UICoreLayerAddStyle(this.layer, "view");
@@ -66,100 +71,57 @@ export class UIView extends NSObject
         //this.layer.style.background = "rgb(255, 255, 255)";                
     }
 
-    initFrameCGRect(frame: CGRect) {
+    initWithCoder( coder: NSCoder ) {
+        super.initWithCoder( coder );        
+        if ( coder instanceof UICoreNibCoder ) {
+            let c = MIOCoreClassByName( this.className );
+            this.layer = new c.layerClass( coder.layerContents );
+            this._subviews = coder.decodeSubviews();
+            // Custom properties
+            this.tag = coder.decodeIntegerForKey( "tag" );
+            this._assign_outlets( coder );
+        }
+
+        this.awakeFromNib();
+    }
+
+    private _assign_outlets( coder: UICoreNibCoder ){
+        for (let key in this._outlets) {
+            let obj = coder.outlets[ key ];
+            let prop = this._outlets[ key ];
+            this[ prop ] = obj;
+        }
+    }
+
+
+    initWithFrame(frame: CGRect) {
         this.layer = new CALayer( this.layerID );
         // this.layer = MUICoreLayerCreate(this.layerID);
-        this.layer.style.position = "absolute";
+        // this.layer.style.position = "absolute";
         this.setX(frame.origin.x);
         this.setY(frame.origin.y);
         this.setWidth(frame.size.width);
         this.setHeight(frame.size.height);
     }
 
-    // initWithLayer(layer, owner, options?) {
-    //     this.layer = layer;
-    //     this.layerOptions = options;
-    //     this.owner = owner;
+    awakeFromNib() { }
 
-    //     let layerID = this.layer.getAttribute("id");
-    //     if (layerID != null) this.layerID = layerID;
-
-    //     let tag = this.layer.getAttribute("data-tag");
-    //     this.tag = tag || 0;
-
-    //     this._addLayerToDOM();
-
-    //     // Add subviews
-    //     if (this.layer.childNodes.length > 0) {
-    //         for (let index = 0; index < this.layer.childNodes.length; index++) {
-    //             let subLayer = this.layer.childNodes[index];
-    
-    //             if (subLayer.tagName != "DIV" && subLayer.tagName != "SECTION") continue;
-    
-    //             if (subLayer.getAttribute("data-connections") == "true") {
-    //                 let obj = this;
-    //                 if (options != null && options["Object"] != null) obj = options["Object"];
-    //                 MUICoreStoryboardParseConnectionsLayer(subLayer, obj, owner);
-    //                 continue;
-    //             }
-
-    //             if (subLayer.getAttribute("data-navigation-key") == "navigationItem"){             
-    //                 owner.navigationItem = new UINavigationItem();
-    //                 owner.navigationItem.initWithLayer(subLayer, owner);
-    //                 continue;
-    //             }
-
-    //             let className = subLayer.getAttribute("data-class");
-    //             //if (className == null || className.length == 0) className = "UIView";
-    //             if (className == null) continue;
-    
-    //             if (className == "UIBarItem" || className == "UIBarButtonItem" || className == "UINavigationItem" || className == "UICollectionViewFlowLayout") continue;    
-
-    //             let sv = MUICoreViewCreateView(subLayer, owner);
-    //             this._linkViewToSubview(sv);
-    
-    //             let id = subLayer.getAttribute("id");
-    //             if (id != null) owner._outlets[id] = sv;
-    //         }   
-    //     }
-    
-    //     //MUICoreStoryboardParseLayer(layer, this, owner);
-    // }
-
-    copy() {
-        // let objLayer = this.layer.cloneNode(true);
-
-        // let className = this.getClassName();
-        // if (className == null) throw Error("UIView:copy: Error classname is null");
-
-        // let view = NSClassFromString(className);
-        // view.initWithLayer(objLayer, null);
-
-        // return view;
-    }
-
-    awakeFromHTML() { }
-
-    setParent(view: UIView) {
+    setSuperview(view: UIView) {
         this.willChangeValue("parent");
-        this._parent = view;
+        this._superview = view;
         this.didChangeValue("parent");
     }
 
-    addSubLayer(layer) {
-        // this.layer.innerHTML = layer.innerHTML;
-    }
-
-    _linkViewToSubview(view) {
+    _linkViewToSubview( view:UIView ) {
         if ((view instanceof UIView) == false) throw new Error("_linkViewToSubview: Trying to add an object that is not a view");
 
         this.subviews.push(view);
     }
 
-    addSubview(view, index?) {
+    addSubview( view:UIView, index?:number ) {
         if ((view instanceof UIView) == false) throw new Error("addSubview: Trying to add an object that is not a view");
 
-        view.setParent(this);
+        view.setSuperview(this);
 
         if (index == null)
             this.subviews.push(view);
@@ -171,7 +133,7 @@ export class UIView extends NSObject
     }
 
     insertSubviewAboveSubview(view: UIView, siblingSubview: UIView) {
-        view.setParent(this);
+        view.setSuperview(this);
         let index = this.subviews.indexOf(siblingSubview);
         this.subviews.splice(index, 0, view);
         this.addLayerBeforeLayer(view.layer, siblingSubview.layer);
@@ -185,41 +147,12 @@ export class UIView extends NSObject
         // newLayer._isLayerInDOM = true;
     }
 
-    // protected _addLayerToDOM(index?) {
-    //     if (this._isLayerInDOM == true)
-    //         return;
-
-    //     if (this.layer == null || this.parent == null)
-    //         return;
-
-    //     if (index == null)
-    //         this.parent.layer.appendChild(this.layer);
-    //     else
-    //         this.parent.layer.insertBefore(this.layer, this.parent.layer.children[0])
-
-    //     this._isLayerInDOM = true;
-    // }
-
     removeFromSuperview() {
-        if (this.parent == null) return;
+        if (this.superview == null) return;
 
-        let subviews = this.parent._subviews;
-        var index = subviews.indexOf(this);
-        subviews.splice(index, 1);
-
-        // if (this._isLayerInDOM == false) return;
-
-        // this.parent.layer.removeChild(this.layer);
-        // this._isLayerInDOM = false;
+        this.layer.removeFromSuperlayer();
+        this.superview.subviews.removeObject( this );
     }
-
-    // protected _removeLayerFromDOM() {
-    //     if (this._isLayerInDOM == false)
-    //         return;
-
-    //     this.layer.removeChild(this.layer);
-    //     this._isLayerInDOM = false;
-    // }
 
     // private _removeAllSubviews() {
 
@@ -237,8 +170,8 @@ export class UIView extends NSObject
     //     }
     // }
 
-    setViewIsVisible(value: boolean) {
-
+    setViewIsVisible( value: boolean )
+    {
         this._viewIsVisible = true;
         for (var index = 0; index < this.subviews.length; index++) {
             var v = this.subviews[index];
@@ -246,7 +179,8 @@ export class UIView extends NSObject
         }
     }
 
-    viewWithTag(tag): UIView|null {
+    viewWithTag( tag:number ) : UIView | null 
+    {
         // TODO: Use also the view tag component
         // let view = MUICoreViewSearchViewTag(this, tag);
         return null;
@@ -287,13 +221,7 @@ export class UIView extends NSObject
     setHidden(hidden: boolean) {
         this._hidden = hidden;
 
-        if (this.layer == null)
-            return;
-
-        // if (hidden)
-        //     this.layer.style.display = "none";
-        // else
-        //     this.layer.style.display = "";
+        this.layer.isHidden = hidden;
     }
 
     get hidden(): boolean {
@@ -304,23 +232,10 @@ export class UIView extends NSObject
         this.setHidden(value);
     }
 
-    set backgroundColor(color: UIColor) {
-        // this.layer.style.backgroundColor = "#" + color.hex;
-    }
+    set backgroundColor( color: UIColor ) { this.setBackgroundColor ( color ); }    
 
-    setBackgroundColor(color) {
+    setBackgroundColor( color: UIColor ) {
         // this.layer.style.backgroundColor = "#" + color;
-    }
-
-    setBackgroundRGBColor(r, g, b, a?) {
-        // if (a == null) {
-        //     let value = "rgb(" + r + ", " + g + ", " + b + ")";
-        //     this.layer.style.backgroundColor = value;
-        // }
-        // else {
-        //     let value = "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
-        //     this.layer.style.backgroundColor = value;
-        // }
     }
 
     // getBackgroundColor() {
@@ -462,34 +377,15 @@ export class UIView extends NSObject
     }
 
     //
-    // CSS Subsystem
+    // Event handling and user interaction
     //
 
-    // protected _getValueFromCSSProperty(property) {
-    //     var v = window.getComputedStyle(this.layer, null).getPropertyValue(property);
-    //     return v;
-    // }
-
-    // protected _getIntValueFromCSSProperty(property) {
-    //     let v = this._getValueFromCSSProperty(property);
-    //     //let r = v.hasSuffix("px");
-    //     let r = MIOCoreStringHasSuffix(v, "px");
-    //     if (r == true) v = v.substring(0, v.length - 2);
-    //     else {
-    //         var r2 = v.hasSuffix("%");
-    //         if (r2 == true) v = v.substring(0, v.length - 1);
-    //     }
-
-    //     return parseInt(v);
-    // }
-
-    private _userInteraction = false;
-    set userInteraction(value) {
+    protected _userInteraction = false;
+    set userInteraction( value:boolean ) {
         if (value == this._userInteraction) return;
 
         if (value == true) {
-            // this.layer.addEventListener("mousedown", this.mouseDownEvent.bind(this));
-            // this.layer.addEventListener("mouseup", this.mouseUpEvent.bind(this));
+            this.layer.registerEventAction( this, this.on_event );
         }
         else {
             // this.layer.removeEventListener("mousedown", this.mouseDownEvent);
@@ -497,19 +393,26 @@ export class UIView extends NSObject
         }
     }
 
-    private isMouseDown = false;
-    private mouseDownEvent(ev) {
-        // let e = UIEvent.eventWithSysEvent(ev);
-        // this.touchesBeganWithEvent(null, e);
+    protected on_event( event:CALayerEvent ) {
+        
+        switch ( event ){
+            case CALayerEvent.mouseDown: this.on_mouse_down_event( event ); break;
+            case CALayerEvent.mouseUp: this.on_mouse_up_event( event ); break;
+        }
+    }
+    
+    private on_mouse_down_event( event:any ) {
+        let e = new UIEvent(); //.eventWithSysEvent( event );
+        this.touchesBeganWithEvent(null, e );
         // this.isMouseDown = true;
         // window.addEventListener("mousemove", this.mouseMoveEvent.bind(this));
         // ev.preventDefault(); // Prevent selection
     }
 
-    private mouseUpEvent(ev) {
+    private on_mouse_up_event( event:any ) {
         // this.isMouseDown = false;
-        // let e = UIEvent.eventWithSysEvent(ev);
-        // this.touchesEndedWithEvent(null, e);
+        let e = new UIEvent(); //.eventWithSysEvent(ev);
+        this.touchesEndedWithEvent( null, e );
     }
 
     private mouseMoveEvent(ev) {
@@ -526,28 +429,6 @@ export class UIView extends NSObject
         // }
     }
 
-    touchesBeganWithEvent(touches, ev: UIEvent) {
-        for (let index = 0; index < this.gestureRecognizers.length; index++) {
-            let gr: UIGestureRecognizer = this.gestureRecognizers[index];
-            gr._viewTouchesBeganWithEvent(touches, ev);
-        }
-    }
-
-    touchesMovedWithEvent(touches, ev: UIEvent) {
-        for (let index = 0; index < this.gestureRecognizers.length; index++) {
-            let gr: UIGestureRecognizer = this.gestureRecognizers[index];
-            gr._viewTouchesMovedWithEvent(touches, ev);
-        }
-    }
-
-    touchesEndedWithEvent(touches, ev: UIEvent) {
-        for (let index = 0; index < this.gestureRecognizers.length; index++) {
-            let gr: UIGestureRecognizer = this.gestureRecognizers[index];
-            gr._viewTouchesEndedWithEvent(touches, ev);
-        }
-    }
-
-    private gestureRecognizers = [];
     addGestureRecognizer(gesture: UIGestureRecognizer) {
         if (this.gestureRecognizers.containsObject(gesture)) return;
 

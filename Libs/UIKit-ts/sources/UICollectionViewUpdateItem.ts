@@ -1,6 +1,7 @@
+import { NSObject } from "foundation";
 
 
-class UICollectionViewUpdateItem extends NSObject
+export class UICollectionViewUpdateItem extends NSObject
 {
 
 }

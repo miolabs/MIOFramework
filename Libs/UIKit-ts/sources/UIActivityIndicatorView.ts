@@ -2,19 +2,20 @@
  * Created by godshadow on 21/5/16.
  */
 
-/// <reference path="UIView.ts" />
+import { UIView } from "./UIView";
 
 
-enum UIActivityIndicatorViewStyle {
+export enum UIActivityIndicatorViewStyle 
+{
     white,
     whiteLarge,
     gray
  }
 
-class UIActivityIndicatorView extends UIView
+export class UIActivityIndicatorView extends UIView
 {    
     initWithLayer(layer, owner, options){
-        super.initWithLayer(layer, owner, options);
+        // super.initWithLayer(layer, owner, options);
         this.setHidden(true);
     }
 

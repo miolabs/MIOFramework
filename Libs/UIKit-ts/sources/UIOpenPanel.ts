@@ -1,12 +1,11 @@
-/// <reference path="UIWindow.ts" />
+import { UIWindow } from "./UIWindow";
 
-
-enum MIOFileHandlingPanel
+export enum MIOFileHandlingPanel
 {
     OKButton
 }
 
-class UIOpenPanel extends UIWindow
+export class UIOpenPanel extends UIWindow
 {
     files = [];
 
@@ -35,7 +34,7 @@ class UIOpenPanel extends UIWindow
             instance.filesDidSelect(files);
         }, false);
         
-        UICoreLayerAddSublayer(window.layer, this._inputLayer);
+        // UICoreLayerAddSublayer(window.layer, this._inputLayer);
 
         this._inputLayer.click();
     }

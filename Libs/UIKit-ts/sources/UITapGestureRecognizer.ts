@@ -1,3 +1,4 @@
+import { UIEvent } from "./UIEvent";
 import { UIGestureRecognizer, UIGestureRecognizerState } from "./UIGestureRecognizer";
 
 export class UITapGestureRecognizer extends UIGestureRecognizer

@@ -3,14 +3,14 @@
  */
 
 import { Bundle, NSLog, PropertyListSerialization, URLConnection, URLRequest, _MIOBundleAppGetResource, _MIOBundleLoadBundles } from "foundation";
-import { MIOCoreAddLanguage, MIOCoreGetContentsFromURLString, MIOCoreGetLanguages, MIOCoreGetPlatformLanguage } from "mio-core";
+import { MIOCoreAddLanguage, MIOCoreGetContentsFromURLString, MIOCoreGetLanguages, MIOCoreGetPlatformLanguage, MIOLocalizedStringsSet } from "mio-core";
 import { UIApplicationDelegate } from "./UIApplicationDelegate";
 import { UIStoryboard } from "./UIStoryboard";
 import { UIWindow } from "./UIWindow";
 
 
-export class UIApplication {
-
+export class UIApplication 
+{
     private static _sharedInstance: UIApplication;
 
     static get shared(): UIApplication {
@@ -67,41 +67,21 @@ export class UIApplication {
             return;
         }
         
-        let request = URLRequest.requestWithURL(new URL(url));
-        let con = new URLConnection();
-        con.initWithRequestBlock(request, this, function(code, data){
+        MIOCoreGetContentsFromURLString(url, this, function(this:Bundle, code:number, data:string){
             if (code == 200) {
-                // MIOCoreStringSetLocalizedStrings(JSON.parse(data.replace(/(\r\n|\n|\r)/gm, "")));
+                MIOLocalizedStringsSet(JSON.parse(data.replace(/(\r\n|\n|\r)/gm, "")));
             }
             completion();
         });        
     }
 
-    // Get Languages from the app.plist
-    // private downloadLanguages(config){
-    //     let langs = config["Languages"];
-    //     if (langs == null) {
-    //         this._run();
-    //     }
-    //     else {
-    //         for (let key in langs) {
-    //             let url = langs[key];
-    //             MIOCoreAddLanguage(key, url);
-    //         }
-    //         let lang = MIOCoreGetPlatformLanguage();
-    //         this.setLanguage(lang, this, function(){
-    //             this._run();
-    //         });                
-    //     }
-    // }
-
     run( args:string[] ){
-        _MIOBundleLoadBundles("Bundles.json", (error:Error) => {
+        _MIOBundleLoadBundles("app.bundles.json", (error:Error) => {
             
             if (error != null) { NSLog(error); return }
 
             // Get Languages from the app.plist
-            let appPlistData = _MIOBundleAppGetResource("Main", "App", "plist");
+            let appPlistData = _MIOBundleAppGetResource("Main", "app", "plist");
             if (appPlistData == null) throw new Error("We couldn't download the app.plist");
 
             let config = PropertyListSerialization.propertyListWithData(appPlistData, 0, 0, null);
@@ -178,7 +158,7 @@ export class UIApplication {
     private _launchApp(){
         this.delegate.window.makeKeyAndVisible();
 
-        this.delegate.window.rootViewController.onLoadView(this, function (this: UIApplication) {
+        this.delegate.window.rootViewController.onLoadView( () => {
             
             let window = this.delegate.window as UIWindow;
             window.addSubview(window.rootViewController.view);

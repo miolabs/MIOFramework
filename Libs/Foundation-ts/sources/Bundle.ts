@@ -36,8 +36,8 @@ export class Bundle extends NSObject
         });
     }
 
-    pathForResourceOfType(resource:string, type:string){
-        // return MIOCoreBundleGetAppResource(resource, type);
+    pathForResourceOfType( resource:string, type:string ) : any {
+        return _MIOBundleAppGetResource("Main", resource, type);        
     }
 
 }
@@ -116,7 +116,7 @@ export function  _MIOBundleResourceDownloadCheck(){
 }
 
 
-let _MIOAppBundles = {};
+var _MIOAppBundles = {};
 
 export function _MIOBundleSetResource(identifier:string, resource:string, type:string, content:string){
 

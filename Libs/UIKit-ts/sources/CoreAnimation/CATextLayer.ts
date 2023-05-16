@@ -1,14 +1,33 @@
+import { _UICoreLayerGetFirstElementWithTag } from "../core/UICoreLayer";
 import { CALayer } from "./CALayer";
 
-export class CATextLayer extends CALayer 
-{    
-    set string(text:string|null){
+export interface CATextProtocol
+{
+    set string( text:string | null );
+    get string( ): string | null;
+}
+
+export class CATextLayer extends CALayer implements CATextProtocol
+{        
+    private textElement:any;
+
+    constructor( contents?:any ){
+        super( contents );
+        if ( contents != null ) this.textElement = _UICoreLayerGetFirstElementWithTag( contents, "SPAN");
+        
+        if ( this.textElement == null ) {
+            this.textElement = document.createElement("SPAN");
+            this.contents.appendChild( this.textElement );
+        }        
+    }
+
+    set string( text: string|null ) {
         let newValue = text != null ? text : "";
-        this.contents.value = newValue;
+        this.textElement.innerHTML = newValue;
     }
 
     get string(){
-        return this.contents.value;
+        return this.textElement.innerHTML;
     }
 
 }

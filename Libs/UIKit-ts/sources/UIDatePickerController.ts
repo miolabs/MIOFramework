@@ -1,9 +1,9 @@
-/// <reference path="../types/mio-core.d.ts" />
+import { UIViewController } from "./UIViewController";
+import { CGSize } from "./CoreGraphics/CGSize";
+import { UILabel } from "./UILabel";
+import { UIColor } from "./UIColor";
 
-/// <reference path="UIViewController.ts" />
-
-
-class UIDatePickerController extends UIViewController
+export class UIDatePickerController extends UIViewController
 {
     delegate = null;
     tag = 0;
@@ -11,30 +11,30 @@ class UIDatePickerController extends UIViewController
     private calendarView = null;    
     
     public get preferredContentSize() : CGSize {
-        return new CGSize(320, 329);
+        return new CGSize( 320, 329 );
     }
 
     viewDidLoad(){        
-        this.view.setBackgroundRGBColor(255, 255, 255);
+        this.view.backgroundColor = UIColor.white;
 
-        this.calendarView = new UICalendarView();
-        this.calendarView.init();
-        this.calendarView.dataSource = this;        
-        this.calendarView.delegate = this;        
-        this.view.addSubview(this.calendarView);
+        // this.calendarView = new UICalendarView();
+        // this.calendarView.init();
+        // this.calendarView.dataSource = this;        
+        // this.calendarView.delegate = this;        
+        // this.view.addSubview(this.calendarView);
 
         this.calendarView.reloadData();
     }
 
     viewTitleForHeaderAtMonthForCalendar(calendar, currentMonth){
-        let title = MIODateGetStringForMonth(currentMonth);
+        // let title = MIODateGetStringForMonth(currentMonth);
         let header = new UILabel();
         header.init();
-        header.setText(title);
+        // header.setText(title);
         header.setTextAlignment("center");
         header.setHeight(30);
         header.setTextRGBColor(101, 100, 106);
-        header.setBackgroundRGBColor(255, 255, 255);
+        header.backgroundColor = UIColor.white;
         header.setFontSize(20);
         header.setFontStyle("bold");
         header.setFontFamily("SourceSansPro-Semibold, Source Sans Pro, sans-serif");

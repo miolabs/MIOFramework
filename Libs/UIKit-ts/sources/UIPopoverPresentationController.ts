@@ -3,27 +3,27 @@
  * Created by godshadow on 11/11/2016.
  */
 
-/// <reference path="core/CoreAnimation.ts" />
+import { UIPresentationController } from "./UIPresentationController";
+import { CGRect } from "./CoreGraphics/CGRect";
+import { NSObject } from "foundation";
 
-/// <reference path="UIPresentationController.ts" />
 
-
-enum UIPopoverArrowDirection
+export enum UIPopoverArrowDirection
 {
-    Any,
-    Up,
-    Down,
-    Left,
-    Right
+    any,
+    up,
+    down,
+    left,
+    right
 }
 
-interface UIPopoverPresentationControllerDelegate {
+export interface UIPopoverPresentationControllerDelegate {
     popoverPresentationControllerDidDismissPopover?(popoverPresentationController:UIPopoverPresentationController);
 }
 
-class UIPopoverPresentationController extends UIPresentationController
+export class UIPopoverPresentationController extends UIPresentationController
 {
-    permittedArrowDirections = UIPopoverArrowDirection.Any;
+    permittedArrowDirections = UIPopoverArrowDirection.any;
 
     sourceView = null;
     sourceRect = CGRect.zero();
@@ -47,7 +47,7 @@ class UIPopoverPresentationController extends UIPresentationController
         //if (MIOCoreIsPhone() == true) return;
         
         this._calculateFrame();
-        MUICoreLayerAddStyle(this.presentedView.layer, "popover_window");                
+        // MUICoreLayerAddStyle(this.presentedView.layer, "popover_window");                
     }
 
     dismissalTransitionDidEnd(completed){     
@@ -180,8 +180,8 @@ export class MIOPopOverPresentAnimationController extends NSObject
 
     // TODO: Not iOS like transitions. For now we use css animations
     animations(transitionContext){
-        let animations = MUIClassListForAnimationType(MUIAnimationType.FadeIn);
-        return animations;
+        // let animations = MUIClassListForAnimationType(MUIAnimationType.FadeIn);
+        // return animations;
     }
 
 }
@@ -202,8 +202,8 @@ export class MIOPopOverDismissAnimationController extends NSObject
 
     // TODO: Not iOS like transitions. For now we use css animations
     animations(transitionContext){
-        let animations = MUIClassListForAnimationType(MUIAnimationType.FadeOut);
-        return animations;
+        // let animations = MUIClassListForAnimationType(MUIAnimationType.FadeOut);
+        // return animations;
     }
 
 }

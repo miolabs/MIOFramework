@@ -1,5 +1,5 @@
 declare global {
-    interface URL {
+    export interface URL {
         absoluteString:string;
     }
 }

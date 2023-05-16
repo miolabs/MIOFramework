@@ -1,7 +1,9 @@
 /// <reference path="UIBarItem.ts" />
 
 import { UIBarItem } from "./UIBarItem";
-import { UIButton, UIControl, UIView } from "./_index";
+import { UIButton } from "./UIButton";
+import { UIControl } from "./UIControl";
+import { UIView } from "./UIView";
 
 
 export enum UIBarButtonSystemItem 
@@ -74,9 +76,9 @@ export class UIBarButtonItem extends UIBarItem
         let titleStyle = layer.getAttribute("data-bar-button-item-title");
         if (titleStyle != null) {
             button.setTitle(titleStyle);
-            button.layer.style.position = "absolute";
-            button.layer.style.left = "10px";
-            button.layer.style.top = "15px";
+            // button.layer.style.position = "absolute";
+            // button.layer.style.left = "10px";
+            // button.layer.style.top = "15px";
         }
 
         if (layer.childNodes.length > 0) {

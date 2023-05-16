@@ -2,82 +2,52 @@
  * Created by godshadow on 11/3/16.
  */
 
+import { CATextLayer } from "./CoreAnimation/CATextLayer";
 import { UIView } from "./UIView";
 
 
 export class UILabel extends UIView
-{
-    private _textLayer = null;
+{    
     autoAdjustFontSize = "none";
     autoAdjustFontSizeValue = 4;
 
-    init(){
-        super.init();
-        // MUICoreLayerAddStyle(this.layer, "label");
-        this.setupLayers();
+    static get layerClass(): any { return CATextLayer; }
+
+    init(): void {
+        this.layer = new UILabel.layerClass();
     }
 
-    // initWithLayer(layer, owner, options?){
-    //     super.initWithLayer(layer, owner, options);
-    //     this._textLayer = MUICoreLayerGetFirstElementWithTag(this.layer, "SPAN");
-    //     this.setupLayers();
-    // }
+    setText( text:string ) { this.text = text; }    
+    get text(){ return (this.layer as CATextLayer).string; }
+    set text(text){ (this.layer as CATextLayer).string = text != null ? text : ""; }
 
-    private setupLayers(){
-        //UICoreLayerAddStyle(this.layer, "lbl");
-    
-        // if (this._textLayer == null){
-        //     this.layer.innerHTML = "";
-        //     this._textLayer = document.createElement("span");
-        //     this._textLayer.style.top = "3px";
-        //     this._textLayer.style.left = "3px";
-        //     this._textLayer.style.right = "3px";
-        //     this._textLayer.style.bottom = "3px";
-        //     //this._textLayer.style.font = "inherit";
-        //     //this._textLayer.style.fontSize = "inherit";
-        //     this.layer.appendChild(this._textLayer);
-        // }
+    setTextAlignment( alignment ){
+        // this.layer.style.textAlign = alignment;
     }
 
-    setText(text){
-        this.text = text;
-    }
-    
-    get text(){
-        return this._textLayer.innerHTML;
-    }
-
-    set text(text){
-        this._textLayer.innerHTML = text != null ? text : "";
-    }
-
-    setTextAlignment(alignment){
-        this.layer.style.textAlign = alignment;
-    }
-
-    setHightlighted(value){
+    setHightlighted( value:boolean ){
         if (value == true){
-            this._textLayer.classList.add("label_highlighted_color");
+            // this.layer.style[ "StyleClass" ].addObject( "label_highlighted_color" );
         }
         else{
-            this._textLayer.classList.remove("label_highlighted_color");
+            // this.layer.style[ "StyleClass" ].removeObject( "label_highlighted_color" );
         }
     }
 
-    setTextRGBColor(r, g, b){
-        var value = "rgb(" + r + ", " + g + ", " + b + ")";
-        this._textLayer.style.color = value;
+    setTextRGBColor(r:number, g:number, b:number){
+        let value = "rgb(" + r + ", " + g + ", " + b + ")";
+        // this.layer.style["color"] = value;
     }
 
-    setFontSize(size){
-        this._textLayer.style.fontSize = size + "px";
+    setFontSize( size:number ){
+        // this.layer.style[ "fontSize" ] = size;
     }
 
     setFontStyle(style){
-        this._textLayer.style.fontWeight = style;
+        // this.layer.style[ "FontWeight" ] = style;
     }
 
     setFontFamily(fontFamily){
-        this._textLayer.style.fontFamily = fontFamily;
+        // this.layer.style[ "FontFamily" ] = fontFamily;
     }
 }

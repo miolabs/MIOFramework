@@ -2,7 +2,8 @@
  * Created by godshadow on 26/3/16.
  */
 
-import { NSClassFromString } from "mio-core";
+import { NSClassFromString } from "./NSClassFromString";
+import { NSCoder } from "./NSCoder";
 
 export class NSObject
 {
@@ -25,6 +26,7 @@ export class NSObject
     keyPaths = {};
 
     init(){}
+    initWithCoder( coder: NSCoder ) {}
 
     private _notifyValueChange(key:string, type:string){
         
@@ -163,7 +165,7 @@ export class NSObject
     }
         
 
-    copy() {
+    copy() : NSObject {
         let obj = NSClassFromString(this.className);
         obj.init();
         

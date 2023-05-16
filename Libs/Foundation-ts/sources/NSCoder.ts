@@ -8,21 +8,11 @@ export interface NSCoding
 
 export class NSCoder extends NSObject
 {
-    private contents: any
+    encodeObject(object:any) {}
+    
+    decodeObject() : any {}
 
-    encodeObject(object:any) {
-
-    }
-
-    decodeObject() : any {
-
-    }
-
-    decodeIntegerForKey(key:string):any{
-
-    }
-
-    decodeObjectForKey(key:string):any{
-
-    }
+    decodeBoolForKey(key:string):any {}
+    decodeIntegerForKey(key:string):any {}
+    decodeObjectForKey(key:string):any {}
 }

@@ -102,7 +102,7 @@ function MUICoreLayerSearchElementByID(layer, elementID)
     return null;
 }
 
-function MUICoreLayerGetFirstElementWithTag(layer, tag)
+export function _UICoreLayerGetFirstElementWithTag( layer:any, tag:string )
 {
     let foundLayer:HTMLElement|null = null;
 
@@ -121,4 +121,29 @@ function MUICoreLayerGetFirstElementWithTag(layer, tag)
     }
 
     return foundLayer;
+}
+
+export function _UICoreLayerGetAllElementsWithTag( layer:any, tag:string, attribute_name?:string, attribute_value?:string )
+{
+    let layers:HTMLElement[] = [];
+    let l = null;
+
+    if (layer.childNodes.length == 0) return [];
+        
+    for (let l of layer.childNodes) {
+        if ( l.tagName != tag ) continue;
+
+        if ( attribute_name != null ) {
+            let value = l.getAttribute("data-" + attribute_name );
+            if ( value == null ) continue;
+
+            if ( attribute_value == null ) layer.addObject( l );
+            else if (value == attribute_value ) layer.addObject( l );
+        }
+        else {
+            layer.addObject( l );
+        }
+    }
+
+    return layers;
 }

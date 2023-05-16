@@ -3,6 +3,7 @@
  */
 
 import { UIControl } from "./UIControl";
+import { UIEvent } from "./UIEvent";
 
 export class UICheckButton extends UIControl
 {
@@ -30,6 +31,11 @@ export class UICheckButton extends UIControl
     //     this.action = action;
     // }
 
+    touchesBeganWithEvent(touches: any, event: UIEvent): void {
+        super.touchesBeganWithEvent( touches, event );
+        this.toggleValue();
+    }
+
     private _on = false;
     get on():boolean{
         return this._on;
@@ -41,18 +47,10 @@ export class UICheckButton extends UIControl
 
     setOn(on:boolean){
         this._on = on;
-        if (on == true){
-            // MUICoreLayerAddStyle(this.layer, "selected");
-        }
-        else {
-            // MUICoreLayerRemoveStyle(this.layer, "selected");            
-        }
+        this.selected = on;
     }
 
     toggleValue(){
         this.setOn(!this._on);
-
-        // if (this.target != null && this.action != null)
-        //     this.action.call(this.target, this, this._on);
     }
 }

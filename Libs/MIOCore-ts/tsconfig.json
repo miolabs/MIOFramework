@@ -1,17 +1,20 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": false,
-    "target": "es6",
+    "target": "es5",
     "module": "es6",
-    "removeComments": true,
-    "preserveConstEnums": true,
+    // "removeComments": true,
+    // "preserveConstEnums": true,
     "sourceMap": true,
     "declaration": true,
-    // "declarationDir": "./@types",
+    "declarationDir": "dist/@types/",
+    "declarationMap": true,
     "moduleResolution": "node",
     "outDir": "./dist",
-    "rootDir": "."
+    // "rootDir": "."
   },
-  "files": ["sources/_index.ts"]
+  "include": ["sources/**/*"],
+  // "exclude": ["sources/_index.ts"]
 }

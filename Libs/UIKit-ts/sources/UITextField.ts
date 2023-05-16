@@ -3,9 +3,8 @@
  */
 
 import { Formatter, NSCoder, NSLocalizeString } from "foundation";
-import { CATextLayer } from "./CoreAnimation/CATextLayer";
+import { CAInputLayer } from "./CoreAnimation/CAInputLayer";
 import { UIControl } from "./UIControl";
-import { CALayer } from "./_index";
 
 export enum UITextFieldType 
 {
@@ -32,12 +31,11 @@ export class UITextField extends UIControl
 
     formatter:Formatter = null;
 
-    init() {
-        this.layer = new CALayer( );
-    }
-    
-    initWithCoder(coder: NSCoder) {
+    static get layerClass(): any { return CAInputLayer; }
 
+    initWithCoder(coder: NSCoder): void {
+        super.initWithCoder( coder );
+        (this.layer as CAInputLayer).onChangeBlock = ( value:string ) => { this._textDidChange( value ); }
     }
 
     // initWithLayer(layer, owner, options?){
@@ -87,23 +85,20 @@ export class UITextField extends UIControl
 
     set text(text:string){        
         let newValue = text != null ? text : "";        
-        (this.layer as CATextLayer).string = newValue;
+        (this.layer as CAInputLayer).string = newValue;
     }
 
     get text():string{
-        return (this.layer as CATextLayer).string;
+        return (this.layer as CAInputLayer).string;
     }
 
-    setPlaceholderText(text){
-        this.placeHolder = text;
-        this._inputLayer.setAttribute("placeholder", text);
+    setPlaceholderText( text: string ){
+        ( this.layer as CAInputLayer).placeHolderText = text;        
     }
 
-    set placeholderText(text:string){
-        this.setPlaceholderText(text);
-    }
+    set placeholderText( text:string ){ this.setPlaceholderText(text); }
 
-    setOnChangeText(target, action){
+    setOnChangeText(target:any, action:any){
         this.textChangeTarget = target;
         this.textChangeAction = action;
     }    
@@ -138,13 +133,12 @@ export class UITextField extends UIControl
 
     }
 
-    private _textDidChange(){
+    private _textDidChange( value:string ) {
         if (this.enabled == false) return;
 
-        // Check the formater
-        let value = this._inputLayer.value;
+        // Check the formater        
         if (this.formatter == null) {
-            this._textDidChangeDelegate(value);
+            this._textDidChangeDelegate( value);
         }
         else {
             let result, newStr;

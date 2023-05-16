@@ -1,4 +1,4 @@
-import { NSClassFromString } from "mio-core";
+import { NSClassFromString } from "./NSClassFromString";
 import { NSCoder } from "./NSCoder";
 import { PropertyListSerialization } from "./PropertyListSerialization";
 
@@ -86,7 +86,8 @@ export class NSKeyedUnarchiver extends NSCoder
 
         let dict = {};
         for (let index = 0; index < keys.length; index++){
-            let k = this.valueFromInfo(keys[index]);
+            // let k = this.valueFromInfo(keys[index]);
+            let k = keys[index];
             let v = this.valueFromInfo(objects[index]); 
             dict[k] = v;           
         }

@@ -1,3 +1,4 @@
+import { NSObject } from "foundation";
 
 function MIOEdgeInsetsMake(top, left, bottom, rigth){
 
@@ -7,7 +8,7 @@ function MIOEdgeInsetsMake(top, left, bottom, rigth){
     return ei;
 }
 
-class UIEdgeInsets extends NSObject
+export class UIEdgeInsets extends NSObject
 {
     top = 0;
     left = 0;

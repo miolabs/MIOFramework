@@ -1,4 +1,0 @@
-class UIOutlineView extends UIView 
-{
-
-}

@@ -1,85 +1,28 @@
-import { MIOCoreIsPhone, NSClassFromString } from "mio-core";
+import { MIOCoreIsPhone } from "mio-core";
 import { CGSize } from "../CoreGraphics/CGSize";
 import { UIModalPresentationStyle, UIPresentationController } from "../UIPresentationController";
-import { UIView } from "../UIView";
 import { UIViewController } from "../UIViewController";
-import { _CAAnimationStart } from "../_index";
-
-
-
-function MUIOutletRegister(owner, layerID, c)
-{
-    owner._outlets[layerID] = c;
-}
-
-function MUIOutletQuery(owner, layerID)
-{
-    return owner._outlets[layerID];
-}
-
-function MUIOutlet(owner, elementID, className?, options?)
-{
-    // //var layer = document.getElementById(elementID);
-    // let query = MUIOutletQuery(owner, elementID);
-    // if (query != null) return query;
-
-    // let layer = null;
-
-    // if (owner instanceof UIView)
-    //     layer = MUICoreLayerSearchElementByID(owner.layer, elementID);
-    // else if (owner instanceof UIViewController)
-    //     layer = MUICoreLayerSearchElementByID(owner.view.layer, elementID);
-
-    // if (layer == null) return null; // Element not found
-    //     //throw new Error(`DIV identifier specified is not valid (${elementID})`);
-        
-    // if (className == null)
-    //     className = layer.getAttribute("data-class");
-
-    // if (className == null)
-    //     className = "UIView";
-
-    // let classInstance = NSClassFromString(className);
-    // classInstance.initWithLayer(layer, owner, options);
-    // // Track outlets inside view controller (owner)
-    // MUIOutletRegister(owner, elementID, classInstance);
-
-    // if (owner instanceof UIView)
-    //     owner._linkViewToSubview(classInstance);
-    // else if (owner instanceof UIViewController){
-
-    //     if (classInstance instanceof UIView){
-    //         owner.view._linkViewToSubview(classInstance);
-    //     }
-    //     else if (classInstance instanceof UIViewController)
-    //         owner.addChildViewController(classInstance);
-    //     else throw new Error("UIOutlet: Wrong type");        
-    // }
-
-    // if (classInstance instanceof UIView)
-    //     classInstance.awakeFromHTML();
-
-    // return classInstance;
-}
+import { _CAAnimationStart } from "../CoreAnimation/CoreAnimation+ViewController";
+import { MUICoreEvent, MUICoreEventType } from "./UICoreEvents"
+import { UIViewControllerTransitioningDelegate } from "../CoreAnimation/CoreAnimation";
 
 export function MUIWindowSize()
 {
-    let w = document.body.clientWidth;
-    //var h = document.body.clientHeight;window.innerHeight
+    let w = document.body.clientWidth;    
     let h = window.innerHeight;
 
     return new CGSize(w, h);
 }
 
-export function _UIShowViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, animated:boolean, target?, completion?)
+export function _UIShowViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, animated:boolean, completion?:any)
 {
-    toVC.viewWillAppear();
+    toVC.viewWillAppear( false );
     //toVC._childControllersWillAppear();
 
     if (toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
         || toVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
 
-        fromVC.viewWillDisappear();
+        fromVC.viewWillDisappear( false );
         //fromVC._childControllersWillDisappear();
     }
 
@@ -92,7 +35,7 @@ export function _UIShowViewController(fromVC:UIViewController, toVC:UIViewContro
         view = toVC.view;
 
     if (animated == false) {
-        _UICoreAnimationDidStart(fromVC, toVC, pc, target, completion);
+        _UICoreAnimationDidStart( fromVC, toVC, pc, completion );
         return;
     }
     
@@ -118,22 +61,20 @@ export function _UIShowViewController(fromVC:UIViewController, toVC:UIViewContro
     }
 
     //view.setNeedsDisplay();
-
-    let layer = view.layer;
             
-    _CAAnimationStart(layer, ac, animationContext, function () {
-        _UICoreAnimationDidStart(fromVC, toVC, pc, target, completion);
-    });
+    _CAAnimationStart( view.layer, ac, animationContext, () => {
+        _UICoreAnimationDidStart( fromVC, toVC, pc, completion );
+    } );
 
 }
-export function _UICoreAnimationDidStart(fromVC:UIViewController, toVC:UIViewController, pc:UIPresentationController, target?, completion?){
-    toVC.viewDidAppear();
+export function _UICoreAnimationDidStart(fromVC:UIViewController, toVC:UIViewController, pc:UIPresentationController, completion?:any){
+    toVC.viewDidAppear( true );
     //toVC._childControllersDidAppear();
 
     if (toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
         || toVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
 
-        fromVC.viewDidDisappear();
+        fromVC.viewDidDisappear( true );
         //fromVC._childControllersDidDisappear();
     }
     if (pc != null) {
@@ -141,24 +82,22 @@ export function _UICoreAnimationDidStart(fromVC:UIViewController, toVC:UIViewCon
         pc._isPresented = true;
     }
 
-    if (target != null && completion != null)
-        completion.call(target);
-
+    if ( completion != null ) completion();
 }
 
-export function _UICoreHideViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, target?, completion?)
+export function _UICoreHideViewController( fromVC:UIViewController, toVC:UIViewController, sourceVC:UIViewControllerTransitioningDelegate, completion?:any )
 {
     if (fromVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
         || fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext
         || MIOCoreIsPhone() == true) {
 
-        toVC.viewWillAppear();
+        toVC.viewWillAppear( false );
         //toVC._childControllersWillAppear();
 
         //toVC.view.layout();
     }
 
-    fromVC.viewWillDisappear();
+    fromVC.viewWillDisappear( false );
     //fromVC._childControllersWillDisappear();
 
     let view = null;
@@ -195,20 +134,19 @@ export function _UICoreHideViewController(fromVC:UIViewController, toVC:UIViewCo
         if (fromVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
             || fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
 
-            toVC.viewDidAppear();
+            toVC.viewDidAppear( false );
             //toVC._childControllersDidAppear();
         }
 
-        fromVC.viewDidDisappear();
+        fromVC.viewDidDisappear( false );
         //fromVC._childControllersDidDisappear();
 
-        if (pc != null){
-            pc.dismissalTransitionDidEnd(true);
+        if ( pc != null ){
+            pc.dismissalTransitionDidEnd( true );
             pc._isPresented = false;
         }
 
-        if (target != null && completion != null)
-            completion.call(target);
+        if ( completion != null ) completion();
     });
 }
 

@@ -1,4 +1,4 @@
-
+/*
 import { UIView } from "./UIView";
 import { UICoreLayerAddStyle } from "./MIOUI_CoreLayer";
 
@@ -88,3 +88,5 @@ export class UICodeEditor extends UIView
     }
 
 }
+
+*/

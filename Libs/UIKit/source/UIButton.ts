@@ -1,4 +1,4 @@
-import { NSLocalizeString } from "mio-foundation-web";
+import { NSLocalizeString } from "foundation";
 import { UIControl } from "./UIControl";
 import { UIControl.Event } from "./UIControl";
 import { MUICoreLayerAddStyle } from "./core/MUICoreLayer";

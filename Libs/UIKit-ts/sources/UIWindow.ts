@@ -2,11 +2,25 @@
  * Created by godshadow on 11/3/16.
  */
 
-import { CALayer, CAWindowLayer } from "./CoreAnimation/CALayer";
+import { MIOCoreIsMobile } from "mio-core";
+import { CALayer } from "./CoreAnimation/CALayer";
 import { UIApplication } from "./UIApplication";
 import { UIView } from "./UIView";
 import { UIViewController } from "./UIViewController";
 
+class CAWindowLayer extends CALayer
+{    
+    constructor( ) {
+        super( );
+        this.addStyle( "window" );
+
+        document.body.appendChild( this.contents );
+    }
+
+    removeFromSuperlayer(): void {
+        document.body.removeChild( this.contents );
+    }
+}
 
 export class UIWindow extends UIView
 {
@@ -14,10 +28,10 @@ export class UIWindow extends UIView
 
     private _resizeWindow = false; 
 
+    static get layerClass() : any { return CAWindowLayer; }
+
     init(){
-        this.layer = new CAWindowLayer( );
-        this.layer.style = { "StyleClass":"window" };
-        // MUICoreLayerAddStyle(this.layer, "window");
+        this.layer = new UIWindow.layerClass();
     }
 
     initWithRootViewController(vc: UIViewController){
@@ -59,7 +73,7 @@ export class UIWindow extends UIView
     // }
 
     removeFromSuperview(){                
-        // this._removeLayerFromDOM();
+        this.layer.removeFromSuperlayer();
     }
 
     // protected _removeLayerFromDOM(){
@@ -100,3 +114,12 @@ export class UIWindow extends UIView
     }
 }
 
+export class _UIModalWindow extends UIWindow
+{
+    init() {
+        super.init();
+        if (MIOCoreIsMobile() == false ) {
+            this.layer.addStyle( "desktop-modal" );
+        }
+    }
+}
