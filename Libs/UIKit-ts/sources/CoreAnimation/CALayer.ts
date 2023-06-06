@@ -37,6 +37,14 @@ export class CALayer
         return Number( this.contents.style.opacity ) ?? 1.0;
     }
     
+    set disabled(disabled:boolean) {     
+        this.contents.disabled = disabled;
+    }
+
+    get disabled() : boolean {
+        return this.contents.disabled;
+    }
+
     addStyle( style:string ) {
         this.contents.classList.add( style );
     }

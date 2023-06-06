@@ -25,12 +25,12 @@ export class CAComboBoxLayer extends CALayer
     
     private _on_change_target:any = null;
     private _on_change_action:any = null;
-    setOnChangeBlock( target:any, action:any) {
+    setOnChangeBlock( target:any, action:any) {        
         if (target == null) {
-            this.contents.removeEventListener( "change", this.on_change.bind(this) );
+            this.selectElement.removeEventListener( "change", this.on_change.bind(this) );
         }
         else {
-            this.contents.addEventListener( "change", this.on_change.bind(this) );
+            this.selectElement.addEventListener( "change", this.on_change.bind(this) );
         }
 
         this._on_change_target = target;
@@ -41,7 +41,7 @@ export class CAComboBoxLayer extends CALayer
         if ( this._on_change_action != null ) this._on_change_action.call( this._on_change_target, CALayerEvent.change );
     }
 
-    private items:CATextLayer[] = []
+    private items:CAComboBoxItemLayer[] = []
     
     addItemLayer( item:CAComboBoxItemLayer ){
         this.items.addObject( item );
@@ -54,6 +54,14 @@ export class CAComboBoxLayer extends CALayer
 
     get selectedItem() : any {
         return this.selectElement.value;
+    }
+
+    removeItemLayers() {
+        for(let i of this.items) {
+            this.selectElement.removeChild( i.optionElement );
+        }
+
+        this.items = [];
     }
 
 }

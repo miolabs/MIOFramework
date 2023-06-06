@@ -101,17 +101,12 @@ export class UIControl extends UIView
             this.sendAction(a, t, controlEvents );
         }
     }
-
-    private _enabled = true;
-    get enabled(){return this._enabled;}
+    
+    get enabled(){return this.layer.disabled;}
     set enabled(value:boolean){this.setEnabled(value);}
 
-    setEnabled(enabled:boolean){
-        this._enabled = enabled;
-        // if (enabled == true)
-        //     this.layer.style.opacity = "1.0";
-        // else
-        //     this.layer.style.opacity = "0.10";
+    setEnabled(enabled:boolean){        
+        this.layer.disabled = !enabled;
     }
 
     private _selected = false;

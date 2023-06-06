@@ -60,10 +60,10 @@ export class UISegmentedControl extends UIControl
             lastItem.setSelected(false);
         }
 
-        this.selectedSegmentIndex = index;        
+        this.selectedSegmentIndex = index;
         if ( index == -1 ) return;
 
-        let item = this.segmentedItems[this.selectedSegmentIndex];
+        let item = this.segmentedItems[ this.selectedSegmentIndex ];
         item.setSelected(true);        
     }
 }

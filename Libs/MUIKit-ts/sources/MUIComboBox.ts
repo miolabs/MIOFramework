@@ -1,6 +1,7 @@
 import { CALayerEvent, UIControl } from "uikit";
 import { CAComboBoxLayer } from "./CustomLayers/CAComboBoxLayer";
 import { CAComboBoxItemLayer } from "./CustomLayers/CAComboBoxItemLayer";
+import { NSCoder } from "../../Foundation-ts/dist/@types/NSCoder";
 
 
 export class MUIComboBox extends UIControl
@@ -13,7 +14,12 @@ export class MUIComboBox extends UIControl
         this.layer = new MUIComboBox.layerClass();
 
         (this.layer as CAComboBoxLayer).setOnChangeBlock( this, this.on_change );
-    }    
+    }
+
+    initWithCoder(coder: NSCoder): void {
+        super.initWithCoder( coder );
+        (this.layer as CAComboBoxLayer).setOnChangeBlock( this, this.on_change );
+    }
 
     addItem(title:string, value?:any)
     {
@@ -45,18 +51,7 @@ export class MUIComboBox extends UIControl
 
     removeAllItems()
     {
-    //     var node = this._selectLayer;
-
-    //     while (this._selectLayer.hasChildNodes()) {              // selected elem has children
-
-    //         if (node.hasChildNodes()) {                // current node has children
-    //             node = node.lastChild;                 // set current node to child
-    //         }
-    //         else {                                     // last child found
-    //             node = node.parentNode;                // set node to parent
-    //             node.removeChild(node.lastChild);      // remove last node
-    //         }
-    //     }
+        (this.layer as CAComboBoxLayer).removeItemLayers();
     }
 
     // getItemAtIndex(index)
