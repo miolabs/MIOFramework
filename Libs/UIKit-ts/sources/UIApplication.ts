@@ -3,7 +3,7 @@
  */
 
 import { Bundle, NSLog, PropertyListSerialization, URLConnection, URLRequest, _MIOBundleAppGetResource, _MIOBundleLoadBundles } from "foundation";
-import { MIOCoreAddLanguage, MIOCoreGetContentsFromURLString, MIOCoreGetLanguages, MIOCoreGetPlatformLanguage, MIOLocalizedStringsSet } from "mio-core";
+import { MIOCoreAddLanguage, MIOCoreGetContentsFromURLString, MIOCoreGetLanguages, MIOCoreGetMainURLString, MIOCoreGetPlatformLanguage, MIOCoreGetQueryOptions, MIOLocalizedStringsSet } from "mio-core";
 import { UIApplicationDelegate } from "./UIApplicationDelegate";
 import { UIStoryboard } from "./UIStoryboard";
 import { UIWindow } from "./UIWindow";
@@ -104,7 +104,7 @@ export class UIApplication
             }
             let lang = MIOCoreGetPlatformLanguage();
             this.setLanguage(lang, () => {
-                // this._parse_options();
+                let args = this._parse_options();
                 this._run( args );
             });
         });
@@ -130,9 +130,24 @@ export class UIApplication
         //     }
         // });
     }
+
+    private _parse_options() {
+        let url = MIOCoreGetMainURLString();
+        let queryOptions = MIOCoreGetQueryOptions();
+
+        let options = {}
+        options["url"] = url;
+        for (let index = 0; index < queryOptions.length; index++) {
+            const op = queryOptions[index];
+            const array = op.split("=");
+            options[array[0]] = decodeURIComponent(array[1]);
+        }
+
+        return options;
+    }
     
     private mainStoryboard:UIStoryboard = null;
-    private _run( args:string[] ) {
+    private _run( args:any ) {
 
         if ( this.delegate.applicationDidFinishLaunchingWithOptions( this, args ) == false ) {
             NSLog("Error in applicationDidFinishLaunchingWithOptions");

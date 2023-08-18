@@ -2,7 +2,7 @@
  * Created by godshadow on 11/3/16.
  */
 
-import { MIOCoreIsMobile } from "mio-core";
+import { MIOCoreIsMobile, MIOCoreIsPhone } from "mio-core";
 import { CALayer } from "./CoreAnimation/CALayer";
 import { UIApplication } from "./UIApplication";
 import { UIView } from "./UIView";
@@ -12,7 +12,7 @@ class CAWindowLayer extends CALayer
 {    
     constructor( ) {
         super( );
-        this.addStyle( "window" );
+        this.addStyle( "window" );        
 
         document.body.appendChild( this.contents );
     }
@@ -32,6 +32,7 @@ export class UIWindow extends UIView
 
     init(){
         this.layer = new UIWindow.layerClass();
+        if ( MIOCoreIsPhone() )this.layer.contents.style.overflow = "scroll";
     }
 
     initWithRootViewController(vc: UIViewController){
@@ -118,8 +119,9 @@ export class _UIModalWindow extends UIWindow
 {
     init() {
         super.init();
-        if (MIOCoreIsMobile() == false ) {
-            this.layer.addStyle( "desktop-modal" );
-        }
+        this.layer.addStyle( "modal-window" );
+        // if (MIOCoreIsMobile() == false ) {
+        //     this.layer.addStyle( "desktop-modal" );
+        // }
     }
 }
