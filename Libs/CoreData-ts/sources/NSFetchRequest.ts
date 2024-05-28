@@ -1,28 +1,28 @@
-import { MIOPersistentStoreRequest, MIORequestType } from "./MIOPersistentStoreRequest";
-import { MIOEntityDescription } from "./MIOEntityDescription";
-import { MIOPredicate } from "../MIOFoundation";
+import { NSPersistentStoreRequest, NSRequestType } from "./NSPersistentStoreRequest";
+import { NSEntityDescription } from "./NSEntityDescription";
+import { NSPredicate } from "foundation";
 
-export enum MIOFetchRequestResultType{
-    MIOManagedObject,
-    MIOManagedObjectID,
+export enum NSFetchRequestResultType{
+    NSManagedObject,
+    NSManagedObjectID,
     Dictionary,
     Count
 }
 
-export class MIOFetchRequest extends MIOPersistentStoreRequest {
+export class NSFetchRequest extends NSPersistentStoreRequest {
     
     entityName:string = null;
-    entity:MIOEntityDescription = null;
-    predicate:MIOPredicate = null;
+    entity:NSEntityDescription = null;
+    predicate:NSPredicate = null;
     sortDescriptors = null;
-    resultType = MIOFetchRequestResultType.MIOManagedObject;
+    resultType = NSFetchRequestResultType.NSManagedObject;
     fetchLimit = 0;
     fetchOffset = 0;
     relationshipKeyPathsForPrefetching = [];
     userInfo = {};
 
     static fetchRequestWithEntityName(entityName:string) {
-        var fetch = new MIOFetchRequest();
+        var fetch = new NSFetchRequest();
         fetch.initWithEntityName(entityName);
 
         return fetch;
@@ -30,11 +30,11 @@ export class MIOFetchRequest extends MIOPersistentStoreRequest {
 
     initWithEntityName(entityName:string) {
         this.entityName = entityName;
-        this.requestType = MIORequestType.Fetch;
+        this.requestType = NSRequestType.Fetch;
     }
 
     copy(){
-        let request = new MIOFetchRequest();
+        let request = new NSFetchRequest();
         request.initWithEntityName(this.entityName);
 
         request.entity = this.entity;

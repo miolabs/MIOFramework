@@ -27,7 +27,7 @@ export class NSSortDescriptor extends NSObject
 // For internal purposes: Don't use it, could change
 //
 
-function _NSSortDescriptorSortObjects(objs, sortDescriptors)
+export function _NSSortDescriptorSortObjects(objs, sortDescriptors)
 {
     let resultObjects = null;
     

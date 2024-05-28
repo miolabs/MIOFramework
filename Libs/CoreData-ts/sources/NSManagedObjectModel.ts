@@ -1,29 +1,46 @@
-import { MIOObject, MIOURL, MIOURLConnection, MIOXMLParser, MIOURLRequest, MIODateFromString, MIOLog, MIONotificationCenter, MIOBundle, MIOPropertyListSerialization } from "../MIOFoundation";
-import { MIORelationshipDescription, MIODeleteRule } from "./MIORelationshipDescription";
-import { MIOEntityDescription } from "./MIOEntityDescription";
-import { MIOAttributeType } from "./MIOAttributeDescription";
-import { MIOManagedObjectContext } from "./MIOManagedObjectContext";
+import { NSObject, URLConnection, XMLParser, URLRequest, NSLog, NotificationCenter, Bundle, PropertyListSerialization, DateFormatter } from "foundation";
+import { NSRelationshipDescription, NSDeleteRule } from "./NSRelationshipDescription";
+import { NSEntityDescription } from "./NSEntityDescription";
+import { NSAttributeType } from "./NSAttributeDescription";
+import { NSManagedObjectContext } from "./NSManagedObjectContext";
 
 
-export class MIOManagedObjectModel extends MIOObject
+
+let _dateTimeFormatter:DateFormatter = null;
+function DateFromString(dateString:string):Date
+{
+    /*
+    if (_dateTimeFormatter == null) {
+        _dateTimeFormatter = new DateFormatter();
+        _dateTimeFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss";
+    }
+
+    return _dateTimeFormatter.dateFromString(dateString);
+    */
+   return new Date(dateString);
+}
+
+export class NSManagedObjectModel extends NSObject
 {    
-    private _entitiesByName = {};
-    private _entitiesByConfigName = {};
+    private _entitiesByName:any = {};
+    //private _entitiesByConfigName = {};
+    private _entitiesByConfigName: { [key: string]: any } = {};
     
-    static entityForNameInManagedObjectContext(entityName, context:MIOManagedObjectContext):MIOEntityDescription{
+    
+    static entityForNameInManagedObjectContext(entityName:any, context:NSManagedObjectContext):NSEntityDescription{
         
         let mom = context.persistentStoreCoordinator.managedObjectModel;
         let entity = mom.entitiesByName[entityName];
         
         if (entity == null) {
-            throw new Error(`MIOManagedObjectModel: Unkown entity (${entityName})`);
+            throw new Error(`NSManagedObjectModel: Unkown entity (${entityName})`);
         }
         
         return entity;
     }
 
     private _namespace:string = null;
-    initWithContentsOfURL(url:MIOURL){
+    initWithContentsOfURL(url:URL){
 
         // check if we already have it
         let type = url.absoluteString.match(/\.[0-9a-z]+$/i)[0].substring(1);
@@ -32,8 +49,8 @@ export class MIOManagedObjectModel extends MIOObject
         if (type == "xcdatamodeld") {
             // Core Data Bundle
             let versionFile = url.absoluteString + "/xccurrentversion";
-            let versionData = MIOBundle.mainBundle().pathForResourceOfType(versionFile, null);
-            let versionInfo = MIOPropertyListSerialization.propertyListWithData(versionData, 0, 0, null);
+            let versionData = Bundle.main.pathForResourceOfType(versionFile, null);
+            let versionInfo = PropertyListSerialization.propertyListWithData(versionData, 0, 0, null);
             
             resource = url.absoluteString + "/" + versionInfo["_XCCurrentVersionName"] + "/contents";
             type = "xml";
@@ -42,35 +59,35 @@ export class MIOManagedObjectModel extends MIOObject
             this._namespace = components[0];
         }
 
-        let data = MIOBundle.mainBundle().pathForResourceOfType(resource, type);
+        let data = Bundle.main.pathForResourceOfType(resource, type);
         if (data != null) {
             this.parseContents(data);
             return;
         }
 
         // Download the file
-        let request = MIOURLRequest.requestWithURL(url);
+        let request = URLRequest.requestWithURL(url);
 
-        let uc = new MIOURLConnection();
+        let uc = new URLConnection();
         uc.initWithRequest(request, this);
     }
 
-    connectionDidReceiveText(urlConnection, data){        
+    connectionDidReceiveText(urlConnection:any, data:any){        
         this.parseContents(data)
     }
 
-    private parseContents(contents) {
-        let parser = new MIOXMLParser();
+    private parseContents(contents:any) {
+        let parser = new XMLParser();
         parser.initWithString(contents, this);
         parser.parse();                
     }
 
     // #region XML Parser delegate
-    private currentEntity:MIOEntityDescription = null;
+    private currentEntity:NSEntityDescription = null;
     private currentConfigName:string = null;
 
     // XML Parser delegate
-    parserDidStartElement(parser:MIOXMLParser, element:string, attributes){
+    parserDidStartElement(parser:XMLParser, element:string, attributes:any){
 
         //console.log("XMLParser: Start element (" + element + ")");        
         
@@ -81,13 +98,13 @@ export class MIOManagedObjectModel extends MIOObject
             let parentName = attributes["parentEntity"]; 
             let is_abstract = attributes["isAbstract"] ? attributes["isAbstract"] : "NO";
 
-            this.currentEntity = new MIOEntityDescription();
+            this.currentEntity = new NSEntityDescription();
             let cs = this._namespace == null ? classname : this._namespace + "." + classname;
             this.currentEntity.initWithEntityName(name, null, this, cs);
             this.currentEntity.parentEntityName = parentName;
             this.currentEntity.isAbstract = (is_abstract.toLowerCase() == "yes");            
 
-            MIOLog("\n\n--- " + name);
+            NSLog("\n\n--- " + name);
         }
         else if (element == "attribute") {
 
@@ -115,14 +132,17 @@ export class MIOManagedObjectModel extends MIOObject
             this.currentConfigName = attributes["name"];
         }        
         else if (element == "memberEntity") {
+            console.log("NSManagedObjectModel::parse: memberEntity not implemented");
+            /*
             let entityName = attributes["name"];
             let entity = this._entitiesByName[entityName];
             this._setEntityForConfiguration(entity, this.currentConfigName);
+            */
         }        
 
     }
 
-    parserDidEndElement(parser:MIOXMLParser, element:string){
+    parserDidEndElement(parser:XMLParser, element:string){
         
         //console.log("XMLParser: End element (" + element + ")");
 
@@ -133,14 +153,14 @@ export class MIOManagedObjectModel extends MIOObject
         }
     }
 
-    parserDidEndDocument(parser:MIOXMLParser){
+    parserDidEndDocument(parser:XMLParser){
 
         // Check every relation ship and assign the right destination entity
         for (let entityName in this._entitiesByName) {
-            let entity = this._entitiesByName[entityName] as MIOEntityDescription;
+            let entity = this._entitiesByName[entityName] as NSEntityDescription;
             entity.build();
             // for (var index = 0; index < e.relationships.length; index++) {
-            //     let r:MIORelationshipDescription = e.relationships[index];
+            //     let r:NSRelationshipDescription = e.relationships[index];
                 
             //     if (r.destinationEntity == null){
             //         let de = this._entitiesByName[r.destinationEntityName];
@@ -150,21 +170,21 @@ export class MIOManagedObjectModel extends MIOObject
         }
 
         //console.log("datamodel.xml parser finished");
-        MIONotificationCenter.defaultCenter().postNotification("MIOManagedObjectModelDidParseDataModel", null);
+        NotificationCenter.defaultCenter().postNotification("NSManagedObjectModelDidParseDataModel", null);
     }
 
     // #endregion
 
     private _addAttribute(name:string, type:string, optional:string, serverName:string, syncable:string, defaultValueString:string){
 
-        MIOLog((serverName != null ? serverName : name) + " (" + type + ", optional=" + optional + (defaultValue != null? ", defaultValue: " + defaultValue : "") + "): ");
+        NSLog((serverName != null ? serverName : name) + " (" + type + ", optional=" + optional + (defaultValue != null? ", defaultValue: " + defaultValue : "") + "): ");
 
         var attrType = null;
         var defaultValue = null;
         
         switch(type){
             case "Boolean":
-                attrType = MIOAttributeType.Boolean;
+                attrType = NSAttributeType.Boolean;
                 if (defaultValueString != null) defaultValue = (defaultValueString.toLocaleLowerCase() == "true" || defaultValueString.toLocaleLowerCase() == "yes") ? true : false;
                 break;
 
@@ -173,37 +193,39 @@ export class MIOManagedObjectModel extends MIOObject
             case "Integer 16":
             case "Integer 32":
             case "Integer 64":
-                attrType = MIOAttributeType.Integer;
+                attrType = NSAttributeType.Integer;
                 if (defaultValueString != null) defaultValue = parseInt(defaultValueString);
                 break;
 
             case "Float":
-                attrType = MIOAttributeType.Float;
+            case "Double":
+            case "Decimal":
+                attrType = NSAttributeType.Float;
                 if (defaultValueString != null) defaultValue = parseFloat(defaultValueString);
                 break;
-
+        
             case "Number":
-                attrType = MIOAttributeType.Number;
+                attrType = NSAttributeType.Number;
                 if (defaultValueString != null) defaultValue = parseFloat(defaultValueString);
                 break;
 
             case "String":
-                attrType = MIOAttributeType.String;
+                attrType = NSAttributeType.String;
                 if (defaultValueString != null) defaultValue = defaultValueString;
                 break;
 
             case "Date":
-                attrType = MIOAttributeType.Date;
-                if (defaultValueString != null) defaultValue = MIODateFromString(defaultValueString); 
+                attrType = NSAttributeType.Date;
+                if (defaultValueString != null) defaultValue = DateFromString(defaultValueString); 
                 break;
 
             case "Transformable":
-                attrType = MIOAttributeType.Transformable;
+                attrType = NSAttributeType.Transformable;
                 if (defaultValueString != null) defaultValue = defaultValueString;
                 break;
 
             default:
-                MIOLog("MIOManagedObjectModel: Unknown class type: " + type);
+                NSLog("NSManagedObjectModel: Unknown class type: " + type);
                 if (defaultValueString != null) defaultValue = defaultValueString;
                 break;
         }
@@ -219,7 +241,7 @@ export class MIOManagedObjectModel extends MIOObject
 
     private _addRelationship(name:string, destinationEntityName:string, toMany:string, serverName:string, inverseName:string, inverseEntity:string, optional:string, deletionRule:string){
 
-        MIOLog((serverName != null ? serverName : name) + " (" + destinationEntityName + ", optional=" + optional + ", inverseEntity: " + inverseEntity + ", inverseName: "  + inverseName + ")");
+        NSLog((serverName != null ? serverName : name) + " (" + destinationEntityName + ", optional=" + optional + ", inverseEntity: " + inverseEntity + ", inverseName: "  + inverseName + ")");
 
         let isToMany = false;
         if (toMany != null && (toMany.toLocaleLowerCase() == "yes" || toMany.toLocaleLowerCase() == "true")){
@@ -229,16 +251,17 @@ export class MIOManagedObjectModel extends MIOObject
         let opt = true;
         if (optional != null && (optional.toLocaleLowerCase() == "no" || optional.toLocaleLowerCase() == "false")) opt = false;
 
-        let del_rule = MIODeleteRule.noActionDeleteRule;
+        let del_rule = NSDeleteRule.noActionDeleteRule;
         switch(deletionRule){
-            case "Nullify": del_rule = MIODeleteRule.nullifyDeleteRule; break;
-            case "Cascade": del_rule = MIODeleteRule.cascadeDeleteRule; break;
+            case "Nullify": del_rule = NSDeleteRule.nullifyDeleteRule; break;
+            case "Cascade": del_rule = NSDeleteRule.cascadeDeleteRule; break;
         }
 
         this.currentEntity.addRelationship(name, destinationEntityName, isToMany, serverName, inverseName, inverseEntity, opt, del_rule);
     }
 
-    private _setEntityForConfiguration(entity, configuration:string) {
+    /*
+    private _setEntityForConfiguration(entity:any, configuration:string) {
         var array = this.entitiesForConfiguration[configuration];
         if (array == null){
             array = [];
@@ -247,7 +270,7 @@ export class MIOManagedObjectModel extends MIOObject
         array.addObject(entity);
     }
 
-    setEntitiesForConfiguration(entities, configuration:string) {
+    setEntitiesForConfiguration(entities:any, configuration:string) {
         for (var index = 0; index < entities.length; index++){
             let entity = entities[index];
             this._setEntityForConfiguration(entity, configuration);
@@ -257,7 +280,7 @@ export class MIOManagedObjectModel extends MIOObject
     entitiesForConfiguration(configurationName:string){        
         return this.entitiesForConfiguration[configurationName];
     }
-
+    */
     get entitiesByName() {
         return this._entitiesByName;
     }

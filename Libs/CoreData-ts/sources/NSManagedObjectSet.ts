@@ -1,48 +1,48 @@
-import { MIOObject, MIOPredicate, _MIOPredicateFilterObjects, _MIOSortDescriptorSortObjects} from "../MIOFoundation";
-import { MIORelationshipDescription } from "./MIORelationshipDescription";
-import { MIOManagedObjectID } from "./MIOManagedObjectID";
-import { MIOManagedObject } from "./MIOManagedObject";
+import { NSObject, NSPredicate, _NSPredicateFilterObjects, _NSSortDescriptorSortObjects} from "foundation";
+import { NSRelationshipDescription } from "./NSRelationshipDescription";
+import { NSManagedObjectID } from "./NSManagedObjectID";
+import { NSManagedObject } from "./NSManagedObject";
 
-export class MIOManagedObjectSet<T = any> extends MIOObject {
+export class NSManagedObjectSet<T = any> extends NSObject {
 
-    static _setWithManagedObject(object:MIOManagedObject, relationship:MIORelationshipDescription) {
-        let mos = new MIOManagedObjectSet();
+    static _setWithManagedObject(object:NSManagedObject, relationship:NSRelationshipDescription) {
+        let mos = new NSManagedObjectSet();
         mos._initWithManagedObject(object, relationship);
         return mos;
     }
 
-    private mo:MIOManagedObject = null;
-    private relationship:MIORelationshipDescription = null;
+    private mo:NSManagedObject = null;
+    private relationship:NSRelationshipDescription = null;
     private objectIDs = [];
     private relationshipFault = true;
 
     init(){
-        throw new Error("MIOManagedObjectSet: Can't initialize an MIOManagedObjectSet with -init")
+        throw new Error("NSManagedObjectSet: Can't initialize an NSManagedObjectSet with -init")
     }
 
-    _initWithManagedObject(object:MIOManagedObject, relationship:MIORelationshipDescription){
+    _initWithManagedObject(object:NSManagedObject, relationship:NSRelationshipDescription){
         super.init();
         this.mo = object;
         this.relationship = relationship;
     }
 
-    _addObjectID(objectID:MIOManagedObjectID){
+    _addObjectID(objectID:NSManagedObjectID){
         if (this.objectIDs.containsObject(objectID) == true) return;
         this.objectIDs.addObject(objectID);
         this.relationshipFault = true;        
     }
 
-    addObject(object:MIOManagedObject){
+    addObject(object:NSManagedObject){
         this._addObjectID(object.objectID);
     }
 
-    _removeObject(objectID:MIOManagedObjectID){
+    _removeObject(objectID:NSManagedObjectID){
         if (this.objectIDs.containsObject(objectID) == false) return;
         this.objectIDs.removeObject(objectID);
         this.relationshipFault = true;        
     }
 
-    removeObject(object:MIOManagedObject){
+    removeObject(object:NSManagedObject){
         this._removeObject(object.objectID);
     }
 
@@ -50,16 +50,26 @@ export class MIOManagedObjectSet<T = any> extends MIOObject {
         this.objectIDs = [];
     }
 
-    indexOfObject(object:MIOManagedObject) {
-        return this.objectIDs.indexOfObject(object.objectID);
+    indexOfObject(object:NSManagedObject|string|Array<string>) {
+        if (object instanceof NSManagedObject) return this.objectIDs.indexOfObject(object.objectID);
+        let ids = this.allObjects.map( function(e){ return e.objectID._getReferenceObject(); } );
+        
+        if ( typeof( object ) === "string" ){
+            return ids.indexOfObject( object );
+        }
+
+        for (let id of ids) {
+            if ( object.containsObject(id) ) return 0;
+        }
+        return -1;
     }
 
-    containsObject(object:MIOManagedObject){
+    containsObject(object:NSManagedObject){
         return this.objectIDs.indexOfObject(object.objectID) > -1 ? true : false;
     }
 
     objectAtIndex(index){
-        var objects = this.allObjects;
+        let objects = this.allObjects;
         return objects.objectAtIndex(index);
     }
 
@@ -89,19 +99,19 @@ export class MIOManagedObjectSet<T = any> extends MIOObject {
         return this.count;
     }    
 
-    filterWithPredicate(predicate:MIOPredicate) {
-        let objs = _MIOPredicateFilterObjects(this.allObjects, predicate);
+    filterWithPredicate(predicate:NSPredicate) {
+        let objs = _NSPredicateFilterObjects(this.allObjects, predicate);
         return objs;
     }
 
     sortedArrayUsingDescriptors(sortDescriptors){
-        let objs = _MIOSortDescriptorSortObjects(this.allObjects, sortDescriptors);
+        let objs = _NSSortDescriptorSortObjects(this.allObjects, sortDescriptors);
         return objs;
     }
     
     // Prevent KVO on special properties
     addObserver(obs, keypath:string, context?){
-        if (keypath == "count" || keypath == "length") throw new Error("MIOSet: Can't observe count. It's not KVO Compilant"); 
+        if (keypath == "count" || keypath == "length") throw new Error("NSSet: Can't observe count. It's not KVO Compilant"); 
         super.addObserver(obs, keypath, context);
     }
 
@@ -111,8 +121,8 @@ export class MIOManagedObjectSet<T = any> extends MIOObject {
         this.objectIDs = [];
     }
 
-    intersection(set:MIOManagedObjectSet) : MIOManagedObjectSet {
-        let intersect = MIOManagedObjectSet._setWithManagedObject(this.mo, this.relationship);
+    intersection(set:NSManagedObjectSet) : NSManagedObjectSet {
+        let intersect = NSManagedObjectSet._setWithManagedObject(this.mo, this.relationship);
 
         for (let index = 0; index < set.count; index++) {
             let obj = set.objectAtIndex(index);
@@ -122,8 +132,8 @@ export class MIOManagedObjectSet<T = any> extends MIOObject {
         return intersect;
     }
 
-    subtracting(set:MIOManagedObjectSet) : MIOManagedObjectSet {
-        let substract = MIOManagedObjectSet._setWithManagedObject(this.mo, this.relationship);
+    subtracting(set:NSManagedObjectSet) : NSManagedObjectSet {
+        let substract = NSManagedObjectSet._setWithManagedObject(this.mo, this.relationship);
  
         for (let index = 0; index < this.count; index++) {
             let obj = this.objectAtIndex(index);
@@ -133,7 +143,7 @@ export class MIOManagedObjectSet<T = any> extends MIOObject {
         return substract;
     }
 
-    map(block: (e:T, index:number, s:MIOManagedObjectSet<T>) => any) {
+    map(block: (e:T, index:number, s:NSManagedObjectSet<T>) => any) {
         let array = [];
         for(let index = 0; index < this.count; index++){ 
             let obj = this.objectAtIndex(index);
@@ -143,9 +153,9 @@ export class MIOManagedObjectSet<T = any> extends MIOObject {
         return array;
     }
 
-    copy() : MIOManagedObjectSet {
+    copy() : NSManagedObjectSet {
 
-        let set = MIOManagedObjectSet._setWithManagedObject(this.mo, this.relationship);
+        let set = NSManagedObjectSet._setWithManagedObject(this.mo, this.relationship);
 
         for (let index = 0; index < this.count; index++) {
             let obj = this.objectAtIndex(index);
@@ -155,4 +165,5 @@ export class MIOManagedObjectSet<T = any> extends MIOObject {
         return set;
 
     }
+
 }

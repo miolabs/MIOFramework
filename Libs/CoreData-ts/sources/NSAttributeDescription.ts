@@ -1,6 +1,7 @@
-import { MIOPropertyDescription } from "./MIOPropertyDescription";
 
-export enum MIOAttributeType {
+import { NSPropertyDescription } from "./NSPropertyDescription";
+
+export enum NSAttributeType {
 
     Undefined,
     Boolean,
@@ -12,14 +13,14 @@ export enum MIOAttributeType {
     Transformable   
 }
 
-export class MIOAttributeDescription extends MIOPropertyDescription
+export class NSAttributeDescription extends NSPropertyDescription
 {    
-    private _attributeType = MIOAttributeType.Undefined;
-    private _defaultValue = null;
-    private _serverName:string = null;
+    private _attributeType = NSAttributeType.Undefined;
+    private _defaultValue:any = null;
+    private _serverName:string | null = null; 
     private _syncable = true;
 
-    initWithName(name:string, type:MIOAttributeType, defaultValue, optional:boolean, serverName?:string, syncable?:boolean){
+    initWithName(name:string, type:NSAttributeType, defaultValue:any, optional:boolean, serverName:string | null, syncable?:boolean){
 
         super.init();
 

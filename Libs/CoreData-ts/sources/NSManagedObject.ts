@@ -1,25 +1,25 @@
-import { MIOObject, MIOSet } from "../MIOFoundation";
-import { MIOManagedObjectID } from "./MIOManagedObjectID";
-import { MIOManagedObjectContext } from "./MIOManagedObjectContext";
-import { MIOEntityDescription } from "./MIOEntityDescription";
-import { MIOIncrementalStore } from "./MIOIncrementalStore";
-import { MIOAttributeDescription } from "./MIOAttributeDescription";
-import { MIODeleteRule, MIORelationshipDescription } from "./MIORelationshipDescription";
-import { MIOManagedObjectSet } from "./MIOManagedObjectSet";
-import { MIOManagedObjectModel } from "./MIOManagedObjectModel";
+import { NSObject, NSSet } from "foundation";
+import { NSManagedObjectID } from "./NSManagedObjectID";
+import { NSManagedObjectContext } from "./NSManagedObjectContext";
+import { NSEntityDescription } from "./NSEntityDescription";
+import { NSIncrementalStore } from "./NSIncrementalStore";
+import { NSAttributeDescription } from "./NSAttributeDescription";
+import { NSDeleteRule, NSRelationshipDescription } from "./NSRelationshipDescription";
+import { NSManagedObjectSet } from "./NSManagedObjectSet";
+import { NSManagedObjectModel } from "./NSManagedObjectModel";
 
 /**
  * Created by godshadow on 23/03/2017.
  */
 
 
-export class MIOManagedObject extends MIOObject {        
+export class NSManagedObject extends NSObject {        
 
     init(){
-        throw new Error("MIOManagedObject: Can't initialize an MIOManagedObject with -init");
+        throw new Error("NSManagedObject: Can't initialize an NSManagedObject with -init");
     }
 
-    _initWithObjectID(objectID:MIOManagedObjectID, context:MIOManagedObjectContext) {
+    _initWithObjectID(objectID:NSManagedObjectID, context:NSManagedObjectContext) {
 
         //super.init();
         this._objectID = objectID;
@@ -29,12 +29,12 @@ export class MIOManagedObject extends MIOObject {
 
         this.awakeFromFetch();
 
-        //MIOLog("ManagedObject create: " + this.entity.name + "/" + this.objectID._getReferenceObject());
+        //NSLog("ManagedObject create: " + this.entity.name + "/" + this.objectID._getReferenceObject());
     }
 
-    initWithEntityAndInsertIntoManagedObjectContext(entity:MIOEntityDescription, context:MIOManagedObjectContext){        
+    initWithEntityAndInsertIntoManagedObjectContext(entity:NSEntityDescription, context:NSManagedObjectContext){        
         
-        let objectID = MIOManagedObjectID._objectIDWithEntity(entity);
+        let objectID = NSManagedObjectID._objectIDWithEntity(entity);
         this._initWithObjectID(objectID, context);
 
         context.insertObject(this);        
@@ -42,7 +42,7 @@ export class MIOManagedObject extends MIOObject {
 
         this.awakeFromInsert();
 
-        //MIOLog("ManagedObject ins create: " + this.entity.name + "/" + this.objectID._getReferenceObject());                  
+        //NSLog("ManagedObject ins create: " + this.entity.name + "/" + this.objectID._getReferenceObject());                  
     }
 
     private setDefaultValues(){
@@ -57,12 +57,12 @@ export class MIOManagedObject extends MIOObject {
         }
     }
     
-    private _objectID:MIOManagedObjectID = null;    
-    get objectID():MIOManagedObjectID {return this._objectID;}
-    get entity():MIOEntityDescription {return this.objectID.entity;}
+    private _objectID:NSManagedObjectID = null;    
+    get objectID():NSManagedObjectID {return this._objectID;}
+    get entity():NSEntityDescription {return this.objectID.entity;}
 
-    private _managedObjectContext:MIOManagedObjectContext = null;
-    get managedObjectContext():MIOManagedObjectContext {return this._managedObjectContext;}
+    private _managedObjectContext:NSManagedObjectContext = null;
+    get managedObjectContext():NSManagedObjectContext {return this._managedObjectContext;}
 
     get hasChanges():boolean {return (this._isInserted || this._isUpdated || this._isDeleted);}
 
@@ -112,10 +112,10 @@ export class MIOManagedObject extends MIOObject {
     awakeFromInsert() {}
     awakeFromFetch() {}
 
-    private _changedValues = {}; 
+    private _changedValues:{ [key:string] : any } = {}; 
     get changedValues() {return this._changedValues;} 
 
-    private _storedValues = null;
+    private _storedValues:{ [key:string] : any } = null;
     private committedValues(){
         if (this.objectID.isTemporaryID == true) return {};
         // if (this.objectID.isTemporaryID == true && this._storedValues == null) {
@@ -125,11 +125,11 @@ export class MIOManagedObject extends MIOObject {
 
         if (this._storedValues == null) {
             // Get from the store
-            if (this.objectID.persistentStore instanceof MIOIncrementalStore) {
+            if (this.objectID.persistentStore instanceof NSIncrementalStore) {
                 this._storedValues = this.storeValuesFromIncrementalStore(this.objectID.persistentStore);
             }
             else{
-                throw new Error("MIOManagedObject: Only Incremental store is supported.");
+                throw new Error("NSManagedObject: Only Incremental store is supported.");
             }
             this._setIsFault(false);
         }
@@ -137,21 +137,21 @@ export class MIOManagedObject extends MIOObject {
         return this._storedValues;
     }
 
-    private storeValuesFromIncrementalStore(store:MIOIncrementalStore){        
-        let storedValues = {};        
+    private storeValuesFromIncrementalStore(store:NSIncrementalStore){        
+        let storedValues:{ [key:string] : any }  = {};        
         let properties = this.entity.properties;
         
         for(let index = 0; index < properties.length; index++){
             let property = properties[index];
-            if (property instanceof MIOAttributeDescription) {
-                let attribute = property as MIOAttributeDescription;
+            if (property instanceof NSAttributeDescription) {
+                let attribute = property as NSAttributeDescription;
                 let node = store.newValuesForObjectWithID(this.objectID, this.managedObjectContext);
                 if (node == null) continue;
                 let value = node.valueForPropertyDescription(attribute);                
                 storedValues[attribute.name] = value;
             }
-            else if (property instanceof MIORelationshipDescription) {
-                let relationship = property as MIORelationshipDescription;                
+            else if (property instanceof NSRelationshipDescription) {
+                let relationship = property as NSRelationshipDescription;                
                 
                 if (relationship.isToMany == false) {                    
                     let objectID = store.newValueForRelationship(relationship, this.objectID, this.managedObjectContext);
@@ -161,7 +161,7 @@ export class MIOManagedObject extends MIOObject {
                 }
                 else {                  
                     // Tick. I store the value in a private property when the object is temporary                      
-                    let set:MIOManagedObjectSet = MIOManagedObjectSet._setWithManagedObject(this, relationship);
+                    let set:NSManagedObjectSet = NSManagedObjectSet._setWithManagedObject(this, relationship);
                     //storedValues[relationship.name] = set;
                     
                     let objectIDs = store.newValueForRelationship(relationship, this.objectID, this.managedObjectContext);
@@ -180,16 +180,15 @@ export class MIOManagedObject extends MIOObject {
         return storedValues;
     }
 
-    committedValuesForKeys(keys){
+    committedValuesForKeys(keys:string[]){
         let values = this.committedValues();
         if (keys == null) return values;
 
-        let result = {};
+        let result: { [key:string] : any } = {};
         for (let key in keys){
             let obj = values[key];
             result[key] = obj;
         }
-
         return result;
     }
 
@@ -213,7 +212,7 @@ export class MIOManagedObject extends MIOObject {
     //     if (keys.length == 1) return value;
         
     //     // We need to follow the tree
-    //     const object = value as MIOManagedObject;
+    //     const object = value as NSManagedObject;
     //     keys.removeObjectAtIndex(0);
     //     const newKeyPath = keys.join(".")
     //     return object.valueForKeyPath(newKeyPath);
@@ -231,7 +230,7 @@ export class MIOManagedObject extends MIOObject {
 
         let value = null;
 
-        if (property instanceof MIOAttributeDescription){
+        if (property instanceof NSAttributeDescription){
             if (key in this._changedValues) {
                 value = this._changedValues[key];
             }
@@ -239,11 +238,11 @@ export class MIOManagedObject extends MIOObject {
                 value = this.primitiveValueForKey(key);
             }
         }
-        else if (property instanceof MIORelationshipDescription){
-            let relationship = property as MIORelationshipDescription;
+        else if (property instanceof NSRelationshipDescription){
+            let relationship = property as NSRelationshipDescription;
             if (relationship.isToMany == false){
                 if (key in this._changedValues) {
-                    let objID:MIOManagedObjectID = this._changedValues[key];
+                    let objID:NSManagedObjectID = this._changedValues[key];
                     if (objID != null) {
                         value = this.managedObjectContext.objectWithID(objID);
                     }
@@ -267,7 +266,7 @@ export class MIOManagedObject extends MIOObject {
         return value;
     }
 
-    setValueForKey(value:any, key:string, visited:MIOSet = new MIOSet()){
+    setValueForKey(value:any, key:string, visited:NSSet = new NSSet()){
         let property = this.entity.propertiesByName[key];
 
         if (property == null) {
@@ -277,13 +276,13 @@ export class MIOManagedObject extends MIOObject {
 
         this.willChangeValueForKey(key);
 
-        if (property instanceof MIORelationshipDescription){
-            let relationship = property as MIORelationshipDescription;
+        if (property instanceof NSRelationshipDescription){
+            let relationship = property as NSRelationshipDescription;
                         
             if (relationship.isToMany == false){
                 let currentValue = this.valueForKey(key);
                 
-                let objID = value != null ? (value as MIOManagedObject).objectID : null;
+                let objID = value != null ? (value as NSManagedObject).objectID : null;
                 this._changedValues[key] = objID;
             
                 this._setInverseRelationshipValue(currentValue, value, relationship, visited);
@@ -307,19 +306,19 @@ export class MIOManagedObject extends MIOObject {
 
         let committedValues = this.committedValues();
         
-        if (property instanceof MIORelationshipDescription){
-            let relationship = property as MIORelationshipDescription;
+        if (property instanceof NSRelationshipDescription){
+            let relationship = property as NSRelationshipDescription;
             if (relationship.isToMany == false){                
-                let objID:MIOManagedObjectID = committedValues[key];
+                let objID:NSManagedObjectID = committedValues[key];
                 if (objID == null) return null;
                 let obj = this.managedObjectContext.objectWithID(objID);
                 return obj;
             }
             else {                
                 // Trick. I store the value in a private property when the object is temporary
-                let set:MIOManagedObjectSet = this["_" + relationship.name];
+                let set:NSManagedObjectSet = this["_" + relationship.name];
                 if (set == null) {
-                    set = MIOManagedObjectSet._setWithManagedObject(this, relationship);
+                    set = NSManagedObjectSet._setWithManagedObject(this, relationship);
                     this["_" + relationship.name] = set;
                 }
                 return set;
@@ -330,7 +329,7 @@ export class MIOManagedObject extends MIOObject {
         return committedValues[key];
     }
 
-    setPrimitiveValueForKey(value, key:string){
+    setPrimitiveValueForKey(value:any, key:string){
         
         let property = this.entity.propertiesByName[key];
         
@@ -339,18 +338,18 @@ export class MIOManagedObject extends MIOObject {
         if (value == null) {
             committedValues[key] = null;
         }
-        else if (property instanceof MIORelationshipDescription){
-            let relationship = property as MIORelationshipDescription;
+        else if (property instanceof NSRelationshipDescription){
+            let relationship = property as NSRelationshipDescription;
             if (relationship.isToMany == false){
-                let obj = value as MIOManagedObject;
+                let obj = value as NSManagedObject;
                 committedValues[key] = obj.objectID;
             }            
             else {
                 if (value == null){
-                    this["_" + relationship.name] = MIOManagedObjectSet._setWithManagedObject(this, relationship);
+                    this["_" + relationship.name] = NSManagedObjectSet._setWithManagedObject(this, relationship);
                 }
                 else {
-                    if ((value instanceof MIOManagedObjectSet) == false) throw new Error("MIOManagedObject: Trying to set a value in relation ships that is not a set.");
+                    if ((value instanceof NSManagedObjectSet) == false) throw new Error("NSManagedObject: Trying to set a value in relation ships that is not a set.");
                     this["_" + relationship.name] = value;
                 }
             }
@@ -375,8 +374,8 @@ export class MIOManagedObject extends MIOObject {
     //
 
 
-    _addObjectForKey(object:MIOManagedObject, key:string, visited:MIOSet = new MIOSet()){
-        let set:MIOManagedObjectSet = this._changedValues[key];
+    _addObjectForKey(object:NSManagedObject, key:string, visited:NSSet = new NSSet()){
+        let set:NSManagedObjectSet = this._changedValues[key];
         
         if (set == null) {
             // Check for committed value
@@ -384,9 +383,9 @@ export class MIOManagedObject extends MIOObject {
             set = storedSet != null ? storedSet.copy() : null;
         }
 
-        let rel:MIORelationshipDescription = this.entity.relationshipsByName[key];
+        let rel:NSRelationshipDescription = this.entity.relationshipsByName[key];
         if (set == null) {            
-            set = MIOManagedObjectSet._setWithManagedObject(this, rel);            
+            set = NSManagedObjectSet._setWithManagedObject(this, rel);            
         }
 
         set.addObject(object);
@@ -396,8 +395,8 @@ export class MIOManagedObject extends MIOObject {
         this._setInverseRelationshipValue(null, object, rel, visited);
     }
 
-    _removeObjectForKey(object, key:string, visited:MIOSet = new MIOSet()){
-        let set:MIOManagedObjectSet = this._changedValues[key];
+    _removeObjectForKey(object:any, key:string, visited:NSSet = new NSSet()){
+        let set:NSManagedObjectSet = this._changedValues[key];
         
         if (set == null) {
             // Check for committed value
@@ -405,9 +404,9 @@ export class MIOManagedObject extends MIOObject {
             set = storedSet != null ? storedSet.copy() : null;
         }
 
-        let rel:MIORelationshipDescription = this.entity.relationshipsByName[key];
+        let rel:NSRelationshipDescription = this.entity.relationshipsByName[key];
         if (set == null) {            
-            set = MIOManagedObjectSet._setWithManagedObject(this, rel);
+            set = NSManagedObjectSet._setWithManagedObject(this, rel);
         }
 
         set.removeObject(object);
@@ -423,14 +422,14 @@ export class MIOManagedObject extends MIOObject {
         this._setIsFault(false);
     }
 
-    private _setInverseRelationshipValue(oldValue:MIOManagedObject, newValue:MIOManagedObject, relationShip:MIORelationshipDescription, visited:MIOSet){
+    private _setInverseRelationshipValue(oldValue:NSManagedObject, newValue:NSManagedObject, relationShip:NSRelationshipDescription, visited:NSSet){
         if (relationShip.inverseRelationship == null) return;
         //if (oldValue == newValue) return;
         visited.addObject(this.objectID.URIRepresentation.absoluteString);
         
         let relName = relationShip.inverseName;        
         let relEntity = this.entity.managedObjectModel.entitiesByName[relationShip.inverseEntityName];
-        let rel = relEntity.relationshipsByName[relName] as MIORelationshipDescription;
+        let rel = relEntity.relationshipsByName[relName] as NSRelationshipDescription;
         if (rel.isToMany == false){
             if (oldValue != null && !visited.containsObject(oldValue.objectID.URIRepresentation.absoluteString)) oldValue.setValueForKey(null, relName, visited);
             // NOTE: This is to ensure, we update the graph correctly 
@@ -453,16 +452,16 @@ export class MIOManagedObject extends MIOObject {
 
         let relationships = this.entity.relationshipsByName;
         for (let relName in relationships) {
-            let rel:MIORelationshipDescription = relationships[relName];
+            let rel:NSRelationshipDescription = relationships[relName];
             if (rel.inverseRelationship != null) {
-                let parentObject:MIOManagedObject = this.valueForKey(relName);
+                let parentObject:NSManagedObject = this.valueForKey(relName);
                 if (parentObject == null) continue;
                 let parentRelationship = parentObject.entity.relationshipsByName[rel.inverseRelationship.name];
                 if (parentRelationship.isToMany == false){
                     parentObject.setValueForKey(this, rel.inverseRelationship.name);
                 }
                 else {
-                    let set:MIOManagedObjectSet = parentObject.valueForKey(rel.inverseRelationship.name);
+                    let set:NSManagedObjectSet = parentObject.valueForKey(rel.inverseRelationship.name);
                     set.addObject(this);
                 }
             }
@@ -473,29 +472,29 @@ export class MIOManagedObject extends MIOObject {
         
         let relationships = this.entity.relationshipsByName;
         for (let relName in relationships) {
-            let rel = relationships[relName] as MIORelationshipDescription;
+            let rel = relationships[relName] as NSRelationshipDescription;
             if (rel.inverseRelationship == null) continue;
             
             switch (rel.deleteRule) 
             {
-                case MIODeleteRule.cascadeDeleteRule: this.deleteByCascade(rel); break;
-                case MIODeleteRule.nullifyDeleteRule: this.deleteByNullify(rel); break;
+                case NSDeleteRule.cascadeDeleteRule: this.deleteByCascade(rel); break;
+                case NSDeleteRule.nullifyDeleteRule: this.deleteByNullify(rel); break;
                 default: break
             }
         }
     }
 
-    private deleteByNullify(relationship: MIORelationshipDescription){
+    private deleteByNullify(relationship: NSRelationshipDescription){
         
-        let visited = new MIOSet();
+        let visited = new NSSet();
         visited.addObject(this);
         if (relationship.isToMany == false) {
-            let obj = this.valueForKey(relationship.name) as MIOManagedObject;
+            let obj = this.valueForKey(relationship.name) as NSManagedObject;
             if (obj == null || obj.isDeleted == false) return;
             obj._nullify_inverse_relation(relationship.inverseRelationship, this, visited);
         }
         else {
-            let objects = this.valueForKey(relationship.name) as MIOManagedObjectSet;
+            let objects = this.valueForKey(relationship.name) as NSManagedObjectSet;
             for (let index = 0; index < objects.count; index++){
                 let obj = objects.objectAtIndex(index);
                 if (obj.isDeleted == false) obj._nullify_inverse_relation(relationship.inverseRelationship, this, visited);
@@ -503,7 +502,7 @@ export class MIOManagedObject extends MIOObject {
         }
     }
     
-    private _nullify_inverse_relation (relationship: MIORelationshipDescription, obj: MIOManagedObject, visited: MIOSet) {
+    private _nullify_inverse_relation (relationship: NSRelationshipDescription, obj: NSManagedObject, visited: NSSet) {
         if (relationship.isToMany == false) {            
             this.setValueForKey(null, relationship.name, visited);
         }
@@ -513,17 +512,17 @@ export class MIOManagedObject extends MIOObject {
     }
 
     
-    private deleteByCascade(relationship: MIORelationshipDescription) {
+    private deleteByCascade(relationship: NSRelationshipDescription) {
 
         if (relationship.isToMany == false) {
-            let obj = this.valueForKey(relationship.name) as MIOManagedObject;
+            let obj = this.valueForKey(relationship.name) as NSManagedObject;
             if (obj == null || obj.isDeleted == false) return;
             this.managedObjectContext.deleteObject(obj);
         }
         else {
-            let objects = this.valueForKey(relationship.name) as MIOManagedObjectSet;
+            let objects = this.valueForKey(relationship.name) as NSManagedObjectSet;
             for (let index = 0; index < objects.count; index++){
-                let obj = this.valueForKey(relationship.name) as MIOManagedObject;
+                let obj = objects.objectAtIndex(index);
                 if (obj.isDeleted == false) this.managedObjectContext.deleteObject(obj);
                 this._removeObjectForKey(obj, relationship.name)
             }
@@ -535,12 +534,12 @@ export class MIOManagedObject extends MIOObject {
 
     //     let relationships = this.entity.relationshipsByName;
     //     for (let relName in relationships) {
-    //         let rel = relationships[relName] as MIORelationshipDescription;
+    //         let rel = relationships[relName] as NSRelationshipDescription;
     //         if (rel.inverseRelationship != null) {
     //             let value = this.valueForKey(relName);
     //             if (value == null) return;
-    //             if (value instanceof MIOManagedObject) {
-    //                 let object = value as MIOManagedObject;
+    //             if (value instanceof NSManagedObject) {
+    //                 let object = value as NSManagedObject;
     //                 let parentRelationship = object.entity.relationshipsByName[rel.inverseRelationship.name];
     //                 if (parentRelationship.isToMany == false){
     //                     object.setValueForKey(null, rel.inverseRelationship.name);
@@ -549,7 +548,7 @@ export class MIOManagedObject extends MIOObject {
     //                     object._removeObjectForKey(this, rel.inverseRelationship.name);
     //                 }
     //             }
-    //             // else if (value instanceof MIOManagedObjectSet){
+    //             // else if (value instanceof NSManagedObjectSet){
                     
     //             // }                
     //         }
