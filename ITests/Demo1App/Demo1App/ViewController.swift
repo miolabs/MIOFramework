@@ -32,11 +32,11 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
   
     @IBAction func switchClicked(sender: UISwitch){
-        label.text = "Hello from switch button " + (sender.isOn ? "on" : "not on");
+        label.text = "Hello from switch button " + (sender.isOn ? "on" : "not on")
     }
     
     @IBAction func segmentedClicked(sender: UISegmentedControl){
-        label.text = "Hello 2 from segment " + String(sender.selectedSegmentIndex);
+        label.text = "Hello 2 from segment " + String(sender.selectedSegmentIndex)
     }
 
 

@@ -186,7 +186,7 @@ class TableViewController: UITableViewController, NSFetchedResultsControllerDele
         }
         
     }
-    
+        
     /*The last delegate call*/
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         /*finally balance beginUpdates with endupdates*/

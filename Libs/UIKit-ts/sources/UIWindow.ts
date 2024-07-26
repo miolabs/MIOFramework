@@ -119,9 +119,6 @@ export class _UIModalWindow extends UIWindow
 {
     init() {
         super.init();
-        this.layer.addStyle( "modal-window" );
-        // if (MIOCoreIsMobile() == false ) {
-        //     this.layer.addStyle( "desktop-modal" );
-        // }
+        this.layer.addStyle( MIOCoreIsMobile() ? "mobile-modal" : "desktop-modal" );
     }
 }

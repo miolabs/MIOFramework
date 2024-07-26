@@ -114,4 +114,15 @@ export function MIOCoreGetContentsFromURLString(path:string, target:any, complet
     xhr.send();
 }
 
+export function MIOCoreGetQueryOptions(){
+
+    let searchString = window.location.search;
+    if (searchString.length == 0) return [];
+
+    if (searchString.length > 0 && searchString[0] == "?") searchString = searchString.substr(1);
+            
+    let params = searchString.split("&");
+    return params;
+}
+
 
