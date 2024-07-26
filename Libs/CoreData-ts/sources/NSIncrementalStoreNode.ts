@@ -1,24 +1,24 @@
-import { MIOObject, MIOISO8601DateFormatter } from "../MIOFoundation";
-import { MIOManagedObjectID } from "./MIOManagedObjectID";
-import { MIOPropertyDescription } from "./MIOPropertyDescription";
-import { MIORelationshipDescription } from "./MIORelationshipDescription";
-import { MIOAttributeDescription, MIOAttributeType } from "./MIOAttributeDescription";
+import { NSObject, ISO8601DateFormatter } from "foundation";
+import { NSManagedObjectID } from "./NSManagedObjectID";
+import { NSPropertyDescription } from "./NSPropertyDescription";
+import { NSRelationshipDescription } from "./NSRelationshipDescription";
+import { NSAttributeDescription, NSAttributeType } from "./NSAttributeDescription";
 
 
 
-export class _MIOIncrementalStoreNodeDateTransformer {
-    static sdf:MIOISO8601DateFormatter = MIOISO8601DateFormatter.iso8601DateFormatter();
+export class _NSIncrementalStoreNodeDateTransformer {
+    static sdf:ISO8601DateFormatter = ISO8601DateFormatter.iso8601DateFormatter();
 }
 
-export class MIOIncrementalStoreNode extends MIOObject {
+export class NSIncrementalStoreNode extends NSObject {
 
-    private _objectID:MIOManagedObjectID = null;
-    get objectID():MIOManagedObjectID {return this._objectID;}
+    private _objectID:NSManagedObjectID = null;
+    get objectID():NSManagedObjectID {return this._objectID;}
     
     private _version = 0;
     get version(){return this._version;}
 
-    initWithObjectID(objectID:MIOManagedObjectID, values, version){
+    initWithObjectID(objectID:NSManagedObjectID, values: any, version: number){
         this._objectID = objectID;
         this._values = values;
         this._version = version;
@@ -30,27 +30,27 @@ export class MIOIncrementalStoreNode extends MIOObject {
         this._version = version;
     }
 
-    private _values = null;
-    valueForPropertyDescription(property:MIOPropertyDescription) {
+    private _values: any = null;
+    valueForPropertyDescription(property:NSPropertyDescription) {
 
         let value = this._values[property.name];
 
-        if (property instanceof MIORelationshipDescription) {
-            let rel = property as MIORelationshipDescription;
+        if (property instanceof NSRelationshipDescription) {
+            let rel = property as NSRelationshipDescription;
             if (value == null) {
                 value = this._values[rel.serverName];
             }
             return value;
         }
-        else if (property instanceof MIOAttributeDescription) {
-            let attr = property as MIOAttributeDescription;
+        else if (property instanceof NSAttributeDescription) {
+            let attr = property as NSAttributeDescription;
             let type = attr.attributeType;
 
             if (value == null){
                 value = this._values[attr.serverName];
             }        
     
-            if (type == MIOAttributeType.Boolean) {
+            if (type == NSAttributeType.Boolean) {
                 if (typeof (value) === "boolean") {
                     return value;
                 }
@@ -66,22 +66,22 @@ export class MIOIncrementalStoreNode extends MIOObject {
                     return v;
                 }
             }
-            else if (type == MIOAttributeType.Integer) {
+            else if (type == NSAttributeType.Integer) {
                 let v = parseInt(value);
                 return isNaN(v) ? null : v;
             }
-            else if (type == MIOAttributeType.Float || type == MIOAttributeType.Number) {
+            else if (type == NSAttributeType.Float || type == NSAttributeType.Number) {
                 let v = parseFloat(value); 
                 return isNaN(v) ? null : v;
             }
-            else if (type == MIOAttributeType.String) {
+            else if (type == NSAttributeType.String) {
                 return value;
             }
-            else if (type == MIOAttributeType.Date) {                
-                let date = _MIOIncrementalStoreNodeDateTransformer.sdf.dateFromString(value);
+            else if (type == NSAttributeType.Date) {                
+                let date = _NSIncrementalStoreNodeDateTransformer.sdf.dateFromString(value);
                 return date;
             }
-            else if (type == MIOAttributeType.Transformable) {                
+            else if (type == NSAttributeType.Transformable) {                
                 let v = value != null ? JSON.parse(value) : null;
                 return v;
             }

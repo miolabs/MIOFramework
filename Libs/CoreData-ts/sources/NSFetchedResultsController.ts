@@ -1,31 +1,31 @@
-import { MIOObject, MIONotificationCenter, MIONotification, MIOSet, MIOIndexPath } from "../MIOFoundation";
-import { MIOFetchRequest } from "./MIOFetchRequest";
-import { MIOManagedObjectContext, MIOManagedObjectContextDidSaveNotification, MIOManagedObjectContextObjectsDidChange, MIOUpdatedObjectsKey, MIOInsertedObjectsKey, MIODeletedObjectsKey, MIORefreshedObjectsKey } from "./MIOManagedObjectContext";
-import { MIOManagedObject } from "./MIOManagedObject";
-import { _MIOSortDescriptorSortObjects } from "../MIOFoundation/MIOSortDescriptor";
-import { MIOManagedObjectModel } from "./MIOManagedObjectModel"
-import { MIOEntityDescription } from "./MIOEntityDescription";
+
+import { NSObject, NotificationCenter, Notification, NSSet, IndexPath, _NSSortDescriptorSortObjects } from "foundation";
+import { NSFetchRequest } from "./NSFetchRequest";
+import { NSManagedObjectContext, NSManagedObjectContextDidSaveNotification, NSManagedObjectContextObjectsDidChange, NSUpdatedObjectsKey, NSInsertedObjectsKey, NSDeletedObjectsKey, NSRefreshedObjectsKey } from "./NSManagedObjectContext";
+import { NSManagedObject } from "./NSManagedObject";
+import { NSManagedObjectModel } from "./NSManagedObjectModel"
+import { NSEntityDescription } from "./NSEntityDescription";
 
 /**
  * Created by godshadow on 12/4/16.
  */
 
-export enum MIOFetchedResultsChangeType {
+export enum NSFetchedResultsChangeType {
     Insert,
     Delete,
     Update,
     Move
 }
 
-export interface MIOFetchedResultsControllerDelegate {
-    controllerWillChangeContent?(controller:MIOFetchedResultsController);
-    controllerDidChangeContent?(controller:MIOFetchedResultsController);
+export interface NSFetchedResultsControllerDelegate {
+    controllerWillChangeContent?(controller:NSFetchedResultsController);
+    controllerDidChangeContent?(controller:NSFetchedResultsController);
 
-    controllerDidChangeSection?(controller:MIOFetchedResultsController, sectionInfo, sectionIndex, changeType:MIOFetchedResultsChangeType);
-    controllerDidChangeObject?(controller:MIOFetchedResultsController, object, indexPath:MIOIndexPath, changeType:MIOFetchedResultsChangeType, newIndexPath:MIOIndexPath);
+    controllerDidChangeSection?(controller:NSFetchedResultsController, sectionInfo, sectionIndex, changeType:NSFetchedResultsChangeType);
+    controllerDidChangeObject?(controller:NSFetchedResultsController, object, indexPath:IndexPath, changeType:NSFetchedResultsChangeType, newIndexPath:IndexPath);
 }
 
-export class MIOFetchSection extends MIOObject
+export class NSFetchSection extends NSObject
 {
     objects = [];
 
@@ -34,14 +34,14 @@ export class MIOFetchSection extends MIOObject
     }
 }
 
-export class MIOFetchedResultsController extends MIOObject
+export class NSFetchedResultsController extends NSObject
 {
     sections = [];
     
-    fetchRequest:MIOFetchRequest = null;
-    managedObjectContext:MIOManagedObjectContext  = null;
+    fetchRequest:NSFetchRequest = null;
+    managedObjectContext:NSManagedObjectContext  = null;
     sectionNameKeyPath = null;
-    fetchEntity:MIOEntityDescription = null;
+    fetchEntity:NSEntityDescription = null;
     
     // private registerObjects = {};
     private registerObjects = {};
@@ -52,37 +52,37 @@ export class MIOFetchedResultsController extends MIOObject
         this.sectionNameKeyPath = sectionNameKeyPath;        
     }
 
-    private _delegate:MIOFetchedResultsControllerDelegate = null;
-    get delegate():MIOFetchedResultsControllerDelegate{
+    private _delegate:NSFetchedResultsControllerDelegate = null;
+    get delegate():NSFetchedResultsControllerDelegate{
         return this._delegate;
     }
-    set delegate(delegate:MIOFetchedResultsControllerDelegate){
+    set delegate(delegate:NSFetchedResultsControllerDelegate){
         this._delegate = delegate;
 
         // TODO: Add and remove notification observer
 
         if (delegate != null) {
-            MIONotificationCenter.defaultCenter().addObserver(this, MIOManagedObjectContextDidSaveNotification, function(this:MIOFetchedResultsController, notification:MIONotification){
+            NotificationCenter.defaultCenter().addObserver(this, NSManagedObjectContextDidSaveNotification, function(this:NSFetchedResultsController, notification:Notification){
 
-                let moc:MIOManagedObjectContext = notification.object;
+                let moc:NSManagedObjectContext = notification.object;
                 if (moc !== this.managedObjectContext) return;
                 
                 let entityName = this.fetchRequest.entityName;
 
-                let ins_objs = this.objectsFromEntitiesAndSubentities(entityName, notification.userInfo[MIOInsertedObjectsKey]);
-                let upd_objs = this.objectsFromEntitiesAndSubentities(entityName, notification.userInfo[MIOUpdatedObjectsKey]);
-                let del_objs = this.objectsFromEntitiesAndSubentities(entityName, notification.userInfo[MIODeletedObjectsKey]);
+                let ins_objs = this.objectsFromEntitiesAndSubentities(entityName, notification.userInfo[NSInsertedObjectsKey]);
+                let upd_objs = this.objectsFromEntitiesAndSubentities(entityName, notification.userInfo[NSUpdatedObjectsKey]);
+                let del_objs = this.objectsFromEntitiesAndSubentities(entityName, notification.userInfo[NSDeletedObjectsKey]);
 
                 if (ins_objs.length > 0 || upd_objs.length > 0 || del_objs.length > 0)
                      this.updateContent(ins_objs, upd_objs, del_objs);
             });
 
-            MIONotificationCenter.defaultCenter().addObserver(this, MIOManagedObjectContextObjectsDidChange, function(this:MIOFetchedResultsController, notification:MIONotification) {
+            NotificationCenter.defaultCenter().addObserver(this, NSManagedObjectContextObjectsDidChange, function(this:NSFetchedResultsController, notification:Notification) {
 
-                let moc:MIOManagedObjectContext = notification.object;
+                let moc:NSManagedObjectContext = notification.object;
                 if (moc !== this.managedObjectContext) return;
 
-                let refreshed = notification.userInfo[MIORefreshedObjectsKey];
+                let refreshed = notification.userInfo[NSRefreshedObjectsKey];
                 if (refreshed == null) return;
                 let entityName = this.fetchRequest.entityName;
 
@@ -91,28 +91,28 @@ export class MIOFetchedResultsController extends MIOObject
             });
         }
         else {
-            MIONotificationCenter.defaultCenter().removeObserver(this, MIOManagedObjectContextDidSaveNotification);
-            MIONotificationCenter.defaultCenter().removeObserver(this, MIOManagedObjectContextObjectsDidChange);
+            NotificationCenter.defaultCenter().removeObserver(this, NSManagedObjectContextDidSaveNotification);
+            NotificationCenter.defaultCenter().removeObserver(this, NSManagedObjectContextObjectsDidChange);
         }
     }
 
     private checkEntity(entityName:string, fetchEntityName:string) : boolean {
         if (entityName == fetchEntityName) return true;
 
-        let entity = MIOManagedObjectModel.entityForNameInManagedObjectContext(entityName, this.managedObjectContext);
+        let entity = NSManagedObjectModel.entityForNameInManagedObjectContext(entityName, this.managedObjectContext);
         if (entity.superentity == null) return false;        
 
         return this.checkEntity(entity.superentity.name, fetchEntityName);
     }
 
     private objectsFromEntitiesAndSubentities(entityName:string, entities:any){        
-        let objects:MIOSet = new MIOSet();
+        let objects:NSSet = new NSSet();
         if (entities == null) return objects;
 
         for (let key in entities) {
             if (this.checkEntity(key, entityName) == false) continue;            
             let objs = entities[key];
-            if (objs instanceof MIOSet) objs = objs.allObjects;
+            if (objs instanceof NSSet) objs = objs.allObjects;
             for (let i = 0; i < objs.length; i++) objects.addObject(objs[i]);
         }
                 
@@ -136,17 +136,17 @@ export class MIOFetchedResultsController extends MIOObject
         return this.resultObjects;
     }
 
-    private processObject(object:MIOManagedObject, result:boolean){
+    private processObject(object:NSManagedObject, result:boolean){
 
         if (result == true) {
             let ref = object.objectID._getReferenceObject();
             if (this.registerObjects[ref] == null){
                 this.resultObjects.push(object);
                 this.registerObjects[ref] = object;
-                this.changeObjects[ref] = {"Object": object, "ChangeType": MIOFetchedResultsChangeType.Insert};                
+                this.changeObjects[ref] = {"Object": object, "ChangeType": NSFetchedResultsChangeType.Insert};                
             }
             else {
-                this.changeObjects[ref] = {"Object": object, "IndexPath": this.indexPathForObject(object), "ChangeType": MIOFetchedResultsChangeType.Update};                
+                this.changeObjects[ref] = {"Object": object, "IndexPath": this.indexPathForObject(object), "ChangeType": NSFetchedResultsChangeType.Update};                
             }    
         }
         else {
@@ -154,7 +154,7 @@ export class MIOFetchedResultsController extends MIOObject
             if (this.registerObjects[ref] != null){
                 this.resultObjects.removeObject(object);
                 delete this.registerObjects[ref];
-                this.changeObjects[ref] = {"Object": object, "IndexPath": this.indexPathForObject(object), "ChangeType": MIOFetchedResultsChangeType.Delete};                
+                this.changeObjects[ref] = {"Object": object, "IndexPath": this.indexPathForObject(object), "ChangeType": NSFetchedResultsChangeType.Delete};                
             }
         }
     }
@@ -173,18 +173,20 @@ export class MIOFetchedResultsController extends MIOObject
         }        
     }
 
-    private refreshObjects(objects:MIOSet){ 
+    private refreshObjects(objects:NSSet){ 
         if (objects.count == 0) return;
 
+        this.changeObjects = {};
+
         this.checkObjects(objects);
-        this.resultObjects = _MIOSortDescriptorSortObjects(this.resultObjects, this.fetchRequest.sortDescriptors);
+        this.resultObjects = _NSSortDescriptorSortObjects(this.resultObjects, this.fetchRequest.sortDescriptors);
         this._splitInSections();
         this._notify();
     }
 
     private changeObjects = {};
 
-    private updateContent(inserted:MIOSet, updated:MIOSet, deleted:MIOSet){
+    private updateContent(inserted:NSSet, updated:NSSet, deleted:NSSet){
         
         this.changeObjects = {};
 
@@ -209,11 +211,11 @@ export class MIOFetchedResultsController extends MIOObject
                 this.resultObjects.splice(index, 1);
                 let ref = o.objectID._getReferenceObject();
                 delete this.registerObjects[ref];
-                this.changeObjects[ref] = {"Object": o, "IndexPath": this.indexPathForObject(o), "ChangeType": MIOFetchedResultsChangeType.Delete};                
+                this.changeObjects[ref] = {"Object": o, "IndexPath": this.indexPathForObject(o), "ChangeType": NSFetchedResultsChangeType.Delete};                
             }
         }        
 
-        this.resultObjects = _MIOSortDescriptorSortObjects(this.resultObjects, this.fetchRequest.sortDescriptors);        
+        this.resultObjects = _NSSortDescriptorSortObjects(this.resultObjects, this.fetchRequest.sortDescriptors);        
         this._splitInSections();
         this._notify();
     }
@@ -227,16 +229,16 @@ export class MIOFetchedResultsController extends MIOObject
         for (let sectionIndex = 0; sectionIndex < this.sections.length; sectionIndex++){
             let sectionInfo = this.sections[sectionIndex];
             if (typeof this._delegate.controllerDidChangeSection === "function")
-                this._delegate.controllerDidChangeSection(this, sectionInfo, sectionIndex, MIOFetchedResultsChangeType.Insert);
+                this._delegate.controllerDidChangeSection(this, sectionInfo, sectionIndex, NSFetchedResultsChangeType.Insert);
 
             if (typeof this._delegate.controllerDidChangeObject === "function") {                    
 
                 for (let ref in this.changeObjects) {
                     let item = this.changeObjects[ref];
                     let obj = item["Object"];
-                    let indexPath = item["IndexPath"] as MIOIndexPath;
-                    let newIndexPath = item["NewIndexPath"] as MIOIndexPath;
-                    let changeType = item["ChangeType"] as MIOFetchedResultsChangeType;
+                    let indexPath = item["IndexPath"] as IndexPath;
+                    let newIndexPath = item["NewIndexPath"] as IndexPath;
+                    let changeType = item["ChangeType"] as NSFetchedResultsChangeType;
                     if (indexPath != null && newIndexPath != null && indexPath.isEqualToIndexPath(newIndexPath)) newIndexPath = null;                    
                     this._delegate.controllerDidChangeObject(this, obj, indexPath, changeType, newIndexPath);
                 }
@@ -244,8 +246,8 @@ export class MIOFetchedResultsController extends MIOObject
                 // let items = sectionInfo.objects;
                 // for (let index = 0; index < items.length; index++) {
                 //     let obj = items[index];
-                //     let newIndexPath = MIOIndexPath.indexForRowInSection(index, sectionIndex);
-                //     this._delegate.controllerDidChangeObject(this, obj, null, MIOFetchedResultsChangeType.Insert, newIndexPath);
+                //     let newIndexPath = NSIndexPath.indexForRowInSection(index, sectionIndex);
+                //     this._delegate.controllerDidChangeObject(this, obj, null, NSFetchedResultsChangeType.Insert, newIndexPath);
                 // }
             }
         }
@@ -254,7 +256,7 @@ export class MIOFetchedResultsController extends MIOObject
             this._delegate.controllerDidChangeContent(this);
     }
 
-    indexPathForObject(object:MIOManagedObject):MIOIndexPath {
+    indexPathForObject(object:NSManagedObject):IndexPath {
         let ref = object.objectID._getReferenceObject();
         let section = this.objects2sections[ref];
         if (section == null) return null;
@@ -264,7 +266,7 @@ export class MIOFetchedResultsController extends MIOObject
 
         if (rowIndex == -1) return null;
 
-        return MIOIndexPath.indexForRowInSection(rowIndex, sectionIndex);
+        return IndexPath.indexForRowInSection(rowIndex, sectionIndex);
     }
     
     private objects2sections = {};
@@ -273,10 +275,10 @@ export class MIOFetchedResultsController extends MIOObject
         this.objects2sections = {};
 
         if (this.sectionNameKeyPath == null){
-            let section = new MIOFetchSection();
+            let section = new NSFetchSection();
             //section.objects = this.resultObjects;
             for (let index = 0; index < this.resultObjects.length; index++){
-                let obj:MIOManagedObject = this.resultObjects[index];                
+                let obj:NSManagedObject = this.resultObjects[index];                
                 // Cache to for checking updates
                 let ref = obj.objectID._getReferenceObject();
                 this.registerObjects[ref] = obj;  
@@ -285,7 +287,7 @@ export class MIOFetchedResultsController extends MIOObject
 
                 if (this.changeObjects[ref] != null) {
                     let item = this.changeObjects[ref];
-                    item["NewIndexPath"] = MIOIndexPath.indexForRowInSection(index, 0);
+                    item["NewIndexPath"] = IndexPath.indexForRowInSection(index, 0);
                 }
             }
 
@@ -298,8 +300,8 @@ export class MIOFetchedResultsController extends MIOObject
             if (this.resultObjects.length == 0) return;
 
             // Set first object
-            let firstObj:MIOManagedObject = this.resultObjects[0];
-            currentSection = new MIOFetchSection();
+            let firstObj:NSManagedObject = this.resultObjects[0];
+            currentSection = new NSFetchSection();
             this.sections.push(currentSection);
             currentSectionKeyPathValue = firstObj.valueForKeyPath(this.sectionNameKeyPath); 
             // Cache to for checking updates
@@ -309,7 +311,7 @@ export class MIOFetchedResultsController extends MIOObject
             // this.objects2sections[reference] = currentSection;
             let rowIndex = 0;
             for (let index = 0; index < this.resultObjects.length; index++){
-                let obj:MIOManagedObject = this.resultObjects[index];
+                let obj:NSManagedObject = this.resultObjects[index];
                 // Cache to for checking updates
                 let ref = obj.objectID._getReferenceObject();
                 this.registerObjects[ref] = obj;
@@ -317,7 +319,7 @@ export class MIOFetchedResultsController extends MIOObject
                 let value = obj.valueForKeyPath(this.sectionNameKeyPath);          
 
                 if (currentSectionKeyPathValue != value) {
-                    currentSection = new MIOFetchSection();
+                    currentSection = new NSFetchSection();
                     this.sections.push(currentSection);
                     currentSectionKeyPathValue = value;
                     rowIndex = 0;
@@ -329,7 +331,7 @@ export class MIOFetchedResultsController extends MIOObject
                 if (this.changeObjects[ref] != null) {
                     let item = this.changeObjects[ref];
                     let sectionIndex = this.sections.indexOf(currentSection);
-                    item["NewIndexPath"] = MIOIndexPath.indexForRowInSection(rowIndex, sectionIndex);
+                    item["NewIndexPath"] = IndexPath.indexForRowInSection(rowIndex, sectionIndex);
                 }
 
                 rowIndex++;
@@ -337,7 +339,7 @@ export class MIOFetchedResultsController extends MIOObject
         }
     }
 
-    objectAtIndexPath(indexPath:MIOIndexPath){
+    objectAtIndexPath(indexPath:IndexPath){
         let section = this.sections[indexPath.section];
         let object = section.objects[indexPath.row];
         return object;

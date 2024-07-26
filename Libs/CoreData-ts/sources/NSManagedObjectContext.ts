@@ -1,30 +1,29 @@
-import { MIOObject, MIOSet, MIONotificationCenter, _MIOPredicateFilterObjects, MIONotification } from "../MIOFoundation";
-import { MIOManagedObjectID } from "./MIOManagedObjectID";
-import { MIOClassFromString } from "../MIOCore/platform";
-import { _MIOSortDescriptorSortObjects } from "../MIOFoundation/MIOSortDescriptor";
-import { MIOManagedObject } from "./MIOManagedObject";
-import { MIOIncrementalStore } from "./MIOIncrementalStore";
-import { MIOIncrementalStoreNode } from "./MIOIncrementalStoreNode";
-import { MIOEntityDescription } from "./MIOEntityDescription";
-import { MIOFetchRequest } from "./MIOFetchRequest";
-import { MIOPersistentStoreCoordinator } from "./MIOPersistentStoreCoordinator";
-import { MIOPersistentStore } from "./MIOPersistentStore";
-import { MIOSaveChangesRequest } from "./MIOSaveChangesRequest";
+import { NSObject, NSSet, NotificationCenter, _NSPredicateFilterObjects, _NSSortDescriptorSortObjects, Notification, NSClassFromString } from "foundation";
+import { NSManagedObjectID } from "./NSManagedObjectID";
+import { NSManagedObject } from "./NSManagedObject";
+import { NSManagedObjectSet } from "./NSManagedObjectSet";
+import { NSIncrementalStore } from "./NSIncrementalStore";
+import { NSIncrementalStoreNode } from "./NSIncrementalStoreNode";
+import { NSEntityDescription } from "./NSEntityDescription";
+import { NSFetchRequest } from "./NSFetchRequest";
+import { NSPersistentStoreCoordinator } from "./NSPersistentStoreCoordinator";
+import { NSPersistentStore } from "./NSPersistentStore";
+import { NSSaveChangesRequest } from "./NSSaveChangesRequest";
 
 /**
  * Created by godshadow on 12/4/16.
  */
 
-export let MIOManagedObjectContextWillSaveNotification = "MIOManagedObjectContextWillSaveNotification";
-export let MIOManagedObjectContextDidSaveNotification = "MIOManagedObjectContextDidSaveNotification";
-export let MIOManagedObjectContextObjectsDidChange = "MIOManagedObjectContextObjectsDidChange";
+export let NSManagedObjectContextWillSaveNotification = "NSManagedObjectContextWillSaveNotification";
+export let NSManagedObjectContextDidSaveNotification = "NSManagedObjectContextDidSaveNotification";
+export let NSManagedObjectContextObjectsDidChange = "NSManagedObjectContextObjectsDidChange";
 
-export let MIOInsertedObjectsKey = "MIOInsertedObjectsKey";
-export let MIOUpdatedObjectsKey = "MIOUpdatedObjectsKey";
-export let MIODeletedObjectsKey = "MIODeletedObjectsKey";
-export let MIORefreshedObjectsKey = "MIORefreshedObjectsKey";
+export let NSInsertedObjectsKey = "NSInsertedObjectsKey";
+export let NSUpdatedObjectsKey = "NSUpdatedObjectsKey";
+export let NSDeletedObjectsKey = "NSDeletedObjectsKey";
+export let NSRefreshedObjectsKey = "NSRefreshedObjectsKey";
 
-export enum MIOManagedObjectContextConcurrencyType {
+export enum NSManagedObjectContextConcurrencyType {
     PrivateQueue,
     MainQueue
 }
@@ -33,31 +32,31 @@ export enum NSMergePolicy {
     None
 }
 
-export class MIOManagedObjectContext extends MIOObject {
-    persistentStoreCoordinator: MIOPersistentStoreCoordinator = null;
+export class NSManagedObjectContext extends NSObject {
+    persistentStoreCoordinator: NSPersistentStoreCoordinator = null;
 
-    concurrencyType = MIOManagedObjectContextConcurrencyType.MainQueue;
+    concurrencyType = NSManagedObjectContextConcurrencyType.MainQueue;
     mergePolicy = "";
 
-    private _parent: MIOManagedObjectContext = null;
+    private _parent: NSManagedObjectContext = null;
 
     // private managedObjectChanges = {};
 
-    private objectsByEntity = {};
-    private objectsByID = {};
+    private objectsByEntity: { [key:string] : any[] } = {};
+    private objectsByID : { [key:string] : any } = {};
 
-    private insertedObjects: MIOSet = MIOSet.set();
-    private updatedObjects: MIOSet = MIOSet.set();
-    private deletedObjects: MIOSet = MIOSet.set();
+    private insertedObjects: NSManagedObjectSet = new NSManagedObjectSet(); //= NSSet.set();
+    private updatedObjects: NSManagedObjectSet = new NSManagedObjectSet(); //= NSSet.set();
+    private deletedObjects: NSManagedObjectSet = new NSManagedObjectSet(); //= NSSet.set();
 
-    private blockChanges = null;
+    private blockChanges:{ [key:string] : any } = null;
 
-    initWithConcurrencyType(type: MIOManagedObjectContextConcurrencyType) {
+    initWithConcurrencyType(type: NSManagedObjectContextConcurrencyType) {
         super.init();
         this.concurrencyType = type;
     }
 
-    set parent(value: MIOManagedObjectContext) {
+    set parent(value: NSManagedObjectContext) {
         this._parent = value;
         if (value != null) {
             this.persistentStoreCoordinator = value.persistentStoreCoordinator;
@@ -66,8 +65,8 @@ export class MIOManagedObjectContext extends MIOObject {
     get parent() { return this._parent; }
 
     
-    private registerObjects = [];
-    private _registerObject(object: MIOManagedObject) {
+    private registerObjects : NSManagedObject[] = [];
+    private _registerObject(object: NSManagedObject) {
 
         if (this.objectsByID[object.objectID.URIRepresentation.absoluteString] != null) return;
 
@@ -84,13 +83,13 @@ export class MIOManagedObjectContext extends MIOObject {
 
         this._registerObjectForEntity(object, object.entity);
 
-        if (object.objectID.persistentStore instanceof MIOIncrementalStore){
-            let is = object.objectID.persistentStore as MIOIncrementalStore;
+        if (object.objectID.persistentStore instanceof NSIncrementalStore){
+            let is = object.objectID.persistentStore as NSIncrementalStore;
             is.managedObjectContextDidRegisterObjectsWithIDs([object.objectID]);
         }        
     }
 
-    private _registerObjectForEntity(object:MIOManagedObject, entity:MIOEntityDescription) {        
+    private _registerObjectForEntity(object:NSManagedObject, entity:NSEntityDescription) {        
         let entityName = entity.name;
         let array = this.objectsByEntity[entityName];
         if (array == null) {
@@ -102,7 +101,7 @@ export class MIOManagedObjectContext extends MIOObject {
         if (entity.superentity != null) this._registerObjectForEntity(object, entity.superentity);
     }
 
-    private _unregisterObject(object: MIOManagedObject) {
+    private _unregisterObject(object: NSManagedObject) {
         this.registerObjects.removeObject(object);
         delete this.objectsByID[object.objectID.URIRepresentation.absoluteString];
 
@@ -112,14 +111,14 @@ export class MIOManagedObjectContext extends MIOObject {
             array.removeObject(object);
         }        
 
-        if (object.objectID.persistentStore instanceof MIOIncrementalStore){
-            let is = object.objectID.persistentStore as MIOIncrementalStore;
+        if (object.objectID.persistentStore instanceof NSIncrementalStore){
+            let is = object.objectID.persistentStore as NSIncrementalStore;
             is.managedObjectContextDidUnregisterObjectsWithIDs([object.objectID]);
         }        
         
     }
 
-    insertObject(object: MIOManagedObject) {
+    insertObject(object: NSManagedObject) {
         if (this.insertedObjects.containsObject(object)) return;
 
         let store = this.persistentStoreCoordinator._persistentStoreForObject(object);
@@ -135,7 +134,7 @@ export class MIOManagedObjectContext extends MIOObject {
         object._setIsInserted(true);
     }
 
-    updateObject(object: MIOManagedObject) {
+    updateObject(object: NSManagedObject) {
         if (this.updatedObjects.containsObject(object)) return;        
         if (this.insertedObjects.containsObject(object)) return;
         if (this.deletedObjects.containsObject(object)) return;
@@ -143,7 +142,7 @@ export class MIOManagedObjectContext extends MIOObject {
         object._setIsUpdated(true);
     }
 
-    deleteObject(object: MIOManagedObject) {
+    deleteObject(object: NSManagedObject) {
         if (this.deletedObjects.containsObject(object)) { return; }
         if (this.updatedObjects.containsObject(object)) { this.updatedObjects.removeObject(object); }
         
@@ -160,29 +159,29 @@ export class MIOManagedObjectContext extends MIOObject {
         return this.objectsByID[urlString];
     }
 
-    objectWithID(objectID: MIOManagedObjectID) {
+    objectWithID(objectID: NSManagedObjectID) {
 
-        let obj:MIOManagedObject = this.objectsByID[objectID.URIRepresentation.absoluteString];
+        let obj:NSManagedObject = this.objectsByID[objectID.URIRepresentation.absoluteString];
         if (obj == null) {
-            obj = MIOClassFromString(objectID.entity.managedObjectClassName);
+            obj = NSClassFromString(objectID.entity.managedObjectClassName);
             obj._initWithObjectID(objectID, this);  
             this._registerObject(obj);               
         }
         return obj;
     }
 
-    existingObjectWithID(objectID: MIOManagedObjectID): MIOManagedObject {
+    existingObjectWithID(objectID: NSManagedObjectID): NSManagedObject {
 
-        let obj: MIOManagedObject = this.objectsByID[objectID.URIRepresentation.absoluteString];
+        let obj: NSManagedObject = this.objectsByID[objectID.URIRepresentation.absoluteString];
 
-        let store:MIOIncrementalStore = objectID.persistentStore as MIOIncrementalStore;
-        let node:MIOIncrementalStoreNode = store._nodeForObjectID(objectID, this);
+        let store:NSIncrementalStore = objectID.persistentStore as NSIncrementalStore;
+        let node:NSIncrementalStoreNode = store._nodeForObjectID(objectID, this);
 
         if (obj != null && node != null){
             obj._setIsFault(true);
         }
         else if (obj == null && node != null){
-            obj = MIOClassFromString(objectID.entity.managedObjectClassName);
+            obj = NSClassFromString(objectID.entity.managedObjectClassName);
             obj._initWithObjectID(objectID, this);
             this._registerObject(obj);
         }
@@ -190,27 +189,27 @@ export class MIOManagedObjectContext extends MIOObject {
         return obj;
     }
 
-    refreshObject(object: MIOManagedObject, mergeChanges: boolean) {
+    refreshObject(object: NSManagedObject, mergeChanges: boolean) {
 
         if (mergeChanges == false) return;
 
         if (object.isFault == false) return;
 
-        let changes = null;
+        let changes :{ [key:string]:any} = null;
         if (this.blockChanges != null) {
             changes = this.blockChanges;
         }
         else {
             changes = {};
-            changes[MIORefreshedObjectsKey] = {};
+            changes[NSRefreshedObjectsKey] = {};
         }
 
         let entityName = object.entity.name;
-        let objs = changes[MIORefreshedObjectsKey];
+        let objs = changes[NSRefreshedObjectsKey];
 
         let set = objs[entityName];
         if (set == null) {
-            set = MIOSet.set();
+            set = NSSet.set();
             objs[entityName] = set;
         }
 
@@ -219,11 +218,11 @@ export class MIOManagedObjectContext extends MIOObject {
         if (this.blockChanges == null) {
             //this.persistentStoreCoordinator.updateObjectWithObjectID(object.objectID, this); 
             //object.isFault = false;           
-            MIONotificationCenter.defaultCenter().postNotification(MIOManagedObjectContextObjectsDidChange, this, changes);
+            NotificationCenter.defaultCenter().postNotification(NSManagedObjectContextObjectsDidChange, this, changes);
         }
     }
 
-    private addObjectToTracking(objectTracking, object: MIOManagedObject) {
+    private addObjectToTracking(objectTracking: any, object: NSManagedObject) {
         let array = objectTracking[object.entity.name];
         if (array == null) {
             array = [];
@@ -232,14 +231,14 @@ export class MIOManagedObjectContext extends MIOObject {
         array.push(object);
     }
 
-    private removeObjectFromTracking(objectTracking, object: MIOManagedObject) {
+    private removeObjectFromTracking(objectTracking: any, object: NSManagedObject) {
         let array = objectTracking[object.entity.name];
         if (array == null) return;
         let index = array.indexOf(object);
         if (index > -1) array.splice(index, 1);
     }
 
-    removeAllObjectsForEntityName(entityName) {
+    removeAllObjectsForEntityName(entityName : string) {
         let objs = this.objectsByEntity[entityName];
         if (objs != null) {
             for (let index = objs.length - 1; index >= 0; index--) {
@@ -249,14 +248,14 @@ export class MIOManagedObjectContext extends MIOObject {
         }
     }
 
-    executeFetch(request) {
+    executeFetch(request : any) {
 
         let entityName = request.entityName;
-        let entity = MIOEntityDescription.entityForNameInManagedObjectContext(entityName, this);
+        let entity = NSEntityDescription.entityForNameInManagedObjectContext(entityName, this);
         request.entity = entity;
 
         //TODO: Get the store from configuration name
-        let store: MIOPersistentStore = this.persistentStoreCoordinator.persistentStores[0];
+        let store: NSPersistentStore = this.persistentStoreCoordinator.persistentStores[0];
         let objs = store._executeRequest(request, this);
 
         for (let index = 0; index < objs.length; index++) {
@@ -264,18 +263,18 @@ export class MIOManagedObjectContext extends MIOObject {
             this._registerObject(o);
         }
 
-        if (request instanceof MIOFetchRequest) {
-            let fetchRequest = request as MIOFetchRequest;
-            let objects = _MIOPredicateFilterObjects(this.objectsByEntity[entityName], fetchRequest.predicate);
-            objects = _MIOSortDescriptorSortObjects(objects, fetchRequest.sortDescriptors);
+        if (request instanceof NSFetchRequest) {
+            let fetchRequest = request as NSFetchRequest;
+            let objects = _NSPredicateFilterObjects(this.objectsByEntity[entityName], fetchRequest.predicate);
+            objects = _NSSortDescriptorSortObjects(objects, fetchRequest.sortDescriptors);
             return objects;
         }
 
         return [];
     }
 
-    _obtainPermanentIDForObject(object: MIOManagedObject) {
-        let store: MIOPersistentStore = object.objectID.persistentStore;
+    _obtainPermanentIDForObject(object: NSManagedObject) {
+        let store: NSPersistentStore = object.objectID.persistentStore;
         let objID = store._obtainPermanentIDForObject(object);
 
         delete this.objectsByID[object.objectID.URIRepresentation.absoluteString];
@@ -291,12 +290,12 @@ export class MIOManagedObjectContext extends MIOObject {
         if (this.insertedObjects.length == 0 && this.updatedObjects.length == 0 && this.deletedObjects.length == 0) return;
 
         // There's changes, so keep going...
-        MIONotificationCenter.defaultCenter().postNotification(MIOManagedObjectContextWillSaveNotification, this);
+        NotificationCenter.defaultCenter().postNotification(NSManagedObjectContextWillSaveNotification, this);
 
         // Deleted objects
-        let deletedObjectsByEntityName = {};
+        let deletedObjectsByEntityName: { [key:string] : NSManagedObject[] }  = {};
         for (let index = 0; index < this.deletedObjects.count; index++) {
-            let delObj: MIOManagedObject = this.deletedObjects.objectAtIndex(index);
+            let delObj: NSManagedObject = this.deletedObjects.objectAtIndex(index);
 
             // Track object for save notification
             let entityName = delObj.entity.name;
@@ -309,9 +308,9 @@ export class MIOManagedObjectContext extends MIOObject {
         }
 
         // Inserted objects
-        let insertedObjectsByEntityName = {};
+        let insertedObjectsByEntityName: { [key:string] : NSManagedObject[] }  = {};
         for (let index = 0; index < this.insertedObjects.count; index++) {
-            let insObj: MIOManagedObject = this.insertedObjects.objectAtIndex(index);
+            let insObj: NSManagedObject = this.insertedObjects.objectAtIndex(index);
 
             this._obtainPermanentIDForObject(insObj);
 
@@ -326,9 +325,9 @@ export class MIOManagedObjectContext extends MIOObject {
         }
 
         // Updated objects
-        let updatedObjectsByEntityName = {};
+        let updatedObjectsByEntityName: { [key:string] : NSManagedObject[] }  = {};
         for (let index = 0; index < this.updatedObjects.count; index++) {
-            let updObj: MIOManagedObject = this.updatedObjects.objectAtIndex(index);
+            let updObj: NSManagedObject = this.updatedObjects.objectAtIndex(index);
 
             // Track object for save notification
             let entityName = updObj.entity.name;
@@ -342,53 +341,53 @@ export class MIOManagedObjectContext extends MIOObject {
 
         if (this.parent == null) {
             // Save to persistent store
-            let saveRequest = new MIOSaveChangesRequest();
+            let saveRequest = new NSSaveChangesRequest();
             saveRequest.initWithObjects(this.insertedObjects, this.updatedObjects, this.deletedObjects);
             //TODO: Execute save per store configuration            
-            let store: MIOPersistentStore = this.persistentStoreCoordinator.persistentStores[0];
+            let store: NSPersistentStore = this.persistentStoreCoordinator.persistentStores[0];
             store._executeRequest(saveRequest, this);
 
             //Clear values
             for (let index = 0; index < this.insertedObjects.count; index++) {
-                let obj: MIOManagedObject = this.insertedObjects.objectAtIndex(index);
+                let obj: NSManagedObject = this.insertedObjects.objectAtIndex(index);
                 obj._didCommit();
             }
 
             for (let index = 0; index < this.updatedObjects.count; index++) {
-                let obj: MIOManagedObject = this.updatedObjects.objectAtIndex(index);
+                let obj: NSManagedObject = this.updatedObjects.objectAtIndex(index);
                 obj._didCommit();
             }
 
             for (let index = 0; index < this.deletedObjects.count; index++) {
-                let obj: MIOManagedObject = this.deletedObjects.objectAtIndex(index);
+                let obj: NSManagedObject = this.deletedObjects.objectAtIndex(index);
                 obj._didCommit();
                 this._unregisterObject(obj);
             }
 
             // Clear
-            this.insertedObjects = MIOSet.set();
-            this.updatedObjects = MIOSet.set();
-            this.deletedObjects = MIOSet.set();
+            this.insertedObjects = new NSManagedObjectSet(); //NSSet.set();
+            this.updatedObjects = new NSManagedObjectSet(); //NSSet.set();
+            this.deletedObjects = new NSManagedObjectSet(); //NSSet.set();
         }
 
-        let objsChanges = {};
-        objsChanges[MIOInsertedObjectsKey] = insertedObjectsByEntityName;
-        objsChanges[MIOUpdatedObjectsKey] = updatedObjectsByEntityName;
-        objsChanges[MIODeletedObjectsKey] = deletedObjectsByEntityName;
+        let objsChanges : { [key:string] : any}  = {};
+        objsChanges[NSInsertedObjectsKey] = insertedObjectsByEntityName;
+        objsChanges[NSUpdatedObjectsKey] = updatedObjectsByEntityName;
+        objsChanges[NSDeletedObjectsKey] = deletedObjectsByEntityName;
 
-        let noty = new MIONotification(MIOManagedObjectContextDidSaveNotification, this, objsChanges);
+        let noty = new Notification(NSManagedObjectContextDidSaveNotification, this, objsChanges);
         if (this.parent != null) {
             this.parent.mergeChangesFromContextDidSaveNotification(noty);
         }
 
-        MIONotificationCenter.defaultCenter().postNotification(MIOManagedObjectContextDidSaveNotification, this, objsChanges);
+        NotificationCenter.defaultCenter().postNotification(NSManagedObjectContextDidSaveNotification, this, objsChanges);
     }
 
-    mergeChangesFromContextDidSaveNotification(notification: MIONotification) {
+    mergeChangesFromContextDidSaveNotification(notification: Notification) {
 
-        let insertedObjects = notification.userInfo[MIOInsertedObjectsKey];
-        let updateObjects = notification.userInfo[MIOUpdatedObjectsKey];
-        let deletedObjects = notification.userInfo[MIODeletedObjectsKey];
+        let insertedObjects = notification.userInfo[NSInsertedObjectsKey];
+        let updateObjects = notification.userInfo[NSUpdatedObjectsKey];
+        let deletedObjects = notification.userInfo[NSDeletedObjectsKey];
 
         // Inserted objects        
         for (let entityName in insertedObjects) {
@@ -446,21 +445,21 @@ export class MIOManagedObjectContext extends MIOObject {
         }
     }
 
-    performBlockAndWait(target, block) {
+    performBlockAndWait(target:any, block:any) {
 
         this.blockChanges = {};
-        this.blockChanges[MIOInsertedObjectsKey] = {};
-        this.blockChanges[MIOUpdatedObjectsKey] = {};
-        this.blockChanges[MIODeletedObjectsKey] = {};
-        this.blockChanges[MIORefreshedObjectsKey] = {};
+        this.blockChanges[NSInsertedObjectsKey] = {};
+        this.blockChanges[NSUpdatedObjectsKey] = {};
+        this.blockChanges[NSDeletedObjectsKey] = {};
+        this.blockChanges[NSRefreshedObjectsKey] = {};
 
         block.call(target);
 
         // Refresed block objects
-        let refresed = this.blockChanges[MIORefreshedObjectsKey];
+        let refresed = this.blockChanges[NSRefreshedObjectsKey];
         //this.refreshObjectsFromStore(refresed);
 
-        MIONotificationCenter.defaultCenter().postNotification(MIOManagedObjectContextObjectsDidChange, this, this.blockChanges);
+        NotificationCenter.defaultCenter().postNotification(NSManagedObjectContextObjectsDidChange, this, this.blockChanges);
         this.blockChanges = null;
     }
 
@@ -468,7 +467,7 @@ export class MIOManagedObjectContext extends MIOObject {
         let pss = {};
         
         for (let key in this.objectsByID){
-            let obj:MIOManagedObject = this.objectsByID[key];
+            let obj:NSManagedObject = this.objectsByID[key];
             
             let arr = pss[obj.objectID.persistentStore.identifier];
             if (arr == null) {
@@ -485,8 +484,8 @@ export class MIOManagedObjectContext extends MIOObject {
             let objs = pss[ps.identifier];
             if (objs == null || objs.length == 0) continue;
 
-            if (ps instanceof MIOIncrementalStore){
-                let is = ps as MIOIncrementalStore;
+            if (ps instanceof NSIncrementalStore){
+                let is = ps as NSIncrementalStore;
                 is.managedObjectContextDidUnregisterObjectsWithIDs(objs);
             }                        
         }        
@@ -495,9 +494,9 @@ export class MIOManagedObjectContext extends MIOObject {
         this.objectsByID = {};
         this.objectsByEntity = {};
         
-        this.insertedObjects = MIOSet.set();
-        this.updatedObjects = MIOSet.set();
-        this.deletedObjects = MIOSet.set();        
+        this.insertedObjects = new NSManagedObjectSet(); //NSSet.set();
+        this.updatedObjects = new NSManagedObjectSet(); //NSSet.set();
+        this.deletedObjects = new NSManagedObjectSet(); //NSSet.set();        
     }
 
 }
