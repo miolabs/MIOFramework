@@ -78,6 +78,12 @@ export class MUIDatePicker extends UIControl implements MUIDatePickerHeaderDeleg
         this.daysView.selectDate( date );
     }
 
+    resetSelection(){
+        this.selectedMonth = null;
+        this.selectedYear = null;
+        this.daysView.resetSelection();
+    }
+
     reloadData() {
         this.daysView.setupDaysLayer();
     }
@@ -391,6 +397,10 @@ class MUICalendarDaysView extends UIView
             this.lastSelectedCell = cell;
             cell.selected = true;
         }        
+    }
+
+    resetSelection(){
+        if (this.lastSelectedCell != null ) this.lastSelectedCell.selected = false;
     }
 
 }
