@@ -3,8 +3,7 @@ import { _UICoreLayerGetFirstElementWithTag } from "uikit";
 import { CAComboBoxItemLayer } from "./CAComboBoxItemLayer";
 
 export class CAComboBoxLayer extends CALayer
-{
-    
+{    
     private selectElement:any;
 
     constructor( contents?:any ) {
@@ -26,15 +25,15 @@ export class CAComboBoxLayer extends CALayer
     private _on_change_target:any = null;
     private _on_change_action:any = null;
     setOnChangeBlock( target:any, action:any) {        
+        this._on_change_target = target;
+        this._on_change_action = action;
+
         if (target == null) {
             this.selectElement.removeEventListener( "change", this.on_change.bind(this) );
         }
         else {
             this.selectElement.addEventListener( "change", this.on_change.bind(this) );
         }
-
-        this._on_change_target = target;
-        this._on_change_action = action;
     }
 
     private on_change( e:any ){

@@ -49,10 +49,6 @@ export class CAInputLayer extends CALayer
         this._onChangeBlock( this.inputElement.value );
     }
 
-    private on_click( e:any ) {
-        e.stopPropagation();
-    }
-
     private on_focus() {
 
     }

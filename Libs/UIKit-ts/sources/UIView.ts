@@ -59,7 +59,10 @@ export class UIView extends UIResponder
     static get layerClass() : any { return CALayer }
 
     init() {
-        this.layer = new UIView.layerClass();
+        let c = MIOCoreClassByName( this.className );
+        this.layer = c ? new c.layerClass( ) : new UIView.layerClass();
+
+        //if (this.layer == null) this.layer = new UIView.layerClass();
         // this.layer = MUICoreLayerCreate(this.layerID);        
         //UICoreLayerAddStyle(this.layer, "view");
         //UICoreLayerAddStyle(this.layer, "view");
@@ -381,6 +384,7 @@ export class UIView extends UIResponder
     //
 
     protected _userInteraction = false;
+    get userInteraction(): boolean { return this._userInteraction; }
     set userInteraction( value:boolean ) {
         if (value == this._userInteraction) return;
 
@@ -388,8 +392,7 @@ export class UIView extends UIResponder
             this.layer.registerEventAction( this, this.on_event );
         }
         else {
-            // this.layer.removeEventListener("mousedown", this.mouseDownEvent);
-            // this.layer.removeEventListener("mouseup", this.mouseUpEvent);
+            this.layer.unregisterEventAction( this, this.on_event );
         }
     }
 

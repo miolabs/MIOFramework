@@ -92,25 +92,30 @@ export class CALayer
     private _event_target: any = null;
     private _event_action: any = null;
     registerEventAction( target:any, action: any ) {
+        if (action == null) throw new Error("CALayer: Can't add a null action");
+
         this._event_target = target;
         this._event_action = action;        
 
-        this.contents.addEventListener( "click", function(e:any) { e.stopPropagation(); } );
+        this.contents.addEventListener( "click", this.on_click.bind(this) );
 
-        let instance = this;
-        if (action == null && this._event_action != null ) {
-            this._event_action = null;            
-            this.contents.removeEventListener( "mouseup", this.on_mouse_down.bind(this) );
-            this.contents.removeEventListener( "mousedown", this.on_mouse_down.bind(this) );
-
-        }
-        else if ( action != null ) {
-            this._event_action = action;
-            this.contents.addEventListener( "mouseup", this.on_mouse_up.bind(this) );
-            this.contents.addEventListener( "mousedown", this.on_mouse_down.bind(this) );
-        }
-
+        this.contents.addEventListener( "mouseup", this.on_mouse_up.bind(this) );
+        this.contents.addEventListener( "mousedown", this.on_mouse_down.bind(this) );        
     }
+
+    unregisterEventAction( target:any, action: any ) {
+        if (action == null) throw new Error("CALayer: Can't remove a null action");
+
+        this._event_target = null;
+        this._event_action = null;
+
+        let instance = this;          
+        this.contents.removeEventListener( "click", this.on_click.bind(this) );  
+        this.contents.removeEventListener( "mouseup", this.on_mouse_down.bind(this) );
+        this.contents.removeEventListener( "mousedown", this.on_mouse_down.bind(this) );        
+    }
+
+    private on_click( e:any ){ e.stopPropagation(); }
 
     private on_mouse_up( e:any ){
         if ( this._event_action != null ) this._event_action.call( this._event_target, CALayerEvent.mouseUp );

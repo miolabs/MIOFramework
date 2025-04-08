@@ -21,12 +21,15 @@ export class UIControl extends UIView
 {
     static get layerClass() : any { return CALayer }
 
-    initWithCoder( coder: NSCoder ) {
-        super.initWithCoder( coder );
-        
-        this._selected = coder.decodeIntegerForKey( "selected" );
+    init(): void {
+        super.init();
+        this._userInteraction = true;
+    }
 
-        this.userInteraction = true;
+    initWithCoder( coder: NSCoder ) {
+        super.initWithCoder( coder );        
+        this._selected = coder.decodeIntegerForKey( "selected" );
+        this._userInteraction = true;
     }
 
     private actionSegue = null;
@@ -69,16 +72,17 @@ export class UIControl extends UIView
     }
 
     protected actionEvents = [];
-    addTarget(target:any, action:any, controlEvents:any /*UIControl.Event */ ){
-        
+    addTarget(target:any, action:any, controlEvents:any /*UIControl.Event */ ){        
+        if (this.userInteraction == false) { return; }
         if (action == null) throw new Error("UIControl: Can't add a null action");
 
-        let item = {};        
+        let item = {};
         item["Target"] = target;
         item["Action"] = action;
         item["EventType"] = controlEvents;
 
         this.actionEvents.addObject( item );
+        this.layer.registerEventAction( this, this.on_event );
 
         // if ( this.layer instanceof CAControlLayer) {
         //     this.layer.registerEventBlock( ( event: any) => {

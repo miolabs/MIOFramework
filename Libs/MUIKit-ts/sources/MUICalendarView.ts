@@ -111,7 +111,7 @@ class MUIDatePickerHeader extends UIView
     }
 
     initWithDelegate( delegate: MUIDatePickerHeaderDelegate ){
-        super.init();      
+        super.init();
         this.delegate = delegate;
         this._setup();
     }
@@ -132,9 +132,7 @@ class MUIDatePickerHeader extends UIView
             this.prevButton.layer.addStyle( "calendar-prev-btn" ); 
             this.navBar.addSubview(this.prevButton); 
         }
-        this.prevButton.addTarget(this, ( control:MUIDatePicker ) => {
-            this.addDateOffset(-1);
-        }, UIControl.Event.touchUpInside );
+        this.prevButton.addTarget(this, this.prev_month_action, UIControl.Event.touchUpInside );
 
         if (this.monthComboBox == null) {
             this.monthComboBox = new MUIComboBox();
@@ -179,10 +177,15 @@ class MUIDatePickerHeader extends UIView
             this.navBar.addSubview(this.nextButton); 
         }
         
-        this.nextButton.addTarget(this, () => {
-            this.addDateOffset( 1 );
-        }, UIControl.Event.touchUpInside );
+        this.nextButton.addTarget(this, this.next_month_action, UIControl.Event.touchUpInside );
+    }
 
+    private prev_month_action( control:UIControl ) {
+        this.addDateOffset( -1 );
+    }
+
+    private next_month_action( control:UIControl ) {
+        this.addDateOffset( 1 );
     }
 
     private date_did_change() {
@@ -200,8 +203,8 @@ class MUIDatePickerHeader extends UIView
     }
 
     private addDateOffset( offset:number ){
-        let m =  this.monthComboBox.selectedItem;
-        let y = this.yearComboBox.selectedItem;
+        let m = parseInt( this.monthComboBox.selectedItem );
+        let y = parseInt( this.yearComboBox.selectedItem );
 
         m += offset;
         if (m < 0) {
@@ -369,7 +372,7 @@ class MUICalendarDaysView extends UIView
         for (let colIndex = lastColIndex+1; colIndex < 7; colIndex++){
             let cell = new CATableCellLayer();
             cell.addStyle( "empty-cell" );
-            lastRow.addSublayer( cell );            
+            lastRow.addSublayer( cell );
         }
     }
     

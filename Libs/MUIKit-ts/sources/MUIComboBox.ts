@@ -11,14 +11,13 @@ export class MUIComboBox extends UIControl
     private _selectedItem = -1;
 
     init(): void {
-        this.layer = new MUIComboBox.layerClass();
-
-        (this.layer as CAComboBoxLayer).setOnChangeBlock( this, this.on_change );
+        super.init();
+        (this.layer as CAComboBoxLayer).setOnChangeBlock( this, this._on_change );
     }
 
     initWithCoder(coder: NSCoder): void {
         super.initWithCoder( coder );
-        (this.layer as CAComboBoxLayer).setOnChangeBlock( this, this.on_change );
+        (this.layer as CAComboBoxLayer).setOnChangeBlock( this, this._on_change );
     }
 
     addItem(title:string, value?:any)
@@ -36,7 +35,7 @@ export class MUIComboBox extends UIControl
         return (this.layer as CAComboBoxLayer).selectedItem;
     }
 
-    private on_change() {
+    private _on_change() {
         this.sendActions( UIControl.Event.valueChanged );
     }
 
@@ -49,8 +48,7 @@ export class MUIComboBox extends UIControl
     //     }
     // }
 
-    removeAllItems()
-    {
+    removeAllItems() {
         (this.layer as CAComboBoxLayer).removeItemLayers();
     }
 
@@ -75,11 +73,11 @@ export class MUIComboBox extends UIControl
     // }
 
 
-    protected on_event( event:any ) {
-        super.on_event( event );
+    // protected on_event( event:any ) {
+    //     super.on_event( event );
         
-        if (event == CALayerEvent.change) {
-            this.sendActions( UIControl.Event.valueChanged );
-        }
-    }
+    //     if (event == CALayerEvent.change) {
+    //         this.sendActions( UIControl.Event.valueChanged );
+    //     }
+    // }
 }
