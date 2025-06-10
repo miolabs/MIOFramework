@@ -132,8 +132,9 @@ export class UIAlertController extends UIViewController
 
         this.tableView = new UITableView();
         this.tableView.init();
-        this.tableView.dataSource = this;
-        this.tableView.delegate = this;
+        // this.tableView.dataSource = this;
+        // this.tableView.delegate = this;
+        
         // this.tableView.layer.style.background = "";
         // this.tableView.layer.style.position = "";
         // this.tableView.layer.style.width = "";
