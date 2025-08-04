@@ -70,6 +70,13 @@ export class CATableLayer extends CALayer
         this.footerLayer = item;
     } 
 
+    newContentView() : UIView {
+        let v = new UIView();
+        v.init();
+        v.layer.contents.classList.add( "table-cell-content" );
+        return v;
+    }
+
     newHeaderView( ) : UIView|null {
         if ( this.headerLayer == null ) return null;
         return this.newViewFromItem( this.headerLayer ) as UIView;

@@ -37,9 +37,7 @@ export class UITableView extends UIView
     initWithCoder( coder: NSCoder ): void {
         super.initWithCoder( coder );
 
-        this.contentView = new UIView();
-        this.contentView.init();
-
+        this.contentView = (this.layer as CATableLayer).newContentView() as UIView;
         this.addSubview( this.contentView );
     }
 
