@@ -3,6 +3,7 @@
 import { UILabel } from "./UILabel";
 import { UIView } from "./UIView";
 import { NSCoder } from "foundation";
+import { CATableCellLayer } from "./CoreAnimation/CATableCellLayer";
 
 
 export enum UITableViewCellStyle 
@@ -42,6 +43,8 @@ export enum UITableViewCellSelectionStyle
 
 export class UITableViewCell extends UIView 
 {
+    static get layerClass() : any { return CATableCellLayer }
+
     reuseIdentifier: string = null;
 
     nodeID: string = null;
@@ -76,15 +79,7 @@ export class UITableViewCell extends UIView
         if (style == UITableViewCellStyle.default) {
             this.textLabel = new UILabel();
             this.textLabel.init();
-            // this.textLabel.layer.style.top = "";
-            // this.textLabel.layer.style.left = "";
-            // this.textLabel.layer.style.width = "";
-            // this.textLabel.layer.style.height = "";
-            // this.textLabel.layer.classList.add("tableviewcell_default_textlabel");
             this.addSubview(this.textLabel);
-            // this.layer.style.height = "44px";
-
-            // MUICoreLayerAddStyle(this.layer, "cell");
         }
 
         this._setupLayer();
@@ -114,50 +109,6 @@ export class UITableViewCell extends UIView
         this._setupLayer();
     }
 
-    private scanLayerNodes(layer, owner) {
-
-        if (layer.childNodes.length == 0) return;
-
-        if (layer.childNodes.length > 0) {
-            for (var index = 0; index < layer.childNodes.length; index++) {
-                var subLayer = layer.childNodes[index];
-
-                if (subLayer.tagName != "DIV")
-                    continue;
-
-                this.scanLayerNodes(subLayer, owner);
-
-                if (subLayer.getAttribute("data-accessory-type") != null) {
-                    this.addAccessoryView(subLayer, owner);
-                }
-
-                if (subLayer.getAttribute("data-editing-accessory-view") != null) {
-                    this.addEditingAccessoryView(subLayer, owner);
-                }
-            }
-        }
-
-    }
-
-        // Check for actions    
-
-    //data-accessory-type="checkmark"
-
-    private addAccessoryView(layer, owner) {
-
-        let type = layer.getAttribute("data-accessory-type");
-
-        this.accessoryView = new UIView();
-        // this.accessoryView.initWithLayer(layer, owner);
-
-        if (type == "checkmark") this.accessoryType = UITableViewCellAccessoryType.checkmark;
-        else this.accessoryType = UITableViewCellAccessoryType.none;
-
-        if (this.accessoryType != UITableViewCellAccessoryType.none) return;
-        
-        // this.accessoryView.layer.addEventListener("click", this.accessoryViewDidClick.bind(this));
-    }
-
     private accessoryViewDidClick(e:Event){
         e.stopPropagation();
         this._onAccessoryClickFn.call(this._target, this);
@@ -165,37 +116,6 @@ export class UITableViewCell extends UIView
 
     private editingAccessoryInsertView:UIView = null;
     private editingAccessoryDeleteView:UIView = null;
-    private addEditingAccessoryView(layer, owner) {
-
-        let type = layer.getAttribute("data-editing-accessory-view");
-        if (type == "insert") {
-            this.editingAccessoryInsertView = new UIView();
-            // this.editingAccessoryInsertView.initWithLayer(layer, owner);
-
-            // this.editingAccessoryInsertView.layer.addEventListener("click", this.editingAccessoryViewDidClick.bind(this));
-        }
-        else if (type == "delete") {
-            this.editingAccessoryDeleteView = new UIView();
-            // this.editingAccessoryDeleteView.initWithLayer(layer, owner);
-
-            // this.editingAccessoryDeleteView.layer.addEventListener("click", this.editingAccessoryViewDidClick.bind(this));
-        }
-        else {
-            this.editingAccessoryView = new UIView();
-            // this.editingAccessoryView.initWithLayer(layer, owner);    
-
-            // this.editingAccessoryView.layer.addEventListener("click", this.editingAccessoryViewDidClick.bind(this));
-        }
-
-        // // TODO: Change for a gesuture recongnizer or something independent of the html
-        // let instance = this;
-        // this.editingAccessoryView.layer.onclick = function (e) {
-        //     if (instance._onAccessoryClickFn != null) {
-        //         e.stopPropagation();
-        //         instance._onAccessoryClickFn.call(instance._target, instance);
-        //     }
-        // };
-    }
 
     private _editingAccessoryType = UITableViewCellEditingStyle.none;
 
@@ -291,32 +211,17 @@ export class UITableViewCell extends UIView
         }
     }
 
-    setSelected(value) {
+    setSelected(value:boolean, animated:boolean) {
         if (this._selected == value) return;
-
-        // WORKAORUND
-        //let fix = this.layer.getClientRects();
-        // WORKAORUND
 
         this.willChangeValue("selected");
         this._selected = value;
-        if (this.selectionStyle == UITableViewCellSelectionStyle.default) {
-            // if (value == true)
-            //     MUICoreLayerAddStyle(this.layer, "selected");
-            // else 
-            //     MUICoreLayerRemoveStyle(this.layer, "selected");
-        }
-        
+        (this.layer as CATableCellLayer).setSelected(value, animated);
         this.didChangeValue("selected"); 
     }
 
-    set selected(value) {
-        this.setSelected(value);
-    }
-
-    get selected() {
-        return this._selected;
-    }
+    set isSelected(value:boolean) { this.setSelected(value, false); }
+    get isSelected() { return this._selected; }
 
     _setHightlightedSubviews(value) {
         for (var count = 0; count < this.subviews.length; count++) {

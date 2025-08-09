@@ -29,28 +29,14 @@ export class CALayer
             this.contents.style.display = "";
     }
     
-    set opacity(opacity:number) {
-        this.contents.style.opacity = String( opacity );
-    }
-
-    get opacity() : number {
-        return Number( this.contents.style.opacity ) ?? 1.0;
-    }
+    set opacity(opacity:number) { this.contents.style.opacity = String( opacity ); }
+    get opacity() : number { return Number( this.contents.style.opacity ) ?? 1.0; }
     
-    set disabled(disabled:boolean) {     
-        this.contents.disabled = disabled;
-    }
+    set disabled(disabled:boolean) { this.contents.disabled = disabled; }
+    get disabled() : boolean { return this.contents.disabled; }
 
-    get disabled() : boolean {
-        return this.contents.disabled;
-    }
-
-    addStyle( style:string ) {
-        this.contents.classList.add( style );
-    }
-    removeStyle( style:string ) {
-        this.contents.classList.remove( style );
-    }    
+    addStyle   ( style:string ) { this.contents.classList.add   ( style ); }
+    removeStyle( style:string ) { this.contents.classList.remove( style ); }    
 
     // private _contents:any;
     // get contents() : any {

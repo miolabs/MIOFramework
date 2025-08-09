@@ -221,7 +221,7 @@ export class UITableView extends UIView
 
         // TODO: Add support for multiple selection
 
-        cell.selected = true;
+        cell.setSelected(true, true);
         if (this.delegate != null && typeof this.delegate.didSelectCellAtIndexPath === "function") {
             this.delegate.didSelectCellAtIndexPath(this, indexPath);
         }                
@@ -242,8 +242,8 @@ export class UITableView extends UIView
         if (canSelectCell == false)
             return;
 
-        if (this.allowsMultipleSelection == false) {                        
-            cell.selected = true;
+        if (this.allowsMultipleSelection == false) {
+            cell.setSelected(true, true);
             if (this.delegate != null && typeof this.delegate.didSelectCellAtIndexPath === "function") {
                 this.delegate.didSelectCellAtIndexPath(this, indexPath);
             }                                        
