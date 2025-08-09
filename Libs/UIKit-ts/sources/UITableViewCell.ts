@@ -2,6 +2,7 @@
 
 import { UILabel } from "./UILabel";
 import { UIView } from "./UIView";
+import { NSCoder } from "foundation";
 
 
 export enum UITableViewCellStyle 
@@ -88,7 +89,7 @@ export class UITableViewCell extends UIView
 
         this._setupLayer();
     }
-
+/*
     initWithLayer(layer, owner, options?) {
         // super.initWithLayer(layer, owner, options);
 
@@ -104,6 +105,12 @@ export class UITableViewCell extends UIView
 
         //MUICoreStoryboardParseLayer(layer, this, owner);
 
+        this._setupLayer();
+    }
+*/
+
+    initWithCoder( coder: NSCoder ) {
+        super.initWithCoder(coder);
         this._setupLayer();
     }
 
@@ -222,22 +229,8 @@ export class UITableViewCell extends UIView
     }
 
     private _setupLayer() {
-        // this.layer.style.position = "relative";        
-        // this.layer.style.top = "";        
+        // this.layer.registerEventAction( this, this._onClickFn );
 
-        // this.layer.addEventListener("click", function(e) {
-        //     e.stopPropagation();            
-        //     this._onClickFn.call(this._target, this);
-        //     this._performSegue();
-        // }.bind(this));
-
-        let instance = this;
-        // this.layer.onclick = function (e) {
-        //     if (instance._onClickFn != null) {
-        //         e.stopPropagation();
-        //         instance._onClickFn.call(instance._target, instance);
-        //     }
-        // };
 
         // this.layer.ondblclick = function (e) {
         //     if (instance._onDblClickFn != null) {

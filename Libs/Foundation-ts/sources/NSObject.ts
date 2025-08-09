@@ -166,9 +166,8 @@ export class NSObject
         
 
     copy() : NSObject {
-        let obj = NSClassFromString(this.className);
+        let obj = NSClassFromString(this.className);        
         obj.init();
-        
         return obj;
     }
 

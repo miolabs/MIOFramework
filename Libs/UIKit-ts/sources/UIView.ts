@@ -4,7 +4,7 @@
 
 import { NSCoder } from "foundation";
 import { MIOCoreClassByName } from "mio-core";
-import { UICoreNibCoder } from "./core/UICoreNibParser";
+import { UICoreNibCoder, UICoreNibCopy } from "./core/UICoreNibParser";
 import { CALayer, CALayerEvent } from "./CoreAnimation/CALayer";
 import { CGRect } from "./CoreGraphics/CGRect";
 import { UIColor } from "./UIColor";
@@ -219,6 +219,10 @@ export class UIView extends UIResponder
     // layerWithItemID(itemID) {
     //     return MUICoreLayerSearchElementByID(this.layer, itemID);
     // }
+
+    copy() {        
+        return UICoreNibCopy( this.layer.contents );
+    }
 
     private _hidden: boolean = false;
     setHidden(hidden: boolean) {

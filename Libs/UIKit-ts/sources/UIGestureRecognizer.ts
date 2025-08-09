@@ -28,7 +28,7 @@ export class UIGestureRecognizer extends NSObject
     
     private target = null;
     private block = null;
-    initWithTarget(target, block){
+    initWithTarget(target:any, block:any){
         super.init();
 
         this.target = target;

@@ -1,6 +1,7 @@
 import { IndexPath, NSCoder } from "foundation";
 import { UIGestureRecognizer, UIGestureRecognizerState } from "./UIGestureRecognizer";
-import { UITableViewCell } from "./UITableViewCell";
+import { UITapGestureRecognizer } from "./UITapGestureRecognizer";
+import { UITableViewCell, UITableViewCellSelectionStyle } from "./UITableViewCell";
 import { UIView } from "./UIView";
 import { CATableLayer } from "./CoreAnimation/CATableLayer";
 
@@ -54,7 +55,7 @@ export class UITableView extends UIView
 
     private addSectionHeader(section:number){
         let header = null;
-        if (typeof this.dataSource.viewForHeaderInSection === "function") header = this.dataSource[0].viewForHeaderInSection(this, section) as UIView;
+        if (typeof this.dataSource.viewForHeaderInSection === "function") header = this.dataSource.viewForHeaderInSection(this, section) as UIView;
         if (header == null) return;
         header.hidden = false;
         this.contentView.addSubview(header);
@@ -91,14 +92,17 @@ export class UITableView extends UIView
             section.addObject(cell);
         }        
 
-        cell._target = this;
-        cell._onClickFn = this.cellOnClickFn;
+        if (cell.selectionStyle != UITableViewCellSelectionStyle.none) {
+            let tapGesture = new UITapGestureRecognizer();
+            tapGesture.initWithTarget(this, this.cellDidTap.bind(this));
+            cell.addGestureRecognizer( tapGesture );
+        }
         //cell._onDblClickFn = this.cellOnDblClickFn;
         //cell._onAccessoryClickFn = this.cellOnAccessoryClickFn;
         cell._onEditingAccessoryClickFn = this.cellOnEditingAccessoryClickFn;
     }
 
-    private removeCell(indexPath){        
+    private removeCell(indexPath:IndexPath){        
         let section = this.sections[indexPath.section];
         let cell = section[indexPath.row];
         
@@ -124,15 +128,20 @@ export class UITableView extends UIView
         return IndexPath.indexForRowInSection(0, sectionIndex);
     }
 
-    private addSectionFooter(section){
+    private addSectionFooter(section:number){
 
     }
 
     reloadData(){
-        // Remove all subviews
-        for (let index = 0; index < this.rows.length; index++) {
-            let row = this.rows[index];
-            row.removeFromSuperview();                            
+        // // Remove all subviews
+        // for (let index = 0; index < this.rows.length; index++) {
+        //     let row = this.rows[index];
+        //     row.removeFromSuperview();                            
+        // }
+
+        for (let i = this.contentView.subviews.length - 1; i >= 0; i--) {
+            let subview = this.contentView.subviews[i];
+            subview.removeFromSuperview();
         }
 
         this.rows = [];        
@@ -144,7 +153,7 @@ export class UITableView extends UIView
         let sections = 1;
         if (typeof this.dataSource.numberOfSections === "function") sections = this.dataSource.numberOfSections(this);
         
-        for (let sectionIndex = 0; sectionIndex < sections; sectionIndex++) {            
+        for (let sectionIndex = 0; sectionIndex < sections; sectionIndex++) {
             let section = [];                                    
             this.sections.push(section);
             
@@ -162,14 +171,14 @@ export class UITableView extends UIView
         }
     }
 
-    insertRowsAtIndexPaths(indexPaths, rowAnimation){
+    insertRowsAtIndexPaths(indexPaths:IndexPath[], rowAnimation){
         for (let index = 0; index < indexPaths.length; index++){
             let ip = indexPaths[index];
             this.addCell(ip);
         }        
     }
 
-    deleteRowsAtIndexPaths(indexPaths, rowAnimation){
+    deleteRowsAtIndexPaths(indexPaths:IndexPath[], rowAnimation){
         for (let index = 0; index < indexPaths.length; index++){
             let ip = indexPaths[index];
             this.removeCell(ip);
@@ -199,10 +208,24 @@ export class UITableView extends UIView
         let sectionIndex = this.sections.indexOf(section);
         let rowIndex = section.indexOfObject(cell);
         
-        if (this.delegate != null && typeof this.delegate.didSelectCellAtIndexPath === "function") {
-            this.delegate.didSelectCellAtIndexPath(this, IndexPath.indexForRowInSection(rowIndex, sectionIndex));
-        }                
+        let indexPath = IndexPath.indexForRowInSection(rowIndex, sectionIndex);
 
+        let canSelectCell = true;
+
+        if (this.delegate != null) {
+            if (typeof this.delegate.canSelectCellAtIndexPath === "function")
+                canSelectCell = this.delegate.canSelectCellAtIndexPath(this, indexPath);
+        }
+
+        if (canSelectCell == false) return;
+
+        // TODO: Add support for multiple selection
+
+        cell.selected = true;
+        if (this.delegate != null && typeof this.delegate.didSelectCellAtIndexPath === "function") {
+            this.delegate.didSelectCellAtIndexPath(this, indexPath);
+        }                
+        
     }
 
     private cellOnClickFn(cell: UITableViewCell) {

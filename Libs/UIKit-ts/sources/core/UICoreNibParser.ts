@@ -159,7 +159,11 @@ export class UICoreNibParser extends NSObject implements MIOCoreHTMLParserDelega
     
 }
 
-// 
+export function UICoreNibCopy( contents:any ) : UIView | UIViewController {
+    let new_contents = contents.cloneNode(true);
+    new_contents.removeAttribute("id");
+    return parse_element( new_contents, null );
+}
 
 export function UICoreNibLoad( contents:any, owner:any ) {
     parse_root_element( contents, owner );
