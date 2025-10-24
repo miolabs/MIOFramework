@@ -38,6 +38,7 @@ export class NumberFormatter extends Formatter
 
         switch(this.locale.region){
             case "US":
+            case "CA":
             this.currencyHasSpaces = false;
             this.currencyIsRight = false;
             break;
@@ -66,15 +67,15 @@ export class NumberFormatter extends Formatter
         return null;
     }
 
-    stringFrom(number:NSNumber):string {
+    stringFromNumber(number:number|NSNumber):string {
         // return _injectIntoOptional(this.stringForObjectValue(number));//TODO automatically refactor function results
-        return this.stringForObjectValue(number);//TODO automatically refactor function results
+        if(number instanceof NSNumber) return this.stringForObjectValue(number);
+        return this.stringForObjectValue( NSNumber.numberWithFloat( number ) );//TODO automatically refactor function results
     }
 
-    stringForObjectValue(value):string {
+    stringForObjectValue(value:any):string {
         
-        let number = value as NSNumber;
-        if(number == null) number = NSNumber.numberWithFloat(0);
+        let number = value != null && value instanceof NSNumber ? value as NSNumber : NSNumber.numberWithFloat(0);
         let str = number.floatValue.toString();
         let intValue = null;
         let floatValue = null;
