@@ -35,6 +35,7 @@ export * from "./UILabel"
 export * from "./UIButton"
 export * from "./UICheckButton"
 export * from "./UISegmentedControl"
+export * from "./UIImageView"
 
 export * from "./UICollectionView"
 export * from "./UICollectionViewLayout"
