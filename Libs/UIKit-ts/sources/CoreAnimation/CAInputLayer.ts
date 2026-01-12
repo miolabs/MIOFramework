@@ -5,15 +5,16 @@ import { CALayer, CALayerDelegate } from "./CALayer";
 
 export class CAInputLayer extends CALayer 
 {        
-    private inputElement:any;
+    private _inputElement:any;
+    get inputElement(){ return this._inputElement; }
 
     constructor( contents?:any ){
         super( contents );
-        this.inputElement = _UICoreLayerGetFirstElementWithTag( contents, "INPUT") ?? document.createElement("INPUT");
+        this._inputElement = _UICoreLayerGetFirstElementWithTag( contents, "INPUT") ?? document.createElement("INPUT");
 
         const placeholderKey = contents.getAttribute("data-placeholder");
         if (placeholderKey != null)
-            this.inputElement.setAttribute( "placeholder", NSLocalizeString( placeholderKey, placeholderKey ) );
+            this._inputElement.setAttribute( "placeholder", NSLocalizeString( placeholderKey, placeholderKey ) );
         
         // this.element.addEventListener("input", this.on_input);
         // this.element.addEventListener("click", this.on_click);
@@ -23,11 +24,11 @@ export class CAInputLayer extends CALayer
 
     set string( text: string|null ) {
         let newValue = text != null ? text : "";
-        this.inputElement.value = newValue;
+        this._inputElement.value = newValue;
     }
 
     get string(){
-        return this.inputElement.value;
+        return this._inputElement.value;
     }
 
     set placeHolderText( text:string ) { this.contents.setAttribute( "placeholder", text ); }
@@ -38,15 +39,15 @@ export class CAInputLayer extends CALayer
         if ( block == null && this._onChangeBlock != null ) {
             // Remove callback
             this._onChangeBlock = null;
-            this.inputElement.removeEventListener( "input", this.on_input.bind(this) );
+            this._inputElement.removeEventListener( "input", this.on_input.bind(this) );
         }
         else if ( block != null ) {
             this._onChangeBlock = block;
-            this.inputElement.addEventListener( "input", this.on_input.bind(this) );
+            this._inputElement.addEventListener( "input", this.on_input.bind(this) );
         }
     }
     private on_input() {
-        this._onChangeBlock( this.inputElement.value );
+        this._onChangeBlock( this._inputElement.value );
     }
 
     private on_focus() {
