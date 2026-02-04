@@ -16,10 +16,12 @@ export class UITextArea extends UIControl
 
     static get layerClass(): any { return CATextAreaLayer; }
 
+    /*
     initWithCoder(coder: NSCoder): void {
         super.initWithCoder( coder );
         // (this.layer as CATextAreaLayer).onChangeBlock = ( value:string ) => { this._textDidChange( value ); }
     }
+    */
 
     setText( text:string ) { this.text = text; }    
     get text(){ return (this.layer as CATextAreaLayer).string; }
@@ -29,6 +31,7 @@ export class UITextArea extends UIControl
         this.textareaLayer.disabled = !value;
     }
 
+    /*
     setOnChangeText(target:any, action:any){
         this.textChangeTarget = target;
         this.textChangeAction = action;
@@ -41,4 +44,5 @@ export class UITextArea extends UIControl
             }
         });
     }
+    */
 }
