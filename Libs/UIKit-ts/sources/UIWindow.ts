@@ -118,7 +118,8 @@ export class UIWindow extends UIView
 export class _UIModalWindow extends UIWindow
 {
     init() {
-        super.init();
-        this.layer.addStyle( MIOCoreIsMobile() ? "mobile-modal" : "desktop-modal" );
+        super.init();        
+        this.layer.addStyle( "modal" );
+        this.layer.addStyle( MIOCoreIsMobile() ? "mobile" : "desktop" );
     }
 }
