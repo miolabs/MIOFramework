@@ -31,9 +31,10 @@ export class UITextArea extends UIControl
         this.textareaLayer.disabled = !value;
     }
 
-    /*
+    
     setOnChangeText(target:any, action:any){
-        this.textChangeTarget = target;
+    
+    /*    this.textChangeTarget = target;
         this.textChangeAction = action;
         var instance = this;
 
@@ -43,6 +44,6 @@ export class UITextArea extends UIControl
                 instance.textChangeAction.call(target, instance, value);
             }
         });
+        */
     }
-    */
 }
