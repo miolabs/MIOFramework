@@ -26,15 +26,11 @@ export class UIButton extends UIControl
     private _imageStatusStyle = null;
     private _imageLayer = null;
     
-    type = UIButtonType.MomentaryPushIn;
+    private _type = UIButtonType.MomentaryPushIn;
+    get type():UIButtonType { return this._type; }
+    set type(value:UIButtonType) { this._type = value; }
     
     static get layerClass() : any { return CAButtonLayer }
-
-    initWithFrame(frame: CGRect) {
-        super.initWithFrame(frame);
-        // MUICoreLayerAddStyle(this.layer, "btn");
-        // this.setupLayers();
-    }
 
     initWithCoder( coder: NSCoder ) {
         super.initWithCoder( coder );
@@ -74,11 +70,11 @@ export class UIButton extends UIControl
     //
 
     setTitle(title:string){
-        (this.layer as CAButtonLayer).string = title;
+        (this.layer as CAButtonLayer).title = title;
     }
 
     set title(title){ this.setTitle( title ); }
-    get title() { return (this.layer as CAButtonLayer).string; }
+    get title() { return (this.layer as CAButtonLayer).title; }
 
     setTitleColorFor(color: UIColor) {
         this._titleLayer.style.color = "#" + color.hex;

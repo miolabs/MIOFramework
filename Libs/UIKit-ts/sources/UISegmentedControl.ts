@@ -18,27 +18,6 @@ export class UISegmentedControl extends UIControl
         };        
     }
 
-    // initWithLayer(layer, owner, options?){
-    //     // super.initWithLayer(layer, owner, options);
-
-    //     // for (let index = 0; index < this.layer.childNodes.length; index++){
-    //     //     let itemLayer = this.layer.childNodes[index];
-    //     //     if (itemLayer.tagName == "DIV"){
-    //     //         let si = new UIButton();
-    //     //         // si.initWithLayer(itemLayer, owner);
-    //     //         si.type = UIButtonType.PushIn;
-    //     //         this._addSegmentedItem(si);
-    //     //         // MUIOutletRegister(owner, si.layerID, si);
-    //     //     }
-    //     // }
-
-    //     if (this.segmentedItems.length > 0){
-    //         let item = this.segmentedItems[0];
-    //         item.setSelected(true);
-    //         this.selectedSegmentIndex = 0;
-    //     }
-    // }
-
     private _addSegmentedItem( item:UIButton ){        
         item.addTarget( this, this._didClickSegmentedButton, UIControl.Event.allTouchEvents );
         if (item.selected) this.selectedSegmentIndex = this.segmentedItems.count;
@@ -64,6 +43,15 @@ export class UISegmentedControl extends UIControl
         if ( index == -1 ) return;
 
         let item = this.segmentedItems[ this.selectedSegmentIndex ];
-        item.setSelected(true);        
+        item.setSelected(true);                     
+    }
+
+    insertSegmentedItemWithTitle( title: string|null, atIndex: number, animated:boolean ){
+        let item = new UIButton();
+        item.init();
+        item.type = UIButtonType.PushIn;
+        item.title = title;
+        this.addSubview( item );
+        this._addSegmentedItem( item );        
     }
 }

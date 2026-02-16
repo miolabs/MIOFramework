@@ -5,15 +5,14 @@ import { CATextLayer } from "./CATextLayer";
 
 export class CAButtonLayer extends CALayer
 {   
-    private textLayer:CATextLayer;
     private imageLayer:CALayer;
 
     constructor( contents?:any ) {
         super( contents );
-        this.textLayer = new CATextLayer( contents );
+        if (contents == null) this.addStyle( "button" );
     }
 
-    set string(title:string) { this.textLayer.string = title; }
-    get string() { return this.textLayer.string; }
+    set title(title:string) { this.contents.innerHTML = title; }
+    get title() { return this.contents.innerHTML; }
 
 }
