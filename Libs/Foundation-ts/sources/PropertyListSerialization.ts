@@ -118,10 +118,13 @@ export class PropertyListSerialization extends NSObject
         if (element == "key") {
             this.currentKey = this.currentString;            
         }
-        else if (element == "string" || element == "integer" || element == "real" || element == "data") {
+        else if (element == "string" || element == "true" || element == "false" || element == "integer" || element == "real" || element == "data") {
             this.currentValue = this.currentString;
-            if (element == "integer") this.currentValue = parseInt(this.currentString);
-            if (element == "real") this.currentValue = parseFloat(this.currentString);
+            if (element == "true") this.currentValue = true;
+            else if (element == "false") this.currentValue = false;
+            else if (element == "integer") this.currentValue = parseInt(this.currentString);
+            else if (element == "real") this.currentValue = parseFloat(this.currentString);
+
             if (this.currentElementType == 1) this.currentElement.push(this.currentValue);
             else if (this.currentElementType == 0 && this.currentKey != null){
                 let key = this.currentKey;
