@@ -78,7 +78,7 @@ export class UIView extends UIResponder
         super.initWithCoder( coder );        
         if ( coder instanceof UICoreNibCoder ) {
             let c = MIOCoreClassByName( this.className );
-            this.layer = new c.layerClass( coder.layerContents );
+            this.layer = new c.layerClass( coder.layerContents, coder.scripts );
             this._subviews = coder.decodeSubviews();
             // Custom properties
             this.tag = coder.decodeIntegerForKey( "tag" );

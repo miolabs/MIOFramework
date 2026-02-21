@@ -16,10 +16,12 @@ export class CALayer
 
     _layerID: string|null = null;
     contents:any;
+    scripts:string[] = [];
 
-    constructor( contents?:any ) {
+    constructor( contents?:any, sctipts?:string[] ) {
         this.contents = contents ?? document.createElement('div');
         this._layerID = contents?.getAttribute( "id" );        
+        this.scripts = sctipts ?? [];
     }
             
     set isHidden(value:boolean) {
@@ -59,6 +61,14 @@ export class CALayer
         // HTML Stuff
         this.contents.appendChild( layer.contents );
         layer._isLayerInDOM = true;
+
+        // Execute scripts
+        for (let url of layer.scripts) {
+            let s = document.createElement('script');
+            s.setAttribute('type', 'text/javascript');
+            s.setAttribute('src', url);
+            document.head.appendChild(s);
+        }
     }    
 
     removeFromSuperlayer(){

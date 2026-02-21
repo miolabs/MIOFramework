@@ -40,6 +40,8 @@ export class UICoreNibParser extends NSObject implements MIOCoreHTMLParserDelega
     private layerID = null;
     private rootClassname = null;
 
+    private scripts = [];
+
     parseString(data:string, owner:any){
         let parser = new MIOCoreHTMLParser();
         parser.initWithString(data, this);
@@ -50,7 +52,7 @@ export class UICoreNibParser extends NSObject implements MIOCoreHTMLParserDelega
         let items = domParser.parseFromString(this.result, "text/html");
         let contents = items.getElementById(this.layerID);
 
-        parse_root_element( contents, owner );
+        parse_root_element( contents, owner, this.scripts );
     }
 
     //
@@ -63,7 +65,11 @@ export class UICoreNibParser extends NSObject implements MIOCoreHTMLParserDelega
     // HTML Parser delegate
     parserDidStartElement(parser:MIOCoreHTMLParser, element:string, attributes){
         
-        if (element.toLocaleLowerCase() == "div"){
+        if (element.toLocaleLowerCase() == "script") {
+            if (attributes["src"] != null) this.scripts.addObject( attributes["src"] );
+            return;
+        }
+        else if (element.toLocaleLowerCase() == "div"){
             
             if (attributes["data-root-view-controller"] == "true") {
                 // Start capturing   
@@ -74,7 +80,7 @@ export class UICoreNibParser extends NSObject implements MIOCoreHTMLParserDelega
             }
         }
 
-        if (this.isCapturing == true) {            
+        if (this.isCapturing == true) {
             this.openTag(element, attributes);
             this.elementCapturingCount++;
         }
@@ -114,7 +120,8 @@ export class UICoreNibParser extends NSObject implements MIOCoreHTMLParserDelega
 
     parserDidEndDocument(parser:MIOCoreHTMLParser){
         console.log("html parser finished");
-        console.log(this.result);        
+        console.log(this.result);     
+        console.log(this.scripts);   
     }
 
     private openTag(element, attributes){
@@ -169,10 +176,10 @@ export function UICoreNibLoad( contents:any, owner:any ) {
     parse_root_element( contents, owner );
 }
 
-function parse_root_element( contents:any, owner:any )
+function parse_root_element( contents:any, owner:any, scripts?:string[] )
 {
     let coder = new UICoreNibCoder();
-    coder.initWithContents( contents, owner, {} );
+    coder.initWithContents( contents, owner, {}, scripts );
 
     owner.initWithCoder( coder );
 }
@@ -192,7 +199,7 @@ function parse_element( contents:any, coder:UICoreNibCoder ) : UIView | UIViewCo
     if ( outlet_id != null) outlets[ outlet_id ] = obj;
 
     let new_coder = new UICoreNibCoder();
-    new_coder.initWithContents( contents, obj, outlets );
+    new_coder.initWithContents( contents, obj, outlets, coder?.scripts || [] );
 
     obj.initWithCoder( new_coder );
 
@@ -254,13 +261,15 @@ export class UICoreNibCoder extends NSCoder
 {    
     owner:object;    
     outlets: object;
+    scripts: string[];
 
     private contents: any;
 
-    initWithContents(contents:any, owner: object, outlets: object ) {
+    initWithContents(contents:any, owner: object, outlets: object, scripts?:string[] ) {
         this.contents = contents;
         this.owner = owner;
-        this.outlets = outlets;        
+        this.outlets = outlets;
+        this.scripts = scripts ?? [];
     }
 
     decodeBoolForKey(key:string):any {
