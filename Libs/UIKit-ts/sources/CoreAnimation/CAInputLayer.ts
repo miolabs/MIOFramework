@@ -40,10 +40,12 @@ export class CAInputLayer extends CALayer
             // Remove callback
             this._onChangeBlock = null;
             this._inputElement.removeEventListener( "input", this.on_input.bind(this) );
+            this._inputElement.removeEventListener( "change", this.on_input.bind(this) );
         }
         else if ( block != null ) {
             this._onChangeBlock = block;
             this._inputElement.addEventListener( "input", this.on_input.bind(this) );
+            this._inputElement.addEventListener( "change", this.on_input.bind(this) );
         }
     }
     private on_input() {
