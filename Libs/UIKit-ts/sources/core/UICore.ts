@@ -14,7 +14,7 @@ export function MUIWindowSize()
     return new CGSize(w, h);
 }
 
-export function _UIShowViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC: UIViewController, animated:boolean, completion?:any)
+export function _UIShowViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, animated:boolean, completion?:any)
 {
     toVC.viewWillAppear( animated );
     //toVC._childControllersWillAppear();
@@ -85,7 +85,7 @@ export function _UICoreAnimationDidStart(fromVC:UIViewController, toVC:UIViewCon
     if ( completion != null ) completion();
 }
 
-export function _UICoreHideViewController( fromVC:UIViewController, toVC:UIViewController, sourceVC:UIViewControllerTransitioningDelegate, completion?:any )
+export function _UICoreHideViewController( fromVC:UIViewController, toVC:UIViewController, sourceVC, completion?:any )
 {
     if (fromVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
         || fromVC.modalPresentationStyle == UIModalPresentationStyle.currentContext
