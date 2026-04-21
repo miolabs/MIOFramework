@@ -37,6 +37,8 @@ export * from "./UIButton"
 export * from "./UICheckButton"
 export * from "./UISegmentedControl"
 export * from "./UIImageView"
+export * from "./UISearchBar"
+export * from "./UIActivityIndicatorView"
 
 export * from "./UICollectionView"
 export * from "./UICollectionViewLayout"
@@ -45,3 +47,4 @@ export * from "./UICollectionViewUpdateItem"
 
 export * from "./UITableView"
 export * from "./UITableViewCell"
+export * from "./UITableViewController"

@@ -18,10 +18,10 @@ export class CALayer
     contents:any;
     scripts:string[] = [];
 
-    constructor( contents?:any, sctipts?:string[] ) {
+    constructor( contents?:any, scripts?:string[] ) {
         this.contents = contents ?? document.createElement('div');
         this._layerID = contents?.getAttribute( "id" );        
-        this.scripts = sctipts ?? [];
+        this.scripts = scripts ?? [];
     }
             
     set isHidden(value:boolean) {

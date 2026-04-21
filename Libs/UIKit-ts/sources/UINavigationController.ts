@@ -12,16 +12,17 @@ import { UINavigationItem } from "./UINavigationItem";
 import { UIView } from "./UIView";
 import { UIViewController } from "./UIViewController";
 import { UIViewControllerTransitioningDelegate } from "./CoreAnimation/CoreAnimation";
+import { _CAAnimationType, _CAClassListForAnimationType } from "./_index";
 
 
 export class UINavigationController extends UIViewController implements UIViewControllerTransitioningDelegate
 {
-    rootViewController:UIViewController = null;
-    viewControllersStack = [];
+    rootViewController:UIViewController|null = null;
+    viewControllersStack:UIViewController[] = [];
     currentViewControllerIndex = -1;
     
-    private _navigationBar:UINavigationBar = null;
-    get navigationBar():UINavigationBar {
+    private _navigationBar:UINavigationBar|null = null;
+    get navigationBar():UINavigationBar|null {
         return this._navigationBar;
     }
 
@@ -30,9 +31,15 @@ export class UINavigationController extends UIViewController implements UIViewCo
         // this.view.layer.style.overflow = "hidden";        
     }
 
-    initWithRootViewController(vc:UIViewController){        
+    viewDidLoad(): void {
+        super.viewDidLoad();
+        //TODO: Move to CANavigationLayer
+        this.view.layer.addStyle("navigation_view");
+    }
+
+    initWithRootViewController(vc:UIViewController){
+        this.setRootViewController(vc);
         this.init();
-        this.setRootViewController(vc);        
     }
 
     setRootViewController(vc:UIViewController){
@@ -69,7 +76,8 @@ export class UINavigationController extends UIViewController implements UIViewCo
         this._didLoadView();
     }
 
-    protected _setViewLoaded(value) {                
+    protected _setViewLoaded(value:boolean) {    
+        if (this.rootViewController == null) return;            
         // this.rootViewController.view.layer.style.left = "0px";
         // this.rootViewController.view.layer.style.top = "44px";
         // this.rootViewController.view.layer.style.width = "100%";
@@ -77,36 +85,36 @@ export class UINavigationController extends UIViewController implements UIViewCo
         this.view.addSubview(this.rootViewController.view);
         
         let navItems = [this.rootViewController.navigationItem];
-        this._navigationBar.setItems(navItems, false);
+        this._navigationBar?.setItems(navItems, false);
 
         super._setViewLoaded(value);
     }
 
-    viewWillAppear(animated?:boolean){
+    viewWillAppear(animated:boolean){
         if (this.currentViewControllerIndex < 0) return;
         let vc = this.viewControllersStack[this.currentViewControllerIndex];
         vc.viewWillAppear(animated);
     }
 
-    viewDidAppear(animated?){
+    viewDidAppear(animated:boolean){
         if (this.currentViewControllerIndex < 0) return;
         let vc = this.viewControllersStack[this.currentViewControllerIndex];
         vc.viewDidAppear(animated);
     }
 
-    viewWillDisappear(animated?){
+    viewWillDisappear(animated:boolean){
         if (this.currentViewControllerIndex < 0) return;
         let vc = this.viewControllersStack[this.currentViewControllerIndex];
         vc.viewWillDisappear(animated);
     }
 
-    viewDidDisappear(animated?){
+    viewDidDisappear(animated:boolean){
         if (this.currentViewControllerIndex < 0) return;
         let vc = this.viewControllersStack[this.currentViewControllerIndex];
         vc.viewDidDisappear(animated);
     }
 
-    pushViewController(vc:UIViewController, animated?:boolean){
+    pushViewController(vc:UIViewController, animated:boolean){
         let lastVC = this.viewControllersStack[this.currentViewControllerIndex];
 
         this.viewControllersStack.push(vc);
@@ -169,7 +177,7 @@ export class UINavigationController extends UIViewController implements UIViewCo
         });
     }
 
-    popToRootViewController(animated?:boolean){
+    popToRootViewController(animated:boolean){
         if(this.viewControllersStack.length == 1) return;
         
         let currentVC = this.viewControllersStack.pop();
@@ -271,10 +279,9 @@ export class MUIPushAnimationController extends NSObject
 
     // TODO: Not iOS like transitions. For now we use css animations
     animations(transitionContext){
-        // let animations = MUIClassListForAnimationType(MUIAnimationType.Push);
-        // return animations;
+        const animations = _CAClassListForAnimationType ( _CAAnimationType.Push );
+        return animations;
     }
-
 }
 
 export class MUIPopAnimationController extends NSObject
@@ -293,8 +300,8 @@ export class MUIPopAnimationController extends NSObject
 
     // TODO: Not iOS like transitions. For now we use css animations
     animations(transitionContext){
-        // let animations = MUIClassListForAnimationType(MUIAnimationType.Pop);
-        // return animations;
+        const animations = _CAClassListForAnimationType ( _CAAnimationType.Pop );
+        return animations;
     }
 
 }

@@ -14,15 +14,15 @@ export function MUIWindowSize()
     return new CGSize(w, h);
 }
 
-export function _UIShowViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC, animated:boolean, completion?:any)
+export function _UIShowViewController(fromVC:UIViewController, toVC:UIViewController, sourceVC: UIViewController, animated:boolean, completion?:any)
 {
-    toVC.viewWillAppear( false );
+    toVC.viewWillAppear( animated );
     //toVC._childControllersWillAppear();
 
     if (toVC.modalPresentationStyle == UIModalPresentationStyle.fullScreen
         || toVC.modalPresentationStyle == UIModalPresentationStyle.currentContext) {
 
-        fromVC.viewWillDisappear( false );
+        fromVC.viewWillDisappear( animated );
         //fromVC._childControllersWillDisappear();
     }
 

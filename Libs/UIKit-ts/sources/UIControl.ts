@@ -60,7 +60,7 @@ export class UIControl extends UIView
 
                     let segue = new UIStoryboardSegue();                
                     segue.initWithIdentifierAndPerformHandler(identifier, fromVC, toVC, function(){
-                        fromVC.navigationController.pushViewController(toVC);
+                        fromVC.navigationController.pushViewController(toVC, true);
                     });           
                     
                     segue._sender = this;

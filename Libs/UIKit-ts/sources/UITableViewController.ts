@@ -4,7 +4,7 @@ import { UIViewController } from "./UIViewController";
 
 export class UITableViewController extends UIViewController implements UITableViewDatasource, UITableViewDelegate
 {
-    tableView:UITableView = null;
+    tableView:UITableView|null = null;
 
     viewDidLoad(){
       super.viewDidLoad();
@@ -14,10 +14,10 @@ export class UITableViewController extends UIViewController implements UITableVi
       this.tableView.delegate = this;
     }
 
-    viewWillAppear(animated?:boolean){
+    viewWillAppear(animated:boolean){
       super.viewWillAppear(animated);
 
-      this.tableView.reloadData();
+      this.tableView?.reloadData();
     }
 
     // UITableViewDataSource required methods
